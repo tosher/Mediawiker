@@ -1,0 +1,24 @@
+[
+    {
+        "caption": "Mediawiker: Get page",
+        "command": "mediawiker_page",
+        "args": {"goto": "mediawiker_show_page"}
+    },
+    {
+        "caption": "Mediawiker: Publish page",
+        "command": "mediawiker_page",
+        "args": {"goto": "mediawiker_publish_page"}
+    },
+    {
+        "caption": "Mediawiker: Select page from history",
+        "command": "mediawiker_page_list"
+    },
+    {
+        "caption": "Mediawiker: Show TOC",
+        "command": "mediawiker_show_toc"
+    },
+    {
+        "caption": "Mediawiker: Change active site",
+        "command": "mediawiker_set_active_site"
+    }
+]

@@ -1,0 +1,13 @@
+{
+    "mediawiki_site":
+    {
+        "English wikipedia": { "host": "en.wikipedia.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "" },
+        "Russian wikipedia": { "host": "ru.wikipedia.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "" },
+        "Mediawiki": { "host": "www.mediawiki.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "" }
+    },
+    "mediawiki_site_active": "English wikipedia",
+    "mediawiker_summary_postfix": " (by SublimeText.Mediawiker)",
+    "mediawiker_clipboard_as_defaultpagename": false,
+    "mediawiker_newtab_ongetpage": true,
+    "mediawiker_pagelist_maxsize": 100
+}

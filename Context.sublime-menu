@@ -1,0 +1,27 @@
+[
+    {
+        "caption": "Mediawiker",
+        "children":
+        [
+            {
+                "command": "mediawiker_page", "caption": "Get page", "args": {"goto": "mediawiker_show_page"}
+            },
+            {
+                "command": "mediawiker_page_list", "caption": "Select page from history"
+            },
+            {
+                "command": "mediawiker_page", "caption": "Publish page", "args": {"goto": "mediawiker_publish_page"}
+            },
+            {
+                "command": "mediawiker_show_toc", "caption": "Show TOC"
+            },
+            {
+                "command": "mediawiker_set_active_site", "caption": "Change active site"
+            },
+            {
+                "command": "mediawiker_open_page_in_browser", "caption": "Open page in browser"
+            }
+
+        ]
+    }
+]
