@@ -58,10 +58,10 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 - Use **Show TOC** option for show table of contents of the current page and to move by page headers.
  - *Alt+F2*
  - *Context menu:Mediawiker:Show TOC*
--Use **Change active site** to set your current wiki site.
+- Use **Change active site** to set your current wiki site.
  - *Alt+F3*
  - *Context menu:Mediawiker:Change active site*
--Use **Open page in browser** to open current page in web-browser.
+- Use **Open page in browser** to open current page in web-browser.
  - *Alt+F5*
  - *Context menu:Mediawiker:Open page in browser*
 - Check status messages while using the plugin.
