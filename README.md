@@ -48,6 +48,7 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
  - *Alt+F4*
  - *Context menu:Mediawiker:Get page*
  - *Main menu:File:Mediawiker:Get page*
+- Use clear page name or page url as a wiki page name.
 - Use **Publish Page** option for publishing pages. When you publish a page, the name of the page will be saved to history.
  - *Alt+F7*
  - *Context menu:Mediawiker:Publish page*
