@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Mediawiker by tosher</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Mediawiker</h1>
+          <h2>Sublime Text 2 plugin: Mediawiker</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/tosher/Mediawiker/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/tosher/Mediawiker/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/tosher/Mediawiker" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>Sublime Text 2 plugin: Mediawiker</h1>
+
+<p>Mediawiker is a plugin for Sublime Text 2 editor that adds possibility to create and edit pages on <a href="http://mediawiki.org">Mediawiki</a> based sites.</p>
+
+<p>Warning! It was tested on the latest windows release build of Sublime Text 2 and some Mediawiki sites. No guarantees here!</p>
+
+<h2>Features</h2>
+
+<ul>
+<li>Connection to existing mediawiki based site through the use of <a href="http://sourceforge.net/apps/mediawiki/mwclient/index.php?title=Main_Page">mwclient library</a> .</li>
+<li>New pages creation / existing pages edition and publishing to wiki.</li>
+<li>Possibility to open pages from history-list of published pages.</li>
+<li>TOC (table of contents) menu of the page edited to move by page headers.</li>
+<li>Syntax highlighting from <a href="https://github.com/textmate/mediawiki.tmbundle">Textmate Mediawiki bundle</a> (included).</li>
+</ul><h2>Install</h2>
+
+<h3>Package Control (not available now!)</h3>
+
+<p>The easiest way to install this is with <a href="http://wbond.net/sublime_packages/package_control">Package Control</a>.</p>
+
+<ul>
+<li>If you just went and installed Package Control, you probably need to restart Sublime Text 2 before doing this next bit.</li>
+<li>Bring up the Command Palette (Command+Shift+p on OS X, Control+Shift+p on Linux/Windows).</li>
+<li>Select "Package Control: Install Package" (it'll take a few seconds)</li>
+<li>Select Mediawiker when the list appears.</li>
+</ul><p>Package Control will automatically keep Mediawiker up to date with the latest version.</p>
+
+<h3>Other methods</h3>
+
+<p>First find your Sublime Text 2 Packages folder:</p>
+
+<pre><code>- OS X: ~/Library/Application Support/Sublime Text 2/Packages/
+- Windows: %APPDATA%/Sublime Text 2/Packages/
+- Linux: ~/.Sublime Text 2/Packages/
+</code></pre>
+
+<p>If you have Git, you can clone this repo to "/packages-folder/Mediawiker/"</p>
+
+<p>or,</p>
+
+<p>Download this repo using the "ZIP" button above, unzip and place the files in "/packages-folder/Mediawiker/"</p>
+
+<h2>Documentation</h2>
+
+<ul>
+<li>Use Packages/Mediawiker/Mediawiker.sublime-settings for setup wiki-connect and plugin options.</li>
+<li>Some connection specific rules:
+
+<ul>
+<li>If user-name is empty, then authorization will not be used.</li>
+<li>If user-name is not empty, but user-password is empty, you will be prompted for password on action.</li>
+</ul>
+</li>
+<li>Use <strong>Get Page</strong> option for retrieving existing wiki-page. If the page does not exists, you can create the new one.
+
+<ul>
+<li><em>Alt+F4</em></li>
+<li><em>Context menu:Mediawiker:Get page</em></li>
+<li><em>Main menu:File:Mediawiker:Get page</em></li>
+</ul>
+</li>
+<li>Use <strong>Publish Page</strong> option for publishing pages. When you publish a page, the name of the page will be saved to history.
+
+<ul>
+<li><em>Alt+F7</em></li>
+<li><em>Context menu:Mediawiker:Publish page</em></li>
+<li><em>Main menu:File:Mediawiker:Publish page</em></li>
+</ul>
+</li>
+<li>Use <strong>Select page from history</strong> option to open the page by name from history.
+
+<ul>
+<li><em>Alt+F1</em></li>
+<li><em>Context menu:Mediawiker:Get by from history</em></li>
+</ul>
+</li>
+<li>Use <strong>Show TOC</strong> option for show table of contents of the current page and to move by page headers.
+
+<ul>
+<li><em>Alt+F2</em></li>
+<li><em>Context menu:Mediawiker:Show TOC</em></li>
+</ul>
+</li>
+<li>Use <strong>Change active site</strong> to set your current wiki site.
+
+<ul>
+<li><em>Alt+F3</em></li>
+<li><em>Context menu:Mediawiker:Change active site</em></li>
+</ul>
+</li>
+<li>Use <strong>Open page in browser</strong> to open current page in web-browser.
+
+<ul>
+<li><em>Alt+F5</em></li>
+<li><em>Context menu:Mediawiker:Open page in browser</em></li>
+</ul>
+</li>
+<li>Check status messages while using the plugin.</li>
+<li>All settings available under the Main menu:Preferences:Package Settings:Mediawiker.</li>
+</ul><h3>Predefined mediawiki sites settings</h3>
+
+<p>Note: You must setup your credentials for authorization in the settings.</p>
+
+<ul>
+<li>English wikipedia: <a href="http://en.wikipedia.org">en.wikipedia.org</a>
+</li>
+<li>Russian wikipedia: <a href="http://ru.wikipedia.org">ru.wikipedia.org</a>
+</li>
+<li>Mediawiki <a href="http://www.mediawiki.org">www.mediawiki.org</a>
+</li>
+</ul><p>You can add your favorite sites in the settings.</p>
+        </section>
+
+        <footer>
+          Mediawiker is maintained by <a href="https://github.com/tosher">tosher</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
