@@ -40,6 +40,15 @@ def mediawiker_get_connect(password=''):
     return sitecon
 
 
+def mediawiker_pagename_clear(pagename):
+    """ Return clear pagename if page-url was set instead of.."""
+    site_name_active = mediawiker_get_setting('mediawiki_site_active')
+    site_list = mediawiker_get_setting('mediawiki_site')
+    site = site_list[site_name_active]["host"]
+    pagepath = site_list[site_name_active]["pagepath"]
+    return pagename.replace('http://%s%s' % (site, pagepath),'')
+
+
 def mediawiker_save_mypages(title):
     #for wiki '_' and ' ' are equal in page name
     title = title.replace('_', ' ')
@@ -72,6 +81,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
 
     def on_done(self, text):
         try:
+            text = mediawiker_pagename_clear(text)
             self.window.run_command("mediawiker_validate_connection_params", {"title": text, "goto": self.goto})
         except ValueError, e:
             sublime.message_dialog(e)
