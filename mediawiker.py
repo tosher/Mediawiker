@@ -46,7 +46,8 @@ def mediawiker_pagename_clear(pagename):
     site_list = mediawiker_get_setting('mediawiki_site')
     site = site_list[site_name_active]["host"]
     pagepath = site_list[site_name_active]["pagepath"]
-    return pagename.replace('http://','').replace('%s%s' % (site, pagepath),'')
+    pageindex = pagename.find(site) + len(site) + len(pagepath)
+    return pagename[pageindex:]
 
 
 def mediawiker_save_mypages(title):
