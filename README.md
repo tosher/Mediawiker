@@ -2,7 +2,7 @@
 
 Mediawiker is a plugin for Sublime Text 2 editor that adds possibility to create and edit pages on [Mediawiki](http://mediawiki.org) based sites.
 
-Warning! It was tested on the latest windows release build of Sublime Text 2 and some Mediawiki sites. No guarantees here!
+Was tested on the latest windows\mac release builds of Sublime Text 2 and some Mediawiki sites.
 
 ##Features
 * Connection to existing mediawiki based site through the use of [mwclient library](http://sourceforge.net/apps/mediawiki/mwclient/index.php?title=Main_Page) .
