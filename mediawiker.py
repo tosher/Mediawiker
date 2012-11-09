@@ -4,6 +4,7 @@
 import mwclient
 import webbrowser
 import urllib
+
 import sublime, sublime_plugin
 #http://www.sublimetext.com/docs/2/api_reference.html
 #sublime.message_dialog
@@ -77,7 +78,15 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
     goto = ''
     def run(self, goto):
         self.goto = goto
-        pagename_default = sublime.get_clipboard() if bool(mediawiker_get_setting('mediawiker_clipboard_as_defaultpagename')) else ''
+        pagename_default = ''
+        #use clipboard or selected text for page name
+        if bool(mediawiker_get_setting('mediawiker_clipboard_as_defaultpagename')):
+            pagename_default = sublime.get_clipboard().strip()
+        if not pagename_default:
+            selection = self.window.active_view().sel()
+            for selreg in selection:
+                pagename_default = self.window.active_view().substr(selreg).strip()
+
         if goto == "mediawiker_show_page":
             self.window.show_input_panel("Wiki page name:", pagename_default, self.on_done, None, None)
         elif goto == "mediawiker_publish_page":
