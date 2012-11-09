@@ -3,6 +3,7 @@
 
 import mwclient
 import webbrowser
+import urllib
 import sublime, sublime_plugin
 #http://www.sublimetext.com/docs/2/api_reference.html
 #sublime.message_dialog
@@ -46,8 +47,10 @@ def mediawiker_pagename_clear(pagename):
     site_list = mediawiker_get_setting('mediawiki_site')
     site = site_list[site_name_active]["host"]
     pagepath = site_list[site_name_active]["pagepath"]
-    pageindex = pagename.find(site) + len(site) + len(pagepath)
-    return pagename[pageindex:]
+    if site in pagename:
+        pageindex = pagename.find(site) + len(site) + len(pagepath)
+        pagename = urllib.unquote(pagename[pageindex:].encode('ascii')).decode('utf-8')
+    return pagename
 
 
 def mediawiker_save_mypages(title):
