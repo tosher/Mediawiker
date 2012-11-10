@@ -4,7 +4,6 @@
 import mwclient
 import webbrowser
 import urllib
-
 import sublime, sublime_plugin
 #http://www.sublimetext.com/docs/2/api_reference.html
 #sublime.message_dialog
@@ -50,7 +49,13 @@ def mediawiker_pagename_clear(pagename):
     pagepath = site_list[site_name_active]["pagepath"]
     if site in pagename:
         pageindex = pagename.find(site) + len(site) + len(pagepath)
-        pagename = urllib.unquote(pagename[pageindex:].encode('ascii')).decode('utf-8')
+        pagename = pagename[pageindex:]
+        try:
+            pagename = urllib.unquote(pagename.encode('ascii')).decode('utf-8')
+        except UnicodeEncodeError, e:
+            return pagename
+        except Exception, e:
+            return pagename
     return pagename
 
 
@@ -76,6 +81,9 @@ def mediawiker_save_mypages(title):
 
 class MediawikerPageCommand(sublime_plugin.WindowCommand):
     goto = ''
+    inputpanel = None
+    is_inputfixed = False
+
     def run(self, goto):
         self.goto = goto
         pagename_default = ''
@@ -88,9 +96,22 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
                 pagename_default = self.window.active_view().substr(selreg).strip()
 
         if goto == "mediawiker_show_page":
-            self.window.show_input_panel("Wiki page name:", pagename_default, self.on_done, None, None)
+            self.inputpanel = self.window.show_input_panel("Wiki page name:", mediawiker_pagename_clear(pagename_default), self.on_done, self.on_change, self.on_escape)
         elif goto == "mediawiker_publish_page":
             self.on_done('')
+
+    def on_escape(self):
+        self.inputpanel = None
+
+    def on_change(self, text):
+        if not self.is_inputfixed and text and bool(mediawiker_get_setting('mediawiker_clearpagename_oninput')):
+            edit = self.inputpanel.begin_edit()
+            self.is_inputfixed = True
+            self.inputpanel.erase(edit, sublime.Region(0, self.inputpanel.size()))
+            self.inputpanel.insert(edit, 0, mediawiker_pagename_clear(text))
+            self.inputpanel.end_edit(edit)
+            sublime.status_message('Page name was cleared.')
+            self.is_inputfixed = False
 
     def on_done(self, text):
         try:
@@ -164,8 +185,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
                 self.view = sublime.active_window().new_file()
             else:
                 #clear tab
-                self.view.run_command('select_all')
-                self.view.run_command('right_delete')
+                self.view.erase(edit, sublime.Region(0, self.view.size()))
             self.view.set_syntax_file('Packages/Mediawiker/Mediawiki.tmLanguage')
             self.view.set_name(title)
             #load page data
