@@ -9,5 +9,6 @@
     "mediawiker_summary_postfix": " (by SublimeText.Mediawiker)",
     "mediawiker_clipboard_as_defaultpagename": false,
     "mediawiker_newtab_ongetpage": true,
+    "mediawiker_clearpagename_oninput": true,
     "mediawiker_pagelist_maxsize": 100
 }
