@@ -64,18 +64,20 @@ def mediawiker_save_mypages(title):
     title = title.replace('_', ' ')
     pagelist_maxsize = mediawiker_get_setting('mediawiker_pagelist_maxsize')
     site_name_active = mediawiker_get_setting('mediawiki_site_active')
-    mediawiker_pagelist = mediawiker_get_setting('mediawiker_pagelist')
+    mediawiker_pagelist = mediawiker_get_setting('mediawiker_pagelist', {})
+
+    if site_name_active not in mediawiker_pagelist:
+        mediawiker_pagelist[site_name_active] = []
+
     my_pages = mediawiker_pagelist[site_name_active]
 
-    while len(my_pages) >= pagelist_maxsize:
-        my_pages.pop(0)
+    if my_pages:
+        while len(my_pages) >= pagelist_maxsize:
+            my_pages.pop(0)
 
-    if my_pages and type(my_pages) == list:
         if title in my_pages:
             #for sorting
             my_pages.remove(title)
-    else:
-        my_pages = []
     my_pages.append(title)
     mediawiker_set_setting('mediawiker_pagelist', mediawiker_pagelist)
 
@@ -124,13 +126,13 @@ class MediawikerPageListCommand(sublime_plugin.WindowCommand):
     my_pages = []
     def run(self):
         site_name_active = mediawiker_get_setting('mediawiki_site_active')
-        mediawiker_pagelist = mediawiker_get_setting('mediawiker_pagelist')
-        self.my_pages = mediawiker_pagelist[site_name_active]
-        self.my_pages.reverse()
-        if self.my_pages and type(self.my_pages) == list:
+        mediawiker_pagelist = mediawiker_get_setting('mediawiker_pagelist', {})
+        self.my_pages = mediawiker_pagelist[site_name_active] if site_name_active in mediawiker_pagelist else []
+        if self.my_pages:
+            self.my_pages.reverse()
             self.window.show_quick_panel(self.my_pages, self.on_done)
         else:
-            return
+            sublime.status_message('List of pages for wiki "%s" is empty.' % (site_name_active))
 
     def on_done(self, index):
         if index >= 0:
