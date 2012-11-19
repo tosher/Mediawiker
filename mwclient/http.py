@@ -181,8 +181,11 @@ class HTTPConnection(HTTPPersistentConnection):
 		return res
 
 class HTTPSPersistentConnection(HTTPPersistentConnection):
-	http_class = httplib.HTTPSConnection
-	scheme_name = 'https'
+	#Sublime havent socket module compiled with SSL support: use http until will be resolved
+	#http_class = httplib.HTTPSConnection
+	http_class = httplib.HTTPConnection
+	#scheme_name = 'https'
+	scheme_name = 'http'
 
 	
 class HTTPPool(list):
