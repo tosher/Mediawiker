@@ -55,7 +55,7 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
  - *Main menu:File:Mediawiker:Publish page*
 - Use **Select page from history** option to open the page by name from history.
  - *Alt+F1*
- - *Context menu:Mediawiker:Get by from history*
+ - *Context menu:Mediawiker:Select page from history*
 - Use **Show TOC** option for show table of contents of the current page and to move by page headers.
  - *Alt+F2*
  - *Context menu:Mediawiker:Show TOC*
