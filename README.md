@@ -13,7 +13,7 @@ Was tested on the latest windows\mac release builds of Sublime Text 2 and some M
 
 ## Install
 
-### Package Control (not available now!)
+### Package Control
 
 The easiest way to install this is with [Package Control](http://wbond.net/sublime\_packages/package\_control).
 
@@ -40,7 +40,7 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 
 ## Documentation
 
-- Use Packages/Mediawiker/Mediawiker.sublime-settings for setup wiki-connect and plugin options.
+- Use Preferences:Package settings:Mediawiker: "Settings  - Default" and "Settings - User" for setup wiki-connect and plugin options.
 - Some connection specific rules:
  - If user-name is empty, then authorization will not be used.
  - If user-name is not empty, but user-password is empty, you will be prompted for password on action.
