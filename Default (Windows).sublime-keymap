@@ -1,8 +1,8 @@
 [
-    { "keys": ["alt+f4"], "command": "mediawiker_page", "args": {"goto": "mediawiker_show_page"} },
-    { "keys": ["alt+f7"], "command": "mediawiker_page", "args": {"goto": "mediawiker_publish_page"} },
-    { "keys": ["alt+f1"], "command": "mediawiker_page_list" },
-    { "keys": ["alt+f2"], "command": "mediawiker_show_toc" },
-    { "keys": ["alt+f3"], "command": "mediawiker_set_active_site" },
-    { "keys": ["alt+f5"], "command": "mediawiker_open_page_in_browser" }
+    { "keys": ["ctrl+alt+f4"], "command": "mediawiker_page", "args": {"goto": "mediawiker_show_page"} },
+    { "keys": ["ctrl+alt+f7"], "command": "mediawiker_page", "args": {"goto": "mediawiker_publish_page"} },
+    { "keys": ["ctrl+alt+f1"], "command": "mediawiker_page_list" },
+    { "keys": ["ctrl+alt+f2"], "command": "mediawiker_show_toc" },
+    { "keys": ["ctrl+alt+f3"], "command": "mediawiker_set_active_site" },
+    { "keys": ["ctrl+alt+f5"], "command": "mediawiker_open_page_in_browser" }
 ]
