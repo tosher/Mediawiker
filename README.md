@@ -45,7 +45,7 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
  - If user-name is empty, then authorization will not be used.
  - If user-name is not empty, but user-password is empty, you will be prompted for password on action.
 - Use **Get Page** option for retrieving existing wiki-page. If the page does not exists, you can create the new one.
- - *Alt+F4*
+ - *Alt+F3*
  - *Context menu:Mediawiker:Get page*
  - *Main menu:File:Mediawiker:Get page*
 - Use clear page name or page url as a wiki page name.
@@ -60,7 +60,7 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
  - *Alt+F2*
  - *Context menu:Mediawiker:Show TOC*
 - Use **Change active site** to set your current wiki site.
- - *Alt+F3*
+ - *Alt+F6*
  - *Context menu:Mediawiker:Change active site*
 - Use **Open page in browser** to open current page in web-browser.
  - *Alt+F5*
