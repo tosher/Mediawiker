@@ -30,7 +30,7 @@
                         [
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/Mediawiker/README.markdown"},
+                                "args": {"file": "${packages}/Mediawiker/README.md"},
                                 "caption": "README"
                             },
                             { "caption": "-" },
