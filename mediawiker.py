@@ -1,6 +1,7 @@
 ﻿#!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
+from os.path import splitext, basename
 import mwclient
 import webbrowser
 import urllib
@@ -204,8 +205,13 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, title, password):
         sitecon = mediawiker_get_connect(password)
-        self.title = self.view.name()
-        self.page = sitecon.Pages[self.title]
+        title = self.view.name()
+        if not title:
+            title, ext = splitext(basename(self.view.file_name()))
+            if ext not in ('mediawiki', 'wiki', 'wikipedia', ''):
+                return
+        self.title = title
+        self.page = sitecon.Pages[title]
         self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
         self.view.window().show_input_panel("Changes summary:", '', self.on_done, None, None)
 
