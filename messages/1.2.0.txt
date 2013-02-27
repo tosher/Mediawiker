@@ -1,0 +1,3 @@
+Mediawiker 1.2.0 Changelog:
+
+ - Possibility to use files as wiki pages (https://github.com/tosher/Mediawiker/pull/3).

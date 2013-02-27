@@ -4,7 +4,9 @@
 import mwclient
 import webbrowser
 import urllib
-import sublime, sublime_plugin
+from os.path import splitext, basename
+import sublime
+import sublime_plugin
 #http://www.sublimetext.com/docs/2/api_reference.html
 #sublime.message_dialog
 
@@ -52,9 +54,9 @@ def mediawiker_pagename_clear(pagename):
         pagename = pagename[pageindex:]
         try:
             pagename = urllib.unquote(pagename.encode('ascii')).decode('utf-8')
-        except UnicodeEncodeError, e:
+        except UnicodeEncodeError:
             return pagename
-        except Exception, e:
+        except Exception:
             return pagename
     return pagename
 
@@ -80,6 +82,7 @@ def mediawiker_save_mypages(title):
             my_pages.remove(title)
     my_pages.append(title)
     mediawiker_set_setting('mediawiker_pagelist', mediawiker_pagelist)
+
 
 class MediawikerPageCommand(sublime_plugin.WindowCommand):
     goto = ''
@@ -122,8 +125,10 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
         except ValueError, e:
             sublime.message_dialog(e)
 
+
 class MediawikerPageListCommand(sublime_plugin.WindowCommand):
     my_pages = []
+
     def run(self):
         site_name_active = mediawiker_get_setting('mediawiki_site_active')
         mediawiker_pagelist = mediawiker_get_setting('mediawiker_pagelist', {})
@@ -142,6 +147,7 @@ class MediawikerPageListCommand(sublime_plugin.WindowCommand):
                 self.window.run_command("mediawiker_validate_connection_params", {"title": text, "goto": "mediawiker_show_page"})
             except ValueError, e:
                 sublime.message_dialog(e)
+
 
 class MediawikerValidateConnectionParamsCommand(sublime_plugin.WindowCommand):
     site = None
@@ -174,6 +180,7 @@ class MediawikerValidateConnectionParamsCommand(sublime_plugin.WindowCommand):
         self.window.active_view().run_command(self.goto, {"title": self.title,
                                                           "password": self.password})
 
+
 class MediawikerShowPageCommand(sublime_plugin.TextCommand):
     def run(self, edit, title, password):
         sitecon = mediawiker_get_connect(password)
@@ -196,6 +203,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         else:
             sublime.status_message('You have not rights to edit this page')
 
+
 class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
     my_pages = None
     page = None
@@ -205,9 +213,22 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
     def run(self, edit, title, password):
         sitecon = mediawiker_get_connect(password)
         self.title = self.view.name()
-        self.page = sitecon.Pages[self.title]
-        self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
-        self.view.window().show_input_panel("Changes summary:", '', self.on_done, None, None)
+        if not self.title and self.view.file_name():
+            #haven't view.name, try to get from view.file_name (without extension)
+            title, ext = splitext(basename(self.view.file_name()))
+            wiki_extensions = mediawiker_get_setting('mediawiker_files_extension')
+            if ext[1:] in wiki_extensions and title:
+                self.title = title
+            else:
+                sublime.status_message('Anauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
+                return
+        if self.title:
+            self.page = sitecon.Pages[self.title]
+            self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
+            self.view.window().show_input_panel("Changes summary:", '', self.on_done, None, None)
+        else:
+            sublime.status_message('Can\'t publish page with empty title')
+            return
 
     def on_done(self, summary):
         try:
@@ -226,6 +247,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 class MediawikerShowTocCommand(sublime_plugin.TextCommand):
     items = []
     regions = []
+
     def run(self, edit):
         self.items = []
         self.regions = []
@@ -246,6 +268,7 @@ class MediawikerShowTocCommand(sublime_plugin.TextCommand):
 
 class MediawikerSetActiveSiteCommand(sublime_plugin.TextCommand):
     site_keys = []
+
     def run(self, edit):
         site_active = mediawiker_get_setting('mediawiki_site_active')
         sites = mediawiker_get_setting('mediawiki_site')
@@ -260,6 +283,7 @@ class MediawikerSetActiveSiteCommand(sublime_plugin.TextCommand):
         if index >= 0 and type(self.site_keys[index]) != list:
             # not escaped and not active
             mediawiker_set_setting("mediawiki_site_active", self.site_keys[index])
+
 
 class MediawikerOpenPageInBrowserCommand(sublime_plugin.TextCommand):
     def run(self, edit):
