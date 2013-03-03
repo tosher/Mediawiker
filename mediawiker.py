@@ -84,6 +84,24 @@ def mediawiker_save_mypages(title):
     mediawiker_set_setting('mediawiker_pagelist', mediawiker_pagelist)
 
 
+def mediawiker_get_title(view_name, file_name):
+    ''' returns page title from view_name or from file_name'''
+
+    if view_name:
+        return view_name
+    elif file_name:
+        wiki_extensions = mediawiker_get_setting('mediawiker_files_extension')
+        #haven't view.name, try to get from view.file_name (without extension)
+        title, ext = splitext(basename(file_name))
+        if ext[1:] in wiki_extensions and title:
+            return title
+        else:
+            sublime.status_message('Anauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
+            return ''
+    else:
+        return ''
+
+
 class MediawikerPageCommand(sublime_plugin.WindowCommand):
     goto = ''
     inputpanel = None
@@ -212,17 +230,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, title, password):
         sitecon = mediawiker_get_connect(password)
-        self.title = self.view.name()
-        #TODO: replace with get_title func..
-        if not self.title and self.view.file_name():
-            #haven't view.name, try to get from view.file_name (without extension)
-            title, ext = splitext(basename(self.view.file_name()))
-            wiki_extensions = mediawiker_get_setting('mediawiker_files_extension')
-            if ext[1:] in wiki_extensions and title:
-                self.title = title
-            else:
-                sublime.status_message('Anauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
-                return
+        self.title = mediawiker_get_title(self.view.name(), self.view.file_name())
         if self.title:
             self.page = sitecon.Pages[self.title]
             self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
@@ -292,14 +300,7 @@ class MediawikerOpenPageInBrowserCommand(sublime_plugin.TextCommand):
         site_list = mediawiker_get_setting('mediawiki_site')
         site = site_list[site_name_active]["host"]
         pagepath = site_list[site_name_active]["pagepath"]
-        title = self.view.name()
-        if not title and self.view.file_name():
-            #haven't view.name, try to get from view.file_name (without extension)
-            title, ext = splitext(basename(self.view.file_name()))
-            wiki_extensions = mediawiker_get_setting('mediawiker_files_extension')
-            if ext[1:] not in wiki_extensions:
-                sublime.status_message('Anauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
-                return
+        title = mediawiker_get_title(self.view.name(), self.view.file_name())
         if title:
             webbrowser.open('http://%s%s%s' % (site, pagepath, title))
         else:
