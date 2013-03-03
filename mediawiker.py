@@ -213,6 +213,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
     def run(self, edit, title, password):
         sitecon = mediawiker_get_connect(password)
         self.title = self.view.name()
+        #TODO: replace with get_title func..
         if not self.title and self.view.file_name():
             #haven't view.name, try to get from view.file_name (without extension)
             title, ext = splitext(basename(self.view.file_name()))
@@ -291,4 +292,16 @@ class MediawikerOpenPageInBrowserCommand(sublime_plugin.TextCommand):
         site_list = mediawiker_get_setting('mediawiki_site')
         site = site_list[site_name_active]["host"]
         pagepath = site_list[site_name_active]["pagepath"]
-        webbrowser.open('http://%s%s%s' % (site, pagepath, self.view.name()))
+        title = self.view.name()
+        if not title and self.view.file_name():
+            #haven't view.name, try to get from view.file_name (without extension)
+            title, ext = splitext(basename(self.view.file_name()))
+            wiki_extensions = mediawiker_get_setting('mediawiker_files_extension')
+            if ext[1:] not in wiki_extensions:
+                sublime.status_message('Anauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
+                return
+        if title:
+            webbrowser.open('http://%s%s%s' % (site, pagepath, title))
+        else:
+            sublime.status_message('Can\'t open page with empty title')
+            return
