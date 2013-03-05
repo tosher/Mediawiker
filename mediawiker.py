@@ -118,9 +118,14 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
             for selreg in selection:
                 pagename_default = self.window.active_view().substr(selreg).strip()
 
-        if goto == "mediawiker_show_page":
-            self.inputpanel = self.window.show_input_panel("Wiki page name:", mediawiker_pagename_clear(pagename_default), self.on_done, self.on_change, self.on_escape)
-        elif goto == "mediawiker_publish_page":
+        if goto == 'mediawiker_show_page':
+            #open wiki page in editor
+            self.inputpanel = self.window.show_input_panel('Wiki page name:', mediawiker_pagename_clear(pagename_default), self.on_done, self.on_change, self.on_escape)
+        elif goto == 'mediawiker_publish_page':
+            #publish current page to wiki server
+            self.on_done('')
+        elif goto == 'mediawiker_add_category':
+            #add category to current page
             self.on_done('')
 
     def on_escape(self):
@@ -306,3 +311,31 @@ class MediawikerOpenPageInBrowserCommand(sublime_plugin.TextCommand):
         else:
             sublime.status_message('Can\'t open page with empty title')
             return
+
+
+class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
+    categories_list = None
+    password = ''
+    title = ''
+
+    def run(self, edit, title, password):
+        sitecon = mediawiker_get_connect(self.password)
+        category_root = mediawiker_get_setting('mediawiker_category_root')
+        category = sitecon.Pages[category_root]
+        self.categories_list_names = []
+        self.categories_list_values = []
+        for page in category:
+            #is category namespace always has value 14?
+            if page.namespace == 14:
+                self.categories_list_values.append(page.name)
+                self.categories_list_names.append(page.name[page.name.find(':') + 1:])
+        sublime.active_window().show_quick_panel(self.categories_list_names, self.on_done)
+
+    def on_done(self, idx):
+        # the dialog was cancelled
+        if idx is -1:
+            return
+        index_of_textend = self.view.size()
+        edit = self.view.begin_edit()
+        self.view.insert(edit, index_of_textend, '[[%s]]' % self.categories_list_values[idx])
+        self.view.end_edit(edit)

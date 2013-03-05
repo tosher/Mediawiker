@@ -20,6 +20,9 @@
             },
             {
                 "command": "mediawiker_open_page_in_browser", "caption": "Open page in browser"
+            },
+            {
+                "command": "mediawiker_page", "caption": "Add category", "args": {"goto": "mediawiker_add_category"}
             }
 
         ]

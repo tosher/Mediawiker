@@ -65,6 +65,9 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 - Use **Open page in browser** to open current page in web-browser.
  - *Alt+F5*
  - *Context menu:Mediawiker:Open page in browser*
+- Experimental! Use **Add category** to add article category from list of root category members (check "mediawiker_category_root" option in configuration).
+ - *Alt+F9*
+ - *Context menu:Mediawiker:Add category*
 - Check status messages while using the plugin.
 - All settings available under the Main menu:Preferences:Package Settings:Mediawiker.
 

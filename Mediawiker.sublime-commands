@@ -20,5 +20,10 @@
     {
         "caption": "Mediawiker: Change active site",
         "command": "mediawiker_set_active_site"
+    },
+    {
+        "caption": "Mediawiker: Add category",
+        "command": "mediawiker_page",
+        "args": {"goto": "mediawiker_add_category"}
     }
 ]
