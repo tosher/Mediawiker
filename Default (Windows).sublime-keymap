@@ -5,5 +5,5 @@
     { "keys": ["alt+f2"], "command": "mediawiker_show_toc" },
     { "keys": ["alt+f6"], "command": "mediawiker_set_active_site" },
     { "keys": ["alt+f5"], "command": "mediawiker_open_page_in_browser" },
-    { "keys": ["alt+f9"], "command": "mediawiker_page", "args": {"goto": "mediawiker_add_category"} }
+    { "keys": ["alt+f11"], "command": "mediawiker_page", "args": {"goto": "mediawiker_add_category"} }
 ]
