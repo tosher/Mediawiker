@@ -23,6 +23,9 @@
             },
             {
                 "command": "mediawiker_page", "caption": "Add category", "args": {"goto": "mediawiker_add_category"}
+            },
+            {
+                "command": "mediawiker_enumerate_toc", "caption": "Enumerate TOC"
             }
 
         ]

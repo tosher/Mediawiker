@@ -25,5 +25,9 @@
         "caption": "Mediawiker: Add category",
         "command": "mediawiker_page",
         "args": {"goto": "mediawiker_add_category"}
+    },
+    {
+        "caption": "Mediawiker: Enumerate TOC",
+        "command": "mediawiker_enumerate_toc"
     }
 ]

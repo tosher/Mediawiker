@@ -68,6 +68,9 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 - Experimental! Use **Add category** to add article category from list of root category members (check "mediawiker_category_root" option in configuration).
  - *Alt+F11*
  - *Context menu:Mediawiker:Add category*
+- Use **Enumerate TOC** to set headers as numbered list (format 1.1.1.).
+ - *Ctrl+Alt+F2*
+ - *Context menu:Mediawiker:Enumerate TOC*
 - Check status messages while using the plugin.
 - All settings available under the Main menu:Preferences:Package Settings:Mediawiker.
 
