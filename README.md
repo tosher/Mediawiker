@@ -53,6 +53,7 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
  - *Alt+F7*
  - *Context menu:Mediawiker:Publish page*
  - *Main menu:File:Mediawiker:Publish page*
+ - Settings option **mediawiker_mark_as_minor** (default: false) - using for mark changes as minor. Or You can use **!** character as **summary prefix** to invert this option on current save.
 - Use **Select page from history** option to open the page by name from history.
  - *Alt+F1*
  - *Context menu:Mediawiker:Select page from history*

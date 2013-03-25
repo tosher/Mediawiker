@@ -252,8 +252,13 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
     def on_done(self, summary):
         try:
             summary = '%s%s' % (summary, mediawiker_get_setting('mediawiker_summary_postfix', ' (by SublimeText.Mediawiker)'))
+            mark_as_minor = mediawiker_get_setting('mediawiker_mark_as_minor')
             if self.page.can('edit'):
-                self.page.save(self.current_text, summary=summary)
+                #invert minor settings command '!'
+                if summary[0] == '!':
+                    mark_as_minor = not mark_as_minor
+                    summary = summary[1:]
+                self.page.save(self.current_text, summary=summary.strip(), minor=mark_as_minor)
             else:
                 sublime.status_message('You have not rights to edit this page')
         except mwclient.EditError, e:

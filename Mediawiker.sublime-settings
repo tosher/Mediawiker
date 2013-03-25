@@ -12,5 +12,6 @@
     "mediawiker_clearpagename_oninput": true,
     "mediawiker_pagelist_maxsize": 100,
     "mediawiker_files_extension": ["mediawiki", "wiki", "wikipedia", ""],
-    "mediawiker_category_root": "Category:Help"
+    "mediawiker_category_root": "Category:Help",
+    "mediawiker_mark_as_minor": false
 }

@@ -1,0 +1,3 @@
+﻿Mediawiker 1.5.0 Changelog:
+
+ - Mark changes as minor.
