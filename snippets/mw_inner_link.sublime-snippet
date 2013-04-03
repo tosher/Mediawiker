@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+[[${1:PAGE_NAME}|${2:PAGE_DESCRIPTION}]]
+]]></content>
+<tabTrigger>wlink</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+<description>Mediawiker: Internal link</description>
+</snippet>

@@ -39,6 +39,7 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 
 
 ## Documentation
+- Check [https://github.com/tosher/Mediawiker/wiki](plugin wiki) for setup instructions.
 
 - Use Preferences:Package settings:Mediawiker: "Settings  - Default" and "Settings - User" for setup wiki-connect and plugin options.
 - Some connection specific rules:

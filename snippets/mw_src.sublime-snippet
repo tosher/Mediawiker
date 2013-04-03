@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+<source lang="${1}">${2}</source>
+]]></content>
+<tabTrigger>wsrc</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+<description>Mediawiker: Source tag</description>
+</snippet>

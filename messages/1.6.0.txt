@@ -1,0 +1,11 @@
+Mediawiker 1.6.0 Changelog:
+ - Snippets:
+  - Heading level 2
+  - Heading level 3
+  - Heading level 4
+  - Internal link
+  - Numbered list
+  - Unnumbered list
+  - External link
+  - Source tag
+ - Some changes for future st3 compatibility

@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+=== ${1} ===
+]]></content>
+<tabTrigger>wh3</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+<description>Mediawiker: Header level 3</description>
+</snippet>

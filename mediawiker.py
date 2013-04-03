@@ -50,15 +50,17 @@ def mediawiker_pagename_clear(pagename):
     site_list = mediawiker_get_setting('mediawiki_site')
     site = site_list[site_name_active]["host"]
     pagepath = site_list[site_name_active]["pagepath"]
+    try:
+        pagename = urllib.unquote(pagename.encode('ascii')).decode('utf-8')
+    except UnicodeEncodeError:
+        return pagename
+    except Exception:
+        return pagename
+
     if site in pagename:
-        pageindex = pagename.find(site) + len(site) + len(pagepath)
-        pagename = pagename[pageindex:]
-        try:
-            pagename = urllib.unquote(pagename.encode('ascii')).decode('utf-8')
-        except UnicodeEncodeError:
-            return pagename
-        except Exception:
-            return pagename
+        pagename = sub(r'(http://)?%s%s' % (site, pagepath), '', pagename)
+
+    sublime.status_message('Page name was cleared.')
     return pagename
 
 
@@ -104,7 +106,13 @@ def mediawiker_get_title(view_name, file_name):
 
 
 def get_hlevel(header_string, substring):
-    return header_string.count(substring) / 2
+    return int(header_string.count(substring) / 2)
+
+
+class MediawikerInsertTextCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit, position, text):
+        self.view.insert(edit, position, text)
 
 
 class MediawikerPageCommand(sublime_plugin.WindowCommand):
@@ -150,7 +158,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
         try:
             text = mediawiker_pagename_clear(text)
             self.window.run_command("mediawiker_validate_connection_params", {"title": text, "goto": self.goto})
-        except ValueError, e:
+        except ValueError as e:
             sublime.message_dialog(e)
 
 
@@ -173,7 +181,7 @@ class MediawikerPageListCommand(sublime_plugin.WindowCommand):
             text = self.my_pages[index]
             try:
                 self.window.run_command("mediawiker_validate_connection_params", {"title": text, "goto": "mediawiker_show_page"})
-            except ValueError, e:
+            except ValueError as e:
                 sublime.message_dialog(e)
 
 
@@ -261,7 +269,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                 self.page.save(self.current_text, summary=summary.strip(), minor=mark_as_minor)
             else:
                 sublime.status_message('You have not rights to edit this page')
-        except mwclient.EditError, e:
+        except mwclient.EditError as e:
             sublime.status_message('Can\'t publish page %s (%s)' % (self.title, e))
         sublime.status_message('Wiki page %s was successfully published to wiki.' % (self.title))
         #save my pages
@@ -339,21 +347,22 @@ class MediawikerEnumerateTocCommand(sublime_plugin.TextCommand):
 
 class MediawikerSetActiveSiteCommand(sublime_plugin.TextCommand):
     site_keys = []
+    site_on = '>'
+    site_off = ' ' * 3
 
     def run(self, edit):
         site_active = mediawiker_get_setting('mediawiki_site_active')
         sites = mediawiker_get_setting('mediawiki_site')
         self.site_keys = sites.keys()
         for key in self.site_keys:
-            if key == site_active:
-                #self.site_keys[self.site_keys.index(key)] = "%s (active)" % (key)
-                self.site_keys[self.site_keys.index(key)] = [key, '(active)']
+            checked = self.site_on if key == site_active else self.site_off
+            self.site_keys[self.site_keys.index(key)] = '%s %s' % (checked, key)
         self.view.window().show_quick_panel(self.site_keys, self.on_done)
 
     def on_done(self, index):
-        if index >= 0 and type(self.site_keys[index]) != list:
-            # not escaped and not active
-            mediawiker_set_setting("mediawiki_site_active", self.site_keys[index])
+        # not escaped and not active
+        if index >= 0 and self.site_on != self.site_keys[index][:len(self.site_on)]:
+            mediawiker_set_setting("mediawiki_site_active", self.site_keys[index].strip())
 
 
 class MediawikerOpenPageInBrowserCommand(sublime_plugin.TextCommand):
@@ -374,6 +383,7 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
     categories_list = None
     password = ''
     title = ''
+    CATEGORY_NAMESPACE = 14  # category namespace number
 
     def run(self, edit, title, password):
         sitecon = mediawiker_get_connect(self.password)
@@ -382,8 +392,7 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
         self.categories_list_names = []
         self.categories_list_values = []
         for page in category:
-            #is category namespace always has value 14?
-            if page.namespace == 14:
+            if page.namespace == self.CATEGORY_NAMESPACE:
                 self.categories_list_values.append(page.name)
                 self.categories_list_names.append(page.name[page.name.find(':') + 1:])
         sublime.active_window().show_quick_panel(self.categories_list_names, self.on_done)
@@ -393,6 +402,4 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
         if idx is -1:
             return
         index_of_textend = self.view.size()
-        edit = self.view.begin_edit()
-        self.view.insert(edit, index_of_textend, '[[%s]]' % self.categories_list_values[idx])
-        self.view.end_edit(edit)
+        self.view.run_command('mediawiker_insert_text', {'position': index_of_textend, 'text': '[[%s]]' % self.categories_list_values[idx]})
