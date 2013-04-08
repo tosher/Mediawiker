@@ -13,5 +13,12 @@
     "mediawiker_pagelist_maxsize": 100,
     "mediawiker_files_extension": ["mediawiki", "wiki", "wikipedia", ""],
     "mediawiker_category_root": "Category:Help",
-    "mediawiker_mark_as_minor": false
+    "mediawiker_mark_as_minor": false,
+    "mediawiker_csvtable_delimiter": ";",
+    "mediawiker_csvtable_properties":
+    {
+        "class": "wikitable"
+    },
+    "mediawiker_csvtable_cell_properties": {}
 }
+

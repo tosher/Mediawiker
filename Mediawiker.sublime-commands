@@ -29,5 +29,9 @@
     {
         "caption": "Mediawiker: Enumerate TOC",
         "command": "mediawiker_enumerate_toc"
+    },
+    {
+        "caption": "Mediawiker: CSV data to wiki table",
+        "command": "mediawiker_csv_table"
     }
 ]

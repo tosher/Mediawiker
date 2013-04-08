@@ -70,8 +70,10 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
  - *Alt+F11*
  - *Context menu:Mediawiker:Add category*
 - Use **Enumerate TOC** to set headers as numbered list (format 1.1.1.).
- - *Ctrl+Alt+F2*
  - *Context menu:Mediawiker:Enumerate TOC*
+- Use *CSV data to wiki table* to transform selected csv-text to wiki table
+ - *Context menu:Mediawiker:CSV data to wiki table*
+- Use *Ctrl+Alt+F10* to show *Command palette* with predefined filter of plugin's commands.
 - Check status messages while using the plugin.
 - All settings available under the Main menu:Preferences:Package Settings:Mediawiker.
 

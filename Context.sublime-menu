@@ -26,6 +26,9 @@
             },
             {
                 "command": "mediawiker_enumerate_toc", "caption": "Enumerate TOC"
+            },
+            {
+                "command": "mediawiker_csv_table", "caption": "CSV data to wiki table"
             }
 
         ]

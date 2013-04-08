@@ -403,3 +403,45 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
             return
         index_of_textend = self.view.size()
         self.view.run_command('mediawiker_insert_text', {'position': index_of_textend, 'text': '[[%s]]' % self.categories_list_values[idx]})
+
+
+class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
+    #selected text, csv data to wiki table (Textmate Mediawiki bundle idea)
+    def run(self, edit):
+        delimiter = mediawiker_get_setting('mediawiker_csvtable_delimiter', ';')
+        table_header = '{|'
+        table_footer = '|}'
+        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mediawiker_get_setting('mediawiker_csvtable_properties', {}).items()])
+        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mediawiker_get_setting('mediawiker_csvtable_cell_properties', {}).items()])
+        if cell_properties:
+            cell_properties = ' %s | ' % cell_properties
+
+        selected_regions = self.view.sel()
+        for reg in selected_regions:
+            table_data_dic_tmp = []
+            table_data = ''
+            for line in self.view.substr(reg).split('\n'):
+                if delimiter in line:
+                    row = line.split(delimiter)
+                    table_data_dic_tmp.append(row)
+
+            #verify and fix columns count in rows
+            cols_cnt = len(max(table_data_dic_tmp, key=len))
+            for row in table_data_dic_tmp:
+                len_diff = cols_cnt - len(row)
+                while len_diff:
+                    row.append('')
+                    len_diff -= 1
+
+            for row in table_data_dic_tmp:
+                if table_data:
+                    table_data += '\n|-\n'
+                    column_separator = '||'
+                else:
+                    table_data += '|-\n'
+                    column_separator = '!!'
+                for col in row:
+                    col_sep = column_separator if row.index(col) else column_separator[0]
+                    table_data += '%s%s%s ' % (col_sep, cell_properties, col)
+
+            self.view.replace(edit, reg, '%s %s\n%s\n%s' % (table_header, table_properties, table_data, table_footer))

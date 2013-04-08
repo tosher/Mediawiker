@@ -1,0 +1,4 @@
+Mediawiker 1.7.0 Changelog:
+ - Shortcut for "Enumerate TOC" was removed
+ - Shortcut for Mediawiker Command Palette was added
+ - "CSV data to wiki table" option for wiki tables generation from selected csv-text. Check settings for table properties.
