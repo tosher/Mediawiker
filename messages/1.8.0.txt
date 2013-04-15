@@ -1,0 +1,3 @@
+Mediawiker 1.8.0 Changelog:
+ - Reopen page command was added.
+ - Sublime Text3 compatibility changes.

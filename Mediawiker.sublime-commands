@@ -33,5 +33,10 @@
     {
         "caption": "Mediawiker: CSV data to wiki table",
         "command": "mediawiker_csv_table"
+    },
+    {
+        "caption": "Mediawiker: Reopen page",
+        "command": "mediawiker_page",
+        "args": {"goto": "mediawiker_reopen_page"}
     }
 ]

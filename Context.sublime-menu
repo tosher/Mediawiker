@@ -29,8 +29,10 @@
             },
             {
                 "command": "mediawiker_csv_table", "caption": "CSV data to wiki table"
+            },
+            {
+                "command": "mediawiker_page", "caption": "Reopen page", "args": {"goto": "mediawiker_reopen_page"}
             }
-
         ]
     }
 ]
