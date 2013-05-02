@@ -1,38 +1,5 @@
 [
     {
-        "caption": "Mediawiker",
-        "children":
-        [
-            {
-                "command": "mediawiker_page", "caption": "Get page", "args": {"goto": "mediawiker_show_page"}
-            },
-            {
-                "command": "mediawiker_page_list", "caption": "Select page from history"
-            },
-            {
-                "command": "mediawiker_page", "caption": "Publish page", "args": {"goto": "mediawiker_publish_page"}
-            },
-            {
-                "command": "mediawiker_show_toc", "caption": "Show TOC"
-            },
-            {
-                "command": "mediawiker_set_active_site", "caption": "Change active site"
-            },
-            {
-                "command": "mediawiker_open_page_in_browser", "caption": "Open page in browser"
-            },
-            {
-                "command": "mediawiker_page", "caption": "Add category", "args": {"goto": "mediawiker_add_category"}
-            },
-            {
-                "command": "mediawiker_enumerate_toc", "caption": "Enumerate TOC"
-            },
-            {
-                "command": "mediawiker_csv_table", "caption": "CSV data to wiki table"
-            },
-            {
-                "command": "mediawiker_page", "caption": "Reopen page", "args": {"goto": "mediawiker_reopen_page"}
-            }
-        ]
+        "command": "mediawiker_edit_panel", "caption": "Mediawiker: Edit panel"
     }
 ]

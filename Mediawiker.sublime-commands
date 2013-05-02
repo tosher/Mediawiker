@@ -1,42 +1,14 @@
 [
-    {
-        "caption": "Mediawiker: Get page",
-        "command": "mediawiker_page",
-        "args": {"goto": "mediawiker_show_page"}
-    },
-    {
-        "caption": "Mediawiker: Publish page",
-        "command": "mediawiker_page",
-        "args": {"goto": "mediawiker_publish_page"}
-    },
-    {
-        "caption": "Mediawiker: Select page from history",
-        "command": "mediawiker_page_list"
-    },
-    {
-        "caption": "Mediawiker: Show TOC",
-        "command": "mediawiker_show_toc"
-    },
-    {
-        "caption": "Mediawiker: Change active site",
-        "command": "mediawiker_set_active_site"
-    },
-    {
-        "caption": "Mediawiker: Add category",
-        "command": "mediawiker_page",
-        "args": {"goto": "mediawiker_add_category"}
-    },
-    {
-        "caption": "Mediawiker: Enumerate TOC",
-        "command": "mediawiker_enumerate_toc"
-    },
-    {
-        "caption": "Mediawiker: CSV data to wiki table",
-        "command": "mediawiker_csv_table"
-    },
-    {
-        "caption": "Mediawiker: Reopen page",
-        "command": "mediawiker_page",
-        "args": {"goto": "mediawiker_reopen_page"}
-    }
+    { "caption": "Mediawiker: Open page", "command": "mediawiker_open_page" },
+    { "caption": "Mediawiker: Post page", "command": "mediawiker_post_page" },
+    { "caption": "Mediawiker: Pages history", "command": "mediawiker_page_list" },
+    { "caption": "Mediawiker: Show TOC", "command": "mediawiker_show_toc" },
+    { "caption": "Mediawiker: Select wiki", "command": "mediawiker_set_active_site" },
+    { "caption": "Mediawiker: Set category", "command": "mediawiker_set_category" },
+    { "caption": "Mediawiker: Numbered TOC", "command": "mediawiker_enumerate_toc" },
+    { "caption": "Mediawiker: CSV to table", "command": "mediawiker_csv_table" },
+    { "caption": "Mediawiker: Reopen page", "command": "mediawiker_reopen_page" },
+    { "caption": "Mediawiker: Wiki table to Simple (for plugin TableEdit)", "command": "mediawiker_table_wiki_to_simple" },
+    { "caption": "Mediawiker: Simple table to wiki (for plugin TableEdit)", "command": "mediawiker_table_simple_to_wiki" },
+    { "caption": "Mediawiker: Edit panel", "command": "mediawiker_edit_panel" }
 ]

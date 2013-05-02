@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-[http://${1:URL} ${2:URL_DESCRIPTION}]
+[http://${1:$TM_SELECTED_TEXT} ${2:URL_DESCRIPTION}]
 ]]></content>
 <tabTrigger>wurl</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->

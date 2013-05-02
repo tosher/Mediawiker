@@ -1,0 +1,9 @@
+Mediawiker 2.0.0 Changelog:
+
+* Support for Sublime Text 3.
+* "Edit panel" is used instead of sub-Context menu for easy using with keyboard. Also "Edit panel" can be called with Alt-F1 shortcut.
+* Some shortcuts was changed or removed:
+ * Alt-F10 instead of Alt-F1 for "Pages history" command (select from history of posted pages).
+ * Shortcut for **Set category** command was removed
+* Some of the commands was changed in this version for easy using in configuration. Please, recreate your key bindings configuration if you changed the original values.
+* Possibility to connect to wiki sites with *https* protocol was added as experimental option. Add {"https": true} parameter to site options for using it. (Not tested.)

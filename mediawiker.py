@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python\n
+#!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
 import sys
@@ -14,6 +14,8 @@ from os.path import splitext, basename
 from re import sub
 import sublime
 import sublime_plugin
+#https://github.com/wbond/sublime_package_control/wiki/Sublime-Text-3-Compatible-Packages
+#http://www.sublimetext.com/docs/2/api_reference.html
 #http://www.sublimetext.com/docs/3/api_reference.html
 #sublime.message_dialog
 
@@ -36,7 +38,11 @@ def mw_get_connect(password=''):
     path = site_list[site_name_active]['path']
     username = site_list[site_name_active]['username']
     domain = site_list[site_name_active]['domain']
-    sitecon = mwclient.Site(site, path)
+    is_https = True if 'https' in site_list[site_name_active] and site_list[site_name_active]['https'] else False
+    if is_https:
+        sublime.status_message('Trying to get https connection to https://%s' % site)
+    addr = site if not is_https else ('https', site)
+    sitecon = mwclient.Site(addr, path)
     # if login is not empty - auth required
     if username:
         try:
@@ -78,7 +84,7 @@ def mw_pagename_clear(pagename):
         return pagename
 
     if site in pagename:
-        pagename = sub(r'(http://)?%s%s' % (site, pagepath), '', pagename)
+        pagename = sub(r'(https?://)?%s%s' % (site, pagepath), '', pagename)
 
     sublime.status_message('Page name was cleared.')
     return pagename
@@ -143,8 +149,8 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
     is_inputfixed = False
     run_in_new_window = False
 
-    def run(self, goto, title=''):
-        self.action = goto
+    def run(self, action, title=''):
+        self.action = action
 
         if self.action == 'mediawiker_show_page':
             if mw_get_setting('mediawiker_newtab_ongetpage'):
@@ -163,11 +169,11 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
                 self.inputpanel = self.window.show_input_panel('Wiki page name:', mw_pagename_clear(pagename_default), self.on_done, self.on_change, self.on_escape)
             else:
                 self.on_done(title)
-        elif goto == 'mediawiker_reopen_page':
+        elif self.action == 'mediawiker_reopen_page':
             #get page name
             title = mw_get_title(self.window.active_view().name(), self.window.active_view().file_name())
             #Note: reopen on the current tab, not new
-            self.goto = 'mediawiker_show_page'
+            self.action = 'mediawiker_show_page'
             self.on_done(title)
         elif self.action == 'mediawiker_publish_page':
             #publish current page to wiki server
@@ -196,6 +202,34 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
             sublime.message_dialog(e)
 
 
+class MediawikerOpenPageCommand(sublime_plugin.WindowCommand):
+    ''' alias to Get page command '''
+
+    def run(self):
+        self.window.run_command("mediawiker_page", {"action": "mediawiker_show_page"})
+
+
+class MediawikerReopenPageCommand(sublime_plugin.WindowCommand):
+    ''' alias to Reopen page command '''
+
+    def run(self):
+        self.window.run_command("mediawiker_page", {"action": "mediawiker_reopen_page"})
+
+
+class MediawikerPostPageCommand(sublime_plugin.WindowCommand):
+    ''' alias to Publish page command '''
+
+    def run(self):
+        self.window.run_command("mediawiker_page", {"action": "mediawiker_publish_page"})
+
+
+class MediawikerSetCategoryCommand(sublime_plugin.WindowCommand):
+    ''' alias to Add category command '''
+
+    def run(self):
+        self.window.run_command("mediawiker_page", {"action": "mediawiker_add_category"})
+
+
 class MediawikerPageListCommand(sublime_plugin.WindowCommand):
     my_pages = []
 
@@ -205,7 +239,9 @@ class MediawikerPageListCommand(sublime_plugin.WindowCommand):
         self.my_pages = mediawiker_pagelist[site_name_active] if site_name_active in mediawiker_pagelist else []
         if self.my_pages:
             self.my_pages.reverse()
-            self.window.show_quick_panel(self.my_pages, self.on_done)
+            #self.window.show_quick_panel(self.my_pages, self.on_done)
+            #error 'Quick panel unavailable' fix with timeout..
+            sublime.set_timeout(lambda: self.window.show_quick_panel(self.my_pages, self.on_done), 1)
         else:
             sublime.status_message('List of pages for wiki "%s" is empty.' % (site_name_active))
 
@@ -214,7 +250,7 @@ class MediawikerPageListCommand(sublime_plugin.WindowCommand):
             # escape from quick panel return -1
             text = self.my_pages[index]
             try:
-                self.window.run_command("mediawiker_page", {"title": text, "goto": "mediawiker_show_page"})
+                self.window.run_command("mediawiker_page", {"title": text, "action": "mediawiker_show_page"})
             except ValueError as e:
                 sublime.message_dialog(e)
 
@@ -252,9 +288,12 @@ class MediawikerValidateConnectionParamsCommand(sublime_plugin.WindowCommand):
 
 class MediawikerShowPageCommand(sublime_plugin.TextCommand):
     def run(self, edit, title, password):
+        is_page_editable = False
+        denied_message = 'You have not rights to edit this page. Click OK button to view its source.'
         sitecon = mw_get_connect(password)
         page = sitecon.Pages[title]
-        if page.can('edit'):
+        is_page_editable = True if page.can('edit') else sublime.ok_cancel_dialog(denied_message)
+        if is_page_editable:
             text = page.edit()
             if not text:
                 sublime.status_message('Wiki page %s is not exists. You can create new..' % (title))
@@ -262,9 +301,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
             self.view.erase(edit, sublime.Region(0, self.view.size()))
             self.view.set_syntax_file('Packages/Mediawiker/Mediawiki.tmLanguage')
             self.view.set_name(title)
-            #load page data
             self.view.run_command('mediawiker_insert_text', {'position': 0, 'text': text})
-            #self.view.insert(edit, 0, text)
             sublime.status_message('Page %s was opened successfully.' % (title))
         else:
             sublime.status_message('You have not rights to edit this page')
@@ -281,9 +318,12 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
         self.title = mw_get_title(self.view.name(), self.view.file_name())
         if self.title:
             self.page = sitecon.Pages[self.title]
-            self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
-            summary_message = 'Changes summary (%s):' % mw_get_setting('mediawiki_site_active')
-            self.view.window().show_input_panel(summary_message, '', self.on_done, None, None)
+            if self.page.can('edit'):
+                self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
+                summary_message = 'Changes summary (%s):' % mw_get_setting('mediawiki_site_active')
+                self.view.window().show_input_panel(summary_message, '', self.on_done, None, None)
+            else:
+                sublime.status_message('You have not rights to edit this page')
         else:
             sublime.status_message('Can\'t publish page with empty title')
             return
@@ -319,7 +359,7 @@ class MediawikerShowTocCommand(sublime_plugin.TextCommand):
         for r in self.regions:
             item = self.view.substr(r).strip(' \t').rstrip('=').replace('=', '  ')
             self.items.append(item)
-        self.view.window().show_quick_panel(self.items, self.on_done)
+        sublime.set_timeout(lambda: self.view.window().show_quick_panel(self.items, self.on_done), 1)
 
     def on_done(self, index):
         if index >= 0:
@@ -376,19 +416,19 @@ class MediawikerEnumerateTocCommand(sublime_plugin.TextCommand):
             self.view.replace(edit, r_new, header_text_numbered)
 
 
-class MediawikerSetActiveSiteCommand(sublime_plugin.TextCommand):
+class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
     site_keys = []
     site_on = '>'
     site_off = ' ' * 3
 
-    def run(self, edit):
+    def run(self):
         site_active = mw_get_setting('mediawiki_site_active')
         sites = mw_get_setting('mediawiki_site')
         self.site_keys = list(sites.keys())
         for key in self.site_keys:
             checked = self.site_on if key == site_active else self.site_off
             self.site_keys[self.site_keys.index(key)] = '%s %s' % (checked, key)
-        self.view.window().show_quick_panel(self.site_keys, self.on_done)
+        sublime.set_timeout(lambda: self.window.show_quick_panel(self.site_keys, self.on_done), 1)
 
     def on_done(self, index):
         # not escaped and not active
@@ -396,13 +436,13 @@ class MediawikerSetActiveSiteCommand(sublime_plugin.TextCommand):
             mw_set_setting("mediawiki_site_active", self.site_keys[index].strip())
 
 
-class MediawikerOpenPageInBrowserCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+class MediawikerOpenPageInBrowserCommand(sublime_plugin.WindowCommand):
+    def run(self):
         site_name_active = mw_get_setting('mediawiki_site_active')
         site_list = mw_get_setting('mediawiki_site')
         site = site_list[site_name_active]["host"]
         pagepath = site_list[site_name_active]["pagepath"]
-        title = mw_get_title(self.view.name(), self.view.file_name())
+        title = mw_get_title(self.window.active_view().name(), self.window.active_view().file_name())
         if title:
             webbrowser.open('http://%s%s%s' % (site, pagepath, title))
         else:
@@ -427,7 +467,7 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
             if page.namespace == self.CATEGORY_NAMESPACE:
                 self.categories_list_values.append(page.name)
                 self.categories_list_names.append(page.name[page.name.find(':') + 1:])
-        sublime.active_window().show_quick_panel(self.categories_list_names, self.on_done)
+        sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.categories_list_names, self.on_done), 1)
 
     def on_done(self, idx):
         # the dialog was cancelled
@@ -438,13 +478,14 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
 
 
 class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
-    #selected text, csv data to wiki table (Textmate Mediawiki bundle idea)
+    ''' selected text, csv data to wiki table '''
+    #TODO: rewrite as simple to wiki command
     def run(self, edit):
-        delimiter = mw_get_setting('mediawiker_csvtable_delimiter', ';')
+        delimiter = mw_get_setting('mediawiker_csvtable_delimiter', '|')
         table_header = '{|'
         table_footer = '|}'
-        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw_get_setting('mediawiker_csvtable_properties', {}).items()])
-        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw_get_setting('mediawiker_csvtable_cell_properties', {}).items()])
+        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw_get_setting('mediawiker_wikitable_properties', {}).items()])
+        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw_get_setting('mediawiker_wikitable_cell_properties', {}).items()])
         if cell_properties:
             cell_properties = ' %s | ' % cell_properties
 
@@ -477,3 +518,242 @@ class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
                     table_data += '%s%s%s ' % (col_sep, cell_properties, col)
 
             self.view.replace(edit, reg, '%s %s\n%s\n%s' % (table_header, table_properties, table_data, table_footer))
+
+
+class MediawikerEditPanelCommand(sublime_plugin.WindowCommand):
+    options = []
+
+    def run(self):
+        snippet_tag = u'\u24C8'
+        self.options = mw_get_setting('mediawiker_panel', {})
+        if self.options:
+            office_panel_list = ['\t%s' % val['caption'] if val['type'] != 'snippet' else '\t%s %s' % (snippet_tag, val['caption']) for val in self.options]
+            self.window.show_quick_panel(office_panel_list, self.on_done)
+
+    def on_done(self, index):
+        if index >= 0:
+            # escape from quick panel return -1
+            try:
+                action_type = self.options[index]['type']
+                action_value = self.options[index]['value']
+                if action_type == 'snippet':
+                    #run snippet
+                    self.window.active_view().run_command("insert_snippet", {"name": action_value})
+                elif action_type == 'window_command':
+                    #run command
+                    self.window.run_command(action_value)
+                elif action_type == 'text_command':
+                    #run command
+                    self.window.active_view().run_command(action_value)
+            except ValueError as e:
+                sublime.status_message(e)
+
+
+class MediawikerTableWikiToSimpleCommand(sublime_plugin.TextCommand):
+    ''' convert selected (or under cursor) wiki table to Simple table (TableEdit plugin) '''
+
+    #TODO: wiki table properties will be lost now...
+    def run(self, edit):
+        selection = self.view.sel()
+        table_region = None
+
+        if not self.view.substr(selection[0]):
+            table_region = self.gettable()
+        else:
+            for reg in selection:
+                table_region = reg
+                break  # only first region will be proceed..
+
+        if table_region:
+            text = self.tblfixer(self.view.substr(table_region))
+            table_data = self.table_parser(text)
+            self.view.replace(edit, table_region, self.drawtable(table_data))
+            #Turn on TableEditor
+            try:
+                self.view.run_command('table_editor_enable_for_current_view', {'prop': 'enable_table_editor'})
+            except Exception as e:
+                sublime.status_message('Need to correct install plugin TableEditor: %s' % e)
+
+    def table_parser(self, text):
+        is_table = False
+        is_row = False
+        TBL_START = '{|'
+        TBL_STOP = '|}'
+        TBL_ROW_START = '|-'
+        CELL_FIRST_DELIM = '|'
+        CELL_DELIM = '||'
+        #CELL_HEAD_FIRST_DELIM = '!'
+        CELL_HEAD_DELIM = '!!'
+        CELL_FIRST_DELIM = '|'
+        is_table_has_header = False
+        table_data = []
+
+        for line in text.split('\n'):
+            is_header = False
+            line = line.replace('\n', '')
+            if line[:2] == TBL_START:
+                is_table = True
+            if line[:2] == TBL_STOP:
+                is_table = False
+            if line[:2] == TBL_ROW_START:
+                is_row = True
+            if is_table and is_row and line[:2] != TBL_ROW_START:
+                row_data = []
+                line = self.delim_fixer(line)  # temp replace char | in cell properties to """"
+                if CELL_DELIM in line:
+                    cells = line.split(CELL_DELIM)
+                elif CELL_HEAD_DELIM in line:
+                    cells = line.split(CELL_HEAD_DELIM)
+                    is_table_has_header = True
+                for cell in cells:
+                    if CELL_FIRST_DELIM in cell:
+                        #cell properties exists
+                        try:
+                            props_data, cell_data = [val.strip() for val in cell.split(CELL_FIRST_DELIM)]
+                            props_data = props_data.replace('""""', CELL_FIRST_DELIM)
+                        except Exception as e:
+                            print('Incorrect cell! %s' % e)
+                    else:
+                        props_data, cell_data = '', cell.strip()
+
+                    if is_table_has_header:
+                        is_header = True
+                        is_table_has_header = False
+                    #saving cell properties, but not used now..
+                    row_data.append({'properties': props_data, 'cell_data': cell_data, 'is_header': is_header})
+                table_data.append(row_data)
+        return table_data
+
+    def gettable(self):
+        cursor_position = self.view.sel()[0].begin()
+        pattern = r'^\{\|(.*\n)*?\|\}'
+        regions = self.view.find_all(pattern)
+        for reg in regions:
+            if reg.a <= cursor_position <= reg.b:
+                return reg
+
+    def drawtable(self, table_list):
+        '''Draw table as Table editor: Simple table'''
+        if not table_list:
+            return ''
+        text = ''
+        need_header = table_list[0][0]['is_header']
+        for row in table_list:
+            header_line = ''
+            if need_header:
+                header_line = '|-\n'
+                need_header = False  # draw header only first time
+            text += '| '
+            text += ' | '.join(cell['cell_data'] for cell in row)
+            text += ' |\n%s' % header_line
+        return text
+
+    def tblfixer(self, text):
+        text = sub(r'(.){1}(\|\-)', r'\1\n\2', text)  # |- on the same line as {| - move to next line
+        text = sub(r'(\{\|.*\n)([\|\!]\s?[^-])', r'\1|-\n\2', text)  # if |- skipped after {| line, add it
+        text = sub(r'\n(\|\s)', r'|| ', text)  # columns to one line
+        text = sub(r'(\|\-)(.*?)(\|\|)', r'\1\2\n| ', text)  # |- on it's own line
+        return text
+
+    def delim_fixer(self, string_data):
+        string_data = string_data[1:]
+        tags_start = ['[', '{']
+        tags_end = [']', '}']
+        CELL_CHAR = '|'
+        REPLACE_STR = '""""'
+        is_tag = False
+        string_out = ''
+        for char in string_data:
+            if char in tags_start and not is_tag:
+                is_tag = True
+            if is_tag and char in tags_end:
+                is_tag = False
+            if is_tag and char == CELL_CHAR:
+                string_out += REPLACE_STR
+            else:
+                string_out += char
+        return string_out
+
+
+class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
+    ''' convert selected (or under cursor) Simple table (TableEditor plugin) to wiki table '''
+    def run(self, edit):
+        selection = self.view.sel()
+        table_region = None
+        if not self.view.substr(selection[0]):
+            table_region = self.gettable()
+        else:
+            for reg in selection:
+                table_region = reg
+                break  # only first region will be proceed..
+
+        if table_region:
+            text = self.view.substr(table_region)
+            table_data = self.table_parser(text)
+            self.view.replace(edit, table_region, self.drawtable(table_data))
+
+    def table_parser(self, text):
+        table_data = []
+        TBL_HEADER_STRING = '|-'
+        need_header = False
+        if text.split('\n')[1][:2] == TBL_HEADER_STRING:
+            need_header = True
+        for line in text.split('\n'):
+            if line:
+                row_data = []
+                if line[:2] == TBL_HEADER_STRING:
+                    continue
+                elif line[0] == '|':
+                    cells = line[1:-1].split('|')  # without first and last char "|"
+                    for cell_data in cells:
+                        row_data.append({'properties': '', 'cell_data': cell_data, 'is_header': need_header})
+                    if need_header:
+                        need_header = False
+            if row_data and type(row_data) is list:
+                table_data.append(row_data)
+        return table_data
+
+    def gettable(self):
+        cursor_position = self.view.sel()[0].begin()
+        # ^([^\|\n].*)?\n\|(.*\n)*?\|.*\n[^\|] - all tables regexp (simple and wiki)?
+        pattern = r'^\|(.*\n)*?\|.*\n[^\|]'
+        regions = self.view.find_all(pattern)
+        for reg in regions:
+            if reg.a <= cursor_position <= reg.b:
+                table_region = sublime.Region(reg.a, reg.b - 2)  # minus \n and [^\|]
+                return table_region
+
+    def drawtable(self, table_list):
+        ''' draw wiki table '''
+        TBL_START = '{|'
+        TBL_STOP = '|}'
+        TBL_ROW_START = '|-'
+        CELL_FIRST_DELIM = '|'
+        CELL_DELIM = '||'
+        CELL_HEAD_FIRST_DELIM = '!'
+        CELL_HEAD_DELIM = '!!'
+
+        text_wikitable = ''
+        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw_get_setting('mediawiker_wikitable_properties', {}).items()])
+
+        need_header = table_list[0][0]['is_header']
+        is_first_line = True
+        for row in table_list:
+            if need_header or is_first_line:
+                text_wikitable += '%s\n%s' % (TBL_ROW_START, CELL_HEAD_FIRST_DELIM)
+                text_wikitable += self.getrow(CELL_HEAD_DELIM, row)
+                is_first_line = False
+                need_header = False
+            else:
+                text_wikitable += '\n%s\n%s' % (TBL_ROW_START, CELL_FIRST_DELIM)
+                text_wikitable += self.getrow(CELL_DELIM, row)
+
+        return '%s %s\n%s\n%s' % (TBL_START, table_properties, text_wikitable, TBL_STOP)
+
+    def getrow(self, delimiter, rowlist=[]):
+        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw_get_setting('mediawiker_wikitable_cell_properties', {}).items()])
+        cell_properties = '%s | ' % cell_properties if cell_properties else ''
+        try:
+            return delimiter.join(' %s%s ' % (cell_properties, cell['cell_data'].strip()) for cell in rowlist)
+        except Exception as e:
+            print('Error in data: %s' % e)

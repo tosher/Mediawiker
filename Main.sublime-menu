@@ -8,8 +8,8 @@
                 "caption": "Mediawiker",
                 "children":
                 [
-                    {"command": "mediawiker_page", "caption": "Get page", "args": {"goto": "mediawiker_show_page"}},
-                    {"command": "mediawiker_page", "caption": "Publish page", "args": {"goto": "mediawiker_publish_page"}}
+                    {"command": "mediawiker_open_page", "caption": "Open page"},
+                    {"command": "mediawiker_post_page", "caption": "Post page"}
                 ]
             }
         ]

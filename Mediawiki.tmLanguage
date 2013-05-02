@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>comment</key>
@@ -238,6 +238,29 @@
 						<dict>
 							<key>match</key>
 							<string>={4}(=+\s*$)</string>
+							<key>name</key>
+							<string>invalid.illegal.extra-equals-sign.mediawiki</string>
+						</dict>
+						<dict>
+							<key>include</key>
+							<string>#inline</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>^(={5})(?!=)(?=.*\1\s*$)</string>
+					<key>comment</key>
+					<string>Match next heading</string>
+					<key>end</key>
+					<string>\1\s*$\n?</string>
+					<key>name</key>
+					<string>markup.heading.5.mediawiki</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>match</key>
+							<string>={5}(=+\s*$)</string>
 							<key>name</key>
 							<string>invalid.illegal.extra-equals-sign.mediawiki</string>
 						</dict>
@@ -1057,7 +1080,7 @@
 					<key>end</key>
 					<string>'''</string>
 					<key>name</key>
-					<string>markup.bold.mediawiki</string>
+					<string>support.bold.mediawiki</string>
 					<key>patterns</key>
 					<array>
 						<dict>
@@ -1072,7 +1095,7 @@
 					<key>end</key>
 					<string>''(?!'[^'])</string>
 					<key>name</key>
-					<string>markup.italic.mediawiki</string>
+					<string>entity.italic.mediawiki</string>
 					<key>patterns</key>
 					<array>
 						<dict>

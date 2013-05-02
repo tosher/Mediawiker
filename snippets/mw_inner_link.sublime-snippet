@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-[[${1:PAGE_NAME}|${2:PAGE_DESCRIPTION}]]
+[[${1:$TM_SELECTED_TEXT}|${2:$TM_SELECTED_TEXT}]]
 ]]></content>
 <tabTrigger>wlink</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->

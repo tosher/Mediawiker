@@ -14,11 +14,35 @@
     "mediawiker_files_extension": ["mediawiki", "wiki", "wikipedia", ""],
     "mediawiker_category_root": "Category:Help",
     "mediawiker_mark_as_minor": false,
-    "mediawiker_csvtable_delimiter": ";",
-    "mediawiker_csvtable_properties":
+    "mediawiker_csvtable_delimiter": "|",
+    "mediawiker_wikitable_properties":
     {
         "class": "wikitable"
     },
-    "mediawiker_csvtable_cell_properties": {}
+    "mediawiker_wikitable_cell_properties": {},
+    "mediawiker_panel":
+    [
+        {"caption": "Open page", "type": "window_command", "value": "mediawiker_open_page"},
+        {"caption": "Post page", "type": "window_command", "value": "mediawiker_post_page"},
+        {"caption": "Pages history", "type": "window_command", "value": "mediawiker_page_list"},
+        {"caption": "Reopen page", "type": "window_command", "value": "mediawiker_reopen_page"},
+        {"caption": "Open page in browser", "type": "window_command", "value": "mediawiker_open_page_in_browser"},
+        {"caption": "Show TOC", "type": "text_command", "value": "mediawiker_show_toc"},
+        {"caption": "Set Category", "type": "window_command", "value": "mediawiker_set_category"},
+        {"caption": "Select wiki", "type": "window_command", "value": "mediawiker_set_active_site"},
+        {"caption": "Numbered TOC", "type": "text_command", "value": "mediawiker_enumerate_toc"},
+        {"caption": "CSV to wiki table", "type": "text_command", "value": "mediawiker_csv_table"},
+        {"caption": "Wiki table to Simple (for plugin TableEdit)", "type": "text_command", "value": "mediawiker_table_wiki_to_simple"},
+        {"caption": "Simple table to wiki (for plugin TableEdit)", "type": "text_command", "value": "mediawiker_table_simple_to_wiki"},
+        {"caption": "Heading 2", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_h2.sublime-snippet"},
+        {"caption": "Heading 3", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_h3.sublime-snippet"},
+        {"caption": "Heading 4", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_h4.sublime-snippet"},
+        {"caption": "Bold", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_bold.sublime-snippet"},
+        {"caption": "Italic", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_italic.sublime-snippet"},
+        {"caption": "External link", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_outer_link.sublime-snippet"},
+        {"caption": "Internal link", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_inner_link.sublime-snippet"},
+        {"caption": "Source tag", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_src.sublime-snippet"}
+    ]
+
 }
 
