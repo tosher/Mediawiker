@@ -1,51 +1,60 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
     <title>Mediawiker by tosher</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
-
   <body>
-    <div id="container">
-      <div class="inner">
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/tosher/Mediawiker">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/tosher/Mediawiker/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/tosher/Mediawiker/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-        <header>
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
           <h1>Mediawiker</h1>
-          <h2>Sublime Text 2 plugin: Mediawiker</h2>
-        </header>
+          <p>Wiki editor plugin for Sublime Text</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/tosher">tosher</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
 
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/tosher/Mediawiker/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/tosher/Mediawiker/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/tosher/Mediawiker" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
+        <h1>Sublime Text plugin: Mediawiker</h1>
 
-        <hr>
+<p><a href="https://github.com/tosher/Mediawiker">Mediawiker</a> is a plugin for Sublime Text editor (ver. 2/3) that adds possibility to use it as Wiki Editor on <a href="http://mediawiki.org">Mediawiki</a> based sites like <a>Wikipedia</a>) and <a href="http://www.mediawiki.org/wiki/Sites_using_MediaWiki/en">many other</a>.</p>
 
-        <section id="main_content">
-          <h1>Sublime Text 2 plugin: Mediawiker</h1>
-
-<p>Mediawiker is a plugin for Sublime Text 2 editor that adds possibility to create and edit pages on <a href="http://mediawiki.org">Mediawiki</a> based sites.</p>
-
-<p>Was tested on the latest windows\mac release builds of Sublime Text 2 and some Mediawiki sites.</p>
-
-<h2>Features</h2>
+<h2>Main features</h2>
 
 <ul>
 <li>Connection to existing mediawiki based site through the use of <a href="http://sourceforge.net/apps/mediawiki/mwclient/index.php?title=Main_Page">mwclient library</a> .</li>
-<li>New pages creation / existing pages edition and publishing to wiki.</li>
-<li>Possibility to open pages from history-list of published pages.</li>
+<li>New pages creation / existing pages edition and posting to wiki.</li>
+<li>Possibility to open pages from history-list of posted pages.</li>
 <li>TOC (table of contents) menu of the page edited to move by page headers.</li>
 <li>Syntax highlighting from <a href="https://github.com/textmate/mediawiki.tmbundle">Textmate Mediawiki bundle</a> (included).</li>
-</ul><h2>Install</h2>
+<li>Possibility to create / edit simple wiki tables with plugin <a href="https://github.com/vkocubinsky/SublimeTableEditor">TableEdit</a>.</li>
+<li>Snippets for main wiki tags.</li>
+</ul><p><img src="https://github.com/tosher/Mediawiker/wiki/sublime_wiki_editor.png" alt="Subime Text Wiki editor plugin - Mediawiker"></p>
+
+<h2>Install</h2>
 
 <h3>Package Control</h3>
 
@@ -73,10 +82,26 @@
 
 <p>Download this repo using the "ZIP" button above, unzip and place the files in "/packages-folder/Mediawiker/"</p>
 
-<h2>Documentation</h2>
+<h2>Changes in version 2.0</h2>
 
 <ul>
-<li>Use Preferences:Package settings:Mediawiker: "Settings  - Default" and "Settings - User" for setup wiki-connect and plugin options.</li>
+<li>Support for Sublime Text 3.</li>
+<li>
+<strong>Edit panel</strong> is used instead of sub-Context menu for easy using with keyboard. Also <strong>Edit panel</strong> can be called with <strong>Alt-F1</strong> shortcut.</li>
+<li>Some shortcuts was changed or removed:
+
+<ul>
+<li>Alt-F10 instead of Alt-F1 for <strong>Pages history</strong> command (select from history of posted pages).</li>
+<li>Shortcut for <strong>Set category</strong> command was removed</li>
+</ul>
+</li>
+<li>Some of the commands was changed in this version for easy using in configuration. Please, recreate your key bindings configuration if you changed the original values.</li>
+<li>Possibility to connect to wiki sites with <em>https</em> protocol was added as experimental option. Add <em>"https": true</em> parameter to site options for using it. (Not tested.)</li>
+</ul><h2>Documentation</h2>
+
+<ul>
+<li>Check <a href="https://github.com/tosher/Mediawiker/wiki">plugin wiki</a> for setup instructions.</li>
+<li>Use Preferences / Package settings / Mediawiker / "Settings  - Default" and "Settings - User" for setup wiki connection and plugin options.</li>
 <li>Some connection specific rules:
 
 <ul>
@@ -84,60 +109,95 @@
 <li>If user-name is not empty, but user-password is empty, you will be prompted for password on action.</li>
 </ul>
 </li>
-<li>Use <strong>Get Page</strong> option for retrieving existing wiki-page. If the page does not exists, you can create the new one.
+<li>Check status messages while using the plugin.</li>
+<li>All settings available under the Main menu / Preferences / Package Settings / Mediawiker.</li>
+</ul><h3>Commands</h3>
+
+<ul>
+<li>
+<strong>Edit panel</strong> with all command and snippets in ordered list (can be customized in the settings).
+
+<ul>
+<li><em>Alt-F1</em></li>
+<li><em>Context menu / Mediawiker: Edit panel</em></li>
+</ul>
+</li>
+<li>
+<strong>Open page</strong> command for retrieving existing wiki-page. If the page does not exists, you can create the new one.
 
 <ul>
 <li><em>Alt+F3</em></li>
-<li><em>Context menu:Mediawiker:Get page</em></li>
-<li><em>Main menu:File:Mediawiker:Get page</em></li>
+<li><em>Main menu / File / Mediawiker / Open page</em></li>
+<li>Use page name or page url as a wiki page name. When the url will be inserted, it will be <em>cleared</em> to page name, if wiki parameters is correct and current wiki site was selected.</li>
 </ul>
 </li>
-<li>Use clear page name or page url as a wiki page name.</li>
-<li>Use <strong>Publish Page</strong> option for publishing pages. When you publish a page, the name of the page will be saved to history.
+<li>
+<strong>Reopen page</strong> command - to reopen current page.</li>
+<li>
+<strong>Post page</strong> command for publishing pages. When you post a page, the name of the page will be saved to pages history.
 
 <ul>
 <li><em>Alt+F7</em></li>
-<li><em>Context menu:Mediawiker:Publish page</em></li>
-<li><em>Main menu:File:Mediawiker:Publish page</em></li>
+<li><em>Main menu / File / Mediawiker / Post page</em></li>
+<li>Settings option <strong>mediawiker_mark_as_minor</strong> (default: false) - using to mark changes as minor. Or you can use <strong>!</strong> character as <strong>summary prefix</strong> to invert this option on current post.</li>
 </ul>
 </li>
-<li>Use <strong>Select page from history</strong> option to open the page by name from history.
+<li>
+<strong>Pages history</strong> command to open the page by name from history.
 
 <ul>
-<li><em>Alt+F1</em></li>
-<li><em>Context menu:Mediawiker:Select page from history</em></li>
+<li><em>Alt+F10</em></li>
 </ul>
 </li>
-<li>Use <strong>Show TOC</strong> option for show table of contents of the current page and to move by page headers.
+<li>
+<strong>Show TOC</strong> command for show table of contents of the current page and to move by page headers.
 
 <ul>
 <li><em>Alt+F2</em></li>
-<li><em>Context menu:Mediawiker:Show TOC</em></li>
 </ul>
 </li>
-<li>Use <strong>Change active site</strong> to set your current wiki site.
+<li>
+<strong>Select wiki</strong> command to select your current wiki site.
 
 <ul>
 <li><em>Alt+F6</em></li>
-<li><em>Context menu:Mediawiker:Change active site</em></li>
 </ul>
 </li>
-<li>Use <strong>Open page in browser</strong> to open current page in web-browser.
+<li>
+<strong>Open page in browser</strong> command to open current page in web-browser.
 
 <ul>
 <li><em>Alt+F5</em></li>
-<li><em>Context menu:Mediawiker:Open page in browser</em></li>
 </ul>
 </li>
-<li>Experimental! Use <strong>Add category</strong> to add article category from list of root category members (check "mediawiker_category_root" option in configuration).
+<li>
+<strong>Set category</strong> command to add category to current article from list of root category members (check "mediawiker_category_root" option in configuration).</li>
+<li>
+<strong>Numbered TOC</strong> command to set headers as numbered list (format 1.1.1.).</li>
+<li>
+<strong>CSV data to wiki table</strong> command to transform selected csv-text to wiki table (default delimiter since version 2.0: |).
+
+<ul>
+<li>
+<strong>Note!</strong> Settings <strong>mediawiker_wikitable_properties</strong> and <strong>mediawiker_wikitable_cell_properties</strong> is using now for all table specific commands. Old settings <strong>mediawiker_csvtable_properties</strong> and <strong>mediawiker_csvtable_cell_properties</strong> was removed in version 2.0.</li>
+</ul>
+</li>
+<li>
+<strong>Wiki table to Simple</strong> command to transform the selected table (or under cursor) to <em>Simple table</em> (for using with plugin <a href="https://github.com/vkocubinsky/SublimeTableEditor">TableEdit</a>).
+
+<ul>
+<li>
+<strong>Warning!</strong> All table styles from original text will be replaced.</li>
+</ul>
+</li>
+<li>
+<strong>Simple table to wiki</strong> command to convert <em>Simple table</em> back to wiki syntax.</li>
+<li>Native Sublime text <strong>Command palette</strong> with predefined filter of plugin's commands and snippets.
 
 <ul>
 <li><em>Alt+F11</em></li>
-<li><em>Context menu:Mediawiker:Add category</em></li>
 </ul>
 </li>
-<li>Check status messages while using the plugin.</li>
-<li>All settings available under the Main menu:Preferences:Package Settings:Mediawiker.</li>
 </ul><h3>Predefined mediawiki sites settings</h3>
 
 <p>Note: You must setup your credentials for authorization in the settings.</p>
@@ -150,15 +210,10 @@
 <li>Mediawiki <a href="http://www.mediawiki.org">www.mediawiki.org</a>
 </li>
 </ul><p>You can add your favorite sites in the settings.</p>
-        </section>
+      </section>
 
-        <footer>
-          Mediawiker is maintained by <a href="https://github.com/tosher">tosher</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
-
-        
-      </div>
     </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
   </body>
 </html>
