@@ -11,6 +11,8 @@
 * Possibility to create / edit simple wiki tables with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor).
 * Snippets for main wiki tags.
 
+![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/sublime_wiki_editor.png)
+
 ## Install
 
 ### Package Control
