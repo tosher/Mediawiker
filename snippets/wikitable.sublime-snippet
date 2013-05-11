@@ -1,0 +1,19 @@
+<snippet>
+  <content><![CDATA[
+{| cellpadding="10" cellspacing="0" border="1" class="wikitable sortable"
+|+ ${1:Headline}
+! ${2:Data}
+! ${3:Value}
+! ${4:Note}
+|-
+| ${5:Data point}
+| ${6:Value point}
+| ${7:Note point}
+|}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>wikitable</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>mediawiki</scope> -->
+	<description>Mediawiker: 3 column table with headers</description>
+</snippet>
