@@ -1,0 +1,9 @@
+<snippet>
+  <content><![CDATA[
+<code style="color:green; background-color:#ffffcc;">$SELECTION</code>]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>yellowcode</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+	<description>Mediawiker: code box around selection with yellow background and green text</description>
+</snippet>
