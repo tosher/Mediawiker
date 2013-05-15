@@ -10,5 +10,9 @@
     { "caption": "Mediawiker: Reopen page", "command": "mediawiker_reopen_page" },
     { "caption": "Mediawiker: Wiki table to Simple (for plugin TableEdit)", "command": "mediawiker_table_wiki_to_simple" },
     { "caption": "Mediawiker: Simple table to wiki (for plugin TableEdit)", "command": "mediawiker_table_simple_to_wiki" },
-    { "caption": "Mediawiker: Edit panel", "command": "mediawiker_edit_panel" }
+    { "caption": "Mediawiker: Edit panel", "command": "mediawiker_edit_panel" },
+    { "caption": "Mediawiker: Insert image", "command": "mediawiker_insert_image"},
+    { "caption": "Mediawiker: Insert template", "command": "mediawiker_insert_template"},
+    { "caption": "Mediawiker: Category tree", "command": "mediawiker_category_tree"},
+    { "caption": "Mediawiker: Search", "command": "mediawiker_search_string"}
 ]

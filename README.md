@@ -3,12 +3,13 @@
 [Mediawiker](https://github.com/tosher/Mediawiker) is a plugin for Sublime Text editor (ver. 2/3) that adds possibility to use it as Wiki Editor on [Mediawiki](http://mediawiki.org) based sites like [Wikipedia]((http://en.wikipedia.org)) and [many other](http://www.mediawiki.org/wiki/Sites_using_MediaWiki/en).
 
 ## Main features
-* Connection to existing mediawiki based site through the use of [mwclient library](http://sourceforge.net/apps/mediawiki/mwclient/index.php?title=Main_Page) .
+* Working with mediawiki based sites through the use of [mwclient library](http://sourceforge.net/apps/mediawiki/mwclient/index.php?title=Main_Page) .
 * New pages creation / existing pages edition and posting to wiki.
-* Possibility to open pages from history-list of posted pages.
+* Possibility to open pages from history-list of posted pages or from category tree menu.
 * TOC (table of contents) menu of the page edited to move by page headers.
 * Syntax highlighting from [Textmate Mediawiki bundle](https://github.com/textmate/mediawiki.tmbundle) (included).
 * Possibility to create / edit simple wiki tables with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor).
+* Wiki search
 * Snippets for main wiki tags.
 
 ![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/sublime_wiki_editor.png)
@@ -79,6 +80,10 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 * **Open page in browser** command to open current page in web-browser.
  * *Alt+F5*
 * **Set category** command to add category to current article from list of root category members (check "mediawiker_category_root" option in configuration).
+* **Insert image** command to insert link to image from wiki. Parameter **mediawiker_image_prefix_min_length** is using to limit length of search prefix for large wikies (by default: 4 characters).
+* **Insert template** command to insert template from wiki.
+* **Search** command to search articles by text string. Results are shown as markdown formatted text in a new tab. Parameter **mediawiker_search_results_count** is using to limit search results count.
+* **Category tree** command to show sub-categories and pages of the predefined category as menu.
 * **Numbered TOC** command to set headers as numbered list (format 1.1.1.).
 * **CSV data to wiki table** command to transform selected csv-text to wiki table (default delimiter since version 2.0: |).
  * **Note!** Settings **mediawiker_wikitable_properties** and **mediawiker_wikitable_cell_properties** is using now for all table specific commands. Old settings **mediawiker_csvtable_properties** and **mediawiker_csvtable_cell_properties** was removed in version 2.0.

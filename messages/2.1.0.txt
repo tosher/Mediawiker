@@ -1,0 +1,8 @@
+Mediawiker 2.1.0 Changelog:
+
+* New options (experimental):
+ * Insert image from wiki list (by predefined prefix - minimal prefix length can be changed in configuration: mediawiker_image_prefix_min_length);
+ * Insert Template from wiki list;
+ * Search - results will be shown in new tab in markdown format, result count limited by mediawiker_search_results_count option in configuration;
+ * Category tree;
+* Proxy connection (experimental) - use "proxy_host": "ip.address:port" in site configuration.

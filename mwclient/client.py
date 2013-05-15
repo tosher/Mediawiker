@@ -216,7 +216,7 @@ class Site(object):
     @staticmethod
     def _to_str(data):
         if pythonver >= 3:
-            return data.encode('utf-8')
+            return str(data).encode('utf-8')
         else:
             if type(data) is unicode:
                 return data.encode('utf-8')
