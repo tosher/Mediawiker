@@ -233,7 +233,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
         if title:
             pagename_cleared = mw_pagename_clear(title)
             if title != pagename_cleared:
-                self.window.show_input_panel('Wiki page name:', pagename_cleared, self.on_done, self.on_change, self.on_escape)
+                self.window.show_input_panel('Wiki page name:', pagename_cleared, self.on_done, self.on_change, None)
 
     def on_done(self, title):
         if self.run_in_new_window:
