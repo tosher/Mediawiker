@@ -105,9 +105,11 @@ def mw_pagename_clear(pagename):
     try:
         pagename = mw_strunquote(pagename)
     except UnicodeEncodeError:
-        return pagename
+        #return pagename
+        pass
     except Exception:
-        return pagename
+        #return pagename
+        pass
 
     if site in pagename:
         pagename = sub(r'(https?://)?%s%s' % (site, pagepath), '', pagename)
@@ -139,22 +141,24 @@ def mw_save_mypages(title):
     mw_set_setting('mediawiker_pagelist', mediawiker_pagelist)
 
 
-def mw_get_title(view_name, file_name):
-    ''' returns page title from view_name or from file_name'''
+def mw_get_title():
+    ''' returns page title of active tab from view_name or from file_name'''
 
+    view_name = sublime.active_window().active_view().name()
     if view_name:
         return view_name
-    elif file_name:
-        wiki_extensions = mw_get_setting('mediawiker_files_extension')
-        #haven't view.name, try to get from view.file_name (without extension)
-        title, ext = splitext(basename(file_name))
-        if ext[1:] in wiki_extensions and title:
-            return title
-        else:
-            sublime.status_message('Anauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
-            return ''
     else:
-        return ''
+        #haven't view.name, try to get from view.file_name (without extension)
+        wiki_extensions = mw_get_setting('mediawiker_files_extension')
+        file_name = sublime.active_window().active_view().file_name()
+        if file_name:
+            title, ext = splitext(basename(file_name))
+            if ext[1:] in wiki_extensions and title:
+                return title
+            else:
+                sublime.status_message('Anauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
+                return ''
+    return ''
 
 
 def mw_get_hlevel(header_string, substring):
@@ -181,7 +185,7 @@ def mw_get_page_url(page_name=''):
     proto = 'https' if is_https else 'http'
     pagepath = site_list[site_name_active]["pagepath"]
     if not page_name:
-        page_name = mw_strquote(mw_get_title(sublime.active_window().active_view().name(), sublime.active_window().active_view().file_name()))
+        page_name = mw_strquote(mw_get_title())
     if page_name:
         return '%s://%s%s%s' % (proto, site, pagepath, page_name)
     else:
@@ -223,7 +227,8 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
                 self.on_done(title)
         elif self.action == 'mediawiker_reopen_page':
             #get page name
-            title = mw_get_title(sublime.active_window().active_view().name(), sublime.active_window().active_view().file_name())
+            if not title:
+                title = mw_get_title()
             self.action = 'mediawiker_show_page'
             self.on_done(title)
         elif self.action in ('mediawiker_publish_page', 'mediawiker_add_category', 'mediawiker_category_list', 'mediawiker_search_string_list', 'mediawiker_add_image', 'mediawiker_add_template'):
@@ -383,7 +388,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, title, password):
         sitecon = mw_get_connect(password)
-        self.title = mw_get_title(self.view.name(), self.view.file_name())
+        self.title = mw_get_title()
         if self.title:
             self.page = sitecon.Pages[self.title]
             if self.page.can('edit'):
@@ -422,10 +427,11 @@ class MediawikerShowTocCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         self.items = []
         self.regions = []
-        pattern = '^={1,5}(.*)?={1,5}'
+        tab = ' ' * 4
+        pattern = r'^(={1,5})\s?(.*?)\s?={1,5}'
         self.regions = self.view.find_all(pattern)
         for r in self.regions:
-            item = self.view.substr(r).strip(' \t').rstrip('=').replace('=', '  ')
+            item = sub(pattern, r'\1\2', self.view.substr(r)).replace('=', tab)
             self.items.append(item)
         sublime.set_timeout(lambda: self.view.window().show_quick_panel(self.items, self.on_done), 1)
 
@@ -1037,3 +1043,28 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
             index_of_cursor = self.view.sel()[0].begin()
             template_text = '{{%s%s}}' % (self.templates_names[idx], params_text)
             self.view.run_command('mediawiker_insert_text', {'position': index_of_cursor, 'text': template_text})
+
+
+class MediawikerOpenPageCli(sublime_plugin.WindowCommand):
+
+    def run(self):
+        print 'opening..'
+        proto_prefix = 'mediawiker|'
+        views = self.window.views()
+        for view in views:
+            view_name = view.file_name()
+            if view_name is not None:
+                #another wiki pages haven't file_name
+                view_name = self.proto_replacer(view_name[view_name.find(proto_prefix):])  # strip abs path and make replaces hacks..
+                if view_name.startswith(proto_prefix):
+                    page_name = mw_pagename_clear(view_name.split('|')[1])
+                    if self.window.active_view().is_read_only():
+                        if (int(sublime.version()) > 3000):
+                            self.window.active_view().set_read_only(False)
+                        else:
+                            self.window.active_view().set_read_only(0)
+
+                    sublime.set_timeout(lambda: self.window.run_command("mediawiker_page", {"action": "mediawiker_reopen_page", "title": page_name}), 1)
+
+    def proto_replacer(self, page_string):
+        return page_string.replace('http!!!\\', 'http://').replace('!!!', ':').replace('\\', '/')
