@@ -149,9 +149,9 @@ def mw_get_title():
         return view_name
     else:
         #haven't view.name, try to get from view.file_name (without extension)
-        wiki_extensions = mw_get_setting('mediawiker_files_extension')
         file_name = sublime.active_window().active_view().file_name()
         if file_name:
+            wiki_extensions = mw_get_setting('mediawiker_files_extension')
             title, ext = splitext(basename(file_name))
             if ext[1:] in wiki_extensions and title:
                 return title

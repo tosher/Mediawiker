@@ -113,7 +113,7 @@ class Site(object):
                 self.site_init()
             except errors.APIError as e:
                 # Private wiki, do init after login
-                if e[0] not in (u'unknown_action', u'readapidenied'):
+                if e.code not in (u'unknown_action', u'readapidenied'):
                     raise
 
     def site_init(self):
