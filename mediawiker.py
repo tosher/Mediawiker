@@ -1048,7 +1048,6 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
 class MediawikerOpenPageCli(sublime_plugin.WindowCommand):
 
     def run(self):
-        print 'opening..'
         proto_prefix = 'mediawiker|'
         views = self.window.views()
         for view in views:
