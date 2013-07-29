@@ -11,6 +11,7 @@
 * Possibility to create / edit simple wiki tables with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor).
 * Wiki search
 * Snippets for main wiki tags.
+* Experimental support for https and proxy connection.
 
 ![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/sublime_wiki_editor.png)
 
@@ -39,15 +40,6 @@ If you have Git, you can clone this repo to "/packages-folder/Mediawiker/"
 or,
 
 Download this repo using the "ZIP" button above, unzip and place the files in "/packages-folder/Mediawiker/"
-
-## Changes in version 2.0
-* Support for Sublime Text 3.
-* **Edit panel** is used instead of sub-Context menu for easy using with keyboard. Also **Edit panel** can be called with **Alt-F1** shortcut.
-* Some shortcuts was changed or removed:
- * Alt-F10 instead of Alt-F1 for **Pages history** command (select from history of posted pages).
- * Shortcut for **Set category** command was removed
-* Some of the commands was changed in this version for easy using in configuration. Please, recreate your key bindings configuration if you changed the original values.
-* Possibility to connect to wiki sites with *https* protocol was added as experimental option. Add *"https": true* parameter to site options for using it. (Not tested.)
 
 ## Documentation
 * Check [plugin wiki](https://github.com/tosher/Mediawiker/wiki) for setup instructions.
@@ -86,10 +78,8 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 * **Category tree** command to show sub-categories and pages of the predefined category as menu.
 * **Numbered TOC** command to set headers as numbered list (format 1.1.1.).
 * **CSV data to wiki table** command to transform selected csv-text to wiki table (default delimiter since version 2.0: |).
- * **Note!** Settings **mediawiker_wikitable_properties** and **mediawiker_wikitable_cell_properties** is using now for all table specific commands. Old settings **mediawiker_csvtable_properties** and **mediawiker_csvtable_cell_properties** was removed in version 2.0.
-* **Wiki table to Simple** command to transform the selected table (or under cursor) to *Simple table* (for using with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor)).
- * **Warning!** All table styles from original text will be replaced.
-* **Simple table to wiki** command to convert *Simple table* back to wiki syntax.
+* **(Buggie!) Wiki table to Simple** command to transform the selected table (or under cursor) to *Simple table* (for using with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor)).
+* **(Buggie!) Simple table to wiki** command to convert *Simple table* back to wiki syntax.
 * Native Sublime text **Command palette** with predefined filter of plugin's commands and snippets.
   * *Alt+F11*
 
