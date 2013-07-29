@@ -78,8 +78,8 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 * **Category tree** command to show sub-categories and pages of the predefined category as menu.
 * **Numbered TOC** command to set headers as numbered list (format 1.1.1.).
 * **CSV data to wiki table** command to transform selected csv-text to wiki table (default delimiter since version 2.0: |).
-* **(Buggie!) Wiki table to Simple** command to transform the selected table (or under cursor) to *Simple table* (for using with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor)).
-* **(Buggie!) Simple table to wiki** command to convert *Simple table* back to wiki syntax.
+* **(Buggy) Wiki table to Simple** command to transform the selected table (or under cursor) to *Simple table* (for using with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor)).
+* **(Buggy) Simple table to wiki** command to convert *Simple table* back to wiki syntax.
 * Native Sublime text **Command palette** with predefined filter of plugin's commands and snippets.
   * *Alt+F11*
 
