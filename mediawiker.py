@@ -2,18 +2,24 @@
 # -*- coding: utf-8 -*-
 
 import sys
+from os.path import splitext, basename, dirname
 pythonver = sys.version_info[0]
 
 if pythonver >= 3:
-    from . import mwclient
+    current_dir = dirname(__file__)
+    if '.sublime-package' in current_dir:
+        sys.path.append(current_dir)
+        import mwclient
+    else:
+        from . import mwclient
 else:
     import mwclient
 import webbrowser
 import urllib
-from os.path import splitext, basename
 import re
 import sublime
 import sublime_plugin
+
 #https://github.com/wbond/sublime_package_control/wiki/Sublime-Text-3-Compatible-Packages
 #http://www.sublimetext.com/docs/2/api_reference.html
 #http://www.sublimetext.com/docs/3/api_reference.html
