@@ -11,7 +11,7 @@ else:
 import webbrowser
 import urllib
 from os.path import splitext, basename
-from re import sub, findall
+import re
 import sublime
 import sublime_plugin
 #https://github.com/wbond/sublime_package_control/wiki/Sublime-Text-3-Compatible-Packages
@@ -112,7 +112,7 @@ def mw_pagename_clear(pagename):
         pass
 
     if site in pagename:
-        pagename = sub(r'(https?://)?%s%s' % (site, pagepath), '', pagename)
+        pagename = re.sub(r'(https?://)?%s%s' % (site, pagepath), '', pagename)
 
     sublime.status_message('Page name was cleared.')
     return pagename
@@ -431,7 +431,7 @@ class MediawikerShowTocCommand(sublime_plugin.TextCommand):
         pattern = r'^(={1,5})\s?(.*?)\s?={1,5}'
         self.regions = self.view.find_all(pattern)
         for r in self.regions:
-            item = sub(pattern, r'\1\2', self.view.substr(r)).replace('=', tab)
+            item = re.sub(pattern, r'\1\2', self.view.substr(r)).replace('=', tab)
             self.items.append(item)
         sublime.set_timeout(lambda: self.view.window().show_quick_panel(self.items, self.on_done), 1)
 
@@ -483,7 +483,7 @@ class MediawikerEnumerateTocCommand(sublime_plugin.TextCommand):
 
             #get title only
             header_text_clear = header_text.strip(' =\t')
-            header_text_clear = sub(r'^(\d\.)+\s+(.*)', r'\2', header_text_clear)
+            header_text_clear = re.sub(r'^(\d\.)+\s+(.*)', r'\2', header_text_clear)
             header_tag = '=' * level
             header_text_numbered = '%s %s. %s %s' % (header_tag, current_number_str, header_text_clear, header_tag)
             len_delta += len(header_text_numbered) - region_len
@@ -627,121 +627,71 @@ class MediawikerTableWikiToSimpleCommand(sublime_plugin.TextCommand):
         table_region = None
 
         if not self.view.substr(selection[0]):
-            table_region = self.gettable()
+            table_region = self.table_getregion()
         else:
             for reg in selection:
                 table_region = reg
                 break  # only first region will be proceed..
 
         if table_region:
-            text = self.tblfixer(self.view.substr(table_region))
-            table_data = self.table_parser(text)
-            self.view.replace(edit, table_region, self.drawtable(table_data))
+            text = self.view.substr(table_region)
+            text = self.table_fixer(text)
+            self.view.replace(edit, table_region, self.table_get(text))
             #Turn on TableEditor
             try:
                 self.view.run_command('table_editor_enable_for_current_view', {'prop': 'enable_table_editor'})
             except Exception as e:
                 sublime.status_message('Need to correct install plugin TableEditor: %s' % e)
 
-    def table_parser(self, text):
-        is_table = False
-        is_row = False
-        TBL_START = '{|'
-        TBL_STOP = '|}'
-        TBL_ROW_START = '|-'
-        CELL_FIRST_DELIM = '|'
-        CELL_DELIM = '||'
-        #CELL_HEAD_FIRST_DELIM = '!'
-        CELL_HEAD_DELIM = '!!'
-        CELL_FIRST_DELIM = '|'
-        is_table_has_header = False
-        table_data = []
+    def table_get(self, text):
+        tbl_row_delimiter = r'\|\-(.*)'
+        tbl_cell_delimiter = r'\n\s?\||\|\||\n\s?\!|\!\!'  # \n| or || or \n! or !!
+        rows = re.split(tbl_row_delimiter, text)
 
-        for line in text.split('\n'):
-            is_header = False
-            line = line.replace('\n', '')
-            if line[:2] == TBL_START:
-                is_table = True
-            if line[:2] == TBL_STOP:
-                is_table = False
-            if line[:2] == TBL_ROW_START:
-                is_row = True
-            if is_table and is_row and line[:2] != TBL_ROW_START:
-                row_data = []
-                line = self.delim_fixer(line)  # temp replace char | in cell properties to """"
-                if CELL_DELIM in line:
-                    cells = line.split(CELL_DELIM)
-                elif CELL_HEAD_DELIM in line:
-                    cells = line.split(CELL_HEAD_DELIM)
-                    is_table_has_header = True
+        tbl_full = []
+        for row in rows:
+            if row and row[0] != '{':
+                tbl_row = []
+                cells = re.split(tbl_cell_delimiter, row, re.DOTALL)[1:]
                 for cell in cells:
-                    if CELL_FIRST_DELIM in cell:
-                        #cell properties exists
-                        try:
-                            props_data, cell_data = [val.strip() for val in cell.split(CELL_FIRST_DELIM)]
-                            props_data = props_data.replace('""""', CELL_FIRST_DELIM)
-                        except Exception as e:
-                            print('Incorrect cell! %s' % e)
-                    else:
-                        props_data, cell_data = '', cell.strip()
+                    cell = cell.replace('\n', '')
+                    cell = ' ' if not cell else cell
+                    if cell[0] != '{' and cell[-1] != '}':
+                        cell = self.delim_fixer(cell)
+                        tbl_row.append(cell)
+                tbl_full.append(tbl_row)
 
-                    if is_table_has_header:
-                        is_header = True
-                        is_table_has_header = False
-                    #saving cell properties, but not used now..
-                    row_data.append({'properties': props_data, 'cell_data': cell_data, 'is_header': is_header})
-                table_data.append(row_data)
-        return table_data
+        tbl_full = self.table_print(tbl_full)
+        return tbl_full
 
-    def gettable(self):
+    def table_print(self, table_data):
+        CELL_LEFT_BORDER = '|'
+        CELL_RIGHT_BORDER = ''
+        ROW_LEFT_BORDER = ''
+        ROW_RIGHT_BORDER = '|'
+        tbl_print = ''
+        for row in table_data:
+            if row:
+                row_print = ''.join(['%s%s%s' % (CELL_LEFT_BORDER, cell, CELL_RIGHT_BORDER) for cell in row])
+                row_print = '%s%s%s' % (ROW_LEFT_BORDER, row_print, ROW_RIGHT_BORDER)
+                tbl_print += '%s\n' % (row_print)
+        return tbl_print
+
+    def table_getregion(self):
         cursor_position = self.view.sel()[0].begin()
-        pattern = r'^\{\|(.*\n)*?\|\}'
+        pattern = r'^\{\|(.*?\n?)*\|\}'
         regions = self.view.find_all(pattern)
         for reg in regions:
             if reg.a <= cursor_position <= reg.b:
                 return reg
 
-    def drawtable(self, table_list):
-        '''Draw table as Table editor: Simple table'''
-        if not table_list:
-            return ''
-        text = ''
-        need_header = table_list[0][0]['is_header']
-        for row in table_list:
-            header_line = ''
-            if need_header:
-                header_line = '|-\n'
-                need_header = False  # draw header only first time
-            text += '| '
-            text += ' | '.join(cell['cell_data'] for cell in row)
-            text += ' |\n%s' % header_line
-        return text
-
-    def tblfixer(self, text):
-        text = sub(r'(.){1}(\|\-)', r'\1\n\2', text)  # |- on the same line as {| - move to next line
-        text = sub(r'(\{\|.*\n)([\|\!]\s?[^-])', r'\1|-\n\2', text)  # if |- skipped after {| line, add it
-        text = sub(r'\n(\|\s)', r'|| ', text)  # columns to one line
-        text = sub(r'(\|\-)(.*?)(\|\|)', r'\1\2\n| ', text)  # |- on it's own line
+    def table_fixer(self, text):
+        text = re.sub(r'(\{\|.*\n)(\s?)(\||\!)(\s?[^-])', r'\1\2|-\n\3\4', text)  # if |- skipped after {| line, add it
         return text
 
     def delim_fixer(self, string_data):
-        string_data = string_data[1:]
-        tags_start = ['[', '{']
-        tags_end = [']', '}']
-        CELL_CHAR = '|'
-        REPLACE_STR = '""""'
-        is_tag = False
-        string_out = ''
-        for char in string_data:
-            if char in tags_start and not is_tag:
-                is_tag = True
-            if is_tag and char in tags_end:
-                is_tag = False
-            if is_tag and char == CELL_CHAR:
-                string_out += REPLACE_STR
-            else:
-                string_out += char
-        return string_out
+        REPLACE_STR = ':::'
+        return string_data.replace('|', REPLACE_STR)
 
 
 class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
@@ -801,6 +751,7 @@ class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
         CELL_DELIM = '||'
         CELL_HEAD_FIRST_DELIM = '!'
         CELL_HEAD_DELIM = '!!'
+        REPLACE_STR = ':::'
 
         text_wikitable = ''
         table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw_get_setting('mediawiker_wikitable_properties', {}).items()])
@@ -816,6 +767,7 @@ class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
             else:
                 text_wikitable += '\n%s\n%s' % (TBL_ROW_START, CELL_FIRST_DELIM)
                 text_wikitable += self.getrow(CELL_DELIM, row)
+                text_wikitable = text_wikitable.replace(REPLACE_STR, '|')
 
         return '%s %s\n%s\n%s' % (TBL_START, table_properties, text_wikitable, TBL_STOP)
 
@@ -967,11 +919,11 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
         text = text.replace("'''", "")
         text = text.replace("''", "")
         #spans to bold
-        text = sub(r'<span(.*?)>', span_replace_open, text)
-        text = sub(r'<\/span>', span_replace_close, text)
+        text = re.sub(r'<span(.*?)>', span_replace_open, text)
+        text = re.sub(r'<\/span>', span_replace_close, text)
         #divs cut
-        text = sub(r'<div(.*?)>', '', text)
-        text = sub(r'<\/div>', '', text)
+        text = re.sub(r'<div(.*?)>', '', text)
+        text = re.sub(r'<\/div>', '', text)
         return text
 
     def do_search(self, string_value):
@@ -1026,7 +978,7 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
     def get_template_params(self, text):
         params_list = []
         pattern = r'\{{3}.*?\}{3}'
-        parameters = findall(pattern, text)
+        parameters = re.findall(pattern, text)
         for param in parameters:
             param = param.strip('{}')
             #default value or not..

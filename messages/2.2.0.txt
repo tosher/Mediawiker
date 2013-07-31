@@ -1,0 +1,3 @@
+Mediawiker 2.1.0 Changelog:
+
+* Wiki table to Simple option was rewritten
