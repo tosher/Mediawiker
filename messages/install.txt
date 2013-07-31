@@ -1,3 +1,5 @@
-Mediawiker 1.0.0 Changelog:
+Mediawiker
 
- - First version release
+Mediawiker is a plugin for Sublime Text editor (ver. 2/3) that adds possibility to use it as Wiki Editor on Mediawiki based sites like Wikipedia) and many other.
+
+https://github.com/tosher/Mediawiker
