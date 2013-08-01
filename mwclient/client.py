@@ -384,9 +384,9 @@ class Site(object):
         else:
             self.site_init()
 
-    def upload(self, file=None, filename=None, description='', ignore=False, file_size=None, url=None, session_key=None):
+    def upload(self, fileobj=None, filename=None, description='', ignore=False, file_size=None, url=None, session_key=None):
         if self.version[:2] < (1, 16):
-            return compatibility.old_upload(self, file=file, filename=filename, description=description, ignore=ignore, file_size=file_size)
+            return compatibility.old_upload(self, fileobj=fileobj, filename=filename, description=description, ignore=ignore, file_size=file_size)
 
         image = self.Images[filename]
         if not image.can('upload'):
@@ -406,24 +406,27 @@ class Site(object):
         if session_key:
             predata['session_key'] = session_key
 
-        if file is None:
+        if fileobj is None:
             postdata = self._query_string(predata)
         else:
-            if type(file) is str:
-                file_size = len(file)
-                file = StringIO(file)
+            if type(fileobj) is str:
+                file_size = len(fileobj)
+                fileobj = StringIO(fileobj)
             if file_size is None:
-                file.seek(0, 2)
-                file_size = file.tell()
-                file.seek(0, 0)
+                fileobj.seek(0, 2)
+                file_size = fileobj.tell()
+                fileobj.seek(0, 0)
 
-            postdata = upload.UploadFile('file', filename, file_size, file, predata)
+            postdata = upload.UploadFile('file', filename, file_size, fileobj, predata)
 
         wait_token = self.wait_token()
         while True:
             try:
                 data = self.raw_call('api', postdata).read()
-                info = json.loads(data)
+                if pythonver >= 3:
+                    info = json.loads(data.decode('utf-8'))
+                else:
+                    info = json.loads(data)
                 if not info:
                     info = {}
                 if self.handle_api_result(info, kwargs=predata):
@@ -437,7 +440,7 @@ class Site(object):
                     self.wait(wait_token)
             except errors.HTTPError:
                 self.wait(wait_token)
-            file.seek(0, 0)
+            fileobj.seek(0, 0)
 
     def parse(self, text, title=None):
         kwargs = {'text': text}

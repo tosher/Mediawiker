@@ -37,6 +37,7 @@
         {"caption": "Select wiki", "type": "window_command", "value": "mediawiker_set_active_site"},
         {"caption": "Numbered TOC", "type": "text_command", "value": "mediawiker_enumerate_toc"},
         {"caption": "Category tree", "type": "window_command", "value": "mediawiker_category_tree"},
+        {"caption": "File upload", "type": "window_command", "value": "mediawiker_file_upload"},
         {"caption": "Search", "type": "window_command", "value": "mediawiker_search_string"},
         {"caption": "CSV to wiki table", "type": "text_command", "value": "mediawiker_csv_table"},
         {"caption": "Wiki table to Simple (for plugin TableEdit)", "type": "text_command", "value": "mediawiker_table_wiki_to_simple"},

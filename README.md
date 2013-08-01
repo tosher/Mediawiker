@@ -77,6 +77,7 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 * **Search** command to search articles by text string. Results are shown as markdown formatted text in a new tab. Parameter **mediawiker_search_results_count** is using to limit search results count.
 * **Category tree** command to show sub-categories and pages of the predefined category as menu.
 * **Numbered TOC** command to set headers as numbered list (format 1.1.1.).
+* **File upload** for uploading files to wiki
 * **CSV data to wiki table** command to transform selected csv-text to wiki table (default delimiter since version 2.0: |).
 * **(Buggy) Wiki table to Simple** command to transform the selected table (or under cursor) to *Simple table* (for using with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor)).
 * **(Buggy) Simple table to wiki** command to convert *Simple table* back to wiki syntax.

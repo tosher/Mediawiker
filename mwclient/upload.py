@@ -23,19 +23,27 @@ class Upload(object):
 	"""
 
 	BLOCK_SIZE = 8192
+
 	def __init__(self, length, content_type):
 		self.length = length
 		self.content_type = content_type
 
 	def __iter__(self):
 		return self
-	
-	#def __next__(self):
-	def next(self):
-		data = self.read(self.BLOCK_SIZE)
-		if data == '':
-			raise StopIteration
-		return data
+
+	if pythonver >= 3:
+		def __next__(self):
+			data = self.read(self.BLOCK_SIZE)
+			if data == '':
+				raise StopIteration
+			return data
+	else:
+		#def __next__(self):
+		def next(self):
+			data = self.read(self.BLOCK_SIZE)
+			if data == '':
+				raise StopIteration
+			return data
 
 	@staticmethod
 	def encode(s):
@@ -90,16 +98,17 @@ class UploadFile(Upload):
 		self.boundary = self.generate_boundary()
 		self.postdata = self.generate_multipart_from_dict(data)
 		self.footer = '\r\n--%s--\r\n' % self.boundary
-		self.fileheader = ('--%s\r\n' % self.boundary +
-				'Content-Disposition: form-data; name="%s"; filename="%s"\r\n' %
-					(self.encode(filefield), self.encode(filename)) +
-				'Content-Type: application/octet-stream\r\n\r\n')
+		if pythonver >= 3:
+			# encode to bytes will be later in httpmw:130
+			# TODO: must be the same for all parts.
+			self.fileheader = ('--%s\r\n' % self.boundary + 'Content-Disposition: form-data; name="%s"; filename="%s"\r\n' % (filefield, filename) + 'Content-Type: application/octet-stream\r\n\r\n')
+		else:
+			self.fileheader = ('--%s\r\n' % self.boundary + 'Content-Disposition: form-data; name="%s"; filename="%s"\r\n' % (self.encode(filefield), self.encode(filename)) + 'Content-Type: application/octet-stream\r\n\r\n')
 		self.file = file
 		self.length_left = filelength
 		self.str_data = None
 
-		Upload.__init__(self, len(self.fileheader) + filelength + len(self.postdata) + len(self.footer) + 2,
-			'multipart/form-data; boundary=' + self.boundary)
+		Upload.__init__(self, len(self.fileheader) + filelength + len(self.postdata) + len(self.footer) + 2, 'multipart/form-data; boundary=' + self.boundary)
 
 	def read(self, length):
 		if self.stage == self.STAGE_DONE:
@@ -132,15 +141,22 @@ class UploadFile(Upload):
 
 	@staticmethod
 	def generate_boundary():
-		return '----%s----' % ''.join((random.choice(
-			'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+		return '----%s----' % ''.join((random.choice('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
 			for i in range_compat(32)))
 
 	def generate_multipart_from_dict(self, data):
 		postdata = []
 		for i in data:
-			postdata.append('--' + self.boundary)
-			postdata.append('Content-Disposition: form-data; name="%s"' % self.encode(i))
-			postdata.append('')
-			postdata.append(self.encode(data[i]))
+			if pythonver >= 3:
+				# encode to bytes will be later in httpmw:130
+				# TODO: must be the same for all parts.
+				postdata.append('--' + self.boundary)
+				postdata.append('Content-Disposition: form-data; name="%s"' % i)
+				postdata.append('')
+				postdata.append('%s' % data[i])
+			else:
+				postdata.append('--' + self.boundary)
+				postdata.append('Content-Disposition: form-data; name="%s"' % self.encode(i))
+				postdata.append('')
+				postdata.append(self.encode(data[i]))
 		return '\r\n'.join(postdata)

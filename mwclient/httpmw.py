@@ -18,6 +18,7 @@ import errors
 
 from client import __ver__
 
+
 class Request(urllib_compat.Request):
     def __init__(self, url, data=None, headers={}, origin_req_host=None, unverifiable=False, head=False):
         urllib_compat.Request.__init__(self, url, data, headers, origin_req_host, unverifiable)
@@ -59,7 +60,7 @@ class CookieJar(dict):
         else:
             value, attrs = cookie.split(': ', 1)[1].split(';', 1)
             i = value.strip().split('=')
-        
+
         if len(i) == 1 and i[0] in self:
             del self[i[0]]
         else:
@@ -128,7 +129,13 @@ class HTTPPersistentConnection(object):
             self._conn.request(method, path, headers = headers)
             if issubclass(data.__class__, upload.Upload):
                 for s in data:
-                    self._conn.send(s)
+                    if pythonver >= 3:
+                        if type(s) is str:
+                            self._conn.send(bytes(s, 'utf-8'))
+                        else:
+                            self._conn.send(s)
+                    else:
+                        self._conn.send(s)
             elif data:
                 if pythonver >= 3:
                     self._conn.send(bytearray(data, 'utf-8'))
