@@ -1,4 +1,7 @@
-This files describes mwclient-0.7.0. The latest version is available in the 
+This files describes mwclient-0.7.0 - updated version of original library for compatibility 
+with Sublime Text 2/3 (python versions 2.6/3.3). 
+
+The latest original version (0.6.5) is available in the 
 subversion repository <https://mwclient.svn.sourceforge.net/svnroot/mwclient>
 and also browsable <http://mwclient.svn.sourceforge.net/viewvc/mwclient/>.
 
