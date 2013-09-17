@@ -51,7 +51,7 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 * All settings available under the Main menu / Preferences / Package Settings / Mediawiker.
 
 ### Commands
-* **Edit panel** with all command and snippets in ordered list (can be customized in the settings).
+* **Edit panel** with all commands and snippets in ordered list (can be customized in the settings).
  * *Alt-F1*
  * *Context menu / Mediawiker: Edit panel*
 * **Open page** command for retrieving existing wiki-page. If the page does not exists, you can create the new one.
