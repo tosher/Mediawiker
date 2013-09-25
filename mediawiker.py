@@ -535,11 +535,10 @@ class MediawikerOpenPageInBrowserCommand(sublime_plugin.WindowCommand):
 
 class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
     categories_list = None
-    password = ''
     title = ''
 
     def run(self, edit, title, password):
-        sitecon = mw_get_connect(self.password)
+        sitecon = mw_get_connect(password)
         category_root = mw_get_category(mw_get_setting('mediawiker_category_root'))[1]
         category = sitecon.Categories[category_root]
         self.categories_list_names = []
@@ -803,6 +802,7 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
     category_prefix = ''  # "Category" namespace name as returned language..
 
     def run(self, edit, title, password):
+        self.password = password
         if self.category_path:
             category_root = mw_get_category(self.get_category_current())[1]
         else:
@@ -896,6 +896,7 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
     search_result = None
 
     def run(self, edit, title, password):
+        self.password = password
         sublime.active_window().show_input_panel('Wiki search:', '', self.show_results, None, None)
 
     def show_results(self, search_value=''):
@@ -951,6 +952,7 @@ class MediawikerAddImageCommand(sublime_plugin.TextCommand):
     images_names = []
 
     def run(self, edit, password, title=''):
+        self.password = password
         self.image_prefix_min_lenght = mw_get_setting('mediawiker_image_prefix_min_length', 4)
         sublime.active_window().show_input_panel('Wiki image prefix (min %s):' % self.image_prefix_min_lenght, '', self.show_list, None, None)
 
