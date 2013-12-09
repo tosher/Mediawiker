@@ -42,6 +42,7 @@ or,
 Download this repo using the "ZIP" button above, unzip and place the files in "/packages-folder/Mediawiker/"
 
 ## Documentation
+* Hint: **Twilight** color scheme is better for highlighting instead of **Monokai**.
 * Check [plugin wiki](https://github.com/tosher/Mediawiker/wiki) for setup instructions.
 * Use Preferences / Package settings / Mediawiker / "Settings  - Default" and "Settings - User" for setup wiki connection and plugin options.
 * Some connection specific rules:
@@ -51,17 +52,17 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 * All settings available under the Main menu / Preferences / Package Settings / Mediawiker.
 
 ### Commands
-* **Edit panel** with all commands and snippets in ordered list (can be customized in the settings).
+* **Edit panel** with all command and snippets in ordered list (can be customized in the settings).
  * *Alt-F1*
- * *Context menu / Mediawiker: Edit panel*
+ * *Main menu / Tools / Mediawiker / Edit panel*
 * **Open page** command for retrieving existing wiki-page. If the page does not exists, you can create the new one.
  * *Alt+F3*
- * *Main menu / File / Mediawiker / Open page*
+ * *Main menu / Tools / Mediawiker / Open page*
  * Use page name or page url as a wiki page name. When the url will be inserted, it will be *cleared* to page name, if wiki parameters is correct and current wiki site was selected.
 * **Reopen page** command - to reopen current page.
 * **Post page** command for publishing pages. When you post a page, the name of the page will be saved to pages history.
  * *Alt+F7*
- * *Main menu / File / Mediawiker / Post page*
+ * *Main menu / Tools / Mediawiker / Post page*
  * Settings option **mediawiker_mark_as_minor** (default: false) - using to mark changes as minor. Or you can use **!** character as **summary prefix** to invert this option on current post.
 * **Pages history** command to open the page by name from history.
  * *Alt+F10*

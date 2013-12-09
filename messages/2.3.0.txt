@@ -1,0 +1,6 @@
+Mediawiker 2.3.0 Changelog:
+
+* Mediawiker sub-menu was moved from "File" to "Tools" menu.
+* Context menu was removed
+* "Set category" option was changed - possibility to change root category on request, possibility to move by category tree to sub-categories.
+

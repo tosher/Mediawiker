@@ -1,6 +1,6 @@
 [
     {
-        "id": "file",
+        "id": "tools",
         "children":
         [
             {
@@ -8,6 +8,7 @@
                 "caption": "Mediawiker",
                 "children":
                 [
+                    {"command": "mediawiker_edit_panel", "caption": "Edit panel"},
                     {"command": "mediawiker_open_page", "caption": "Open page"},
                     {"command": "mediawiker_post_page", "caption": "Post page"}
                 ]
