@@ -355,30 +355,49 @@ class MediawikerValidateConnectionParamsCommand(sublime_plugin.WindowCommand):
     password = ''
     title = ''
     action = ''
+    is_hide_password = False
 
     def run(self, title, action):
+        self.is_hide_password = mw_get_setting('mediawiker_password_input_hide')
         self.action = action  # TODO: check for better variant
         self.title = title
         site = mw_get_setting('mediawiki_site_active')
         site_list = mw_get_setting('mediawiki_site')
         self.password = site_list[site]["password"]
         if site_list[site]["username"]:
-            #auth required if username exists in settings
+            # auth required if username exists in settings
             if not self.password:
-                #need to ask for password
-                self.window.show_input_panel('Password:', '', self.on_done, None, None)
+                # need to ask for password
+                self.window.show_input_panel('Password:', '', self.on_done, self.on_change, None)
             else:
                 self.call_page()
         else:
-            #auth is not required
+            # auth is not required
             self.call_page()
 
+    def _get_password(self, str_val):
+        self.password = self.password + str_val.replace('*', '')
+        return '*' * len(self.password)
+
+    def on_change(self, str_val):
+        if str_val:
+            if self.is_hide_password:
+                # password hiding hack..
+                if str_val:
+                    password = str_val
+                    str_val = self._get_password(str_val)
+                    if password != str_val:
+                        password = str_val
+                        self.window.show_input_panel('Password:', str_val, self.on_done, self.on_change, None)
+        else:
+            self.password = ''
+
     def on_done(self, password):
-        self.password = password
+        if not self.is_hide_password:
+            self.password = password
         self.call_page()
 
     def call_page(self):
-        #TODO: if havent opened views get error.. 'NoneType' object has no attribute 'run_command'.. need to fix..
         self.window.active_view().run_command(self.action, {"title": self.title, "password": self.password})
 
 
