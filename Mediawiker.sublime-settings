@@ -11,6 +11,8 @@
     "mediawiker_newtab_ongetpage": true,
     "mediawiker_clearpagename_oninput": true,
     "mediawiker_password_input_hide": false,
+    "mediawiker_password_char": "\u25CF",
+    "mediawiker_snippet_char": "\u24C8",
     "mediawiker_pagelist_maxsize": 100,
     "mediawiker_files_extension": ["mediawiki", "wiki", "wikipedia", ""],
     "mediawiker_category_root": "Category:Help",

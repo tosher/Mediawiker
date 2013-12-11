@@ -1,0 +1,5 @@
+Mediawiker 2.3.2 Changelog:
+
+* Unicode symbol "\u25CF" as default password character (in hidden mode).
+* Password and snippets characters in configuration for easy customizing: mediawiker_password_char, mediawiker_snippet_char
+

@@ -356,9 +356,11 @@ class MediawikerValidateConnectionParamsCommand(sublime_plugin.WindowCommand):
     title = ''
     action = ''
     is_hide_password = False
+    PASSWORD_CHAR = u'\u25CF'
 
     def run(self, title, action):
         self.is_hide_password = mw_get_setting('mediawiker_password_input_hide')
+        self.PASSWORD_CHAR = mw_get_setting('mediawiker_password_char')
         self.action = action  # TODO: check for better variant
         self.title = title
         site = mw_get_setting('mediawiki_site_active')
@@ -376,8 +378,8 @@ class MediawikerValidateConnectionParamsCommand(sublime_plugin.WindowCommand):
             self.call_page()
 
     def _get_password(self, str_val):
-        self.password = self.password + str_val.replace('*', '')
-        return '*' * len(self.password)
+        self.password = self.password + str_val.replace(self.PASSWORD_CHAR, '')
+        return self.PASSWORD_CHAR * len(self.password)
 
     def on_change(self, str_val):
         if str_val:
@@ -659,12 +661,13 @@ class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
 
 class MediawikerEditPanelCommand(sublime_plugin.WindowCommand):
     options = []
+    SNIPPET_CHAR = u'\u24C8'
 
     def run(self):
-        snippet_tag = u'\u24C8'
+        self.SNIPPET_CHAR = mw_get_setting('mediawiker_snippet_char')
         self.options = mw_get_setting('mediawiker_panel', {})
         if self.options:
-            office_panel_list = ['\t%s' % val['caption'] if val['type'] != 'snippet' else '\t%s %s' % (snippet_tag, val['caption']) for val in self.options]
+            office_panel_list = ['\t%s' % val['caption'] if val['type'] != 'snippet' else '\t%s %s' % (self.SNIPPET_CHAR, val['caption']) for val in self.options]
             self.window.show_quick_panel(office_panel_list, self.on_done)
 
     def on_done(self, index):
