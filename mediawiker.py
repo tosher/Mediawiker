@@ -593,7 +593,6 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
     def on_done(self, idx):
         # the dialog was cancelled
         if idx >= 0:
-            print self.categories_list_values[idx]
             self.category_options[0][1] = self.categories_list_values[idx]
             self.category_options[1][1] = self.categories_list_names[idx]
             sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.category_options, self.on_done_final), 1)
@@ -630,7 +629,6 @@ class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
             table_data_dic_tmp = map(self.get_table_data, self.view.substr(region).split('\n'))
 
             # verify and fix columns count in rows
-            print(table_data_dic_tmp)
             if table_data_dic_tmp:
                 cols_cnt = len(max(table_data_dic_tmp, key=len))
                 for row in table_data_dic_tmp:
