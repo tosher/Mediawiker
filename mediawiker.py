@@ -469,7 +469,8 @@ class MediawikerShowTocCommand(sublime_plugin.TextCommand):
         self.items = []
         self.regions = []
         self.regions = self.view.find_all(self.pattern)
-        self.items = map(self.get_header, self.regions)
+        #self.items = map(self.get_header, self.regions)
+        self.items = [self.get_header(x) for x in self.regions]
         sublime.set_timeout(lambda: self.view.window().show_quick_panel(self.items, self.on_done), 1)
 
     def get_header(self, region):
@@ -540,7 +541,8 @@ class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
     def run(self):
         self.site_active = mw_get_setting('mediawiki_site_active')
         sites = mw_get_setting('mediawiki_site')
-        self.site_keys = map(self.is_checked, list(sites.keys()))
+        #self.site_keys = map(self.is_checked, list(sites.keys()))
+        self.site_keys = [self.is_checked(x) for x in sites.keys()]
         sublime.set_timeout(lambda: self.window.show_quick_panel(self.site_keys, self.on_done), 1)
 
     def is_checked(self, site_key):
@@ -626,7 +628,8 @@ class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
         for region in self.view.sel():
             table_data_dic_tmp = []
             table_data = ''
-            table_data_dic_tmp = map(self.get_table_data, self.view.substr(region).split('\n'))
+            #table_data_dic_tmp = map(self.get_table_data, self.view.substr(region).split('\n'))
+            table_data_dic_tmp = [self.get_table_data(x) for x in self.view.substr(region).split('\n')]
 
             # verify and fix columns count in rows
             if table_data_dic_tmp:
@@ -1013,7 +1016,8 @@ class MediawikerAddImageCommand(sublime_plugin.TextCommand):
         if len(image_prefix) >= self.image_prefix_min_lenght:
             sitecon = mw_get_connect(self.password)
             images = sitecon.allpages(prefix=image_prefix, namespace=IMAGE_NAMESPACE)  # images list by prefix
-            self.images_names = map(self.get_page_title, images)
+            #self.images_names = map(self.get_page_title, images)
+            self.images_names = [self.get_page_title(x) for x in images]
             sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.images_names, self.on_done), 1)
         else:
             sublime.message_dialog('Image prefix length must be more than %s. Operation canceled.' % self.image_prefix_min_lenght)
