@@ -11,7 +11,8 @@
 * Possibility to create / edit simple wiki tables with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor).
 * Wiki search
 * Snippets for main wiki tags.
-* Experimental support for https and proxy connection.
+* Experimental support of https and proxy connection.
+* Experimental support of http basic/digest authorization.
 
 ![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/sublime_wiki_editor.png)
 

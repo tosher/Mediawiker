@@ -54,7 +54,9 @@
         {"caption": "Internal link", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_inner_link.sublime-snippet"},
         {"caption": "Source tag", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_src.sublime-snippet"},
         {"caption": "Unnumbered list", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_liu.sublime-snippet"},
-        {"caption": "Numbered list", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_lio.sublime-snippet"}
+        {"caption": "Numbered list", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_lio.sublime-snippet"},
+        {"caption": "Strike", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_strike.sublime-snippet"},
+        {"caption": "Predefined text", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_pre.sublime-snippet"}
     ]
 
 }

@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+<s>${1:$TM_SELECTED_TEXT}</s>
+]]></content>
+<tabTrigger>wstri</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+<description>Mediawiker: Strike</description>
+</snippet>

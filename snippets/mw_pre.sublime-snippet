@@ -1,0 +1,11 @@
+<snippet>
+	<content><![CDATA[
+<pre>
+${1:$TM_SELECTED_TEXT}
+</pre>
+]]></content>
+<tabTrigger>wpre</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+<description>Mediawiker: Pre</description>
+</snippet>

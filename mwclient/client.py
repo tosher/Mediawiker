@@ -61,7 +61,8 @@ class WaitToken(object):
 class Site(object):
     api_limit = 500
 
-    def __init__(self, host, path='/w/', ext='.php', pool=None, retry_timeout=30, max_retries=25, wait_callback=lambda *x: None, max_lag=3, compress=True, force_login=True, do_init=True):
+    def __init__(self, host, path='/w/', ext='.php', pool=None, retry_timeout=30, max_retries=25, wait_callback=lambda *x: None,
+                 max_lag=3, compress=True, force_login=True, do_init=True, custom_headers=None):
         # Setup member variables
         self.host = host
         self.path = path
@@ -88,6 +89,7 @@ class Site(object):
 
         self.namespaces = self.default_namespaces
         self.writeapi = False
+        self.custom_headers = custom_headers if custom_headers is not None else {}
 
         # Setup connection
         if pool is None:
@@ -243,6 +245,9 @@ class Site(object):
         if self.compress and gzip:
             headers['Accept-Encoding'] = 'gzip'
 
+        if self.custom_headers:
+            headers.update(self.custom_headers)
+
         token = self.wait_token((script, data))
         while True:
             try:
@@ -255,8 +260,8 @@ class Site(object):
                         seekable_stream = StringIO(stream.read())
                     stream = gzip.GzipFile(fileobj=seekable_stream)
                 return stream
-
-            except errors.HTTPStatusError as e:
+            except errors.HTTPStatusError as exc:
+                e = exc.args if pythonver >= 3 else exc
                 if e[0] == 503 and e[1].getheader('X-Database-Lag'):
                     self.wait(token, int(e[1].getheader('Retry-After')))
                 elif e[0] < 500 or e[0] > 599:
@@ -431,7 +436,8 @@ class Site(object):
                     info = {}
                 if self.handle_api_result(info, kwargs=predata):
                     return info.get('upload', {})
-            except errors.HTTPStatusError as e:
+            except errors.HTTPStatusError as exc:
+                e = exc.args if pythonver >= 3 else exc
                 if e[0] == 503 and e[1].getheader('X-Database-Lag'):
                     self.wait(wait_token, int(e[1].getheader('Retry-After')))
                 elif e[0] < 500 or e[0] > 599:

@@ -1,0 +1,6 @@
+Mediawiker 2.3.3 Changelog:
+
+* HTTP Basic, Digest Authorization support (experimental)
+* Snippets: strike, pre
+
+

@@ -26,7 +26,8 @@ class Request(urllib_compat.Request):
         self.head = head
 
     def get_method(self):
-        if self.head: return 'HEAD'
+        if self.head:
+            return 'HEAD'
         return urllib_compat.Request.get_method(self)
 
 
@@ -48,7 +49,9 @@ class CookieJar(dict):
             for cookie in response.msg.getallmatchingheaders('Set-Cookie'):
                 self.parse_cookie(cookie.strip())
         if response.getheader('set-cookie2', None):
-            raise RuntimeError('Set-Cookie2', value)
+            # TODO: value is undefined..
+            # raise RuntimeError('Set-Cookie2', value)
+            raise RuntimeError('Set-Cookie2', '')
 
     def parse_cookie(self, cookie):
         if not cookie:
@@ -80,16 +83,18 @@ class CookieJar(dict):
             for k, v in self.iteritems():
                 yield Cookie(k, v)
 
+
 class Cookie(object):
     def __init__(self, name, value):
         self.name = name
         self.value = value
 
+
 class HTTPPersistentConnection(object):
     http_class = http_compat.HTTPConnection
     scheme_name = 'http'
 
-    def __init__(self, host, pool = None):
+    def __init__(self, host, pool=None):
         self.cookies = {}
         self.pool = pool
         if pool:
@@ -123,10 +128,11 @@ class HTTPPersistentConnection(object):
         elif data:
             headers['Content-Length'] = str(len(data))
 
-        if _headers: headers.update(_headers)
+        if _headers:
+            headers.update(_headers)
 
         try:
-            self._conn.request(method, path, headers = headers)
+            self._conn.request(method, path, headers=headers)
             if issubclass(data.__class__, upload.Upload):
                 for s in data:
                     if pythonver >= 3:
@@ -171,7 +177,8 @@ class HTTPPersistentConnection(object):
                 data = ''
             old_path = path
             path = location[2]
-            if location[4]: path = path + '?' + location[4]
+            if location[4]:
+                path = path + '?' + location[4]
 
             if location[0].lower() != self.scheme_name:
                 raise errors.HTTPRedirectError('Only HTTP connections are supported', res.getheader('Location'))
@@ -195,14 +202,14 @@ class HTTPPersistentConnection(object):
 
         return res
 
-    def get(self, host, path, headers = None):
+    def get(self, host, path, headers=None):
         return self.request('GET', host, path, headers, None)
 
-    def post(self, host, path, headers = None, data = None):
+    def post(self, host, path, headers=None, data=None):
         return self.request('POST', host, path, headers, data)
 
-    def head(self, host, path, headers = None, auto_redirect = False):
-        res = self.request('HEAD', host, path, headers, data = None, raise_on_not_ok = False, auto_redirect = auto_redirect)
+    def head(self, host, path, headers=None, auto_redirect=False):
+        res = self.request('HEAD', host, path, headers, data=None, raise_on_not_ok=False, auto_redirect=auto_redirect)
         res.read()
         return res.status, res.getheaders()
 
@@ -212,12 +219,15 @@ class HTTPPersistentConnection(object):
     def fileno(self):
         return self._conn.sock.fileno()
 
+
 class HTTPConnection(HTTPPersistentConnection):
     def request(self, method, host, path, headers, data, raise_on_not_ok=True, auto_redirect=True):
-        if not headers: headers = {}
+        if not headers:
+            headers = {}
         headers['Connection'] = 'Close'
         res = HTTPPersistentConnection.request(self, method, host, path, headers, data, raise_on_not_ok, auto_redirect)
         return res
+
 
 class HTTPSPersistentConnection(HTTPPersistentConnection):
     #Sublime havent socket module compiled with SSL support: use http until will be resolved
@@ -273,7 +283,7 @@ class HTTPPool(list):
     def post(self, host, path, headers=None, data=None):
         return self.find_connection(host).post(host, path, headers, data)
 
-    def head(self, host, path, headers = None, auto_redirect = False):
+    def head(self, host, path, headers=None, auto_redirect=False):
         return self.find_connection(host).head(host, path, headers, auto_redirect)
 
     def request(self, method, host, path, headers, data, raise_on_not_ok, auto_redirect):
