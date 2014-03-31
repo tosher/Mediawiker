@@ -234,6 +234,7 @@ class HTTPSPersistentConnection(HTTPPersistentConnection):
     try:
         http_class = http_compat.HTTPSConnection
         scheme_name = 'https'
+        print('HTTPS is available.')
     except Exception as e:
         print('HTTPS is not available in this python environment, trying http: %s' % e)
         http_class = http_compat.HTTPConnection

@@ -2,18 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from os.path import splitext, basename, dirname
+from os.path import splitext, basename, dirname, join
+import imp
 pythonver = sys.version_info[0]
 
-if pythonver >= 3:
-    current_dir = dirname(__file__)
-    if '.sublime-package' in current_dir:
-        sys.path.append(current_dir)
-        import mwclient
-    else:
-        from . import mwclient
-else:
-    import mwclient
 import webbrowser
 import urllib
 import re
@@ -27,6 +19,49 @@ import uuid
 #http://www.sublimetext.com/docs/2/api_reference.html
 #http://www.sublimetext.com/docs/3/api_reference.html
 #sublime.message_dialog
+
+st_version = 2
+if int(sublime.version()) > 3000:
+    st_version = 3
+
+# import custom ssl module on linux
+# thnx to wbond and his SFTP module!
+# http://sublimetext.userecho.com/topic/50801-bundle-python-ssl-module/
+
+arch_lib_path = None
+if sublime.platform() == 'linux':
+    arch_lib_path = join(dirname(__file__), 'lib', 'st%d_linux_%s' % (st_version, sublime.arch()))
+    print('Mediawiker: enabling custom linux ssl module')
+    for ssl_ver in ['1.0.0', '10', '0.9.8']:
+        lib_path = join(arch_lib_path, 'libssl-' + ssl_ver)
+        sys.path.append(lib_path)
+        try:
+            import _ssl
+            print('Mediawiker: successfully loaded _ssl module for libssl.so.%s' % ssl_ver)
+            break
+        except (ImportError) as e:
+            print('Mediawiker: _ssl module import error - ' + str(e))
+    if '_ssl' in sys.modules:
+        try:
+            if sys.version_info < (3,):
+                plat_lib_path = join(sublime.packages_path(), 'Mediawiker', 'lib', 'st2_linux')
+                m_info = imp.find_module('ssl', [plat_lib_path])
+                m = imp.load_module('ssl', *m_info)
+            else:
+                import ssl
+        except (ImportError) as e:
+            print('Mediawiker: ssl module import error - ' + str(e))
+
+# import mwclient after ssl
+if pythonver >= 3:
+    current_dir = dirname(__file__)
+    if '.sublime-package' in current_dir:
+        sys.path.append(current_dir)
+        import mwclient
+    else:
+        from . import mwclient
+else:
+    import mwclient
 
 CATEGORY_NAMESPACE = 14  # category namespace number
 IMAGE_NAMESPACE = 6  # image namespace number
