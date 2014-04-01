@@ -49,17 +49,21 @@ if sublime.platform() == 'linux':
                 m = imp.load_module('ssl', *m_info)
             else:
                 import ssl
+                print('Mediawiker: ssl loaded!')
         except (ImportError) as e:
             print('Mediawiker: ssl module import error - ' + str(e))
 
-# import mwclient after ssl
+# after ssl mwclient import
+# in httpmw.py http_compat will be reloaded
 if pythonver >= 3:
-    current_dir = dirname(__file__)
-    if '.sublime-package' in current_dir:
-        sys.path.append(current_dir)
-        import mwclient
-    else:
-        from . import mwclient
+    # NOTE: load from package, not used now because custom ssl
+    # current_dir = dirname(__file__)
+    # if '.sublime-package' in current_dir:
+    #     sys.path.append(current_dir)
+    #     import mwclient
+    # else:
+    #     from . import mwclient
+    from . import mwclient
 else:
     import mwclient
 

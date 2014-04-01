@@ -1,0 +1,4 @@
+Mediawiker 2.3.4 Changelog:
+
+* SSL and HTTPS under linux (Thanx to Will Bond's solution from SFTP plugin)
+* .no-sublime-package was added

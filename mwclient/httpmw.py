@@ -1,10 +1,25 @@
+#!/usr/bin/env python\n
+# -*- coding: utf-8 -*-
+
+FOR_MEDIAWIKER = True
+
 import sys
 pythonver = sys.version_info[0]
+
 
 if pythonver >= 3:
     import urllib.request as urllib_compat  # , urllib.error
     import urllib.parse as urlparse_compat
     import http.client as http_compat
+
+    if FOR_MEDIAWIKER and sys.platform.startswith('linux'):
+        # for mediawiker's ssl under linux under sublime 3
+        # ssl was loaded from mediawiker
+        # under sublime 3 needs to reload ssl required modules
+        from imp import reload
+        reload(http_compat)
+        print('Mediawiker: http_compat reloaded.')
+
 else:
     import urllib2 as urllib_compat
     import urlparse as urlparse_compat
@@ -234,7 +249,8 @@ class HTTPSPersistentConnection(HTTPPersistentConnection):
     try:
         http_class = http_compat.HTTPSConnection
         scheme_name = 'https'
-        print('HTTPS is available.')
+        if FOR_MEDIAWIKER and sys.platform.startswith('linux'):
+            print('Mediawiker: HTTPS is available.')
     except Exception as e:
         print('HTTPS is not available in this python environment, trying http: %s' % e)
         http_class = http_compat.HTTPConnection
