@@ -90,6 +90,13 @@ def mw_enco(value):
     return value
 
 
+def mw_deco(value):
+    ''' for py3 decode from bytes '''
+    if pythonver >= 3:
+        return value.decode('utf-8')
+    return value
+
+
 def mw_dict_val(dictobj, key, default_value=None):
     try:
         return dictobj[key]
@@ -183,7 +190,7 @@ def mw_get_connect(password=''):
 
             if realm is not None:
                 if realm == BASIC_REALM:
-                    auth = base64.standard_b64encode('%s:%s' % (http_auth_login, http_auth_password))
+                    auth = mw_deco(base64.standard_b64encode(mw_enco('%s:%s' % (http_auth_login, http_auth_password))))
                     custom_headers = {'Authorization': 'Basic %s' % auth}
                 elif realm == DIGEST_REALM:
                     auth = mw_get_digest_header(http_auth_header, http_auth_login, http_auth_password, '%sapi.php' % path)
@@ -352,8 +359,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
         actions_validate = ['mediawiker_publish_page', 'mediawiker_add_category',
                             'mediawiker_category_list', 'mediawiker_search_string_list',
                             'mediawiker_add_image', 'mediawiker_add_template',
-                            'mediawiker_upload'
-                           ]
+                            'mediawiker_upload']
 
         if self.action == 'mediawiker_show_page':
             if mw_get_setting('mediawiker_newtab_ongetpage'):
@@ -1214,7 +1220,7 @@ class MediawikerOpenPageCli(sublime_plugin.WindowCommand):
         for view in views:
             view_name = view.file_name()
             if view_name is not None:
-                #another wiki pages haven't file_name
+                # another wiki pages haven't file_name
                 view_name = self.proto_replacer(view_name[view_name.find(proto_prefix):])  # strip abs path and make replaces hacks..
                 if view_name.startswith(proto_prefix):
                     page_name = mw_pagename_clear(view_name.split('|')[1])
