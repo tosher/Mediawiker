@@ -237,7 +237,6 @@ def mw_strunquote(string_value):
     else:
         return urllib.unquote(string_value.encode('ascii')).decode('utf-8')
 
-
 def mw_strquote(string_value):
     if pythonver >= 3:
         return urllib.parse.quote(string_value)
@@ -1212,28 +1211,18 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
             self.view.run_command('mediawiker_insert_text', {'position': index_of_cursor, 'text': template_text})
 
 
-class MediawikerOpenPageCli(sublime_plugin.WindowCommand):
+class MediawikerCli(sublime_plugin.WindowCommand):
 
-    def run(self):
-        proto_prefix = 'mediawiker|'
-        views = self.window.views()
-        for view in views:
-            view_name = view.file_name()
-            if view_name is not None:
-                # another wiki pages haven't file_name
-                view_name = self.proto_replacer(view_name[view_name.find(proto_prefix):])  # strip abs path and make replaces hacks..
-                if view_name.startswith(proto_prefix):
-                    page_name = mw_pagename_clear(view_name.split('|')[1])
-                    if self.window.active_view().is_read_only():
-                        if (int(sublime.version()) > 3000):
-                            self.window.active_view().set_read_only(False)
-                        else:
-                            self.window.active_view().set_read_only(0)
+    def run(self, url):
+        if url:
+            # print('Opening page: %s' % url)
+            page_name = self.proto_replacer(url)
+            sublime.set_timeout(lambda: self.window.run_command("mediawiker_page", {"action": "mediawiker_show_page", "title": page_name}), 1)
 
-                    sublime.set_timeout(lambda: self.window.run_command("mediawiker_page", {"action": "mediawiker_reopen_page", "title": page_name}), 1)
-
-    def proto_replacer(self, page_string):
-        return page_string.replace('http!!!\\', 'http://').replace('!!!', ':').replace('\\', '/')
+    def proto_replacer(self, url):
+        if url.endswith('/'):
+            url = url[:-1]
+        return url.split("://")[1]
 
 
 class MediawikerUploadCommand(sublime_plugin.TextCommand):
