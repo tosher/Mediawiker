@@ -15,6 +15,7 @@
 * Experimental support of http basic/digest authorization.
 
 ![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/sublime_wiki_editor.png)
+*Screenshot using the Twilight theme*
 
 ## Install
 
@@ -43,7 +44,7 @@ or,
 Download this repo using the "ZIP" button above, unzip and place the files in "/packages-folder/Mediawiker/"
 
 ## Documentation
-* Hint: **Twilight** color scheme is better for highlighting instead of **Monokai**.
+* **Hint**: full syntax highlighting is available for some but not all color schemes. Try a color scheme other than the default Monokai scheme, if syntax highlighting seems insufficent for you. 
 * Check [plugin wiki](https://github.com/tosher/Mediawiker/wiki) for setup instructions.
 * Use Preferences / Package settings / Mediawiker / "Settings  - Default" and "Settings - User" for setup wiki connection and plugin options.
 * Some connection specific rules:
