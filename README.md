@@ -3,7 +3,7 @@
 [Mediawiker](https://github.com/tosher/Mediawiker) is a plugin for Sublime Text editor (ver. 2/3) that adds possibility to use it as Wiki Editor on [Mediawiki](http://mediawiki.org) based sites like [Wikipedia]((http://en.wikipedia.org)) and [many other](http://www.mediawiki.org/wiki/Sites_using_MediaWiki/en).
 
 ## Main features
-* Working with mediawiki based sites through the use of [mwclient library](http://sourceforge.net/apps/mediawiki/mwclient/index.php?title=Main_Page) .
+* Working with mediawiki based sites through the use of [mwclient library](http://sourceforge.net/apps/mediawiki/mwclient/index.php?title=Main_Page). Mwclient was modified for work under **Sublime text 3**.
 * New pages creation / existing pages edition and posting to wiki.
 * Possibility to open pages from history-list of posted pages or from category tree menu.
 * TOC (table of contents) menu of the page edited to move by page headers.
@@ -11,10 +11,11 @@
 * Possibility to create / edit simple wiki tables with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor).
 * Wiki search
 * Snippets for main wiki tags.
-* Experimental support of https and proxy connection.
-* Experimental support of http basic/digest authorization.
+* Support of https and proxy connection.
+* Support of http/https basic/digest authorization.
 
 ![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/sublime_wiki_editor.png)
+*Screenshot using the Twilight theme*
 
 ## Install
 
@@ -43,7 +44,7 @@ or,
 Download this repo using the "ZIP" button above, unzip and place the files in "/packages-folder/Mediawiker/"
 
 ## Documentation
-* Hint: **Twilight** color scheme is better for highlighting instead of **Monokai**.
+* Note: Not all color schemes fully supports syntax highlighting scopes required by markup languages like Mediawiki or Markdown. On this moment, color schemes with better support are: **Twilight**, **Sunburst**, **Eiffel**. Also, Mediawiker package includes **Twilight (Mediawiki)**, **Eiffel (Mediawiki)** and **Mediawiker_Dark** schemes with improved highlighting for mediawiki syntax. 
 * Check [plugin wiki](https://github.com/tosher/Mediawiker/wiki) for setup instructions.
 * Use Preferences / Package settings / Mediawiker / "Settings  - Default" and "Settings - User" for setup wiki connection and plugin options.
 * Some connection specific rules:

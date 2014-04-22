@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>comment</key>
@@ -86,6 +86,40 @@
 							<string>#link</string>
 						</dict>
 					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>((&lt;/?)(code|div|pre|span|font))</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.tag.mediawiki</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.tag.mediawiki</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>storage.type.mediawiki</string>
+						</dict>
+					</dict>
+					<key>end</key>
+					<string>(&gt;)</string>
+					<key>endCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.tag.mediawiki</string>
+						</dict>
+					</dict>
+					<key>name</key>
+					<string>meta.tag.validhtml.mediawiki</string>
 				</dict>
 				<dict>
 					<key>begin</key>
@@ -358,7 +392,7 @@
 						is a paragraph.
 					</string>
 					<key>end</key>
-					<string>^(?:\s*$|(?=[;*#:=]|----))</string>
+					<string>^(?:\s*$|(?=[;*#:=&lt;]|----))</string>
 					<key>name</key>
 					<string>meta.paragraph.mediawiki</string>
 					<key>patterns</key>
@@ -1080,7 +1114,7 @@
 					<key>end</key>
 					<string>'''</string>
 					<key>name</key>
-					<string>support.bold.mediawiki</string>
+					<string>markup.bold.html.mediawiki</string>
 					<key>patterns</key>
 					<array>
 						<dict>
@@ -1095,7 +1129,7 @@
 					<key>end</key>
 					<string>''(?!'[^'])</string>
 					<key>name</key>
-					<string>entity.italic.mediawiki</string>
+					<string>markup.italic.html.mediawiki</string>
 					<key>patterns</key>
 					<array>
 						<dict>
@@ -1687,6 +1721,10 @@
 								<dict>
 									<key>include</key>
 									<string>#inline</string>
+								</dict>
+								<dict>
+									<key>include</key>
+									<string>#block</string>
 								</dict>
 							</array>
 						</dict>

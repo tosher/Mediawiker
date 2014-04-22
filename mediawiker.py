@@ -1211,17 +1211,18 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
             self.view.run_command('mediawiker_insert_text', {'position': index_of_cursor, 'text': template_text})
 
 
-class MediawikerCli(sublime_plugin.WindowCommand):
+class MediawikerCliCommand(sublime_plugin.WindowCommand):
 
     def run(self, url):
         if url:
             # print('Opening page: %s' % url)
-            page_name = self.proto_replacer(url)
-            sublime.set_timeout(lambda: self.window.run_command("mediawiker_page", {"action": "mediawiker_show_page", "title": page_name}), 1)
+            sublime.set_timeout(lambda: self.window.run_command("mediawiker_page", {"action": "mediawiker_show_page", "title": self.proto_replacer(url)}), 1)
 
     def proto_replacer(self, url):
-        if url.endswith('/'):
+        if sublime.platform() == 'windows' and url.endswith('/'):
             url = url[:-1]
+        elif sublime.platform() == 'linux' and url.startswith("'") and url.endswith("'"):
+            url = url[1:-1]
         return url.split("://")[1]
 
 
