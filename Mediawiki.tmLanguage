@@ -385,14 +385,14 @@
 				</dict>
 				<dict>
 					<key>begin</key>
-					<string>^(?![\t ;*#:=]|----|$)</string>
+					<string>^(?![\t ;*#:=&lt;]|----|$)</string>
 					<key>comment</key>
 					<string>
 						Anything that is not a code block, list, header, etc.
 						is a paragraph.
 					</string>
 					<key>end</key>
-					<string>^(?:\s*$|(?=[;*#:=]|----))</string>
+					<string>^(?:\s*$|(?=[;*#:=&lt;]|----))</string>
 					<key>name</key>
 					<string>meta.paragraph.mediawiki</string>
 					<key>patterns</key>
