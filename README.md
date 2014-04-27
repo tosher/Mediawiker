@@ -68,6 +68,8 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 * **Pages history** command to open the page by name from history.
  * *Alt+F10*
 * **Show TOC** command for show table of contents of the current page and to move by page headers.
+* **Show internal links** command for show all internal links of the current page. You can go to selected link on page, open it in editor or in browser.
+* **Show external links** command for show all external links of the current page (links like [link..]). You can go to selected links on page or open it in browser.
  * *Alt+F2*
 * **Select wiki** command to select your current wiki site.
  * *Alt+F6*

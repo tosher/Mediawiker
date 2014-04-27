@@ -2,4 +2,4 @@ Mediawiker 2.3.6:
 
 New commands for links management on opened page:
 * Show internal links
-* Show external links
+* Show external links - external wiki links like [link..]

@@ -630,7 +630,7 @@ class MediawikerShowInternalLinksCommand(sublime_plugin.TextCommand):
     items = []
     regions = []
     pattern = r'\[{2}(.*?)(\|.*?)?\]{2}'
-    actions = ['Goto internal link', 'Open page by link']
+    actions = ['Goto internal link', 'Open page in editor', 'Open page in browser']
     selected = None
 
     def run(self, edit):
@@ -659,6 +659,9 @@ class MediawikerShowInternalLinksCommand(sublime_plugin.TextCommand):
             self.view.sel().add(self.regions[self.selected])
         elif index == 1:
             sublime.set_timeout(lambda: self.view.window().run_command("mediawiker_page", {"action": "mediawiker_show_page", "title": self.items[self.selected]}), 1)
+        elif index == 2:
+            url = mw_get_page_url(self.items[self.selected])
+            webbrowser.open(url)
 
 
 class MediawikerShowExternalLinksCommand(sublime_plugin.TextCommand):
