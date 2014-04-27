@@ -44,17 +44,16 @@ or,
 Download this repo using the "ZIP" button above, unzip and place the files in "/packages-folder/Mediawiker/"
 
 ## Documentation
-* Note: Not all color schemes fully supports syntax highlighting scopes required by markup languages like Mediawiki or Markdown. On this moment, color schemes with better support are: **Twilight**, **Sunburst**, **Eiffel**. Also, Mediawiker package includes **Twilight (Mediawiki)**, **Eiffel (Mediawiki)** and **Mediawiker_Dark** schemes with improved highlighting for mediawiki syntax. 
+* **Note**: Not all color schemes fully supports syntax highlighting scopes required by markup languages like Mediawiki or Markdown. On this moment, color schemes with better support are: **Twilight**, **Sunburst**, **Eiffel**. Also, Mediawiker package includes **Twilight (Mediawiki)**, **Eiffel (Mediawiki)** and **Mediawiker_Dark** schemes with improved highlighting for mediawiki syntax. 
 * Check [plugin wiki](https://github.com/tosher/Mediawiker/wiki) for setup instructions.
 * Use Preferences / Package settings / Mediawiker / "Settings  - Default" and "Settings - User" for setup wiki connection and plugin options.
 * Some connection specific rules:
  * If user-name is empty, then authorization will not be used.
  * If user-name is not empty, but user-password is empty, you will be prompted for password on action.
-* Check status messages while using the plugin.
-* All settings available under the Main menu / Preferences / Package Settings / Mediawiker.
+* All settings are available under the Main menu / Preferences / Package Settings / Mediawiker.
 
 ### Commands
-* **Edit panel** with all command and snippets in ordered list (can be customized in the settings).
+* **Edit panel** with all commands and snippets in ordered list (can be customized in the settings).
  * *Alt-F1*
  * *Main menu / Tools / Mediawiker / Edit panel*
 * **Open page** command for retrieving existing wiki-page. If the page does not exists, you can create the new one.

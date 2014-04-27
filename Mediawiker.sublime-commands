@@ -15,5 +15,7 @@
     { "caption": "Mediawiker: Insert template", "command": "mediawiker_insert_template"},
     { "caption": "Mediawiker: Category tree", "command": "mediawiker_category_tree"},
     { "caption": "Mediawiker: Search", "command": "mediawiker_search_string"},
-    { "caption": "Mediawiker: File Upload", "command": "mediawiker_file_upload"}
+    { "caption": "Mediawiker: File Upload", "command": "mediawiker_file_upload"},
+    { "caption": "Mediawiker: Show internal links", "command": "mediawiker_show_internal_links"},
+    { "caption": "Mediawiker: Show external links", "command": "mediawiker_show_external_links"}
 ]
