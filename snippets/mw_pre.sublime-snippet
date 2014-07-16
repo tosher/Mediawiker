@@ -6,6 +6,6 @@ ${1:$TM_SELECTED_TEXT}
 ]]></content>
 <tabTrigger>wpre</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
-	<!-- <scope>source.python</scope> -->
+<scope>text.html.mediawiki</scope>
 <description>Mediawiker: Pre</description>
 </snippet>
