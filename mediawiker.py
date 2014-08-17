@@ -237,6 +237,7 @@ def mw_strunquote(string_value):
     else:
         return urllib.unquote(string_value.encode('ascii')).decode('utf-8')
 
+
 def mw_strquote(string_value):
     if pythonver >= 3:
         return urllib.parse.quote(string_value)
@@ -266,12 +267,12 @@ def mw_pagename_clear(pagename):
     return pagename
 
 
-def mw_save_mypages(title):
-    #for wiki '_' and ' ' are equal in page name
-    title = title.replace('_', ' ')
+def mw_save_mypages(title, storage_name='mediawiker_pagelist'):
+
+    title = title.replace('_', ' ')  # for wiki '_' and ' ' are equal in page name
     pagelist_maxsize = mw_get_setting('mediawiker_pagelist_maxsize')
     site_name_active = mw_get_setting('mediawiki_site_active')
-    mediawiker_pagelist = mw_get_setting('mediawiker_pagelist', {})
+    mediawiker_pagelist = mw_get_setting(storage_name, {})
 
     if site_name_active not in mediawiker_pagelist:
         mediawiker_pagelist[site_name_active] = []
@@ -286,7 +287,7 @@ def mw_save_mypages(title):
             #for sorting
             my_pages.remove(title)
     my_pages.append(title)
-    mw_set_setting('mediawiker_pagelist', mediawiker_pagelist)
+    mw_set_setting(storage_name, mediawiker_pagelist)
 
 
 def mw_get_title():
@@ -468,11 +469,10 @@ class MediawikerSearchStringCommand(sublime_plugin.WindowCommand):
 
 
 class MediawikerPageListCommand(sublime_plugin.WindowCommand):
-    my_pages = []
 
-    def run(self):
+    def run(self, storage_name='mediawiker_pagelist'):
         site_name_active = mw_get_setting('mediawiki_site_active')
-        mediawiker_pagelist = mw_get_setting('mediawiker_pagelist', {})
+        mediawiker_pagelist = mw_get_setting(storage_name, {})
         self.my_pages = mediawiker_pagelist[site_name_active] if site_name_active in mediawiker_pagelist else []
         if self.my_pages:
             self.my_pages.reverse()
@@ -1348,3 +1348,16 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
             sublime.message_dialog('Upload io error: %s' % e)
         except Exception as e:
             sublime.message_dialog('Upload error: %s' % e)
+
+
+class MediawikerFavoritesAddCommand(sublime_plugin.WindowCommand):
+
+    def run(self):
+        title = mw_get_title()
+        mw_save_mypages(title=title, storage_name='mediawiker_favorites')
+
+
+class MediawikerFavoritesOpenCommand(sublime_plugin.WindowCommand):
+
+    def run(self):
+        self.window.run_command("mediawiker_page_list", {"storage_name": 'mediawiker_favorites'})
