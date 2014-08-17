@@ -31,6 +31,8 @@
         {"caption": "Open page", "type": "window_command", "value": "mediawiker_open_page"},
         {"caption": "Post page", "type": "window_command", "value": "mediawiker_post_page"},
         {"caption": "Pages history", "type": "window_command", "value": "mediawiker_page_list"},
+        {"caption": "Add to Favorites", "type": "window_command", "value": "mediawiker_favorites_add"},
+        {"caption": "Favorite pages", "type": "window_command", "value": "mediawiker_favorites_open"},
         {"caption": "Reopen page", "type": "window_command", "value": "mediawiker_reopen_page"},
         {"caption": "Open page in browser", "type": "window_command", "value": "mediawiker_open_page_in_browser"},
         {"caption": "Set Category", "type": "window_command", "value": "mediawiker_set_category"},
