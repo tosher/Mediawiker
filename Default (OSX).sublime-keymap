@@ -6,5 +6,26 @@
     { "keys": ["alt+f6"], "command": "mediawiker_set_active_site" },
     { "keys": ["alt+f7"], "command": "mediawiker_post_page" },
     { "keys": ["alt+f10"], "command": "mediawiker_page_list" },
-    { "keys": ["alt+f11"], "command": "show_overlay", "args": {"overlay": "command_palette", "text":"Mediawiker"} }
+    { "keys": ["alt+f11"], "command": "show_overlay", "args": {"overlay": "command_palette", "text":"Mediawiker"} },
+    {
+        "keys": ["ctrl+b"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_bold.sublime-snippet"},
+        "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
+    },
+    {
+        "keys": ["ctrl+i"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_italic.sublime-snippet"},
+        "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
+    },
+    {
+        "keys": ["ctrl+alt+2"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_h2.sublime-snippet"},
+        "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
+    },
+    {
+        "keys": ["ctrl+alt+3"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_h3.sublime-snippet"},
+        "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
+    },
+    {
+        "keys": ["ctrl+alt+4"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_h4.sublime-snippet"},
+        "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
+    }
+
 ]

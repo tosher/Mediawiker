@@ -1361,3 +1361,11 @@ class MediawikerFavoritesOpenCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         self.window.run_command("mediawiker_page_list", {"storage_name": 'mediawiker_favorites'})
+
+
+class MediawikerLoad(sublime_plugin.EventListener):
+    def on_activated(self, view):
+        if view.settings().get('syntax').endswith('Mediawiker/Mediawiki.tmLanguage'):
+            # Mediawiki mode
+            view.settings().set('mediawiker_is_here', True)
+            view.settings().set('mediawiker_wiki_instead_editor', mw_get_setting('mediawiker_wiki_instead_editor'))
