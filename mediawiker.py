@@ -1284,7 +1284,7 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
             param = param.replace('|', '=') if '|' in param else '%s=' % param
             if param not in params_list:
                 params_list.append(param)
-        return ''.join(['|%s\n' % param for param in params_list])
+        return ''.join(['|%s\n' % p for p in params_list])
 
     def on_done(self, idx):
         if idx >= 0:
