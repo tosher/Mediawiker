@@ -1,0 +1,9 @@
+Mediawiker 2.3.9:
+
+* Mediawiker specific shortcuts:
+ * **ctrl+b** - bold
+ * **ctrl+i** - italic
+ * **ctrl+alt+[2, 3, 4]** - heading of 2, 3 and 4 levels
+ * **f5** - reopen page (refresh)
+ * **ctrl+s** - post page (optional, check new option **mediawiker_wiki_instead_editor**)
+* Possibility to create new shotcuts in mediawiker context (**mediawiker_is_here**) - for examples, check sublime-keymap files.

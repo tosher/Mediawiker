@@ -305,7 +305,7 @@ def mw_get_title():
             if ext[1:] in wiki_extensions and title:
                 return title
             else:
-                sublime.status_message('Anauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
+                sublime.status_message('Unauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
                 return ''
     return ''
 
@@ -1065,7 +1065,9 @@ class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
 
         return '%s %s\n%s\n%s' % (TBL_START, table_properties, text_wikitable, TBL_STOP)
 
-    def getrow(self, delimiter, rowlist=[]):
+    def getrow(self, delimiter, rowlist=None):
+        if rowlist is None:
+            rowlist = []
         cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw_get_setting('mediawiker_wikitable_cell_properties', {}).items()])
         cell_properties = '%s | ' % cell_properties if cell_properties else ''
         try:
