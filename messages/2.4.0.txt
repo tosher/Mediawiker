@@ -1,0 +1,4 @@
+Mediawiker 2.4.0:
+* Add/edit wiki site setup wizard
+* Mediawiker environment shortcuts fix
+* <kbd> tag snippet (mw_kbd, Ctrl+Alt+K)

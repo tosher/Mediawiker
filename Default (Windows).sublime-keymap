@@ -35,5 +35,9 @@
             {"key": "setting.mediawiker_is_here", "operand": true},
             {"key": "setting.mediawiker_wiki_instead_editor", "operand": true}
         ]
+    },
+    {
+        "keys": ["ctrl+alt+k"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_kbd.sublime-snippet"},
+        "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
     }
 ]

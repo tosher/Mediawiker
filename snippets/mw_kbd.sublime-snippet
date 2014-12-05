@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+<kbd>${1:$TM_SELECTED_TEXT}</kbd>
+]]></content>
+<tabTrigger>wkbd</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+<scope>text.html.mediawiki</scope>
+<description>Mediawiker: Kbd</description>
+</snippet>

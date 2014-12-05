@@ -73,6 +73,7 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
  * *Alt+F2*
 * **Select wiki** command to select your current wiki site.
  * *Alt+F6*
+* **Add/Edit wiki site** command for create new or edit existed wiki sites configurations.
 * **Open page in browser** command to open current page in web-browser.
  * *Alt+F5*
 * **Set category** command to add category to current article from list of root category members (check "mediawiker_category_root" option in configuration).

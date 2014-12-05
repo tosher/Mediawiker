@@ -26,6 +26,19 @@
     {
         "keys": ["ctrl+alt+4"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_h4.sublime-snippet"},
         "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
+    },
+    {
+        "keys": ["f5"], "command": "mediawiker_reopen_page", "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
+    },
+    {
+        "keys": ["ctrl+s"], "command": "mediawiker_post_page", "context": [
+            {"key": "setting.mediawiker_is_here", "operand": true},
+            {"key": "setting.mediawiker_wiki_instead_editor", "operand": true}
+        ]
+    },
+    {
+        "keys": ["ctrl+alt+k"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_kbd.sublime-snippet"},
+        "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
     }
 
 ]

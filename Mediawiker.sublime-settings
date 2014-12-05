@@ -39,6 +39,7 @@
         {"caption": "Set Category", "type": "window_command", "value": "mediawiker_set_category"},
         {"caption": "Insert image", "type": "window_command", "value": "mediawiker_insert_image"},
         {"caption": "Insert template", "type": "window_command", "value": "mediawiker_insert_template"},
+        {"caption": "Add/edit wiki site", "type": "window_command", "value": "mediawiker_process_site"},
         {"caption": "Select wiki", "type": "window_command", "value": "mediawiker_set_active_site"},
         {"caption": "Category tree", "type": "window_command", "value": "mediawiker_category_tree"},
         {"caption": "File upload", "type": "window_command", "value": "mediawiker_file_upload"},
@@ -61,7 +62,8 @@
         {"caption": "Unnumbered list", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_liu.sublime-snippet"},
         {"caption": "Numbered list", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_lio.sublime-snippet"},
         {"caption": "Strike", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_strike.sublime-snippet"},
-        {"caption": "Predefined text", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_pre.sublime-snippet"}
+        {"caption": "Predefined text", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_pre.sublime-snippet"},
+        {"caption": "Keyboard", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_kbd.sublime-snippet"}
     ]
 
 }
