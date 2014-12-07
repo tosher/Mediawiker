@@ -1,0 +1,5 @@
+Mediawiker 2.4.1:
+* Auto completions for internal links.
+ * Configuration option "mediawiker_search_namespaces" is used to define namespaces for search pages (default: 0). Example: "0,500".
+ * Configuration option "mediawiker_page_prefix_min_length" defines minimal page prefix length for auto complete.
+

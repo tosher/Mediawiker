@@ -72,6 +72,26 @@ def get_title():
     return ''
 
 
+def pagename_clear(pagename):
+    """ Return clear pagename if page-url was set instead of.."""
+    site_name_active = get_setting('mediawiki_site_active')
+    site_list = get_setting('mediawiki_site')
+    site = site_list[site_name_active]['host']
+    pagepath = site_list[site_name_active]['pagepath']
+    try:
+        pagename = strunquote(pagename)
+    except UnicodeEncodeError:
+        pass
+    except Exception:
+        pass
+
+    if site in pagename:
+        pagename = re.sub(r'(https?://)?%s%s' % (site, pagepath), '', pagename)
+
+    sublime.status_message('Page name was cleared.')
+    return pagename
+
+
 def get_digest_header(header, username, password, path):
     HEADER_ATTR_PATTERN = r'([\w\s]+)=\"?([^".]*)\"?'
     METHOD = "POST"

@@ -71,7 +71,7 @@ IMAGE_NAMESPACE = 6  # image namespace number
 TEMPLATE_NAMESPACE = 10  # template namespace number
 
 
-def mw_get_connect(password=''):
+def mw_get_connect(password=None):
     DIGEST_REALM = 'Digest realm'
     BASIC_REALM = 'Basic realm'
     site_name_active = mw.get_setting('mediawiki_site_active')
@@ -80,6 +80,8 @@ def mw_get_connect(password=''):
     site = site_params['host']
     path = site_params['path']
     username = site_params['username']
+    if password is None:
+        username = site_params['password']
     domain = site_params['domain']
     proxy_host = site_params.get('proxy_host', '')
     is_https = site_params.get('https', False)
@@ -150,26 +152,6 @@ def mw_get_page_text(site, title):
             return False, page.edit()
         else:
             return False, ''
-
-
-def mw_pagename_clear(pagename):
-    """ Return clear pagename if page-url was set instead of.."""
-    site_name_active = mw.get_setting('mediawiki_site_active')
-    site_list = mw.get_setting('mediawiki_site')
-    site = site_list[site_name_active]['host']
-    pagepath = site_list[site_name_active]['pagepath']
-    try:
-        pagename = mw.strunquote(pagename)
-    except UnicodeEncodeError:
-        pass
-    except Exception:
-        pass
-
-    if site in pagename:
-        pagename = re.sub(r'(https?://)?%s%s' % (site, pagepath), '', pagename)
-
-    sublime.status_message('Page name was cleared.')
-    return pagename
 
 
 def mw_save_mypages(title, storage_name='mediawiker_pagelist'):
@@ -261,7 +243,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
                     #     pagename_default = self.window.active_view().substr(selreg).strip()
                     #     break
                     pagename_default = self.window.active_view().substr(selection[0]).strip()
-                self.window.show_input_panel('Wiki page name:', mw_pagename_clear(pagename_default), self.on_done, self.on_change, None)
+                self.window.show_input_panel('Wiki page name:', mw.pagename_clear(pagename_default), self.on_done, self.on_change, None)
             else:
                 self.on_done(title)
         elif self.action == 'mediawiker_reopen_page':
@@ -275,7 +257,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
 
     def on_change(self, title):
         if title:
-            pagename_cleared = mw_pagename_clear(title)
+            pagename_cleared = mw.pagename_clear(title)
             if title != pagename_cleared:
                 self.window.show_input_panel('Wiki page name:', pagename_cleared, self.on_done, self.on_change, None)
 
@@ -285,7 +267,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
             self.run_in_new_window = False
         try:
             if title:
-                title = mw_pagename_clear(title)
+                title = mw.pagename_clear(title)
             self.window.run_command("mediawiker_validate_connection_params", {"title": title, "action": self.action})
         except ValueError as e:
             sublime.message_dialog(e)
@@ -1260,3 +1242,49 @@ class MediawikerLoad(sublime_plugin.EventListener):
             # Mediawiki mode
             view.settings().set('mediawiker_is_here', True)
             view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
+
+
+class MediawikerCompletionsEvent(sublime_plugin.EventListener):
+
+    def check_tab(self, view):
+        mw_here = view.settings().get('mediawiker_is_here', False)
+        if mw_here:
+            return True
+        return False
+
+    def on_query_completions(self, view, prefix, locations):
+        if self.check_tab(view):
+            view = sublime.active_window().active_view()
+
+            # internal links completions
+            position = view.sel()[0].begin()
+            line_before_position = view.substr(view.line(view.sel()[0]))[0:position]
+            internal_link = re.findall(r'\[{2}([^\]\[]+)\]{0,2}', line_before_position)[-1]
+
+            completions = []
+
+            if internal_link:
+                word_cursor_min_len = mw.get_setting('mediawiker_page_prefix_min_length', 3)
+                if len(internal_link) >= word_cursor_min_len:
+                    namespaces = [ns.strip() for ns in mw.get_setting('mediawiker_search_namespaces').split(',')]
+                    sitecon = mw_get_connect()
+                    pages = []
+                    pages_names = []
+                    for ns in namespaces:
+                        pages = sitecon.allpages(prefix=internal_link, namespace=ns)
+                        for p in pages:
+                            # name - full page name with namespace
+                            # page_title - title of the page wo namespace
+                            # For (Main) namespace, shows [page_title (Main)], makes [[page_title]]
+                            # For other namespace, shows [page_title namespace], makes [[name|page_title]]
+                            if int(ns):
+                                ns_name = p.name.split(':')[0]
+                                page_insert = '%s|%s' % (p.name, p.page_title)
+                            else:
+                                ns_name = '(Main)'
+                                page_insert = p.page_title
+                            page_show = '%s\t%s' % (p.page_title, ns_name)
+                            pages_names.append((page_show, page_insert))
+            completions = pages_names
+
+            return completions
