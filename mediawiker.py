@@ -1257,19 +1257,18 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
             view = sublime.active_window().active_view()
 
             # internal links completions
-            position = view.sel()[0].begin()
-            line_before_position = view.substr(view.line(view.sel()[0]))[0:position]
-            internal_link = re.findall(r'\[{2}([^\]\[]+)\]{0,2}', line_before_position)[-1]
+            cursor_position = view.sel()[0].begin()
+            line_region = view.line(view.sel()[0])
+            line_before_position = view.substr(sublime.Region(line_region.a, cursor_position))
+            internal_link = line_before_position[line_before_position.rfind('[[') + 2:]
 
             completions = []
-
             if internal_link:
                 word_cursor_min_len = mw.get_setting('mediawiker_page_prefix_min_length', 3)
                 if len(internal_link) >= word_cursor_min_len:
                     namespaces = [ns.strip() for ns in mw.get_setting('mediawiker_search_namespaces').split(',')]
                     sitecon = mw_get_connect()
                     pages = []
-                    pages_names = []
                     for ns in namespaces:
                         pages = sitecon.allpages(prefix=internal_link, namespace=ns)
                         for p in pages:
@@ -1284,7 +1283,6 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
                                 ns_name = '(Main)'
                                 page_insert = p.page_title
                             page_show = '%s\t%s' % (p.page_title, ns_name)
-                            pages_names.append((page_show, page_insert))
-            completions = pages_names
+                            completions.append((page_show, page_insert))
 
             return completions
