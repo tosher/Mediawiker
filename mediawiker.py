@@ -1260,7 +1260,9 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
             cursor_position = view.sel()[0].begin()
             line_region = view.line(view.sel()[0])
             line_before_position = view.substr(sublime.Region(line_region.a, cursor_position))
-            internal_link = line_before_position[line_before_position.rfind('[[') + 2:]
+            internal_link = ''
+            if line_before_position.rfind('[[') > line_before_position.rfind(']]'):
+                internal_link = line_before_position[line_before_position.rfind('[[') + 2:]
 
             completions = []
             if internal_link:
