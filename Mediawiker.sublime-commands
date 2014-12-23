@@ -1,5 +1,6 @@
 [
     { "caption": "Mediawiker: Open page", "command": "mediawiker_open_page" },
+    { "caption": "Mediawiker: Open page in browser", "command": "mediawiker_open_page_in_browser" },
     { "caption": "Mediawiker: Post page", "command": "mediawiker_post_page" },
     { "caption": "Mediawiker: Pages history", "command": "mediawiker_page_list" },
     { "caption": "Mediawiker: Show TOC", "command": "mediawiker_show_toc" },

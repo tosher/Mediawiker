@@ -1,0 +1,2 @@
+Mediawiker 2.4.2:
+Fixed lost command in command palette: **Open page in browser**
