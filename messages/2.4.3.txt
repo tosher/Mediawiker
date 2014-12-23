@@ -1,0 +1,2 @@
+Mediawiker 2.4.3:
+* Show headings in Symbol list by Ctrl+R (https://github.com/tosher/Mediawiker/issues/28)

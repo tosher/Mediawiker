@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>name</key>
+    <string>Symbol List: Headings</string>
+    <key>scope</key>
+    <string>text.html.mediawiki markup.heading</string>
+    <key>settings</key>
+    <dict>
+        <key>showInSymbolList</key>
+        <integer>1</integer>
+    </dict>
+    <key>uuid</key>
+    <string>c4c4b147-e20c-4c46-9bda-3948804955a0</string>
+</dict>
+</plist>
