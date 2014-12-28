@@ -1,0 +1,2 @@
+Mediawiker 2.4.4:
+* Custom ssl loader was removed. Package control 3.0 now required for work on linux.

@@ -3,16 +3,22 @@
 [Mediawiker](https://github.com/tosher/Mediawiker) is a plugin for Sublime Text editor (ver. 2/3) that adds possibility to use it as Wiki Editor on [Mediawiki](http://mediawiki.org) based sites like [Wikipedia]((http://en.wikipedia.org)) and [many other](http://www.mediawiki.org/wiki/Sites_using_MediaWiki/en).
 
 ## Main features
-* Working with mediawiki based sites through the use of [mwclient library](http://sourceforge.net/apps/mediawiki/mwclient/index.php?title=Main_Page). Mwclient was modified for work under **Sublime text 3**.
-* New pages creation / existing pages edition and posting to wiki.
-* Possibility to open pages from history-list of posted pages or from category tree menu.
-* TOC (table of contents) menu of the page edited to move by page headers.
-* Syntax highlighting from [Textmate Mediawiki bundle](https://github.com/textmate/mediawiki.tmbundle) (included).
-* Possibility to create / edit simple wiki tables with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor).
-* Wiki search
-* Snippets for main wiki tags.
-* Support of https and proxy connection.
-* Support of http/https basic/digest authorization.
+* [MWClient](http://sourceforge.net/apps/mediawiki/mwclient/index.php?title=Main_Page) library based. Mwclient was modified for work under **Sublime text 3**.
+* Syntax highlighting - based on [Textmate Mediawiki bundle](https://github.com/textmate/mediawiki.tmbundle).
+* Editor - create new pages, edit existing and post it to wiki.
+* Completions - auto completions for internal wiki links
+* History - list of edited pages
+* Bookmarks - bookmark your favorite pages
+* TOC - table of contents for opened page - available through command **Show TOC** or **Symbol list** (<kbd>Ctrl</kbd>+<kbd>R</kbd>)
+* Insert templates, images into pages
+* Upload files to wiki
+* Search - search by wiki
+* Table editor - edit simple wiki-tables with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor), convert csv-format tables to wiki-tables.
+* Snippets - basic wiki marking tags - bold, italic, headings, etc.
+* Edit panel - all commands and snippets available through one panel. 
+* Shortcuts - possibility to create plugin specific shortcuts to all commands and snippets to create word-like editor.
+* Connectivity - http/https, direct/proxy connection with basic/digest web-server authorization.
+* Connection manager - add new wiki sites, and switch between them.
 
 ![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/sublime_wiki_editor.png)
 *Screenshot using the Twilight theme*
@@ -20,6 +26,8 @@
 ## Install
 
 ### Package Control
+
+    Package Control 3.0 now required for work on Linux.
 
 The easiest way to install this is with [Package Control](http://wbond.net/sublime\_packages/package\_control).
 
@@ -54,28 +62,21 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 
 ### Commands
 * **Edit panel** with all commands and snippets in ordered list (can be customized in the settings).
- * *Alt-F1*
- * *Main menu / Tools / Mediawiker / Edit panel*
+ * *Main menu / Tools / Mediawiker / Edit panel* (windows, osx: <kbd>Alt</kbd>+<kbd>F1</kbd>, linux: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F1</kbd>)
 * **Open page** command for retrieving existing wiki-page. If the page does not exists, you can create the new one.
- * *Alt+F3*
  * *Main menu / Tools / Mediawiker / Open page*
- * Use page name or page url as a wiki page name. When the url will be inserted, it will be *cleared* to page name, if wiki parameters is correct and current wiki site was selected.
-* **Reopen page** command - to reopen current page.
+* Use page name or page url as a wiki page name. When the url will be inserted, it will be *cleared* to page name, if wiki parameters is correct and current wiki site was selected.
+* **Reopen page** command - to reopen current page (<kbd>F5</kbd>).
 * **Post page** command for publishing pages. When you post a page, the name of the page will be saved to pages history.
- * *Alt+F7*
  * *Main menu / Tools / Mediawiker / Post page*
  * Settings option **mediawiker_mark_as_minor** (default: false) - using to mark changes as minor. Or you can use **!** character as **summary prefix** to invert this option on current post.
 * **Pages history** command to open the page by name from history.
- * *Alt+F10*
-* **Show TOC** command for show table of contents of the current page and to move by page headers.
+* **Show TOC** command for show table of contents of the current page and to move by page headers. Or you can use standard Symbol list (<kbd>Ctrl</kbd>+<kbd>R</kbd>).
 * **Show internal links** command for show all internal links of the current page. You can go to selected link on page, open it in editor or in browser.
 * **Show external links** command for show all external links of the current page (links like [link..]). You can go to selected links on page or open it in browser.
- * *Alt+F2*
 * **Select wiki** command to select your current wiki site.
- * *Alt+F6*
 * **Add/Edit wiki site** command for create new or edit existed wiki sites configurations.
 * **Open page in browser** command to open current page in web-browser.
- * *Alt+F5*
 * **Set category** command to add category to current article from list of root category members (check "mediawiker_category_root" option in configuration).
 * **Insert image** command to insert link to image from wiki. Parameter **mediawiker_image_prefix_min_length** is using to limit length of search prefix for large wikies (by default: 4 characters).
 * **Insert template** command to insert template from wiki.
