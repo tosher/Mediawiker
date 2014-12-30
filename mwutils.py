@@ -131,3 +131,22 @@ def get_digest_header(header, username, password, path):
     # auth = 'username="%s", realm="%s", nonce="%s", uri="%s", response="%s", opaque="%s", qop="%s", nc=%s, cnonce="%s"' % (username, realm, nonce, digest_uri, response, opaque, qop, nc, cnonce)
     auth = 'username="%s", realm="%s", nonce="%s", uri="%s", response="%s", qop="%s", nc=%s, cnonce="%s"' % (username, realm, nonce, digest_uri, response, qop, nc, cnonce)
     return auth
+
+
+class PasswordHider():
+
+    password = ''
+    PASSWORD_CHAR = u'\u25CF'
+
+    def hide(self, password):
+        if len(password) < len(self.password):
+            self.password = self.password[:len(password)]
+        else:
+            try:
+                self.password = '%s%s' % (self.password, password.replace(self.PASSWORD_CHAR, ''))
+            except:
+                pass
+        return self.PASSWORD_CHAR * len(self.password)
+
+    def done(self):
+        return self.password

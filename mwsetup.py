@@ -17,7 +17,16 @@ class MediawikerProcessSiteCommand(sublime_plugin.WindowCommand):
     site_now = None
     site_name = None
 
+    def _on_change_password(self, on_done, hint='Password:'):
+        def password_hider(str_val):
+            if str_val and self.is_hide_password:
+                password = self.ph.hide(str_val)
+                if password != str_val:
+                    self.window.show_input_panel(hint, password, on_done, password_hider, None)
+        return password_hider
+
     def run(self):
+        self.is_hide_password = mw.get_setting('mediawiker_password_input_hide')
         self.hosts = mw.get_setting('mediawiki_site', {})
         self.window.show_input_panel('Internal site name:', '', self.get_host, None, None)
 
@@ -55,10 +64,21 @@ class MediawikerProcessSiteCommand(sublime_plugin.WindowCommand):
 
     def get_password(self, data):
         self.site['username'] = data
-        self.window.show_input_panel('Password:', self.site_now.get('password', ''), self.get_proxy, None, None)
+
+        hint = 'Password:'
+        if self.is_hide_password:
+            self.ph = mw.PasswordHider()
+        on_done = self.get_proxy
+        on_change = self._on_change_password(on_done=on_done, hint=hint)
+        self.window.show_input_panel(hint, self.site_now.get('password', ''), on_done, on_change, None)
 
     def get_proxy(self, data):
-        self.site['password'] = data
+        if self.is_hide_password:
+            self.site['password'] = self.ph.done()
+            del(self.ph)
+        else:
+            self.site['password'] = data
+
         self.window.show_input_panel('Proxy server (optional, host:port):', self.site_now.get('proxy_host', ''), self.get_httpauth, None, None)
 
     def get_httpauth(self, data):
@@ -80,10 +100,20 @@ class MediawikerProcessSiteCommand(sublime_plugin.WindowCommand):
 
     def get_httpauth_password(self, data):
         self.site['http_auth_login'] = data
-        self.window.show_input_panel('Http auth password:', self.site_now.get('http_auth_password', ''), self.get_httpauth_password_done, None, None)
+
+        hint = 'Http auth password:'
+        if self.is_hide_password:
+            self.ph = mw.PasswordHider()
+        on_done = self.get_httpauth_password_done
+        on_change = self._on_change_password(on_done=on_done, hint=hint)
+        self.window.show_input_panel(hint, self.site_now.get('http_auth_password', ''), on_done, on_change, None)
 
     def get_httpauth_password_done(self, data):
-        self.site['http_auth_password'] = data
+        if self.is_hide_password:
+            self.site['http_auth_password'] = self.ph.done()
+            del(self.ph)
+        else:
+            self.site['http_auth_password'] = data
         self.setup_finish()
 
     def setup_finish(self):

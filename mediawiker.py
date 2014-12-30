@@ -328,11 +328,11 @@ class MediawikerValidateConnectionParamsCommand(sublime_plugin.WindowCommand):
     title = ''
     action = ''
     is_hide_password = False
-    PASSWORD_CHAR = u'\u25CF'
 
     def run(self, title, action):
         self.is_hide_password = mw.get_setting('mediawiker_password_input_hide')
-        self.PASSWORD_CHAR = mw.get_setting('mediawiker_password_char')
+        if self.is_hide_password:
+            self.ph = mw.PasswordHider()
         self.action = action  # TODO: check for better variant
         self.title = title
         site = mw.get_setting('mediawiki_site_active')
@@ -349,25 +349,17 @@ class MediawikerValidateConnectionParamsCommand(sublime_plugin.WindowCommand):
             # auth is not required
             self.call_page()
 
-    def _get_password(self, str_val):
-        self.password = self.password + str_val.replace(self.PASSWORD_CHAR, '')
-        return self.PASSWORD_CHAR * len(self.password)
-
     def on_change(self, str_val):
-        if str_val:
-            if self.is_hide_password:
-                # password hiding hack..
-                if str_val:
-                    password = str_val
-                    str_val = self._get_password(str_val)
-                    if password != str_val:
-                        password = str_val
-                        self.window.show_input_panel('Password:', str_val, self.on_done, self.on_change, None)
-        else:
-            self.password = ''
+        if str_val and self.is_hide_password:
+            password = self.ph.hide(str_val)
+            if password != str_val:
+                self.window.show_input_panel('Password:', password, self.on_done, self.on_change, None)
 
     def on_done(self, password):
-        if not self.is_hide_password:
+        if self.is_hide_password:
+            self.password = self.ph.done()
+            del(self.ph)
+        else:
             self.password = password
         self.call_page()
 
