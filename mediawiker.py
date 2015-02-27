@@ -395,14 +395,18 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
     current_text = ''
 
     def run(self, edit, title, password):
+        is_skip_summary = mw.get_setting('mediawiker_skip_summary', False)
         sitecon = mw_get_connect(password)
         self.title = mw.get_title()
         if self.title:
             self.page = sitecon.Pages[self.title]
             if self.page.can('edit'):
                 self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
-                summary_message = 'Changes summary (%s):' % mw.get_setting('mediawiki_site_active')
-                self.view.window().show_input_panel(summary_message, '', self.on_done, None, None)
+                if not is_skip_summary:
+                    summary_message = 'Changes summary (%s):' % mw.get_setting('mediawiki_site_active')
+                    self.view.window().show_input_panel(summary_message, '', self.on_done, None, None)
+                else:
+                    self.on_done('')
             else:
                 sublime.status_message('You have not rights to edit this page')
         else:

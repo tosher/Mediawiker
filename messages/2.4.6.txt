@@ -1,0 +1,2 @@
+Mediawiker 2.4.6:
+* Option **mediawiker_skip_summary** to skip page summary on posting (default: false)
