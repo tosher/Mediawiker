@@ -1,5 +1,8 @@
 # OS X `mediawiker://` application scheme handler
 
+## Application use
+Unfortunately, this is currently a multi-step process. It is detailed in the wiki.
+
 ## Files
 This directory contains two files (apart from this `README` file); 
 
