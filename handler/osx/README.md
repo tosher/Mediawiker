@@ -1,13 +1,5 @@
 # OS X `mediawiker://` application scheme handler
 
-## Application use
-Unfortunately, this is currently a multi-step process. It is detailed in the wiki. 
-
-### Application use, TL;DR
-In case you don't want to soldier through the wiki article and assuming that you have [RCDefaultApp](http://www.rubicode.com/Software/Bundles.html#RCDefaultApp) installed:
-
- ~/Library/PreferencePanes/RCDefaultApp.prefPane/Contents/Resources/lstool write url mediawiker ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/Mediawiker/OS\ X\ App/Sublime\ Text\ Mediawiker\ Launcher.app
-
 ## Files
 This directory contains two files (apart from this `README` file); 
 
