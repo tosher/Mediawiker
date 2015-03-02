@@ -27,6 +27,17 @@
 		<key>x86_64</key>
 		<string>10.6</string>
 	</dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+	<dict>
+        	<key>CFBundleURLName</key>
+	        <string>Mediawiker</string>
+		<key>CFBundleURLSchemes</key>
+		<array>
+			<string>mediawiker</string>
+		</array>
+	</dict>
+	</array>
 	<key>LSRequiresCarbon</key>
 	<true/>
 	<key>WindowState</key>
