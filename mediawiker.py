@@ -967,7 +967,10 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, title, password):
         self.password = password
-        sublime.active_window().show_input_panel('Wiki search:', '', self.show_results, None, None)
+        search_pre = ''
+        selection = self.view.sel()
+        search_pre = self.view.substr(selection[0]).strip()
+        sublime.active_window().show_input_panel('Wiki search:', search_pre, self.show_results, None, None)
 
     def show_results(self, search_value=''):
         # TODO: paging?
