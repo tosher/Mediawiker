@@ -563,7 +563,9 @@ class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
             if site_active.startswith(self.site_on):
                 site_active = site_active[len(self.site_on):]
             # force to set site_active in global and in view settings
-            self.window.active_view().settings().set('mediawiker_site', site_active)
+            current_syntax = self.window.active_view().settings().get('syntax')
+            if current_syntax is not None and current_syntax.endswith('Mediawiker/Mediawiki.tmLanguage'):
+                self.window.active_view().settings().set('mediawiker_site', site_active)
             mw.set_setting("mediawiki_site_active", site_active)
 
 
@@ -1158,6 +1160,7 @@ class MediawikerLoad(sublime_plugin.EventListener):
     def on_activated(self, view):
         current_syntax = view.settings().get('syntax')
         current_site = mw.get_view_site()
+        # TODO: move method to check mediawiker view to mwutils
         if current_syntax is not None and current_syntax.endswith('Mediawiker/Mediawiki.tmLanguage'):
             # Mediawiki mode
             view.settings().set('mediawiker_is_here', True)
@@ -1235,12 +1238,13 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
         self.links = {}
         page = site.Pages[title]
         linksgen = page.langlinks()
-        while True:
-            try:
-                prop = linksgen.next()
-                self.links[prop[0]] = prop[1]
-            except StopIteration:
-                break
+        if linksgen:
+            while True:
+                try:
+                    prop = linksgen.next()
+                    self.links[prop[0]] = prop[1]
+                except StopIteration:
+                    break
 
     def on_done(self, index):
         if index >= 0:
