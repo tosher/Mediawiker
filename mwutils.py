@@ -24,6 +24,10 @@ def set_setting(key, value):
     sublime.save_settings('Mediawiker.sublime-settings')
 
 
+def get_view_site():
+    return sublime.active_window().active_view().settings().get('mediawiker_site', get_setting('mediawiki_site_active'))
+
+
 def enco(value):
     ''' for md5 hashing string must be encoded '''
     if pythonver >= 3:
@@ -74,10 +78,11 @@ def get_title():
 
 def pagename_clear(pagename):
     """ Return clear pagename if page-url was set instead of.."""
-    site_name_active = get_setting('mediawiki_site_active')
+    # site_active = get_setting('mediawiki_site_active')
+    site_active = get_view_site()
     site_list = get_setting('mediawiki_site')
-    site = site_list[site_name_active]['host']
-    pagepath = site_list[site_name_active]['pagepath']
+    site = site_list[site_active]['host']
+    pagepath = site_list[site_active]['pagepath']
     try:
         pagename = strunquote(pagename)
     except UnicodeEncodeError:
@@ -133,6 +138,82 @@ def get_digest_header(header, username, password, path):
     return auth
 
 
+class InputPanel:
+
+    def __init__(self):
+        self.window = sublime.active_window()
+
+    def show_input(self, panel_title='Input', value_pre=''):
+        self.window.show_input_panel(panel_title, value_pre, self.on_done, self.on_change, None)
+
+    def on_done(self, value):
+        pass
+
+    def on_change(self, value):
+        pass
+
+
+class InputPanelPageTitle(InputPanel):
+
+    def get_title(self, title):
+        if not title:
+            title_pre = ''
+            # use clipboard or selected text for page name
+            if bool(get_setting('mediawiker_clipboard_as_defaultpagename')):
+                title_pre = sublime.get_clipboard().strip()
+            if not title_pre:
+                selection = self.window.active_view().sel()
+                title_pre = self.window.active_view().substr(selection[0]).strip()
+            self.show_input('Wiki page name:', title_pre)
+        else:
+            self.on_done(title)
+
+    def on_change(self, title):
+        if title:
+            pagename_cleared = pagename_clear(title)
+            if title != pagename_cleared:
+                self.window.show_input_panel('Wiki page name:', pagename_cleared, self.on_done, self.on_change, None)
+
+
+class InputPanelPassword(InputPanel):
+
+    ph = None
+    is_hide_password = False
+
+    def get_password(self):
+        # site_active = mw.get_setting('mediawiki_site_active')
+        site_active = get_view_site()
+        site_list = get_setting('mediawiki_site')
+        password = site_list[site_active]["password"]
+        if site_list[site_active]["username"]:
+            # auth required if username exists in settings
+            if not password:
+                self.is_hide_password = get_setting('mediawiker_password_input_hide')
+                if self.is_hide_password:
+                    self.ph = PasswordHider()
+                # need to ask for password
+                # window.show_input_panel('Password:', '', self.on_done, self.on_change, None)
+                self.show_input('Password:', '')
+            else:
+                # return password
+                self.on_done(password)
+        else:
+            # auth is not required
+            self.on_done('')
+
+    def on_change(self, str_val):
+        if str_val and self.is_hide_password and self.ph:
+            password = self.ph.hide(str_val)
+            if password != str_val:
+                # self.window.show_input_panel('Password:', password, self.on_done, self.on_change, None)
+                self.show_input('Password:', password)
+
+    def on_done(self, password):
+        if password and self.is_hide_password and self.ph:
+            password = self.ph.done()
+        self.command_run(password)  # defined in executor
+
+
 class PasswordHider():
 
     password = ''
@@ -149,4 +230,9 @@ class PasswordHider():
         return self.PASSWORD_CHAR * len(self.password)
 
     def done(self):
-        return self.password
+        try:
+            return self.password
+        except:
+            pass
+        finally:
+            self.password = ''
