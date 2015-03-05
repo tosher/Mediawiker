@@ -48,6 +48,7 @@
         {"caption": "Show TOC", "type": "text_command", "value": "mediawiker_show_toc"},
         {"caption": "Show internal links", "type": "text_command", "value": "mediawiker_show_internal_links"},
         {"caption": "Show external links", "type": "text_command", "value": "mediawiker_show_external_links"},
+        {"caption": "Show language links", "type": "window_command", "value": "mediawiker_show_page_langlinks"},
         {"caption": "Numbered TOC", "type": "text_command", "value": "mediawiker_enumerate_toc"},
         {"caption": "CSV to wiki table", "type": "text_command", "value": "mediawiker_csv_table"},
         {"caption": "Wiki table to Simple (for plugin TableEdit)", "type": "text_command", "value": "mediawiker_table_wiki_to_simple"},

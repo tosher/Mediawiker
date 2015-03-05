@@ -1211,7 +1211,7 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
             return completions
 
 
-class MediawikerGetPageLanglinksCommand(sublime_plugin.WindowCommand):
+class MediawikerShowPageLanglinksCommand(sublime_plugin.WindowCommand):
     ''' alias to Get page command '''
 
     def run(self):
