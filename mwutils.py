@@ -25,7 +25,11 @@ def set_setting(key, value):
 
 
 def get_view_site():
-    return sublime.active_window().active_view().settings().get('mediawiker_site', get_setting('mediawiki_site_active'))
+    try:
+        return sublime.active_window().active_view().settings().get('mediawiker_site', get_setting('mediawiki_site_active'))
+    except:
+        # st2 exception on start.. sublime not available on activated..
+        return get_setting('mediawiki_site_active')
 
 
 def enco(value):
