@@ -1,0 +1,3 @@
+Mediawiker 2.5.1:
+* With selected text, **Show language links** tries to show language links for it.
+* Selected language link can be opened as page or it's name can be used as replacement for currently selected text (first region only in multiselect mode).
