@@ -7,10 +7,24 @@ pythonver = sys.version_info[0]
 from os.path import splitext, basename
 import re
 import urllib
+import base64
 from hashlib import md5
 import uuid
 
 import sublime
+
+if pythonver >= 3:
+    # NOTE: load from package, not used now because custom ssl
+    # current_dir = dirname(__file__)
+    # if '.sublime-package' in current_dir:
+    #     sys.path.append(current_dir)
+    #     import mwclient
+    # else:
+    #     from . import mwclient
+
+    from . import mwclient
+else:
+    import mwclient
 
 
 def get_setting(key, default_value=None):
@@ -137,10 +151,167 @@ def get_digest_header(header, username, password, path):
     else:
         response = md5(enco('%s:%s:%s' % (ha1, nonce, ha2))).hexdigest()
 
-    # auth = 'username="%s", realm="%s", nonce="%s", uri="%s", response="%s", opaque="%s", qop="%s", nc=%s, cnonce="%s"' % (username, realm, nonce, digest_uri, response, opaque, qop, nc, cnonce)
-    auth = 'username="%s", realm="%s", nonce="%s", uri="%s", response="%s", qop="%s", nc=%s, cnonce="%s"' % (username, realm, nonce, digest_uri, response, qop, nc, cnonce)
-    return auth
+    # auth = 'username="%s", realm="%s", nonce="%s", uri="%s", response="%s", opaque="%s", qop="%s", nc=%s, cnonce="%s"' %
+    # (username, realm, nonce, digest_uri, response, opaque, qop, nc, cnonce)
+    auth_tpl = 'username="%s", realm="%s", nonce="%s", uri="%s", response="%s", qop="%s", nc=%s, cnonce="%s"'
 
+    return auth_tpl % (username, realm, nonce, digest_uri, response, qop, nc, cnonce)
+
+
+def http_auth(http_auth_header, host, path, login, password):
+    sitecon = None
+    DIGEST_REALM = 'Digest realm'
+    BASIC_REALM = 'Basic realm'
+
+    # http_auth_header = e[1].getheader('www-authenticate')
+    custom_headers = {}
+    realm = None
+    if http_auth_header.startswith(BASIC_REALM):
+        realm = BASIC_REALM
+    elif http_auth_header.startswith(DIGEST_REALM):
+        realm = DIGEST_REALM
+
+    if realm is not None:
+        if realm == BASIC_REALM:
+            auth = deco(base64.standard_b64encode(enco('%s:%s' % (login, password))))
+            custom_headers = {'Authorization': 'Basic %s' % auth}
+        elif realm == DIGEST_REALM:
+            auth = get_digest_header(http_auth_header, login, password, '%sapi.php' % path)
+            custom_headers = {'Authorization': 'Digest %s' % auth}
+
+        if custom_headers:
+            sitecon = mwclient.Site(host=host, path=path, custom_headers=custom_headers)
+    else:
+        error_message = 'HTTP connection failed: Unknown realm.'
+        sublime.status_message(error_message)
+        raise Exception(error_message)
+    return sitecon
+
+
+def get_connect(password=None):
+    # site_name_active = mw.get_setting('mediawiki_site_active')
+    site_active = get_view_site()
+    site_list = get_setting('mediawiki_site')
+    site_params = site_list[site_active]
+    site = site_params['host']
+    path = site_params['path']
+    username = site_params['username']
+    if password is None:
+        password = site_params['password']
+    domain = site_params['domain']
+    proxy_host = site_params.get('proxy_host', '')
+    is_https = site_params.get('https', False)
+    if is_https:
+        sublime.status_message('Trying to get https connection to https://%s' % site)
+    host = site if not is_https else ('https', site)
+    if proxy_host:
+        # proxy_host format is host:port, if only host defined, 80 will be used
+        host = proxy_host if not is_https else ('https', proxy_host)
+        proto = 'https' if is_https else 'http'
+        path = '%s://%s%s' % (proto, site, path)
+        sublime.message_dialog('Connection with proxy: %s %s' % (host, path))
+
+    try:
+        sitecon = mwclient.Site(host=host, path=path)
+    except mwclient.HTTPStatusError as exc:
+        e = exc.args if pythonver >= 3 else exc
+        is_use_http_auth = site_params.get('use_http_auth', False)
+        http_auth_login = site_params.get('http_auth_login', '')
+        http_auth_password = site_params.get('http_auth_password', '')
+        if e[0] == 401 and is_use_http_auth and http_auth_login:
+            http_auth_header = e[1].getheader('www-authenticate')
+            sitecon = http_auth(http_auth_header, host, path, http_auth_login, http_auth_password)
+        else:
+            sublime.status_message('HTTP connection failed: %s' % e[1])
+            raise Exception('HTTP connection failed.')
+
+    # if login is not empty - auth required
+    if username:
+        try:
+            if sitecon is not None:
+                sitecon.login(username=username, password=password, domain=domain)
+                sublime.status_message('Logon successfully.')
+            else:
+                sublime.status_message('Login failed: connection unavailable.')
+        except mwclient.LoginError as e:
+            sublime.status_message('Login failed: %s' % e[1]['result'])
+            return
+    else:
+        sublime.status_message('Connection without authorization')
+    return sitecon
+
+# wiki related functions..
+
+
+def get_page_text(site, title):
+    denied_message = 'You have not rights to edit this page. Click OK button to view its source.'
+    page = site.Pages[title]
+    if page.can('edit'):
+        return True, page.edit()
+    else:
+        if sublime.ok_cancel_dialog(denied_message):
+            return False, page.edit()
+        else:
+            return False, ''
+
+
+def save_mypages(title, storage_name='mediawiker_pagelist'):
+
+    title = title.replace('_', ' ')  # for wiki '_' and ' ' are equal in page name
+    pagelist_maxsize = get_setting('mediawiker_pagelist_maxsize')
+    # site_active = mw.get_setting('mediawiki_site_active')
+    site_active = get_view_site()
+    mediawiker_pagelist = get_setting(storage_name, {})
+
+    if site_active not in mediawiker_pagelist:
+        mediawiker_pagelist[site_active] = []
+
+    my_pages = mediawiker_pagelist[site_active]
+
+    if my_pages:
+        while len(my_pages) >= pagelist_maxsize:
+            my_pages.pop(0)
+
+        if title in my_pages:
+            # for sorting
+            my_pages.remove(title)
+    my_pages.append(title)
+    set_setting(storage_name, mediawiker_pagelist)
+
+
+def get_hlevel(header_string, substring):
+    return int(header_string.count(substring) / 2)
+
+
+def get_category(category_full_name):
+    ''' From full category name like "Category:Name" return tuple (Category, Name) '''
+    if ':' in category_full_name:
+        return category_full_name.split(':')
+    else:
+        return 'Category', category_full_name
+
+
+def get_page_url(page_name=''):
+    # site_active = mw.get_setting('mediawiki_site_active')
+    site_active = get_view_site()
+    site_list = get_setting('mediawiki_site')
+    site = site_list[site_active]["host"]
+
+    is_https = False
+    if 'https' in site_list[site_active]:
+        is_https = site_list[site_active]["https"]
+
+    proto = 'https' if is_https else 'http'
+    pagepath = site_list[site_active]["pagepath"]
+    if not page_name:
+        page_name = strquote(get_title())
+    if page_name:
+        return '%s://%s%s%s' % (proto, site, pagepath, page_name)
+    else:
+        return ''
+
+
+# classes..
 
 class InputPanel:
 
