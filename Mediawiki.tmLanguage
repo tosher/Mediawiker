@@ -347,7 +347,7 @@
 						    indented paragraphs, as used on talk pages (:)
 					</string>
 					<key>end</key>
-					<string>^(?!\1)</string>
+					<string>^(?=\S)</string>
 					<key>name</key>
 					<string>markup.list.numbered.mediawiki</string>
 					<key>patterns</key>
@@ -364,7 +364,7 @@
 					<key>comment</key>
 					<string>unordered list</string>
 					<key>end</key>
-					<string>^(?!\1)</string>
+					<string>^(?=\S)</string>
 					<key>name</key>
 					<string>markup.list.unnumbered.mediawiki</string>
 					<key>patterns</key>
