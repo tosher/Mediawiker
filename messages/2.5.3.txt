@@ -1,0 +1,3 @@
+Mediawiker 2.5.3:
+* Syntax highlighting for <source> tag
+* <uml> tag highlight

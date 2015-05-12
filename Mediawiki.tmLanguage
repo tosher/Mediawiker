@@ -185,9 +185,53 @@
 					<array>
 						<dict>
 							<key>include</key>
-							<string>#tag-stuff</string>
+							<string>#source-stuff</string>
 						</dict>
 					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string> ?(&lt;)(uml)(&gt;)</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.tag.mediawiki</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>storage.type.mediawiki</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.tag.mediawiki</string>
+						</dict>
+					</dict>
+					<key>end</key>
+					<string> ?(&lt;/)(uml)(&gt;)</string>
+					<key>endCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.tag.mediawiki</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>storage.type.mediawiki</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.tag.mediawiki</string>
+						</dict>
+					</dict>
+					<key>name</key>
+					<string>meta.tag.source.mediawiki</string>
 				</dict>
 				<dict>
 					<key>begin</key>
@@ -347,7 +391,7 @@
 						    indented paragraphs, as used on talk pages (:)
 					</string>
 					<key>end</key>
-					<string>^(?=\S)</string>
+					<string>^(?!\1)</string>
 					<key>name</key>
 					<string>markup.list.numbered.mediawiki</string>
 					<key>patterns</key>
@@ -364,7 +408,7 @@
 					<key>comment</key>
 					<string>unordered list</string>
 					<key>end</key>
-					<string>^(?=\S)</string>
+					<string>^(?!\1)</string>
 					<key>name</key>
 					<string>markup.list.unnumbered.mediawiki</string>
 					<key>patterns</key>
@@ -1092,6 +1136,525 @@
 					<string>((https?|ftp|file)://|mailto:)[-:@a-zA-Z0-9_.~%+/?=&amp;#]+(?&lt;![.?:])</string>
 					<key>name</key>
 					<string>markup.underline.link.external.mediawiki</string>
+				</dict>
+			</array>
+		</dict>
+		<key>source-stuff</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="python"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.python</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="ini"&gt;)</string>
+					<key>comment</key>
+					<string>INI plugin required</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.ini</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="javascript"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.js</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="c"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.c</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="actionscript"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.actionscript</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="applescript"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.applescript</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="asp"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.asp</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="dos"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.dosbatch</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="csharp"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.cs</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="cpp"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.c++</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="clojure"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.clojure</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="css"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.css</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="d"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.d</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="erlang"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.erlang</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="go"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.go</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="haskell"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.haskell</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="java"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.java</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="groovy"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.groovy</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="latex"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.latex</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="lisp"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.lisp</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="lua"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.lua</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="make"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.makefile</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="matlab"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.matlab</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="objc"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.objc</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="ocaml"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.ocaml</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="pascal"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.pascal</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="perl"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.perl</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="php"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.php</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="r"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.r</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="rails"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.ruby.rails</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="ruby"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.ruby</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="scala"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.scala</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="bash"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.shell</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="sql"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.sql</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="tsql"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.tsql</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="tcl"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.tcl</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="xml"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>text.xml</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="yaml"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>source.yaml</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(?&lt;=&lt;source lang="html5"&gt;)</string>
+					<key>end</key>
+					<string>(?=&lt;/source&gt;)</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>text.html.basic</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>unknown source</string>
 				</dict>
 			</array>
 		</dict>
