@@ -914,6 +914,11 @@
 							<key>name</key>
 							<string>string.other.title.link.wiki-link.mediawiki</string>
 						</dict>
+						<key>4</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.any.mediawiki</string>
+						</dict>
 					</dict>
 					<key>name</key>
 					<string>meta.image.wiki.mediawiki</string>
@@ -935,25 +940,85 @@
 								<key>3</key>
 								<dict>
 									<key>name</key>
-									<string>keyword.control.image.alignment.mediawiki</string>
+									<string>keyword.control.image.frame.mediawiki</string>
 								</dict>
 								<key>4</key>
 								<dict>
 									<key>name</key>
-									<string>constant.numeric.image.width.mediawiki</string>
+									<string>keyword.control.image.alignment.mediawiki</string>
 								</dict>
 								<key>5</key>
 								<dict>
 									<key>name</key>
-									<string>constant.other.unit.mediawiki</string>
+									<string>keyword.control.image.alignment-vertical.mediawiki</string>
+								</dict>
+								<key>6</key>
+								<dict>
+									<key>name</key>
+									<string>constant.numeric.image.width.mediawiki</string>
+								</dict>
+								<key>7</key>
+								<dict>
+									<key>name</key>
+									<string>punctuation.other.unit.image.size.mediawiki</string>
+								</dict>
+								<key>8</key>
+								<dict>
+									<key>name</key>
+									<string>constant.numeric.image.height.mediawiki</string>
+								</dict>
+								<key>9</key>
+								<dict>
+									<key>name</key>
+									<string>keyword.control.image.size.mediawiki</string>
+								</dict>
+								<key>10</key>
+								<dict>
+									<key>name</key>
+									<string>keyword.control.image.link.mediawiki</string>
+								</dict>
+								<key>11</key>
+								<dict>
+									<key>name</key>
+									<string>constant.other.wiki-link.mediawiki</string>
+								</dict>
+								<key>12</key>
+								<dict>
+									<key>name</key>
+									<string>keyword.control.image.alt.mediawiki</string>
+								</dict>
+								<key>13</key>
+								<dict>
+									<key>name</key>
+									<string>constant.other.image.alt.mediawiki</string>
+								</dict>
+								<key>14</key>
+								<dict>
+									<key>name</key>
+									<string>keyword.control.image.css-class.mediawiki</string>
+								</dict>
+								<key>15</key>
+								<dict>
+									<key>name</key>
+									<string>constant.other.image.css-class.mediawiki</string>
+								</dict>
+								<key>16</key>
+								<dict>
+									<key>name</key>
+									<string>string.other.image.caption.mediawiki</string>
 								</dict>
 							</dict>
 							<key>match</key>
 							<string>(?x)
 								(\|)[ ]*
-								( (thumb|thumbnail|frame)
+								( (thumbnail|thumb|frameless|frame|border)
 								 |(right|left|center|none)
-								 |([0-9]+)(px)
+								 |(baseline|sub|super|top|text-top|middle|bottom|text-bottom)
+								 |([0-9]+)?(x?)([0-9]+)?(px)
+								 |(link=)([^|]+)?
+								 |(alt=)([^|]+)?
+								 |(class=)([^|]+)?
+								 |([^|\]]+)
 								)[ ]*
 							</string>
 						</dict>
