@@ -88,7 +88,7 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
 * **(Buggy) Wiki table to Simple** command to transform the selected table (or under cursor) to *Simple table* (for using with plugin [TableEdit](https://github.com/vkocubinsky/SublimeTableEditor)).
 * **(Buggy) Simple table to wiki** command to convert *Simple table* back to wiki syntax.
 * Native Sublime text **Command palette** with predefined filter of plugin's commands and snippets.
-  * *Alt+F11*
+  * *<kbd>Alt</kbd>+<kbd>F11</kbd>*
 
 ### Predefined mediawiki sites settings
 Note: You must setup your credentials for authorization in the settings.
