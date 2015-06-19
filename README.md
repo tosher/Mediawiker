@@ -32,7 +32,7 @@
 The easiest way to install this is with [Package Control](http://wbond.net/sublime\_packages/package\_control).
 
  * If you just went and installed Package Control, you probably need to restart Sublime Text 2 before doing this next bit.
- * Bring up the Command Palette (<kbd>Command</kbd>+<kbd>Shif</kbd>t+<kbd>p</kbd> on OS X, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on Linux/Windows).
+ * Bring up the Command Palette (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on OS X, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on Linux/Windows).
  * Select "Package Control: Install Package" (it'll take a few seconds)
  * Select Mediawiker when the list appears.
 
