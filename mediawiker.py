@@ -178,22 +178,26 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         is_writable = False
         sitecon = mw.get_connect(password)
         is_writable, text = mw.get_page_text(sitecon, title)
-        self.view.set_syntax_file('Packages/Mediawiker/Mediawiki.tmLanguage')
-        self.view.settings().set('mediawiker_is_here', True)
-        self.view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
-        self.view.set_name(title)
 
-        if is_writable:
-            if not text:
+        if is_writable or text:
+            self.view.set_syntax_file('Packages/Mediawiker/Mediawiki.tmLanguage')
+            self.view.settings().set('mediawiker_is_here', True)
+            self.view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
+            self.view.set_name(title)
+
+            if is_writable and not text:
                 sublime.status_message('Wiki page %s is not exists. You can create new..' % (title))
                 text = '<!-- New wiki page: Remove this with text of the new page -->'
             # insert text
             self.view.erase(edit, sublime.Region(0, self.view.size()))
             self.view.run_command('mediawiker_insert_text', {'position': 0, 'text': text})
-        sublime.status_message('Page %s was opened successfully from %s.' % (title, mw.get_view_site()))
-        self.view.set_scratch(True)
-        # own is_changed flag instead of is_dirty for possib. to reset..
-        self.view.settings().set('is_changed', False)
+            sublime.status_message('Page %s was opened successfully from %s.' % (title, mw.get_view_site()))
+            self.view.set_scratch(True)
+            # own is_changed flag instead of is_dirty for possib. to reset..
+            self.view.settings().set('is_changed', False)
+        else:
+            sublime.message_dialog('You have not rights to view this page.')
+            self.view.close()
 
 
 class MediawikerPublishPageCommand(sublime_plugin.TextCommand):

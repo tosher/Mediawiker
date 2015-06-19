@@ -1,0 +1,2 @@
+Mediawiker 2.5.4:
+* Showing source of the read only pages was fixed
