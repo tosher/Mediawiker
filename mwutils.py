@@ -233,7 +233,8 @@ def get_connect(password=None):
                 sublime.status_message('Logon successfully.')
             else:
                 sublime.status_message('Login failed: connection unavailable.')
-        except mwclient.LoginError as e:
+        except mwclient.LoginError as exc:
+            e = exc.args if pythonver >= 3 else exc
             sublime.status_message('Login failed: %s' % e[1]['result'])
             return
     else:
