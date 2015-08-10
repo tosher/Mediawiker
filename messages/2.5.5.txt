@@ -1,0 +1,2 @@
+Mediawiker 2.5.5:
+* Ctrl+s saves the file when the opened page has a link to a file on disk.

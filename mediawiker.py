@@ -1029,7 +1029,12 @@ class MediawikerLoad(sublime_plugin.EventListener):
         if current_syntax is not None and current_syntax.endswith('Mediawiker/Mediawiki.tmLanguage'):
             # Mediawiki mode
             view.settings().set('mediawiker_is_here', True)
-            view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
+
+            if not view.file_name():
+                view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
+            else:
+                view.settings().set('mediawiker_wiki_instead_editor', False)
+
             view.settings().set('mediawiker_site', current_site)
 
     def on_modified(self, view):
@@ -1040,6 +1045,12 @@ class MediawikerLoad(sublime_plugin.EventListener):
                 view.set_scratch(False)
             else:
                 view.settings().set('is_changed', True)
+
+    def on_post_save(self, view):
+        view.settings().set('mediawiker_wiki_instead_editor', False)
+
+    def on_post_save_async(self, view):
+        view.settings().set('mediawiker_wiki_instead_editor', False)
 
 
 class MediawikerCompletionsEvent(sublime_plugin.EventListener):
