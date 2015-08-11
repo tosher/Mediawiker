@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mediawiker Edit Button
 // @namespace    http://github.com/Plloi
-// @version      0.0.6
+// @version      0.0.7
 // @description  Adds a button to edit Media Wiki pages using Mediawiker for SublimeText
 // @author       Shaun Hammill <plloi.pllex@gmail.com>
 // @updateURL    https://raw.githubusercontent.com/tosher/Mediawiker/master/handler/userscript/MediawikerEditButton.meta.js
@@ -13,12 +13,23 @@
 // ==/UserScript==
 
 (function(){
-    var editItem = document.getElementById("ca-edit"),
-        editText = document.querySelector(".plainlinks a[href$=edit]"),
-        pageName = mw.config.get("wgPageName");
+    function addMediawiker(){
+        if(typeof mw === "undefined"){
+            setTimeout(function(){
+                addMediawiker();
+            },250);
+            return;
+        }
 
-    if (editItem && pageName)
-    {
-        editItem.insertAdjacentHTML('afterend','<li><span><a href="mediawiker://'+pageName+'">'+editItem.innerText+' in Mediawiker</a></span></li>');
+        var editItem = document.getElementById("ca-edit"),
+            editText = document.querySelector(".plainlinks a[href$=edit]"),
+            pageName = mw.config.get("wgPageName");
+
+        if (editItem && pageName)
+        {
+            editItem.insertAdjacentHTML('afterend','<li><span><a href="mediawiker://'+pageName+'">'+editItem.innerText+' in Mediawiker</a></span></li>');
+        }
     }
+
+    addMediawiker()
 })();
