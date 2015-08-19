@@ -412,7 +412,9 @@ repository:
         '3': {name: meta.tag.inline.any.mediawiki}
       patterns:
       - include: '#style_in_link'
+
     - name: meta.link.inline.external.mediawiki
+      comment: external link like [http://example.com/example.html Example]
       contentName: string.other.title.link.external.mediawiki
       begin: \[(\S+)\s*(?=[^\]]*\])
       beginCaptures:
@@ -420,8 +422,10 @@ repository:
       end: \]
       patterns:
       - include: '#style_in_link'
+
     - name: markup.underline.link.external.mediawiki
-      match: ((https?|ftp|file)://|mailto:)[-:@a-zA-Z0-9_.~%+/?=&#]+(?<![.?:])
+      comment: external link like just http://example.com/example.html
+      match: ((https?|ftp|file|\S+)://|mailto:)[-:@\w.~%+/?=&#]+(?<![.?:])
 
   source-stuff:
     patterns:
