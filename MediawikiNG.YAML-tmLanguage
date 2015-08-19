@@ -25,7 +25,7 @@ comment: "
   8. <gallery></gallery> tag.  This one adds some complication, but is worth supporting.
   4. commands for bold/italic (tbates)
   4. All lists scoped by type of list. (tbates)"
-name: Mediawiki
+name: Mediawiki NG
 scopeName: text.html.mediawiki
 fileTypes: [mediawiki, wikipedia, wiki]
 uuid: 6AF21ADF-316A-47D1-A8B6-1BB38637DE9A
@@ -243,13 +243,13 @@ repository:
         '1': {name: meta.tag.inline.ref.mediawiki}
       patterns:
       - name: meta.item.gallery.mediawiki
-        begin: |-
+        begin: |
           (?x)
-          ^(?!\s*\n)            # not an empty line
-          ( [ ]*(([Ff]ile|[Ii]mage)(:)) # spaces, image, colon
-            ([^\[\]|]+)           # anything (filename)
-            ((\|)([^\n]*))?        # pipe, anything (description)
-            (?<!\s)[ ]*           # spaces
+          ^(?!\s*\n)                      # not an empty line
+          ( [ ]*(([Ff]ile|[Ii]mage)(:))   # spaces, image, colon
+          ([^\[\]|]+)                     # anything (filename)
+          ((\|)([^\n]*))?                 # pipe, anything (description)
+          (?<!\s)[ ]*                     # spaces
           )?
         beginCaptures:
           '3': {name: constant.other.namespace.image.mediawiki}
@@ -304,19 +304,22 @@ repository:
   link:
     patterns:
     - name: meta.image.wiki.mediawiki
-      begin: "(?x:\n                        (\\[\\[)                         # opening\
-        \ brackets\n                          ( [ ]*(([Ff]ile|[Ii]mage)(:)) # spaces,\
-        \ image, colon\n                            ([^\\[\\]|]+)                #\
-        \ anything\n                            (?<!\\s)[ ]*                # spaces\n\
-        \                          )\n                    )"
+      begin: |
+        (?x:(\[\[)                    # opening brackets
+        ( [ ]*(([Ff]ile|[Ii]mage)(:)) # spaces, image, colon
+        ([^\[\]|]+)                   # anything
+        (?<!\s)[ ]*                   # spaces
+        ))
       beginCaptures:
         '1': {name: meta.tag.inline.any.mediawiki}
         '4': {name: constant.other.namespace.image.mediawiki}
         '5': {name: punctuation.fix_this_later.colon.mediawiki}
         '6': {name: constant.other.wiki-link.image.mediawiki}
-      end: "(?x:\n                          ((\\|)[ ]*( [^\\[\\]|]+ )[ ]*)? # pipe,\
-        \ spaces, anything, spaces\n                        (\\]\\])             \
-        \            # closing brackets\n                    )"
+      end: |
+        (?x:
+        ((\|)[ ]*( [^\[\]|]+ )[ ]*)?  # pipe, spaces, anything, spaces
+        (\]\])                        # closing brackets
+        )
       endCaptures:
         '2': {name: punctuation.fix_this_later.pipe.mediawiki}
         '3': {name: string.other.title.link.wiki-link.mediawiki}
@@ -356,18 +359,24 @@ repository:
       - include: '#style_in_link'
       applyEndPatternLast: 1
     - name: meta.link.wiki.redirect.mediawiki
-      begin: "(?x:\n                    ({{)                       # opening brackets\n\
-        \                        ([Rr]edirect|subst:.*)   # redirect?\n          \
-        \              [ ]*                   # spaces\n                        (\\\
-        |)                   # pipe\n                    )"
+      begin: |
+        (?x:
+        ({{)                        # opening brackets
+        ([Rr]edirect|subst:.*)      # redirect?
+        [ ]*                        # spaces
+        (\\
+        |)                          # pipe
+        )
       beginCaptures:
         '1': {name: meta.tag.inline.redirect.mediawiki}
         '2': {name: keyword.operator.wiki-link.redirect.mediawiki}
         '3': {name: constant.other.pipe.mediawiki}
-      end: "(?x:\n                            (([\\|}]+)(\\|)([\\|}]+))?   #  from\
-        \ | to\n                            ([^}]*)                   # anything\n\
-        \                            (}})                      # closing brackets\n\
-        \                    )"
+      end: |
+        (?x:
+        (([\\|}]+)(\\|)([\\|}]+))?    #  from | to
+        ([^}]*)                       # anything
+        (}})                          # closing brackets
+        )
       endCaptures:
         '2': {name: meta.tag.inline.any.mediawiki}
         '3': {name: markup.underline.link.internal.mediawiki}
@@ -376,13 +385,16 @@ repository:
       patterns:
       - include: '#style_in_link'
     - name: meta.link.wiki.mediawiki
-      begin: "(?x:\n                        (\\[\\[)                       # opening\
-        \ brackets\n                          (:)?                       # colon to\
-        \ suppress image or category?\n                          ((\\s+):[^\\[\\]]*(?=\\\
-        ]\\]))?  # a colon after spaces is invalid\n                          [ ]*\
-        \                       # spaces\n                          ( (([^\\[\\]|]+)(:))?\
-        \        # namespace\n                            ([^\\[\\]|]+)(?<!\\s)[ ]*\
-        \   # link name\n                          )?\n                    )"
+      begin: |
+        (?x:
+        (\[\[)                      # opening brackets
+        (:)?                        # colon to suppress image or category?
+        ((\s+):[^\[\]]*(?=\]\]))?   # a colon after spaces is invalid
+        [ ]*                        # spaces
+        ( (([^\[\]|]+)(:))?         # namespace
+        ([^\[\]|]+)(?<!\s)[ ]*      # link name
+        )?
+        )
       beginCaptures:
         '1': {name: meta.tag.inline.any.mediawiki}
         '2': {name: keyword.operator.wiki-link.suppress-image-or-category.mediawiki}
@@ -390,9 +402,11 @@ repository:
         '7': {name: constant.other.namespace.mediawiki}
         '8': {name: punctuation.fix_this_later.colon.mediawiki}
         '9': {name: constant.other.wiki-link.mediawiki}
-      end: "(?x:\n                          (\\|[ ]*([^\\[\\]\\|]+)[ ]*)?     # pipe,\
-        \ spaces, anything, spaces\n                        (\\]\\])             \
-        \            # closing brackets\n                    )"
+      end: |
+        (?x:
+        (\|[ ]*([^\[\]\|]+)[ ]*)?     # pipe, spaces, anything, spaces
+        (\]\])                        # closing brackets
+        )
       endCaptures:
         '2': {name: string.other.title.link.wiki-link.mediawiki}
         '3': {name: meta.tag.inline.any.mediawiki}
@@ -580,13 +594,13 @@ repository:
               * nowiki, noinclude, includeonly"
     patterns:
     - name: markup.bold.html.mediawiki
-      begin: ''''''''
-      end: ''''''''
+      begin: "'''"
+      end: "'''"
       patterns:
       - include: '#inline'
     - name: markup.italic.html.mediawiki
-      begin: ''''''
-      end: '''''(?!''[^''])'
+      begin: "''"
+      end: "''(?!'[^'])"
       patterns:
       - include: '#inline'
     - contentName: markup.bold.html.mediawiki
@@ -635,13 +649,13 @@ repository:
   style_in_link:
     patterns:
     - name: markup.bold.mediawiki
-      begin: ''''''''
-      end: ''''''''
+      begin: "'''"
+      end: "'''"
       patterns:
       - include: '#style_in_link'
     - name: markup.italic.mediawiki
-      begin: ''''''
-      end: ''''''
+      begin: "''"
+      end: "''"
       patterns:
       - include: '#style_in_link'
     - contentName: markup.bold.html.mediawiki
