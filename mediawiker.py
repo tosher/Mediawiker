@@ -1068,7 +1068,7 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
             if line_before_position.rfind('[[') > line_before_position.rfind(']]'):
                 internal_link = line_before_position[line_before_position.rfind('[[') + 2:]
 
-            if INTERNAL_LINK_SPLITTER in line_before_position:
+            if INTERNAL_LINK_SPLITTER in internal_link:
                 # cursor at custom url text zone..
                 return []
 
