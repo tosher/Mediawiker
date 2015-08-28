@@ -1082,7 +1082,7 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
                     for ns in namespaces:
                         pages = sitecon.allpages(prefix=internal_link, namespace=ns)
                         for p in pages:
-                            print(p.name)
+                            # print(p.name)
                             # name - full page name with namespace
                             # page_title - title of the page wo namespace
                             # For (Main) namespace, shows [page_title (Main)], makes [[page_title]]
