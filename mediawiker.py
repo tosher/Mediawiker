@@ -1056,6 +1056,7 @@ class MediawikerLoad(sublime_plugin.EventListener):
 class MediawikerCompletionsEvent(sublime_plugin.EventListener):
 
     def on_query_completions(self, view, prefix, locations):
+        INTERNAL_LINK_SPLITTER = '|'
         if view.settings().get('mediawiker_is_here', False):
             view = sublime.active_window().active_view()
 
@@ -1066,6 +1067,10 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
             internal_link = ''
             if line_before_position.rfind('[[') > line_before_position.rfind(']]'):
                 internal_link = line_before_position[line_before_position.rfind('[[') + 2:]
+
+            if INTERNAL_LINK_SPLITTER in line_before_position:
+                # cursor at custom url text zone..
+                return []
 
             completions = []
             if internal_link:
