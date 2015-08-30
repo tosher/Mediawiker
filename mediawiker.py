@@ -1056,6 +1056,7 @@ class MediawikerLoad(sublime_plugin.EventListener):
 class MediawikerCompletionsEvent(sublime_plugin.EventListener):
 
     def on_query_completions(self, view, prefix, locations):
+        INTERNAL_LINK_SPLITTER = '|'
         if view.settings().get('mediawiker_is_here', False):
             view = sublime.active_window().active_view()
 
@@ -1067,6 +1068,10 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
             if line_before_position.rfind('[[') > line_before_position.rfind(']]'):
                 internal_link = line_before_position[line_before_position.rfind('[[') + 2:]
 
+            if INTERNAL_LINK_SPLITTER in internal_link:
+                # cursor at custom url text zone..
+                return []
+
             completions = []
             if internal_link:
                 word_cursor_min_len = mw.get_setting('mediawiker_page_prefix_min_length', 3)
@@ -1077,7 +1082,7 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
                     for ns in namespaces:
                         pages = sitecon.allpages(prefix=internal_link, namespace=ns)
                         for p in pages:
-                            print(p.name)
+                            # print(p.name)
                             # name - full page name with namespace
                             # page_title - title of the page wo namespace
                             # For (Main) namespace, shows [page_title (Main)], makes [[page_title]]
