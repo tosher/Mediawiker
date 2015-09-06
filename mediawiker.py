@@ -180,7 +180,8 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         is_writable, text = mw.get_page_text(sitecon, title)
 
         if is_writable or text:
-            self.view.set_syntax_file('Packages/Mediawiker/Mediawiki.tmLanguage')
+            # self.view.set_syntax_file('Packages/Mediawiker/Mediawiki.tmLanguage')
+            mw.set_syntax()
             self.view.settings().set('mediawiker_is_here', True)
             self.view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
             self.view.set_name(title)
@@ -428,8 +429,9 @@ class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
             if site_active.startswith(self.site_on):
                 site_active = site_active[len(self.site_on):]
             # force to set site_active in global and in view settings
-            current_syntax = self.window.active_view().settings().get('syntax')
-            if current_syntax is not None and current_syntax.endswith('Mediawiker/Mediawiki.tmLanguage'):
+            # current_syntax = self.window.active_view().settings().get('syntax')
+            # if current_syntax is not None and current_syntax.endswith('Mediawiker/Mediawiki.tmLanguage'):
+            if self.window.active_view().settings().get('mediawiker_is_here', False):
                 self.window.active_view().settings().set('mediawiker_site', site_active)
             mw.set_setting("mediawiki_site_active", site_active)
 
@@ -1026,7 +1028,7 @@ class MediawikerLoad(sublime_plugin.EventListener):
         current_syntax = view.settings().get('syntax')
         current_site = mw.get_view_site()
         # TODO: move method to check mediawiker view to mwutils
-        if current_syntax is not None and current_syntax.endswith('Mediawiker/Mediawiki.tmLanguage'):
+        if current_syntax is not None and current_syntax.endswith(('Mediawiker/Mediawiki.tmLanguage', 'Mediawiker/MediawikiNG.tmLanguage')):
             # Mediawiki mode
             view.settings().set('mediawiker_is_here', True)
 
@@ -1056,12 +1058,13 @@ class MediawikerLoad(sublime_plugin.EventListener):
 class MediawikerCompletionsEvent(sublime_plugin.EventListener):
 
     def on_query_completions(self, view, prefix, locations):
-        INTERNAL_LINK_SPLITTER = '|'
+        print('fires!')
+        INTERNAL_LINK_SPLITTER = u'|'
         if view.settings().get('mediawiker_is_here', False):
             view = sublime.active_window().active_view()
 
             # internal links completions
-            cursor_position = view.sel()[0].begin()
+            cursor_position = locations[0]  # view.sel()[0].begin()
             line_region = view.line(view.sel()[0])
             line_before_position = view.substr(sublime.Region(line_region.a, cursor_position))
             internal_link = ''
@@ -1097,6 +1100,7 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
                             completions.append((page_show, page_insert))
 
             return completions
+        return []
 
 
 class MediawikerShowPageLanglinksCommand(sublime_plugin.WindowCommand):

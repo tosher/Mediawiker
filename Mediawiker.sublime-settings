@@ -5,6 +5,7 @@
         "Russian wikipedia": { "host": "ru.wikipedia.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "" },
         "Mediawiki": { "host": "www.mediawiki.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "" }
     },
+    "mediawiki_syntax": "Packages/Mediawiker/MediawikiNG.tmLanguage",
     "mediawiki_site_active": "English wikipedia",
     "mediawiker_summary_postfix": " (by SublimeText.Mediawiker)",
     "mediawiker_skip_summary": false,

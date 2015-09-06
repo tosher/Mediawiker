@@ -38,6 +38,11 @@ def set_setting(key, value):
     sublime.save_settings('Mediawiker.sublime-settings')
 
 
+def set_syntax():
+    syntax = get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG.tmLanguage')
+    sublime.active_window().active_view().set_syntax_file(syntax)
+
+
 def get_view_site():
     try:
         return sublime.active_window().active_view().settings().get('mediawiker_site', get_setting('mediawiki_site_active'))
@@ -222,8 +227,11 @@ def get_connect(password=None):
             http_auth_header = e[1].getheader('www-authenticate')
             sitecon = http_auth(http_auth_header, host, path, http_auth_login, http_auth_password)
         else:
-            sublime.status_message('HTTP connection failed: %s' % e[1])
+            sublime.message_dialog('HTTP connection failed: %s' % e[1])
             raise Exception('HTTP connection failed.')
+    except Exception as e:
+        sublime.message_dialog('Connection failed for %s: %s' % (host, e))
+        raise Exception('HTTP connection failed.')
 
     # if login is not empty - auth required
     if username:
