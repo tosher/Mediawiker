@@ -1058,7 +1058,6 @@ class MediawikerLoad(sublime_plugin.EventListener):
 class MediawikerCompletionsEvent(sublime_plugin.EventListener):
 
     def on_query_completions(self, view, prefix, locations):
-        print('fires!')
         INTERNAL_LINK_SPLITTER = u'|'
         if view.settings().get('mediawiker_is_here', False):
             view = sublime.active_window().active_view()
