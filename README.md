@@ -20,8 +20,8 @@
 * Connectivity - http/https, direct/proxy connection with basic/digest web-server authorization.
 * Connection manager - add new wiki sites, and switch between them.
 
-![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/sublime_wiki_editor.png)
-*Screenshot using the Twilight theme*
+![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/Mediawiker_Dark.png)
+*Screenshot using the Mediawiker_Dark color scheme*
 
 ## Install
 
@@ -52,7 +52,7 @@ or,
 Download this repo using the "ZIP" button above, unzip and place the files in "/packages-folder/Mediawiker/"
 
 ## Documentation
-* **Note**: Not all color schemes fully supports syntax highlighting scopes required by markup languages like Mediawiki or Markdown. On this moment, color schemes with better support are: **Twilight**, **Sunburst**, **Eiffel**. Also, Mediawiker package includes **Twilight (Mediawiki)**, **Eiffel (Mediawiki)** and **Mediawiker_Dark** schemes with improved highlighting for mediawiki syntax. 
+* **Note**: Not all color schemes fully supports syntax highlighting scopes required by markup languages like Mediawiki or Markdown. On this moment, color schemes with better support are: **Twilight**, **Sunburst**, **Eiffel**. Also, Mediawiker package includes **Twilight (Mediawiki)**, **Eiffel (Mediawiki)** and **Mediawiker_Dark**/**Mediawiker_Light** schemes with improved highlighting for mediawiki syntax. 
 * Check [plugin wiki](https://github.com/tosher/Mediawiker/wiki) for setup instructions.
 * Use Preferences / Package settings / Mediawiker / "Settings  - Default" and "Settings - User" for setup wiki connection and plugin options.
 * Some connection specific rules:
