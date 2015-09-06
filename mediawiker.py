@@ -318,6 +318,7 @@ class MediawikerShowExternalLinksCommand(sublime_plugin.TextCommand):
     selected = None
 
     def run(self, edit):
+        # TODO: use API..
         self.items = []
         self.regions = []
         self.regions = self.view.find_all(self.pattern)
@@ -331,7 +332,9 @@ class MediawikerShowExternalLinksCommand(sublime_plugin.TextCommand):
     def prepare_header(self, header):
         maxlen = 70
         link_url = mw.strunquote(header.group(1))
-        link_descr = re.sub(r'<.*?>', '', header.group(2))
+        link_descr = ''
+        if header.group(2) is not None:
+            link_descr = re.sub(r'<.*?>', '', header.group(2))
         postfix = '..' if len(link_descr) > maxlen else ''
         return '%s: %s%s' % (link_url, link_descr[:maxlen], postfix)
 
