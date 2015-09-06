@@ -32,7 +32,7 @@ uuid: 6AF21ADF-316A-47D1-A8B6-1BB38637DE9A
 
 patterns:
 - include: '#block'
-
+- include: '#block_pre_spaced'
 - include: '#inline'
 
 repository:
@@ -63,32 +63,34 @@ repository:
     #    '1': {name: punctuation.definition.tag.mediawiki}
     - comment: 'source: <source lang="R">'
       contentName: meta.tag.source.mediawiki
-      begin: ' ?(<)(source|syntaxhighlight)[ \t]+(lang)(=)"([^"]+)"(>)'
+      begin: ' ?(<)(source|syntaxhighlight)[ \t]+(lang)(=)(")([^"]+)(")(>)'
       beginCaptures:
-        '1': {name: punctuation.definition.tag.mediawiki}
+        '1': {name: meta.tag.validhtml.mediawiki}
         '2': {name: entity.name.tag.source.mediawiki}
         '3': {name: entity.other.attribute-name.mediawiki}
-        '4': {name: punctuation.section.mediawiki}
-        '5': {name: string.quoted.mediawiki}
-        '6': {name: punctuation.definition.tag.mediawiki}
+        '4': {name: entity.other.attributes.validhtml.mediawiki}
+        '5': {name: entity.other.attributes.validhtml.mediawiki}
+        '6': {name: string.quoted.mediawiki}
+        '7': {name: entity.other.attributes.validhtml.mediawiki}
+        '8': {name: meta.tag.validhtml.mediawiki}
       end: ' ?(</)(source|syntaxhighlight)(>)'
       endCaptures:
-        '1': {name: punctuation.definition.tag.mediawiki}
+        '1': {name: meta.tag.validhtml.mediawiki}
         '2': {name: entity.name.tag.source.mediawiki}
-        '3': {name: punctuation.definition.tag.mediawiki}
+        '3': {name: meta.tag.validhtml.mediawiki}
       patterns:
       - include: '#source-stuff'
     - contentName: meta.tag.source.mediawiki
       begin: ' ?(<)(uml)(>)'
       beginCaptures:
-        '1': {name: punctuation.definition.tag.mediawiki}
+        '1': {name: meta.tag.validhtml.mediawiki}
         '2': {name: entity.name.tag.source.mediawiki}
-        '3': {name: punctuation.definition.tag.mediawiki}
+        '3': {name: meta.tag.validhtml.mediawiki}
       end: ' ?(</)(uml)(>)'
       endCaptures:
-        '1': {name: punctuation.definition.tag.mediawiki}
+        '1': {name: meta.tag.validhtml.mediawiki}
         '2': {name: entity.name.tag.source.mediawiki}
-        '3': {name: punctuation.definition.tag.mediawiki}
+        '3': {name: meta.tag.validhtml.mediawiki}
     - comment: 'Match lines that begin & end with  1 \u201C=\u201D: Mismatch "=" marked invalid.'
       name: markup.heading.1.mediawiki
       begin: ^(={1})(?!=)(?=.*\1\s*$)
@@ -152,12 +154,6 @@ repository:
     - comment: "A separator is made up of 4 or more -s alone on a line by themselves."
       name: meta.separator.mediawiki
       match: ^-{4,}[ \t]*($\n)?
-    - comment: "Code blocks start with one space.  Wiki text and html are still interpreted in MediaWiki, unlike in mediawiki."
-      name: markup.raw.block.mediawiki
-      begin: ^ (?=\s*\S)
-      end: ^(?=[^ ])
-      patterns:
-      - include: '#inline'
     - comment: "numbered-unnumbered-definition lists"
       name: markup.list.mediawiki
       begin: ^([#*;:]+)
@@ -191,6 +187,17 @@ repository:
     #  end: ^(?:\s*$|(?=[;*#:=<]|----))
     #  patterns:
     #  - include: '#inline'
+
+  block_pre_spaced:
+    patterns:
+    - comment: "Code blocks start with one space.  Wiki text and html are still interpreted in MediaWiki, unlike in mediawiki."
+      name: markup.raw.block.mediawiki
+      begin: ^ (?=\s*\S)
+      end: ^(?=[^ ])
+      patterns:
+      - include: '#inline'
+    - include: '#table'
+    - include: '#comments'
 
   block_html:
     comment: "The available block HTML tags supported are:
@@ -660,11 +667,11 @@ repository:
       end: (</(\2)>)
       beginCaptures:
         '1': {name: meta.tag.validhtml.mediawiki}
-        '2': {name: entity.name.tag.validhtml.mediawiki}
+        '2': {name: entity.name.tag.validhtml.1.mediawiki}
         '3': {name: entity.other.attributes.validhtml.mediawiki}
       endCaptures:
         '1': {name: meta.tag.validhtml.mediawiki}
-        '2': {name: entity.name.tag.validhtml.mediawiki}
+        '2': {name: entity.name.tag.validhtml.2.mediawiki}
       patterns:
       - include: '#inline'
     - contentName: markup.other.strikethrough.html.mediawiki
@@ -724,6 +731,7 @@ repository:
       patterns:
       - include: '#inline'
       - include: '#block'
+      - include: '#block_pre_spaced'
     - contentName: meta.tag.source.validhtml.mediawiki
       begin: (?i:(<(pre)(\b[^>]*)>))
       end: (</(\2)>)
@@ -746,6 +754,25 @@ repository:
       endCaptures:
         '1': {name: meta.tag.validhtml.mediawiki}
         '2': {name: entity.name.tag.validhtml.mediawiki}
+    - name: meta.tag.validhtml.mediawiki
+      match: (?i:(<(br)(\b[^>]*)\/?>))
+      captures:
+        '1': {name: meta.tag.validhtml.mediawiki}
+        '2': {name: entity.name.tag.validhtml.mediawiki}
+        '3': {name: entity.other.attributes.validhtml.mediawiki}
+    - contentName: meta.tag.source.unknown.validhtml.mediawiki
+      begin: (?i:(<([\w]+?)(\b[^>]*)>))
+      end: (</(\2)>)
+      beginCaptures:
+        '1': {name: meta.tag.validhtml.mediawiki}
+        '2': {name: entity.name.tag.unknown.validhtml.mediawiki}
+        '3': {name: entity.other.attributes.validhtml.mediawiki}
+      endCaptures:
+        '1': {name: meta.tag.validhtml.mediawiki}
+        '2': {name: entity.name.tag.unknown.validhtml.mediawiki}
+      patterns:
+      - include: '#inline'
+      - include: '#block'
       # no markup in nowiki..
       # patterns:
       # - include: '#inline'
@@ -850,6 +877,7 @@ repository:
       patterns:
       - include: '#inline'
       - include: '#block'
+      - include: '#block_pre_spaced'
     - contentName: meta.tag.source.validhtml.mediawiki
       begin: (?i:(<(pre)(\b[^>]*)>))
       end: (</(\2)>)
@@ -876,10 +904,12 @@ repository:
         '1': {name: markup.other.special.table.mediawiki}
       patterns:
       - name: meta.table.attributes.mediawiki
-        match: (\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?
+        match: (\S+)(=["']?)((?:.?(?!["']?\s+(?:\S+)=|[>"']))*.?)(["']?)
         captures:
           '1': {name: entity.other.attributes.validhtml.mediawiki}
-          '2': {name: string.quoted.mediawiki}
+          '2': {name: entity.other.attributes.table.cellcontents.validhtml.mediawiki}
+          '3': {name: entity.other.attributes.validhtml.mediawiki}
+          '4': {name: entity.other.attributes.table.cellcontents.validhtml.mediawiki}
       - name: meta.table.caption.mediawiki
         match: ^(\|\+)[\t ]*(.*)$
         captures:
@@ -900,11 +930,16 @@ repository:
             '1': {name: markup.other.special.table.cellwall.mediawiki}
           patterns:
           - include: '#inline'
-          - name: entity.other.attributes.table.cellcontents.validhtml.mediawiki
-            # http://stackoverflow.com/questions/317053/regular-expression-for-extracting-tag-attributes
-            match: (\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?
-            captures:
-              '2': {name: string.quoted.mediawiki}
+          - contentName: entity.other.attributes.table.cellcontents.validhtml.mediawiki
+            begin: (\S+)(=["']?)
+            end: (["'])|(?=\s+\S+=|\s*\|)
+            beginCaptures:
+              '1': {name: entity.other.attributes.table.cellcontents.validhtml.mediawiki}
+              '2': {name: entity.other.attributes.table.cellcontents.validhtml.mediawiki}
+            endCaptures:
+              '1': {name: entity.other.attributes.table.cellcontents.validhtml.mediawiki}
+            patterns:
+            - include: '#inline'
           - name: entity.other.attributes.table.cellcontents.validhtml.mediawiki
             match: \|
 
@@ -965,6 +1000,7 @@ repository:
         patterns:
         - include: '#inline'
         - include: '#block'
+        - include: '#block_pre_spaced'
       - name: punctuation.fix_this_later.pipe.mediawiki
         match: \|
 keyEquivalent: ^~M
