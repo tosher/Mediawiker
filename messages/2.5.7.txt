@@ -1,0 +1,3 @@
+Mediawiker 2.5.7:
+
+* Comparing page revision with server on post. Can be switched off by **mediawiki_validate_revision_on_post** option in settings.

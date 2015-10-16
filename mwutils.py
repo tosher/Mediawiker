@@ -250,12 +250,12 @@ def get_connect(password=None):
     return sitecon
 
 # wiki related functions..
-
-
 def get_page_text(site, title):
     denied_message = 'You have not rights to edit this page. Click OK button to view its source.'
     page = site.Pages[title]
+
     if page.can('edit'):
+        sublime.active_window().active_view().settings().set('page_revision', page.revision)
         return True, page.edit()
     else:
         if sublime.ok_cancel_dialog(denied_message):
@@ -265,7 +265,6 @@ def get_page_text(site, title):
                 return False, ''
         else:
             return False, ''
-
 
 def save_mypages(title, storage_name='mediawiker_pagelist'):
 

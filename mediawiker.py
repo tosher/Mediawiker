@@ -43,7 +43,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
     run_in_new_window = False
     title = None
 
-    def run(self, action, title='', site_active=None):
+    def run(self, action, title='', site_active=None, **kwargs):
         self.site_active = site_active
         self.action = action
 
@@ -57,6 +57,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
 
         else:
             if self.action == 'mediawiker_reopen_page':
+                self.run_in_new_window = kwargs.get('new_tab', False)
                 self.action = 'mediawiker_show_page'
             title = title if title else mw.get_title()
             self.on_done(title)
@@ -208,19 +209,29 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
     current_text = ''
 
     def run(self, edit, title, password):
+
+        is_process_post = True
         is_skip_summary = mw.get_setting('mediawiker_skip_summary', False)
         sitecon = mw.get_connect(password)
         self.title = mw.get_title()
         if self.title:
             self.page = sitecon.Pages[self.title]
+
             if self.page.can('edit'):
-                self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
-                if not is_skip_summary:
-                    # summary_message = 'Changes summary (%s):' % mw.get_setting('mediawiki_site_active')
-                    summary_message = 'Changes summary (%s):' % mw.get_view_site()
-                    self.view.window().show_input_panel(summary_message, '', self.on_done, None, None)
+
+                if mw.get_setting('mediawiki_validate_revision_on_post') and self.view.settings().get('page_revision', 0) != self.page.revision:
+                    is_process_post = sublime.ok_cancel_dialog('Page was changed on server, post page anyway? If not, new revision will be opened in new tab.')
+
+                if is_process_post:
+                    self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
+                    if not is_skip_summary:
+                        # summary_message = 'Changes summary (%s):' % mw.get_setting('mediawiki_site_active')
+                        summary_message = 'Changes summary (%s):' % mw.get_view_site()
+                        self.view.window().show_input_panel(summary_message, '', self.on_done, None, None)
+                    else:
+                        self.on_done('')
                 else:
-                    self.on_done('')
+                    self.view.window().run_command('mediawiker_page', {'action': 'mediawiker_reopen_page', 'new_tab': True})
             else:
                 sublime.status_message('You have not rights to edit this page')
         else:
