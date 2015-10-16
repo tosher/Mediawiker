@@ -212,10 +212,10 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 
         is_process_post = True
         is_skip_summary = mw.get_setting('mediawiker_skip_summary', False)
-        sitecon = mw.get_connect(password)
+        self.sitecon = mw.get_connect(password)
         self.title = mw.get_title()
         if self.title:
-            self.page = sitecon.Pages[self.title]
+            self.page = self.sitecon.Pages[self.title]  # TODO: remove with mwutils func and replace get_page_text with get_page..
 
             if self.page.can('edit'):
 
@@ -248,6 +248,11 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                     mark_as_minor = not mark_as_minor
                     summary = summary[1:]
                 self.page.save(self.current_text, summary=summary.strip(), minor=mark_as_minor)
+
+                # update revision for page in view
+                self.page = self.sitecon.Pages[self.title]
+                self.view.settings().set('page_revision', self.page.revision)
+
                 self.view.set_scratch(True)
                 self.view.settings().set('is_changed', False)  # reset is_changed flag
                 sublime.status_message('Wiki page %s was successfully published to wiki.' % (self.title))
