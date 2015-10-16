@@ -219,7 +219,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 
             if self.page.can('edit'):
 
-                if mw.get_setting('mediawiki_validate_revision_on_post') and self.view.settings().get('page_revision', 0) != self.page.revision:
+                if mw.get_setting('mediawiki_validate_revision_on_post', True) and self.view.settings().get('page_revision', 0) != self.page.revision:
                     is_process_post = sublime.ok_cancel_dialog('Page was changed on server, post page anyway? If not, new revision will be opened in new tab.')
 
                 if is_process_post:
