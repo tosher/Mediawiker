@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 # from . import six
-from . import page
+from .page import Page
 from . import listing
 
 
-class Category(page.Page, listing.GeneratorList):
+class Category(Page, listing.GeneratorList):
 
     def __init__(self, site, name, info=None, namespace=None):
-        page.Page.__init__(self, site, name, info)
+        Page.__init__(self, site, name, info)
         kwargs = {}
         kwargs['gcmtitle'] = self.name
         if namespace:
