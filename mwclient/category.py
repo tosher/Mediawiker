@@ -1,16 +1,19 @@
-from .listing import GeneratorList
-from .page import Page
+# -*- coding: utf-8 -*-
+
+# from . import six
+from . import page
+from . import listing
 
 
-class Category(Page, GeneratorList):
+class Category(page.Page, listing.GeneratorList):
 
     def __init__(self, site, name, info=None, namespace=None):
-        Page.__init__(self, site, name, info)
+        page.Page.__init__(self, site, name, info)
         kwargs = {}
         kwargs['gcmtitle'] = self.name
         if namespace:
             kwargs['gcmnamespace'] = namespace
-        GeneratorList.__init__(self, site, 'categorymembers', 'cm', **kwargs)
+        listing.GeneratorList.__init__(self, site, 'categorymembers', 'cm', **kwargs)
 
     def __repr__(self):
         return "<Category object '%s' for %s>" % (self.name.encode('utf-8'), self.site)

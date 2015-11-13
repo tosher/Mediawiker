@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from . import six
 from .six import text_type
 from .util import parse_timestamp
@@ -54,7 +56,7 @@ class List(object):
             if self.last:
                 raise StopIteration
             self.load_chunk()
-            return List.next(self, full=full)
+            return List.__next__(self, full=full)
 
     def next(self, full=False):
         """ For Python 2.x support """
@@ -125,13 +127,6 @@ class GeneratorList(List):
     def __init__(self, site, list_name, prefix, *args, **kwargs):
         List.__init__(self, site, list_name, prefix, *args, **kwargs)
 
-        from .page import Page
-        from .category import Category
-        from .image import Image
-        self.page_class = Page
-        self.image_class = Image
-        self.category_class = Category
-
         self.args['g' + self.prefix + 'limit'] = self.args[self.prefix + 'limit']
         del self.args[self.prefix + 'limit']
         self.generator = 'generator'
@@ -141,13 +136,25 @@ class GeneratorList(List):
 
         self.result_member = 'pages'
 
-    def next(self):
-        info = List.next(self, full=True)
+        from .page import Page
+        from .image import Image
+        from .category import Category
+
+        self.page_class = Page
+        self.image_class = Image
+        self.category_class = Category
+
+    def __next__(self):
+        info = List.__next__(self, full=True)
         if info['ns'] == 14:
             return self.category_class(self.site, u'', info)
         if info['ns'] == 6:
             return self.image_class(self.site, u'', info)
         return self.page_class(self.site, u'', info)
+
+    def next(self):
+        """ For Python 2.x support """
+        return self.__next__()
 
     def load_chunk(self):
         # Put this here so that the constructor does not fail
@@ -167,8 +174,9 @@ class PageList(GeneratorList):
         if start:
             kwargs['gapfrom'] = start
 
-        GeneratorList.__init__(self, site, 'allpages', 'ap',
-                               gapnamespace=text_type(namespace), gapfilterredir=redirects, **kwargs)
+        GeneratorList.__init__(
+            self, site, 'allpages', 'ap',
+            gapnamespace=text_type(namespace), gapfilterredir=redirects, **kwargs)
 
     def __getitem__(self, name):
         return self.get(name, None)
@@ -188,10 +196,10 @@ class PageList(GeneratorList):
                     return self.category_class(self.site, name, info)
                 elif namespace == 6:
                     return self.image_class(self.site, name, info)
+
             return self.page_class(self.site, name, info)
 
     def guess_namespace(self, name):
-        normal_name = self.page_class.normalize_title(name)
         for ns in self.site.namespaces:
             if ns == 0:
                 continue
@@ -211,9 +219,9 @@ class PageProperty(List):
         self.generator = 'prop'
 
     def set_iter(self, data):
-        for page in six.itervalues(data['query']['pages']):
-            if page['title'] == self.page.name:
-                self._iter = iter(page.get(self.list_name, ()))
+        for _page in six.itervalues(data['query']['pages']):
+            if _page['title'] == self.page.name:
+                self._iter = iter(_page.get(self.list_name, ()))
                 return
         raise StopIteration
 

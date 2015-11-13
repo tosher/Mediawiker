@@ -25,6 +25,12 @@
 
 from .errors import *
 from .client import Site, __ver__
+
+# for circular import in listing..
+from .page import Page
+from .image import Image
+from .category import Category
+
 import logging
 import warnings
 

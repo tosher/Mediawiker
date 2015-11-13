@@ -1,4 +1,8 @@
-import client
+# -*- coding: utf-8 -*-
+
+# from . import six
+from . import client
+
 import requests
 
 

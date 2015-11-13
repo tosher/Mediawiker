@@ -1,10 +1,13 @@
-from . import six
-from .six import text_type
+# -*- coding: utf-8 -*-
+
 import time
 import warnings
+
+from . import six
+from .six import text_type
 from .util import parse_timestamp
-from .listing import List, PageProperty, PagePropertyGenerator, RevisionsIterator, GeneratorList
-from .errors import InsufficientPermission, LoginError, UserBlocked, ProtectedPageError, NoWriteApi, EditError, APIError
+from . import listing
+from . import errors
 
 
 class Page(object):
@@ -14,6 +17,7 @@ class Page(object):
             return self.__dict__.update(name.__dict__)
         self.site = site
         self.name = name
+        self._textcache = {}
 
         if not info:
             if extra_properties:
@@ -125,26 +129,35 @@ class Page(object):
                       category=DeprecationWarning, stacklevel=2)
         return self.text(*args, **kwargs)
 
-    def text(self, section=None, expandtemplates=False):
+    def text(self, section=None, expandtemplates=False, cache=True):
         """
         Get the current wikitext of the page, or of a specific section.
-        If the page does not exist, an empty string is returned.
+        If the page does not exist, an empty string is returned. By
+        default, results will be cached and if you call text() again
+        with the same section and expandtemplates the result will come
+        from the cache. The cache is stored on the instance, so it
+        lives as long as the instance does.
 
         Args:
             section (int): numbered section or `None` to get the whole page (default: `None`)
             expandtemplates (bool): set to `True` to expand templates (default: `False`)
+            cache (bool): set to `False` to disable caching (default: `True`)
         """
 
         if not self.can('read'):
-            raise InsufficientPermission(self)
+            raise errors.InsufficientPermission(self)
         if not self.exists:
             return u''
         if section is not None:
             section = text_type(section)
 
+        key = hash((section, expandtemplates))
+        if cache and key in self._textcache:
+            return self._textcache[key]
+
         revs = self.revisions(prop='content|timestamp', limit=1, section=section, expandtemplates=expandtemplates)
         try:
-            rev = revs.next()
+            rev = next(revs)
             text = rev['*']
             self.last_rev_time = rev['timestamp']
         except StopIteration:
@@ -152,6 +165,9 @@ class Page(object):
             self.last_rev_time = None
         if not expandtemplates:
             self.edit_time = time.gmtime()
+
+        if cache:
+            self._textcache[key] = text
         return text
 
     def save(self, text, summary=u'', minor=False, bot=True, section=None, **kwargs):
@@ -160,17 +176,18 @@ class Page(object):
         """
         if not self.site.logged_in and self.site.force_login:
             # Should we really check for this?
-            raise LoginError(self.site, 'By default, mwclient protects you from ' +
-                             'accidentally editing without being logged in. If you ' +
-                             'actually want to edit without logging in, you can set ' +
-                             'force_login on the Site object to False.')
+            raise errors.LoginError(
+                self.site, 'By default, mwclient protects you from ' +
+                'accidentally editing without being logged in. If you ' +
+                'actually want to edit without logging in, you can set ' +
+                'force_login on the Site object to False.')
         if self.site.blocked:
-            raise UserBlocked(self.site.blocked)
+            raise errors.UserBlocked(self.site.blocked)
         if not self.can('edit'):
-            raise ProtectedPageError(self)
+            raise errors.ProtectedPageError(self)
 
         if not self.site.writeapi:
-            raise NoWriteApi(self)
+            raise errors.NoWriteApi(self)
 
         data = {}
         if minor:
@@ -193,17 +210,17 @@ class Page(object):
                                    summary=summary, token=self.get_token('edit'),
                                    **data)
             if result['edit'].get('result').lower() == 'failure':
-                raise EditError(self, result['edit'])
+                raise errors.EditError(self, result['edit'])
             return result
         try:
             result = do_edit()
-        except APIError as e:
+        except errors.APIError as e:
             if e.code == 'badtoken':
                 # Retry, but only once to avoid an infinite loop
                 self.get_token('edit', force=True)
                 try:
                     result = do_edit()
-                except APIError as e:
+                except errors.APIError as e:
                     self.handle_edit_error(e, summary)
             else:
                 self.handle_edit_error(e, summary)
@@ -211,14 +228,17 @@ class Page(object):
         # 'newtimestamp' is not included if no change was made
         if 'newtimestamp' in result['edit'].keys():
             self.last_rev_time = parse_timestamp(result['edit'].get('newtimestamp'))
+
+        # clear the page text cache
+        self._textcache = {}
         return result['edit']
 
     def handle_edit_error(self, e, summary):
         if e.code == 'editconflict':
-            raise EditError(self, summary, e.info)
+            raise errors.EditError(self, summary, e.info)
         elif e.code in ('protectedtitle', 'cantcreate', 'cantcreate-anon', 'noimageredirect-anon',
                         'noimageredirect', 'noedit-anon', 'noedit'):
-            raise ProtectedPageError(self, e.code, e.info)
+            raise errors.ProtectedPageError(self, e.code, e.info)
         else:
             raise
 
@@ -233,10 +253,10 @@ class Page(object):
 
         """
         if not self.can('move'):
-            raise InsufficientPermission(self)
+            raise errors.InsufficientPermission(self)
 
         if not self.site.writeapi:
-            raise NoWriteApi(self)
+            raise errors.NoWriteApi(self)
 
         data = {}
         if move_talk:
@@ -255,10 +275,10 @@ class Page(object):
 
         """
         if not self.can('delete'):
-            raise InsufficientPermission(self)
+            raise errors.InsufficientPermission(self)
 
         if not self.site.writeapi:
-            raise NoWriteApi(self)
+            raise errors.NoWriteApi(self)
 
         data = {}
         if watch:
@@ -289,13 +309,13 @@ class Page(object):
         API doc: https://www.mediawiki.org/wiki/API:Backlinks
 
         """
-        prefix = List.get_prefix('bl', generator)
-        kwargs = dict(List.generate_kwargs(prefix, namespace=namespace, filterredir=filterredir))
+        prefix = listing.List.get_prefix('bl', generator)
+        kwargs = dict(listing.List.generate_kwargs(prefix, namespace=namespace, filterredir=filterredir))
         if redirect:
             kwargs['%sredirect' % prefix] = '1'
         kwargs[prefix + 'title'] = self.name
 
-        return List.get_list(generator)(self.site, 'backlinks', 'bl', limit=limit, return_values='title', **kwargs)
+        return listing.List.get_list(generator)(self.site, 'backlinks', 'bl', limit=limit, return_values='title', **kwargs)
 
     def categories(self, generator=True):
         """
@@ -305,10 +325,10 @@ class Page(object):
 
         """
         if generator:
-            return PagePropertyGenerator(self, 'categories', 'cl')
+            return listing.PagePropertyGenerator(self, 'categories', 'cl')
         else:
             # TODO: return sortkey if wanted
-            return PageProperty(self, 'categories', 'cl', return_values='title')
+            return listing.PageProperty(self, 'categories', 'cl', return_values='title')
 
     def embeddedin(self, namespace=None, filterredir='all', limit=None, generator=True):
         """
@@ -324,13 +344,13 @@ class Page(object):
             generator (bool): Use generator
 
         Returns:
-            mwclient.listings.list.List: Page iterator
+            listings.List: Page iterator
         """
-        prefix = List.get_prefix('ei', generator)
-        kwargs = dict(List.generate_kwargs(prefix, namespace=namespace, filterredir=filterredir))
+        prefix = listing.List.get_prefix('ei', generator)
+        kwargs = dict(listing.List.generate_kwargs(prefix, namespace=namespace, filterredir=filterredir))
         kwargs[prefix + 'title'] = self.name
 
-        return List.get_list(generator)(self.site, 'embeddedin', 'ei', limit=limit, return_values='title', **kwargs)
+        return listing.List.get_list(generator)(self.site, 'embeddedin', 'ei', limit=limit, return_values='title', **kwargs)
 
     def extlinks(self):
         """
@@ -339,7 +359,7 @@ class Page(object):
         API doc: https://www.mediawiki.org/wiki/API:Extlinks
 
         """
-        return PageProperty(self, 'extlinks', 'el', return_values='*')
+        return listing.PageProperty(self, 'extlinks', 'el', return_values='*')
 
     def images(self, generator=True):
         """
@@ -349,9 +369,9 @@ class Page(object):
 
         """
         if generator:
-            return PagePropertyGenerator(self, 'images', '')
+            return listing.PagePropertyGenerator(self, 'images', '')
         else:
-            return PageProperty(self, 'images', '', return_values='title')
+            return listing.PageProperty(self, 'images', '', return_values='title')
 
     def iwlinks(self):
         """
@@ -360,7 +380,7 @@ class Page(object):
         API doc: https://www.mediawiki.org/wiki/API:Iwlinks
 
         """
-        return PageProperty(self, 'iwlinks', 'iw', return_values=('prefix', '*'))
+        return listing.PageProperty(self, 'iwlinks', 'iw', return_values=('prefix', '*'))
 
     def langlinks(self, **kwargs):
         """
@@ -369,7 +389,7 @@ class Page(object):
         API doc: https://www.mediawiki.org/wiki/API:Langlinks
 
         """
-        return PageProperty(self, 'langlinks', 'll', return_values=('lang', '*'), **kwargs)
+        return listing.PageProperty(self, 'langlinks', 'll', return_values=('lang', '*'), **kwargs)
 
     def links(self, namespace=None, generator=True, redirects=False):
         """
@@ -378,15 +398,15 @@ class Page(object):
         API doc: https://www.mediawiki.org/wiki/API:Links
 
         """
-        prefix = List.get_prefix('pl', generator)
-        kwargs = dict(List.generate_kwargs(prefix, namespace=namespace))
+        prefix = listing.List.get_prefix('pl', generator)
+        kwargs = dict(listing.List.generate_kwargs(prefix, namespace=namespace))
 
         if redirects:
             kwargs['redirects'] = '1'
         if generator:
-            return PagePropertyGenerator(self, 'links', 'pl', **kwargs)
+            return listing.PagePropertyGenerator(self, 'links', 'pl', **kwargs)
         else:
-            return PageProperty(self, 'links', 'pl', return_values='title', **kwargs)
+            return listing.PageProperty(self, 'links', 'pl', return_values='title', **kwargs)
 
     def revisions(self, startid=None, endid=None, start=None, end=None,
                   dir='older', user=None, excludeuser=None, limit=50,
@@ -411,10 +431,10 @@ class Page(object):
             section (int): If rvprop=content is set, only retrieve the contents of this section.
 
         Returns:
-            mwclient.listings.list.List: Revision iterator
+            listings.List: Revision iterator
         """
-        kwargs = dict(List.generate_kwargs('rv', startid=startid, endid=endid, start=start,
-                                           end=end, user=user, excludeuser=excludeuser))
+        kwargs = dict(listing.List.generate_kwargs(
+            'rv', startid=startid, endid=endid, start=start, end=end, user=user, excludeuser=excludeuser))
         kwargs['rvdir'] = dir
         kwargs['rvprop'] = prop
         if expandtemplates:
@@ -422,7 +442,7 @@ class Page(object):
         if section is not None:
             kwargs['rvsection'] = section
 
-        return RevisionsIterator(self, 'revisions', 'rv', limit=limit, **kwargs)
+        return listing.RevisionsIterator(self, 'revisions', 'rv', limit=limit, **kwargs)
 
     def templates(self, namespace=None, generator=True):
         """
@@ -431,9 +451,9 @@ class Page(object):
         API doc: https://www.mediawiki.org/wiki/API:Templates
 
         """
-        prefix = List.get_prefix('tl', generator)
-        kwargs = dict(List.generate_kwargs(prefix, namespace=namespace))
+        prefix = listing.List.get_prefix('tl', generator)
+        kwargs = dict(listing.List.generate_kwargs(prefix, namespace=namespace))
         if generator:
-            return PagePropertyGenerator(self, 'templates', prefix, **kwargs)
+            return listing.PagePropertyGenerator(self, 'templates', prefix, **kwargs)
         else:
-            return PageProperty(self, 'templates', prefix, return_values='title', **kwargs)
+            return listing.PageProperty(self, 'templates', prefix, return_values='title', **kwargs)

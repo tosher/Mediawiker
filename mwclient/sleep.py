@@ -1,5 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import time
 import logging
+
+# from . import six
 from .errors import MaximumRetriesExceeded
 
 log = logging.getLogger(__name__)
