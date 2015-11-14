@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Mediawiker by tosher</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script src="javascripts/respond.js"></script>
     <!--[if lt IE 9]>
@@ -35,39 +35,62 @@
           <p>Wiki editor plugin for Sublime Text</p>
           <hr>
           <span class="credits left">Project maintained by <a href="https://github.com/tosher">tosher</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
         </div>
 
-        <h1>Sublime Text plugin: Mediawiker</h1>
+        <h1>
+<a id="sublime-text-plugin-mediawiker" class="anchor" href="#sublime-text-plugin-mediawiker" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sublime Text plugin: Mediawiker</h1>
 
-<p><a href="https://github.com/tosher/Mediawiker">Mediawiker</a> is a plugin for Sublime Text editor (ver. 2/3) that adds possibility to use it as Wiki Editor on <a href="http://mediawiki.org">Mediawiki</a> based sites like <a>Wikipedia</a>) and <a href="http://www.mediawiki.org/wiki/Sites_using_MediaWiki/en">many other</a>.</p>
+<p><a href="https://github.com/tosher/Mediawiker">Mediawiker</a> is a plugin for Sublime Text editor (ver. 2/3) that adds possibility to use it as Wiki Editor on <a href="http://mediawiki.org">Mediawiki</a> based sites like <a href="http://en.wikipedia.org">Wikipedia</a> and <a href="http://www.mediawiki.org/wiki/Sites_using_MediaWiki/en">many other</a>.</p>
 
-<h2>Main features</h2>
+<h2>
+<a id="main-features" class="anchor" href="#main-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Main features</h2>
 
 <ul>
-<li>Connection to existing mediawiki based site through the use of <a href="http://sourceforge.net/apps/mediawiki/mwclient/index.php?title=Main_Page">mwclient library</a> .</li>
-<li>New pages creation / existing pages edition and posting to wiki.</li>
-<li>Possibility to open pages from history-list of posted pages.</li>
-<li>TOC (table of contents) menu of the page edited to move by page headers.</li>
-<li>Syntax highlighting from <a href="https://github.com/textmate/mediawiki.tmbundle">Textmate Mediawiki bundle</a> (included).</li>
-<li>Possibility to create / edit simple wiki tables with plugin <a href="https://github.com/vkocubinsky/SublimeTableEditor">TableEdit</a>.</li>
-<li>Snippets for main wiki tags.</li>
-</ul><p><img src="https://github.com/tosher/Mediawiker/wiki/sublime_wiki_editor.png" alt="Subime Text Wiki editor plugin - Mediawiker"></p>
+<li>
+<a href="http://sourceforge.net/apps/mediawiki/mwclient/index.php?title=Main_Page">MWClient</a> library based. Mwclient was modified for work under <strong>Sublime text 3</strong>.</li>
+<li>Syntax highlighting - based on <a href="https://github.com/textmate/mediawiki.tmbundle">Textmate Mediawiki bundle</a>.</li>
+<li>Editor - create new pages, edit existing and post it to wiki.</li>
+<li>Completions - auto completions for internal wiki links</li>
+<li>History - list of edited pages</li>
+<li>Bookmarks - bookmark your favorite pages</li>
+<li>TOC - table of contents for opened page - available through command <strong>Show TOC</strong> or <strong>Symbol list</strong> (<kbd>Ctrl</kbd>+<kbd>R</kbd>)</li>
+<li>Insert templates, images into pages</li>
+<li>Upload files to wiki</li>
+<li>Search - search by wiki</li>
+<li>Table editor - edit simple wiki-tables with plugin <a href="https://github.com/vkocubinsky/SublimeTableEditor">TableEdit</a>, convert csv-format tables to wiki-tables.</li>
+<li>Snippets - basic wiki marking tags - bold, italic, headings, etc.</li>
+<li>Edit panel - all commands and snippets available through one panel. </li>
+<li>Shortcuts - possibility to create plugin specific shortcuts to all commands and snippets to create word-like editor.</li>
+<li>Connectivity - http/https, direct/proxy connection with basic/digest web-server authorization.</li>
+<li>Connection manager - add new wiki sites, and switch between them.</li>
+</ul>
 
-<h2>Install</h2>
+<p><img src="https://github.com/tosher/Mediawiker/wiki/Mediawiker_Dark.png" alt="Subime Text Wiki editor plugin - Mediawiker">
+<em>Screenshot using the Mediawiker_Dark color scheme</em></p>
 
-<h3>Package Control</h3>
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<h3>
+<a id="package-control" class="anchor" href="#package-control" aria-hidden="true"><span class="octicon octicon-link"></span></a>Package Control</h3>
+
+<pre><code>Package Control 3.0 now required for work on Linux.
+</code></pre>
 
 <p>The easiest way to install this is with <a href="http://wbond.net/sublime_packages/package_control">Package Control</a>.</p>
 
 <ul>
 <li>If you just went and installed Package Control, you probably need to restart Sublime Text 2 before doing this next bit.</li>
-<li>Bring up the Command Palette (Command+Shift+p on OS X, Control+Shift+p on Linux/Windows).</li>
+<li>Bring up the Command Palette (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on OS X, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on Linux/Windows).</li>
 <li>Select "Package Control: Install Package" (it'll take a few seconds)</li>
 <li>Select Mediawiker when the list appears.</li>
-</ul><p>Package Control will automatically keep Mediawiker up to date with the latest version.</p>
+</ul>
 
-<h3>Other methods</h3>
+<p>Package Control will automatically keep Mediawiker up to date with the latest version.</p>
+
+<h3>
+<a id="other-methods" class="anchor" href="#other-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>Other methods</h3>
 
 <p>First find your Sublime Text 2 Packages folder:</p>
 
@@ -82,24 +105,12 @@
 
 <p>Download this repo using the "ZIP" button above, unzip and place the files in "/packages-folder/Mediawiker/"</p>
 
-<h2>Changes in version 2.0</h2>
+<h2>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h2>
 
 <ul>
-<li>Support for Sublime Text 3.</li>
 <li>
-<strong>Edit panel</strong> is used instead of sub-Context menu for easy using with keyboard. Also <strong>Edit panel</strong> can be called with <strong>Alt-F1</strong> shortcut.</li>
-<li>Some shortcuts was changed or removed:
-
-<ul>
-<li>Alt-F10 instead of Alt-F1 for <strong>Pages history</strong> command (select from history of posted pages).</li>
-<li>Shortcut for <strong>Set category</strong> command was removed</li>
-</ul>
-</li>
-<li>Some of the commands was changed in this version for easy using in configuration. Please, recreate your key bindings configuration if you changed the original values.</li>
-<li>Possibility to connect to wiki sites with <em>https</em> protocol was added as experimental option. Add <em>"https": true</em> parameter to site options for using it. (Not tested.)</li>
-</ul><h2>Documentation</h2>
-
-<ul>
+<strong>Note</strong>: Not all color schemes fully supports syntax highlighting scopes required by markup languages like Mediawiki or Markdown. On this moment, color schemes with better support are: <strong>Twilight</strong>, <strong>Sunburst</strong>, <strong>Eiffel</strong>. Also, Mediawiker package includes <strong>Twilight (Mediawiki)</strong>, <strong>Eiffel (Mediawiki)</strong> and <strong>Mediawiker_Dark</strong>/<strong>Mediawiker_Light</strong> schemes with improved highlighting for mediawiki syntax. </li>
 <li>Check <a href="https://github.com/tosher/Mediawiker/wiki">plugin wiki</a> for setup instructions.</li>
 <li>Use Preferences / Package settings / Mediawiker / "Settings  - Default" and "Settings - User" for setup wiki connection and plugin options.</li>
 <li>Some connection specific rules:
@@ -109,96 +120,83 @@
 <li>If user-name is not empty, but user-password is empty, you will be prompted for password on action.</li>
 </ul>
 </li>
-<li>Check status messages while using the plugin.</li>
-<li>All settings available under the Main menu / Preferences / Package Settings / Mediawiker.</li>
-</ul><h3>Commands</h3>
+<li>All settings are available under the Main menu / Preferences / Package Settings / Mediawiker.</li>
+</ul>
+
+<h3>
+<a id="commands" class="anchor" href="#commands" aria-hidden="true"><span class="octicon octicon-link"></span></a>Commands</h3>
 
 <ul>
 <li>
-<strong>Edit panel</strong> with all command and snippets in ordered list (can be customized in the settings).
+<strong>Edit panel</strong> with all commands and snippets in ordered list (can be customized in the settings).
 
 <ul>
-<li><em>Alt-F1</em></li>
-<li><em>Context menu / Mediawiker: Edit panel</em></li>
+<li>
+<em>Main menu / Tools / Mediawiker / Edit panel</em> (windows, osx: <kbd>Alt</kbd>+<kbd>F1</kbd>, linux: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F1</kbd>)</li>
 </ul>
 </li>
 <li>
 <strong>Open page</strong> command for retrieving existing wiki-page. If the page does not exists, you can create the new one.
 
 <ul>
-<li><em>Alt+F3</em></li>
-<li><em>Main menu / File / Mediawiker / Open page</em></li>
-<li>Use page name or page url as a wiki page name. When the url will be inserted, it will be <em>cleared</em> to page name, if wiki parameters is correct and current wiki site was selected.</li>
+<li><em>Main menu / Tools / Mediawiker / Open page</em></li>
 </ul>
 </li>
+<li>Use page name or page url as a wiki page name. When the url will be inserted, it will be <em>cleared</em> to page name, if wiki parameters is correct and current wiki site was selected.</li>
 <li>
-<strong>Reopen page</strong> command - to reopen current page.</li>
+<strong>Reopen page</strong> command - to reopen current page (<kbd>F5</kbd>).</li>
 <li>
 <strong>Post page</strong> command for publishing pages. When you post a page, the name of the page will be saved to pages history.
 
 <ul>
-<li><em>Alt+F7</em></li>
-<li><em>Main menu / File / Mediawiker / Post page</em></li>
+<li><em>Main menu / Tools / Mediawiker / Post page</em></li>
 <li>Settings option <strong>mediawiker_mark_as_minor</strong> (default: false) - using to mark changes as minor. Or you can use <strong>!</strong> character as <strong>summary prefix</strong> to invert this option on current post.</li>
 </ul>
 </li>
 <li>
-<strong>Pages history</strong> command to open the page by name from history.
-
-<ul>
-<li><em>Alt+F10</em></li>
-</ul>
-</li>
+<strong>Pages history</strong> command to open the page by name from history.</li>
 <li>
-<strong>Show TOC</strong> command for show table of contents of the current page and to move by page headers.
-
-<ul>
-<li><em>Alt+F2</em></li>
-</ul>
-</li>
+<strong>Show TOC</strong> command for show table of contents of the current page and to move by page headers. Or you can use standard Symbol list (<kbd>Ctrl</kbd>+<kbd>R</kbd>).</li>
 <li>
-<strong>Select wiki</strong> command to select your current wiki site.
-
-<ul>
-<li><em>Alt+F6</em></li>
-</ul>
-</li>
+<strong>Show internal links</strong> command for show all internal links of the current page. You can go to selected link on page, open it in editor or in browser.</li>
 <li>
-<strong>Open page in browser</strong> command to open current page in web-browser.
-
-<ul>
-<li><em>Alt+F5</em></li>
-</ul>
-</li>
+<strong>Show external links</strong> command for show all external links of the current page (links like [link..]). You can go to selected links on page or open it in browser.</li>
+<li>
+<strong>Select wiki</strong> command to select your current wiki site.</li>
+<li>
+<strong>Add/Edit wiki site</strong> command for create new or edit existed wiki sites configurations.</li>
+<li>
+<strong>Open page in browser</strong> command to open current page in web-browser.</li>
 <li>
 <strong>Set category</strong> command to add category to current article from list of root category members (check "mediawiker_category_root" option in configuration).</li>
 <li>
+<strong>Insert image</strong> command to insert link to image from wiki. Parameter <strong>mediawiker_image_prefix_min_length</strong> is using to limit length of search prefix for large wikies (by default: 4 characters).</li>
+<li>
+<strong>Insert template</strong> command to insert template from wiki.</li>
+<li>
+<strong>Search</strong> command to search articles by text string. Results are shown as markdown formatted text in a new tab. Parameter <strong>mediawiker_search_results_count</strong> is using to limit search results count.</li>
+<li>
+<strong>Category tree</strong> command to show sub-categories and pages of the predefined category as menu.</li>
+<li>
 <strong>Numbered TOC</strong> command to set headers as numbered list (format 1.1.1.).</li>
 <li>
-<strong>CSV data to wiki table</strong> command to transform selected csv-text to wiki table (default delimiter since version 2.0: |).
-
-<ul>
+<strong>File upload</strong> for uploading files to wiki</li>
 <li>
-<strong>Note!</strong> Settings <strong>mediawiker_wikitable_properties</strong> and <strong>mediawiker_wikitable_cell_properties</strong> is using now for all table specific commands. Old settings <strong>mediawiker_csvtable_properties</strong> and <strong>mediawiker_csvtable_cell_properties</strong> was removed in version 2.0.</li>
-</ul>
-</li>
+<strong>CSV data to wiki table</strong> command to transform selected csv-text to wiki table (default delimiter since version 2.0: |).</li>
 <li>
-<strong>Wiki table to Simple</strong> command to transform the selected table (or under cursor) to <em>Simple table</em> (for using with plugin <a href="https://github.com/vkocubinsky/SublimeTableEditor">TableEdit</a>).
-
-<ul>
+<strong>(Buggy) Wiki table to Simple</strong> command to transform the selected table (or under cursor) to <em>Simple table</em> (for using with plugin <a href="https://github.com/vkocubinsky/SublimeTableEditor">TableEdit</a>).</li>
 <li>
-<strong>Warning!</strong> All table styles from original text will be replaced.</li>
-</ul>
-</li>
-<li>
-<strong>Simple table to wiki</strong> command to convert <em>Simple table</em> back to wiki syntax.</li>
+<strong>(Buggy) Simple table to wiki</strong> command to convert <em>Simple table</em> back to wiki syntax.</li>
 <li>Native Sublime text <strong>Command palette</strong> with predefined filter of plugin's commands and snippets.
 
 <ul>
-<li><em>Alt+F11</em></li>
+<li><em><kbd>Alt</kbd>+<kbd>F11</kbd></em></li>
 </ul>
 </li>
-</ul><h3>Predefined mediawiki sites settings</h3>
+</ul>
+
+<h3>
+<a id="predefined-mediawiki-sites-settings" class="anchor" href="#predefined-mediawiki-sites-settings" aria-hidden="true"><span class="octicon octicon-link"></span></a>Predefined mediawiki sites settings</h3>
 
 <p>Note: You must setup your credentials for authorization in the settings.</p>
 
@@ -209,7 +207,9 @@
 </li>
 <li>Mediawiki <a href="http://www.mediawiki.org">www.mediawiki.org</a>
 </li>
-</ul><p>You can add your favorite sites in the settings.</p>
+</ul>
+
+<p>You can add your favorite sites in the settings.</p>
       </section>
 
     </div>
