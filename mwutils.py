@@ -7,11 +7,9 @@ pythonver = sys.version_info[0]
 from os.path import splitext, basename
 import re
 import urllib
-import base64
-from hashlib import md5
-import uuid
 
 import sublime
+import requests
 
 if pythonver >= 3:
     # NOTE: load from package, not used now because custom ssl
@@ -120,56 +118,12 @@ def pagename_clear(pagename):
     return pagename
 
 
-def get_digest_header(header, username, password, path):
-    HEADER_ATTR_PATTERN = r'([\w\s]+)=\"?([^".]*)\"?'
-    METHOD = "POST"
-    header_attrs = {}
-    hprms = header.split(', ')
-    for hprm in hprms:
-        params = re.findall(HEADER_ATTR_PATTERN, hprm)
-        for param in params:
-            header_attrs[param[0]] = param[1]
-
-    cnonce = str(uuid.uuid4())  # random clients string..
-    nc = '00000001'
-    realm = header_attrs['Digest realm']
-    nonce = header_attrs['nonce']
-    qop = header_attrs.get('qop', 'auth')
-    digest_uri = header_attrs.get('uri', path)
-    algorithm = header_attrs.get('algorithm', 'MD5')
-    # TODO: ?
-    # opaque = header_attrs.get('opaque', '')
-    entity_body = ''  # TODO: ?
-
-    if algorithm == 'MD5':
-        ha1 = md5(enco('%s:%s:%s' % (username, realm, password))).hexdigest()
-    elif algorithm == 'MD5-Sess':
-        ha1 = md5(enco('%s:%s:%s' % (md5(enco('%s:%s:%s' % (username, realm, password))), nonce, cnonce))).hexdigest()
-
-    if 'auth-int' in qop:
-        ha2 = md5(enco('%s:%s:%s' % (METHOD, digest_uri, md5(entity_body)))).hexdigest()
-    elif 'auth' in qop:
-        ha2 = md5(enco('%s:%s' % (METHOD, digest_uri))).hexdigest()
-
-    if 'auth' in qop or 'auth-int' in qop:
-        response = md5(enco('%s:%s:%s:%s:%s:%s' % (ha1, nonce, nc, cnonce, qop, ha2))).hexdigest()
-    else:
-        response = md5(enco('%s:%s:%s' % (ha1, nonce, ha2))).hexdigest()
-
-    # auth = 'username="%s", realm="%s", nonce="%s", uri="%s", response="%s", opaque="%s", qop="%s", nc=%s, cnonce="%s"' %
-    # (username, realm, nonce, digest_uri, response, opaque, qop, nc, cnonce)
-    auth_tpl = 'username="%s", realm="%s", nonce="%s", uri="%s", response="%s", qop="%s", nc=%s, cnonce="%s"'
-
-    return auth_tpl % (username, realm, nonce, digest_uri, response, qop, nc, cnonce)
-
-
 def http_auth(http_auth_header, host, path, login, password):
     sitecon = None
     DIGEST_REALM = 'Digest realm'
     BASIC_REALM = 'Basic realm'
 
-    # http_auth_header = e[1].getheader('www-authenticate')
-    custom_headers = {}
+    httpauth = None
     realm = None
     if http_auth_header.startswith(BASIC_REALM):
         realm = BASIC_REALM
@@ -178,14 +132,12 @@ def http_auth(http_auth_header, host, path, login, password):
 
     if realm is not None:
         if realm == BASIC_REALM:
-            auth = deco(base64.standard_b64encode(enco('%s:%s' % (login, password))))
-            custom_headers = {'Authorization': 'Basic %s' % auth}
+            httpauth = requests.auth.HTTPBasicAuth(login, password)
         elif realm == DIGEST_REALM:
-            auth = get_digest_header(http_auth_header, login, password, '%sapi.php' % path)
-            custom_headers = {'Authorization': 'Digest %s' % auth}
+            httpauth = requests.auth.HTTPDigestAuth(login, password)
 
-        if custom_headers:
-            sitecon = mwclient.Site(host=host, path=path, custom_headers=custom_headers)
+        if httpauth:
+            sitecon = mwclient.Site(host=host, path=path, httpauth=httpauth)
     else:
         error_message = 'HTTP connection failed: Unknown realm.'
         sublime.status_message(error_message)
@@ -218,20 +170,21 @@ def get_connect(password=None):
 
     try:
         sitecon = mwclient.Site(host=host, path=path)
-    except mwclient.HTTPStatusError as exc:
-        e = exc.args if pythonver >= 3 else exc
+    # except mwclient.HTTPStatusError as exc:
+    except requests.exceptions.HTTPError as e:
+        # e = exc.args if pythonver >= 3 else exc
         is_use_http_auth = site_params.get('use_http_auth', False)
         http_auth_login = site_params.get('http_auth_login', '')
         http_auth_password = site_params.get('http_auth_password', '')
-        if e[0] == 401 and is_use_http_auth and http_auth_login:
-            http_auth_header = e[1].getheader('www-authenticate')
+        if e.response.status_code == 401 and is_use_http_auth and http_auth_login:
+            http_auth_header = e.response.headers.get('www-authenticate', '')
             sitecon = http_auth(http_auth_header, host, path, http_auth_login, http_auth_password)
         else:
             sublime.message_dialog('HTTP connection failed: %s' % e[1])
             raise Exception('HTTP connection failed.')
     except Exception as e:
         sublime.message_dialog('Connection failed for %s: %s' % (host, e))
-        raise Exception('HTTP connection failed.')
+        raise Exception('HTTP connection failed: %s' % e)
 
     # if login is not empty - auth required
     if username:
@@ -249,6 +202,7 @@ def get_connect(password=None):
         sublime.status_message('Connection without authorization')
     return sitecon
 
+
 # wiki related functions..
 def get_page_text(site, title):
     denied_message = 'You have not rights to edit this page. Click OK button to view its source.'
@@ -256,15 +210,16 @@ def get_page_text(site, title):
 
     if page.can('edit'):
         sublime.active_window().active_view().settings().set('page_revision', page.revision)
-        return True, page.edit()
+        return True, page.text()
     else:
         if sublime.ok_cancel_dialog(denied_message):
             if page.can('read'):
-                return False, page.edit(readonly=True)
+                return False, page.text()
             else:
                 return False, ''
         else:
             return False, ''
+
 
 def save_mypages(title, storage_name='mediawiker_pagelist'):
 

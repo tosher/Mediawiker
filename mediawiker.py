@@ -15,6 +15,8 @@ import sublime_plugin
 # http://www.sublimetext.com/docs/3/api_reference.html
 # sublime.message_dialog
 
+# TODO: Move rename page
+
 if pythonver >= 3:
     from . import mwutils as mw
 else:
@@ -482,7 +484,7 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
         # self.get_category_menu(self.category_root)
 
     def get_category_menu(self, category_root):
-        category = self.sitecon.Categories[category_root]
+        category = self.sitecon.Categories.get(category_root)
         self.categories_list_names = []
         self.categories_list_values = []
 
@@ -968,7 +970,7 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
     def on_done(self, idx):
         if idx >= 0:
             template = self.sitecon.Pages['Template:%s' % self.templates_names[idx]]
-            text = template.edit()
+            text = template.text()
             params_text = self.get_template_params(text)
             index_of_cursor = self.view.sel()[0].begin()
             template_text = '{{%s%s}}' % (self.templates_names[idx], params_text)
