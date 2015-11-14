@@ -119,11 +119,24 @@ class Site(object):
 
     def site_init(self):
         meta = self.api('query', meta='siteinfo|userinfo',
-                        siprop='general|namespaces', uiprop='groups|rights', retry_on_error=False)
+                        siprop='general|namespaces|namespacealiases', uiprop='groups|rights', retry_on_error=False)
 
         # Extract site info
         self.site = meta['query']['general']
-        self.namespaces = dict(((i['id'], i.get('*', '')) for i in six.itervalues(meta['query']['namespaces'])))
+        self.namespaces = dict((i['id'], i.get('*', '')) for i in six.itervalues(meta['query']['namespaces']))
+        self.namespaces_invert = dict((i.get('*', ''), i['id']) for i in six.itervalues(meta['query']['namespaces']))
+
+        self.namespaces_canonical = dict((i['id'], i.get('canonical', '')) for i in six.itervalues(meta['query']['namespaces']))
+        self.namespaces_canonical_invert = dict((i.get('canonical', ''), i['id']) for i in six.itervalues(meta['query']['namespaces']))
+
+        self.namespaces_aliases = {}
+        for i in meta['query']['namespacealiases']:
+            try:
+                self.namespaces_aliases[i['id']].append(i.get('*', ''))
+            except KeyError:
+                self.namespaces_aliases[i['id']] = [i.get('*', '')]
+        self.namespaces_aliases_invert = dict((i.get('*', ''), i['id']) for i in meta['query']['namespacealiases'])
+
         self.writeapi = 'writeapi' in self.site
 
         # Determine version
