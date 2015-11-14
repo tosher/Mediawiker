@@ -1,0 +1,21 @@
+{
+   "windows": {
+        "*": [
+            "requests"
+        ],
+        "<3000": [
+            "requests",
+            "ordereddict"
+        ]
+   },
+   "linux": {
+        "*": [
+            "requests"
+        ],
+        "<3000": [
+            "requests",
+            "fileio",
+            "ordereddict"
+        ]
+   }
+}
