@@ -1,0 +1,4 @@
+Mediawiker 3.0.0:
+
+* **MWClient** library was upgraded to version [0.8.0](https://github.com/mwclient/mwclient)
+* Autocompletion optimizations

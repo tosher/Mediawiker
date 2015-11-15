@@ -3,7 +3,7 @@
 [Mediawiker](https://github.com/tosher/Mediawiker) is a plugin for Sublime Text editor (ver. 2/3) that adds possibility to use it as Wiki Editor on [Mediawiki](http://mediawiki.org) based sites like [Wikipedia](http://en.wikipedia.org) and [many other](http://www.mediawiki.org/wiki/Sites_using_MediaWiki/en).
 
 ## Main features
-* [MWClient](http://sourceforge.net/apps/mediawiki/mwclient/index.php?title=Main_Page) library based. Mwclient was modified for work under **Sublime text 3**.
+* [MWClient](https://github.com/mwclient/mwclient) library based.
 * Syntax highlighting - based on [Textmate Mediawiki bundle](https://github.com/textmate/mediawiki.tmbundle).
 * Editor - create new pages, edit existing and post it to wiki.
 * Completions - auto completions for internal wiki links
