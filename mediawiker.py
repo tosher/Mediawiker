@@ -1081,9 +1081,9 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
     sitecon = None
 
     def on_query_completions(self, view, prefix, locations):
-        INTERNAL_LINK_SPLITTER = u'|'
-        NAMESPACE_SPLITTER = u':'
         if view.settings().get('mediawiker_is_here', False):
+            INTERNAL_LINK_SPLITTER = u'|'
+            NAMESPACE_SPLITTER = u':'
             view = sublime.active_window().active_view()
 
             # internal links completions
@@ -1101,20 +1101,21 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
             completions = []
             if internal_link:
                 word_cursor_min_len = mw.get_setting('mediawiker_page_prefix_min_length', 3)
+                ns_text = None
+                ns_text_number = None
+
+                if NAMESPACE_SPLITTER in internal_link:
+                    ns_text, internal_link = internal_link.split(NAMESPACE_SPLITTER)
+
                 if len(internal_link) >= word_cursor_min_len:
                     namespaces_search = [ns.strip() for ns in mw.get_setting('mediawiker_search_namespaces').split(',')]
                     self.sitecon = mw.get_connect()
-
-                    ns_text = None
-                    ns_text_number = None
-
-                    if NAMESPACE_SPLITTER in internal_link:
-                        ns_text, internal_link = internal_link.split(NAMESPACE_SPLITTER)
+                    if ns_text:
                         ns_text_number = self.get_ns_number(ns_text)
 
                     pages = []
                     for ns in namespaces_search:
-                        if ns_text_number and int(ns_text_number) == int(ns) or not ns_text:
+                        if not ns_text or ns_text_number and int(ns_text_number) == int(ns):
                             pages = self.sitecon.allpages(prefix=internal_link, namespace=ns)
                             for p in pages:
                                 # name - full page name with namespace
