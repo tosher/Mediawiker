@@ -23,11 +23,26 @@
  OTHER DEALINGS IN THE SOFTWARE.
 """
 
-import sys as _sys
-import os as _os
-_path = _os.path.dirname(__file__)
-_sys.path.insert(0, _os.path.abspath(_path))
+from .errors import *
+from .client import Site, __ver__
 
-from errors import *
-from client import Site, __ver__
-import ex
+# for circular import in listing..
+from .page import Page
+from .image import Image
+from .category import Category
+
+import logging
+import warnings
+
+# Show DeprecationWarning
+warnings.simplefilter('always', DeprecationWarning)
+
+# Logging: Add a null handler to avoid "No handler found" warnings.
+try:
+    from logging import NullHandler
+except ImportError:
+    class NullHandler(logging.Handler):
+        def emit(self, record):
+            pass
+
+logging.getLogger(__name__).addHandler(NullHandler())

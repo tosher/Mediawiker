@@ -15,6 +15,8 @@ import sublime_plugin
 # http://www.sublimetext.com/docs/3/api_reference.html
 # sublime.message_dialog
 
+# TODO: Move rename page
+
 if pythonver >= 3:
     from . import mwutils as mw
 else:
@@ -482,7 +484,7 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
         # self.get_category_menu(self.category_root)
 
     def get_category_menu(self, category_root):
-        category = self.sitecon.Categories[category_root]
+        category = self.sitecon.Categories.get(category_root)
         self.categories_list_names = []
         self.categories_list_values = []
 
@@ -968,7 +970,7 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
     def on_done(self, idx):
         if idx >= 0:
             template = self.sitecon.Pages['Template:%s' % self.templates_names[idx]]
-            text = template.edit()
+            text = template.text()
             params_text = self.get_template_params(text)
             index_of_cursor = self.view.sel()[0].begin()
             template_text = '{{%s%s}}' % (self.templates_names[idx], params_text)
@@ -1076,9 +1078,12 @@ class MediawikerLoad(sublime_plugin.EventListener):
 
 class MediawikerCompletionsEvent(sublime_plugin.EventListener):
 
+    sitecon = None
+
     def on_query_completions(self, view, prefix, locations):
-        INTERNAL_LINK_SPLITTER = u'|'
         if view.settings().get('mediawiker_is_here', False):
+            INTERNAL_LINK_SPLITTER = u'|'
+            NAMESPACE_SPLITTER = u':'
             view = sublime.active_window().active_view()
 
             # internal links completions
@@ -1096,29 +1101,56 @@ class MediawikerCompletionsEvent(sublime_plugin.EventListener):
             completions = []
             if internal_link:
                 word_cursor_min_len = mw.get_setting('mediawiker_page_prefix_min_length', 3)
+                ns_text = None
+                ns_text_number = None
+
+                if NAMESPACE_SPLITTER in internal_link:
+                    ns_text, internal_link = internal_link.split(NAMESPACE_SPLITTER)
+
                 if len(internal_link) >= word_cursor_min_len:
-                    namespaces = [ns.strip() for ns in mw.get_setting('mediawiker_search_namespaces').split(',')]
-                    sitecon = mw.get_connect()
+                    namespaces_search = [ns.strip() for ns in mw.get_setting('mediawiker_search_namespaces').split(',')]
+                    self.sitecon = mw.get_connect()
+                    if ns_text:
+                        ns_text_number = self.get_ns_number(ns_text)
+
                     pages = []
-                    for ns in namespaces:
-                        pages = sitecon.allpages(prefix=internal_link, namespace=ns)
-                        for p in pages:
-                            # print(p.name)
-                            # name - full page name with namespace
-                            # page_title - title of the page wo namespace
-                            # For (Main) namespace, shows [page_title (Main)], makes [[page_title]]
-                            # For other namespace, shows [page_title namespace], makes [[name|page_title]]
-                            if int(ns):
-                                ns_name = p.name.split(':')[0]
-                                page_insert = '%s|%s' % (p.name, p.page_title)
-                            else:
-                                ns_name = '(Main)'
-                                page_insert = p.page_title
-                            page_show = '%s\t%s' % (p.page_title, ns_name)
-                            completions.append((page_show, page_insert))
+                    for ns in namespaces_search:
+                        if not ns_text or ns_text_number and int(ns_text_number) == int(ns):
+                            pages = self.sitecon.allpages(prefix=internal_link, namespace=ns)
+                            for p in pages:
+                                # name - full page name with namespace
+                                # page_title - title of the page wo namespace
+                                # For (Main) namespace, shows [page_title (Main)], makes [[page_title]]
+                                # For Image, Category namespaces, shows [page_title namespace], makes [[name]]
+                                # For other namespace, shows [page_title namespace], makes [[name|page_title]]
+                                if int(ns):
+                                    ns_name = p.name.split(':')[0]
+                                    page_name = p.name if not self.is_equal_ns(ns_text, ns_name) else p.name.split(':')[1]
+                                    if ns in ('6', '14'):  # file, category
+                                        page_insert = page_name
+                                    else:
+                                        page_insert = '%s|%s' % (page_name, p.page_title)
+                                else:
+                                    ns_name = '(Main)'
+                                    page_insert = p.page_title
+                                page_show = '%s\t%s' % (p.page_title, ns_name)
+                                completions.append((page_show, page_insert))
 
             return completions
         return []
+
+    def get_ns_number(self, ns_name):
+        return self.sitecon.namespaces_canonical_invert.get(
+            ns_name, self.sitecon.namespaces_invert.get(
+                ns_name, self.sitecon.namespaces_aliases_invert.get(
+                    ns_name, None)))
+
+    def is_equal_ns(self, ns_name1, ns_name2):
+        ns_name1_number = self.get_ns_number(ns_name1)
+        ns_name2_number = self.get_ns_number(ns_name2)
+        if ns_name1_number and ns_name2_number and int(self.get_ns_number(ns_name1)) == int(self.get_ns_number(ns_name2)):
+            return True
+        return False
 
 
 class MediawikerShowPageLanglinksCommand(sublime_plugin.WindowCommand):
