@@ -1,0 +1,4 @@
+Mediawiker 3.0.1:
+
+* New command: **Show links to page** - pages with backlinks and pages transcludes current.
+

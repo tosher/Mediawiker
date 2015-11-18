@@ -22,5 +22,6 @@
     {"caption": "Mediawiker: Add to Favorites", "command": "mediawiker_favorites_add"},
     {"caption": "Mediawiker: Favorite pages", "command": "mediawiker_favorites_open"},
     {"caption": "Mediawiker: Add/Edit wiki server", "command": "mediawiker_process_site"},
-    {"caption": "Mediawiker: Show language links", "command": "mediawiker_show_page_langlinks"}
+    {"caption": "Mediawiker: Show language links", "command": "mediawiker_show_page_langlinks"},
+    {"caption": "Mediawiker: Show links to page", "command": "mediawiker_show_page_backlinks"}
 ]

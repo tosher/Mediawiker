@@ -16,6 +16,7 @@ import sublime_plugin
 # sublime.message_dialog
 
 # TODO: Move rename page
+# TODO: links (internal, external) based on api..
 
 if pythonver >= 3:
     from . import mwutils as mw
@@ -1221,3 +1222,53 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
                 sublime.status_message('Settings not found for host %s.' % (host_new))
         elif index == 1:
             self.view.run_command('mediawiker_replace_text', {'text': self.page_name})
+
+
+class MediawikerShowPageBacklinksCommand(sublime_plugin.WindowCommand):
+    ''' alias to PageBacklinks command '''
+
+    def run(self):
+        self.window.run_command("mediawiker_page", {"action": "mediawiker_page_backlinks"})
+
+
+class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit, title, password):
+        sitecon = mw.get_connect(password)
+        self.mw_get_page_backlinks(sitecon, title)
+
+        if self.links:
+            sublime.active_window().show_quick_panel(self.links, self.on_done)
+        else:
+            sublime.status_message('Unable to find links to this page')
+
+    def mw_get_page_backlinks(self, site, title):
+        self.links = []
+        links_limit = mw.get_setting('mediawiki_linkstopage_limit', 5)
+        page = site.Pages[title]
+
+        # backlinks to page
+        linksgen = page.backlinks(limit=links_limit)
+        if linksgen:
+            while True:
+                try:
+                    prop = linksgen.next()
+                    self.links.append(prop.name)
+                except StopIteration:
+                    break
+
+        # pages, transcludes this
+        linksgen = page.embeddedin(limit=links_limit)
+        if linksgen:
+            while True:
+                try:
+                    prop = linksgen.next()
+                    self.links.append(prop.name)
+                except StopIteration:
+                    break
+
+    def on_done(self, index):
+        if index >= 0:
+            self.page_name = self.links[index]
+
+            sublime.active_window().run_command("mediawiker_page", {"title": self.page_name, "action": "mediawiker_show_page"})
