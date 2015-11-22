@@ -957,11 +957,30 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
         sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.templates_names, self.on_done), 1)
 
     def get_template_params(self, text):
+        site_active = mw.get_view_site()
+        site_list = mw.get_setting('mediawiki_site')
+        is_wikia = site_list.get(site_active, {}).get('is_wikia', False)
+        if is_wikia:
+            infobox = mw.WikiaInfoboxParser()
+            infobox.feed(text)
+            params_list = infobox.get_params_list()
+            if params_list:
+                return ''.join(['|%s\n' % p for p in params_list])
+
         params_list = []
-        pattern = r'\{{3}.*?\}{3}'
+        # ex: {{{title|{{PAGENAME}}}}}
+        pattern = r'(\{{3}.*?\}{3,})'
         parameters = re.findall(pattern, text)
         for param in parameters:
-            param = param.strip('{}')
+            if param.startswith('{{{'):
+                param = param[3:]
+            if param.endswith('}}}'):
+                param = param[:-3]
+            # cut non-param }} from "if" tags, etc..
+            # ex: {{#if: ... {{{data2|}}}}}
+            close_brackets_diff = param.count('}') - param.count('{')
+            if close_brackets_diff > 0:
+                param = param[:-close_brackets_diff]
             # default value or not..
             param = param.replace('|', '=') if '|' in param else '%s=' % param
             if param not in params_list:

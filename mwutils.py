@@ -8,6 +8,13 @@ from os.path import splitext, basename
 import re
 import urllib
 
+try:
+    # Python 2.7+
+    from collections import OrderedDict
+except ImportError:
+    # Python 2.6
+    from ordereddict import OrderedDict
+
 import sublime
 import requests
 
@@ -19,9 +26,10 @@ if pythonver >= 3:
     #     import mwclient
     # else:
     #     from . import mwclient
-
+    from html.parser import HTMLParser
     from . import mwclient
 else:
+    from HTMLParser import HTMLParser
     import mwclient
 
 
@@ -377,3 +385,62 @@ class PasswordHider():
             pass
         finally:
             self.password = ''
+
+
+class WikiaInfoboxParser(HTMLParser):
+
+    is_infobox = False
+    TAG_INFOBOX = 'infobox'
+    # TAG_FORMAT = 'format'
+    TAG_DEFAULT = 'default'
+    ATTR_SOURCE = 'source'
+
+    tag_path = []
+    params = None
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() == self.TAG_INFOBOX:
+            self.is_infobox = True
+            self.params = OrderedDict()
+        elif self.is_infobox:
+            self.tag_path.append((tag, attrs))
+            source = self.get_source(attrs)
+            if source:
+                self.params[source] = ''
+
+    def handle_endtag(self, tag):
+        self.tag_path = self.tag_path[:-1]
+        if tag.lower() == self.TAG_INFOBOX:
+            self.is_infobox = False
+
+    def handle_data(self, data):
+        val = data.strip()
+        if self.is_infobox and val:
+            tag_current = self.tag_path[-1][0]
+            tag_parent_param, source = self.get_parent_param()
+            if tag_parent_param and source:
+                default_value = ''
+                if tag_current == self.TAG_DEFAULT:
+                    default_value = val
+                self.params[source] = default_value
+
+    def get_parent_param(self):
+        for tag in reversed(self.tag_path):
+            source = self.get_source(tag[1])
+            if source:
+                return tag, source
+        return None, None
+
+    def get_source(self, attrs):
+        for attr in attrs:
+            if attr[0].lower() == self.ATTR_SOURCE:
+                return attr[1]
+        return None
+
+    def get_params_list(self):
+        params_list = []
+        if self.params:
+            for par in self.params.keys():
+                param = '%s=%s' % (par, self.params[par])
+                params_list.append(param)
+        return params_list
