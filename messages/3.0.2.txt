@@ -1,0 +1,5 @@
+Mediawiker 3.0.2:
+
+* Site option **is_ssl_cert_verify** for possibility to switch SSL certificate validation on site (for self-signed certificates on corporate wikies). Default value: **true**.
+* Caching site connection
+

@@ -126,89 +126,8 @@ def pagename_clear(pagename):
     return pagename
 
 
-def http_auth(http_auth_header, host, path, login, password):
-    sitecon = None
-    DIGEST_REALM = 'Digest realm'
-    BASIC_REALM = 'Basic realm'
-
-    httpauth = None
-    realm = None
-    if http_auth_header.startswith(BASIC_REALM):
-        realm = BASIC_REALM
-    elif http_auth_header.startswith(DIGEST_REALM):
-        realm = DIGEST_REALM
-
-    if realm is not None:
-        if realm == BASIC_REALM:
-            httpauth = requests.auth.HTTPBasicAuth(login, password)
-        elif realm == DIGEST_REALM:
-            httpauth = requests.auth.HTTPDigestAuth(login, password)
-
-        if httpauth:
-            sitecon = mwclient.Site(host=host, path=path, httpauth=httpauth)
-    else:
-        error_message = 'HTTP connection failed: Unknown realm.'
-        sublime.status_message(error_message)
-        raise Exception(error_message)
-    return sitecon
-
-
 def get_connect(password=None):
-    # site_name_active = mw.get_setting('mediawiki_site_active')
-    site_active = get_view_site()
-    site_list = get_setting('mediawiki_site')
-    site_params = site_list[site_active]
-    site = site_params['host']
-    path = site_params['path']
-    username = site_params['username']
-    if password is None:
-        password = site_params['password']
-    domain = site_params['domain']
-    proxy_host = site_params.get('proxy_host', '')
-    is_https = site_params.get('https', False)
-    if is_https:
-        sublime.status_message('Trying to get https connection to https://%s' % site)
-    host = site if not is_https else ('https', site)
-    if proxy_host:
-        # proxy_host format is host:port, if only host defined, 80 will be used
-        host = proxy_host if not is_https else ('https', proxy_host)
-        proto = 'https' if is_https else 'http'
-        path = '%s://%s%s' % (proto, site, path)
-        sublime.message_dialog('Connection with proxy: %s %s' % (host, path))
-
-    try:
-        sitecon = mwclient.Site(host=host, path=path)
-    # except mwclient.HTTPStatusError as exc:
-    except requests.exceptions.HTTPError as e:
-        # e = exc.args if pythonver >= 3 else exc
-        is_use_http_auth = site_params.get('use_http_auth', False)
-        http_auth_login = site_params.get('http_auth_login', '')
-        http_auth_password = site_params.get('http_auth_password', '')
-        if e.response.status_code == 401 and is_use_http_auth and http_auth_login:
-            http_auth_header = e.response.headers.get('www-authenticate', '')
-            sitecon = http_auth(http_auth_header, host, path, http_auth_login, http_auth_password)
-        else:
-            sublime.message_dialog('HTTP connection failed: %s' % e[1])
-            raise Exception('HTTP connection failed.')
-    except Exception as e:
-        sublime.message_dialog('Connection failed for %s: %s' % (host, e))
-        raise Exception('HTTP connection failed: %s' % e)
-
-    # if login is not empty - auth required
-    if username:
-        try:
-            if sitecon is not None:
-                sitecon.login(username=username, password=password, domain=domain)
-                sublime.status_message('Logon successfully.')
-            else:
-                sublime.status_message('Login failed: connection unavailable.')
-        except mwclient.LoginError as exc:
-            e = exc.args if pythonver >= 3 else exc
-            sublime.status_message('Login failed: %s' % e[1]['result'])
-            return
-    else:
-        sublime.status_message('Connection without authorization')
-    return sitecon
+    return mwcon.get_site(password)
 
 
 # wiki related functions..
@@ -287,7 +206,117 @@ def get_page_url(page_name=''):
 
 # classes..
 
-class InputPanel:
+class WikiConnect(object):
+
+    conns = {}
+
+    def _site_preinit(self):
+        site_active = get_view_site()
+        site_list = get_setting('mediawiki_site')
+        self.site_params = site_list.get(site_active, {})
+        self.site = self.site_params['host']
+
+    def _site_init(self):
+        self.path = self.site_params['path']
+        self.username = self.site_params['username']
+        self.password = self.site_params['password']
+        self.domain = self.site_params['domain']
+        self.proxy_host = self.site_params.get('proxy_host', '')
+        self.http_auth_login = self.site_params.get('http_auth_login', '')
+        self.http_auth_password = self.site_params.get('http_auth_password', '')
+        self.is_https = self.site_params.get('https', False)
+        self.is_ssl_cert_verify = self.site_params.get('is_ssl_cert_verify', True)
+        self.host = self.site if not self.is_https else ('https', self.site)
+        if self.proxy_host:
+            # proxy_host format is host:port, if only host defined, 80 will be used
+            self.host = self.proxy_host if not self.is_https else ('https', self.proxy_host)
+            proto = 'https' if self.is_https else 'http'
+            self.path = '%s://%s%s' % (proto, self.site, self.path)
+
+    def get_site(self, password=None):
+
+        self._site_preinit()
+
+        sitecon = self.conns.get(self.site, None)
+        if sitecon:
+            # print('return cached connection', sitecon)
+            return sitecon
+
+        self._site_init()
+
+        if password is not None:
+            self.password = password
+
+        if self.is_https:
+            sublime.status_message('Trying to get https connection to https://%s' % self.site)
+        if self.proxy_host:
+            sublime.message_dialog('Connection with proxy: %s %s' % (self.host, self.path))
+
+        try:
+            sitecon = mwclient.Site(host=self.host, path=self.path, do_ssl_cert_verify=self.is_ssl_cert_verify)
+        except requests.exceptions.HTTPError as e:
+            is_use_http_auth = self.site_params.get('use_http_auth', False)
+            if e.response.status_code == 401 and is_use_http_auth:
+                http_auth_header = e.response.headers.get('www-authenticate', '')
+                sitecon = self._http_auth(http_auth_header)
+            else:
+                sublime.message_dialog('HTTP connection failed: %s' % e[1])
+                raise Exception('HTTP connection failed.')
+        except Exception as e:
+            sublime.message_dialog('Connection failed for %s: %s' % (self.host, e))
+            raise Exception('HTTP connection failed: %s' % e)
+
+        # if login is not empty - auth required
+        if self.username:
+            try:
+                if sitecon is not None:
+                    sitecon.login(username=self.username, password=self.password, domain=self.domain)
+                    sublime.status_message('Logon successfully.')
+                else:
+                    sublime.status_message('Login failed: connection unavailable.')
+            except mwclient.LoginError as exc:
+                e = exc.args if pythonver >= 3 else exc
+                sublime.status_message('Login failed: %s' % e[1]['result'])
+                return
+        else:
+            sublime.status_message('Connection without authorization')
+
+        if sitecon:
+            self.conns[self.site] = sitecon
+
+        return sitecon
+
+    def _http_auth(self, http_auth_header):
+        sitecon = None
+        DIGEST_REALM = 'Digest realm'
+        BASIC_REALM = 'Basic realm'
+
+        if not self.http_auth_login or not self.http_auth_password:
+            raise Exception('HTTP connection failed: Empty authorization data.')
+
+        httpauth = None
+        realm = None
+        if http_auth_header.startswith(BASIC_REALM):
+            realm = BASIC_REALM
+        elif http_auth_header.startswith(DIGEST_REALM):
+            realm = DIGEST_REALM
+
+        if realm is not None:
+            if realm == BASIC_REALM:
+                httpauth = requests.auth.HTTPBasicAuth(self.http_auth_login, self.http_auth_password)
+            elif realm == DIGEST_REALM:
+                httpauth = requests.auth.HTTPDigestAuth(self.http_auth_login, self.http_auth_password)
+
+            if httpauth:
+                sitecon = mwclient.Site(host=self.host, path=self.path, httpauth=httpauth, do_ssl_cert_verify=self.is_ssl_cert_verify)
+        else:
+            error_message = 'HTTP connection failed: Unknown realm.'
+            sublime.status_message(error_message)
+            raise Exception(error_message)
+        return sitecon
+
+
+class InputPanel(object):
 
     def __init__(self):
         self.window = sublime.active_window()
@@ -363,7 +392,7 @@ class InputPanelPassword(InputPanel):
         self.command_run(password)  # defined in executor
 
 
-class PasswordHider():
+class PasswordHider(object):
 
     password = ''
     PASSWORD_CHAR = u'\u25CF'
@@ -444,3 +473,6 @@ class WikiaInfoboxParser(HTMLParser):
                 param = '%s=%s' % (par, self.params[par])
                 params_list.append(param)
         return params_list
+
+
+mwcon = WikiConnect()

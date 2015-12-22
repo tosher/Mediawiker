@@ -419,7 +419,7 @@ class MediawikerEnumerateTocCommand(sublime_plugin.TextCommand):
 
             #get title only
             header_text_clear = header_text.strip(' =\t')
-            header_text_clear = re.sub(r'^(\d\.)+\s+(.*)', r'\2', header_text_clear)
+            header_text_clear = re.sub(r'^(\d+\.)+\s+(.*)', r'\2', header_text_clear)
             header_tag = '=' * level
             header_text_numbered = '%s %s. %s %s' % (header_tag, current_number_str, header_text_clear, header_tag)
             len_delta += len(header_text_numbered) - region_len
@@ -558,6 +558,17 @@ class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
                 self.view.replace(edit, region, '%s %s\n%s\n%s' % (table_header, table_properties, table_data, table_footer))
 
     def get_table_data(self, line):
+        while '  ' in line:
+            line = line.replace('  ', ' ').strip()
+
+        if line.startswith('+--'):
+            # ignore line-as-splitter
+            return []
+        if line.startswith('|'):
+            line = line[1:]
+        if line.endswith('|'):
+            line = line[:-1]
+
         if self.delimiter in line:
             return line.split(self.delimiter)
         return []
