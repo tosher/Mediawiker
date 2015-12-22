@@ -2234,56 +2234,6 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 					<key>name</key>
 					<string>meta.tag.validhtml.mediawiki</string>
 				</dict>
-				<dict>
-					<key>begin</key>
-					<string>(?i:(&lt;([\w]+?)(\b[^&gt;]*)&gt;))</string>
-					<key>beginCaptures</key>
-					<dict>
-						<key>1</key>
-						<dict>
-							<key>name</key>
-							<string>meta.tag.validhtml.mediawiki</string>
-						</dict>
-						<key>2</key>
-						<dict>
-							<key>name</key>
-							<string>entity.name.tag.unknown.validhtml.mediawiki</string>
-						</dict>
-						<key>3</key>
-						<dict>
-							<key>name</key>
-							<string>entity.other.attributes.validhtml.mediawiki</string>
-						</dict>
-					</dict>
-					<key>contentName</key>
-					<string>meta.tag.source.unknown.validhtml.mediawiki</string>
-					<key>end</key>
-					<string>(&lt;/(\2)&gt;)</string>
-					<key>endCaptures</key>
-					<dict>
-						<key>1</key>
-						<dict>
-							<key>name</key>
-							<string>meta.tag.validhtml.mediawiki</string>
-						</dict>
-						<key>2</key>
-						<dict>
-							<key>name</key>
-							<string>entity.name.tag.unknown.validhtml.mediawiki</string>
-						</dict>
-					</dict>
-					<key>patterns</key>
-					<array>
-						<dict>
-							<key>include</key>
-							<string>#inline</string>
-						</dict>
-						<dict>
-							<key>include</key>
-							<string>#block</string>
-						</dict>
-					</array>
-				</dict>
 			</array>
 		</dict>
 		<key>style_in_link</key>

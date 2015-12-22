@@ -760,22 +760,23 @@ repository:
         '1': {name: meta.tag.validhtml.mediawiki}
         '2': {name: entity.name.tag.validhtml.mediawiki}
         '3': {name: entity.other.attributes.validhtml.mediawiki}
-    - contentName: meta.tag.source.unknown.validhtml.mediawiki
-      begin: (?i:(<([\w]+?)(\b[^>]*)>))
-      end: (</(\2)>)
-      beginCaptures:
-        '1': {name: meta.tag.validhtml.mediawiki}
-        '2': {name: entity.name.tag.unknown.validhtml.mediawiki}
-        '3': {name: entity.other.attributes.validhtml.mediawiki}
-      endCaptures:
-        '1': {name: meta.tag.validhtml.mediawiki}
-        '2': {name: entity.name.tag.unknown.validhtml.mediawiki}
-      patterns:
-      - include: '#inline'
-      - include: '#block'
-      # no markup in nowiki..
-      # patterns:
-      # - include: '#inline'
+    ########################## TODO ############################
+    # - contentName: meta.tag.source.unknown.validhtml.mediawiki
+    #   begin: (?i:(<([\w]+?)(\b[^>]*)>))
+    #   end: (</(\2)>)
+    #   beginCaptures:
+    #     '1': {name: meta.tag.validhtml.mediawiki}
+    #     '2': {name: entity.name.tag.unknown.validhtml.mediawiki}
+    #     '3': {name: entity.other.attributes.validhtml.mediawiki}
+    #   endCaptures:
+    #     '1': {name: meta.tag.validhtml.mediawiki}
+    #     '2': {name: entity.name.tag.unknown.validhtml.mediawiki}
+    #   patterns:
+    #   - include: '#inline'
+    #   - include: '#block'
+    #   # no markup in nowiki..
+    #   # patterns:
+    #   # - include: '#inline'
 
   style_in_link:
     patterns:
