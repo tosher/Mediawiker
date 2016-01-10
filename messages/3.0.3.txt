@@ -1,0 +1,6 @@
+Mediawiker 3.0.3:
+
+* Proxy connection fix (support in mwclient library).
+* New snippet: **nowiki** tag.
+* Lists auto-continuation by <kbd>Enter</kbd> key.
+
