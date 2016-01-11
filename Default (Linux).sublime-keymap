@@ -44,7 +44,7 @@
         [
             { "key": "setting.mediawiker_is_here", "operand": true},
             { "key": "selector", "operator": "equal", "operand": "text.html.mediawiki", "match_all": true },
-            { "key": "preceding_text", "operator": "regex_contains", "operand": "^[\\*\\#]\\s?\\S.*", "match_all": true },
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^[*#]+\\s+.*", "match_all": true },
             { "key": "auto_complete_visible", "operator": "equal", "operand": false },
             { "key": "selector", "operator": "not_equal", "operand": "markup.raw", "match_all": true }
         ]
