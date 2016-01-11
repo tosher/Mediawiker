@@ -2,8 +2,8 @@
 	<content><![CDATA[
 <nowiki>${1:$TM_SELECTED_TEXT}</nowiki>
 ]]></content>
-<tabTrigger>wbold</tabTrigger>
+<tabTrigger>wno</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 <scope>text.html.mediawiki</scope>
-<description>Mediawiker: Bold</description>
+<description>Mediawiker: NoWiki</description>
 </snippet>
