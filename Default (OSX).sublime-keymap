@@ -40,14 +40,13 @@
         "keys": ["ctrl+alt+k"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_kbd.sublime-snippet"},
         "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
     },
-    { "keys": ["enter"], "command": "insert_snippet", "args": {"contents": "${TM_CURRENT_LINE/^(([*#]+)(\\s+)).*/\n$2$3/}"}, "context":
+    { "keys": ["enter"], "command": "insert_snippet", "args": {"contents": "${TM_CURRENT_LINE/^(([*#]+)(\\s?)).*/\n$2$3/}"}, "context":
         [
             { "key": "setting.mediawiker_is_here", "operand": true},
             { "key": "selector", "operator": "equal", "operand": "text.html.mediawiki", "match_all": true },
-            { "key": "preceding_text", "operator": "regex_contains", "operand": "^[\\*\\#]\\s?\\S.*", "match_all": true },
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "^[*#]+\\s*\\S.*", "match_all": true },
             { "key": "auto_complete_visible", "operator": "equal", "operand": false },
             { "key": "selector", "operator": "not_equal", "operand": "markup.raw", "match_all": true }
         ]
     }
-
 ]
