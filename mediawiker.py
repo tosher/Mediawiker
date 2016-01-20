@@ -890,12 +890,13 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
             te = ''
             search_number = 1
             for pa in self.pages_names:
-                te += '### %s. %s\n* [%s](%s)\n\n%s\n' % (search_number, pa[0], pa[0], mw.get_page_url(pa[0]), self.antispan(pa[1]))
+                te += '### %s. %s\n* [%s](%s)\n\n%s\n\n' % (search_number, pa[0], pa[0], mw.get_page_url(pa[0]), self.antispan(pa[1]))
                 search_number += 1
 
             if te:
                 self.view = sublime.active_window().new_file()
-                self.view.set_syntax_file('Packages/Markdown/Markdown.tmLanguage')
+                syntax_file = mw.get_setting('mediawiki_search_syntax', 'Packages/Markdown/Markdown.tmLanguage')
+                self.view.set_syntax_file(syntax_file)
                 self.view.set_name('Wiki search results: %s' % search_value)
                 self.view.run_command('mediawiker_insert_text', {'position': 0, 'text': te})
             elif search_value:
@@ -913,6 +914,7 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
         # divs cut
         text = re.sub(r'<div(.*?)>', '', text)
         text = re.sub(r'<\/div>', '', text)
+        text = text.replace('`', '**')  # search words highlight
         return text
 
     def do_search(self, string_value):

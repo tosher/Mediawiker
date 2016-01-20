@@ -26,6 +26,7 @@
     "mediawiker_wiki_instead_editor": true,
     "mediawiki_validate_revision_on_post": true,
     "mediawiki_linkstopage_limit": 50,
+    "mediawiki_search_syntax": "Packages/Markdown/Markdown.tmLanguage",
     "mediawiker_wikitable_properties":
     {
         "class": "wikitable"

@@ -1,0 +1,6 @@
+Mediawiker 3.0.4:
+
+* Configurable markdown syntax for search results page: **mediawiki_search_syntax** option in the settings. Default value: "Packages/Markdown/Markdown.tmLanguage"
+* Small changes in search results page: search words highlighting, etc. 
+
+
