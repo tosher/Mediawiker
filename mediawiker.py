@@ -1316,6 +1316,9 @@ class MediawikerOpenInlineCommand(sublime_plugin.TextCommand):
     SCRIBUNTO_PREFIX = '#invoke'
 
     def run(self, edit):
+        if not self.view.settings().get('mediawiker_is_here', False):
+            return
+
         position = self.view.sel()[0].begin()
         text_region = sublime.Region(self.view.line(position).a, self.view.word(position).end())
         text = self.view.substr(text_region)
