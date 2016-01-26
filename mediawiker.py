@@ -417,7 +417,7 @@ class MediawikerEnumerateTocCommand(sublime_plugin.TextCommand):
                 # incr. level
                 i += 1
 
-            #get title only
+            # get title only
             header_text_clear = header_text.strip(' =\t')
             header_text_clear = re.sub(r'^(\d+\.)+\s+(.*)', r'\2', header_text_clear)
             header_tag = '=' * level
@@ -1304,3 +1304,27 @@ class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):
             self.page_name = self.links[index]
 
             sublime.active_window().run_command("mediawiker_page", {"title": self.page_name, "action": "mediawiker_show_page"})
+
+
+class MediawikerOpenInlineCommand(sublime_plugin.TextCommand):
+    '''
+    Open inline template or Scribunto module
+    Tag "{{" must be on the same line as function name
+    Cursor must be pointed to the funcion name
+    '''
+
+    SCRIBUNTO_PREFIX = '#invoke'
+
+    def run(self, edit):
+        position = self.view.sel()[0].begin()
+        text_region = sublime.Region(self.view.line(position).a, self.view.word(position).end())
+        text = self.view.substr(text_region)
+        function_name = self.view.substr(self.view.word(position))
+
+        if text.startswith('{{%s' % self.SCRIBUNTO_PREFIX):
+            # function scribunto (invoke)
+            sublime.active_window().run_command("mediawiker_page", {"title": 'Module:%s' % function_name, "action": "mediawiker_show_page"})
+
+        elif text.startswith('{{'):
+            # template
+            sublime.active_window().run_command("mediawiker_page", {"title": 'Template:%s' % function_name, "action": "mediawiker_show_page"})
