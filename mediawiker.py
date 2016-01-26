@@ -1319,15 +1319,22 @@ class MediawikerOpenInlineCommand(sublime_plugin.TextCommand):
         if not self.view.settings().get('mediawiker_is_here', False):
             return
 
+        selection = self.view.substr(self.view.sel()[0])
         position = self.view.sel()[0].begin()
         text_region = sublime.Region(self.view.line(position).a, self.view.word(position).end())
         text = self.view.substr(text_region)
         function_name = self.view.substr(self.view.word(position))
 
+        title = None
+
         if text.startswith('{{%s' % self.SCRIBUNTO_PREFIX):
             # function scribunto (invoke)
-            sublime.active_window().run_command("mediawiker_page", {"title": 'Module:%s' % function_name, "action": "mediawiker_show_page"})
-
+            title = 'Module:%s' % function_name
         elif text.startswith('{{'):
             # template
-            sublime.active_window().run_command("mediawiker_page", {"title": 'Template:%s' % function_name, "action": "mediawiker_show_page"})
+            title = 'Template:%s' % function_name
+        elif selection:
+            title = selection
+
+        if title:
+            sublime.active_window().run_command("mediawiker_page", {"title": title, "action": "mediawiker_show_page"})
