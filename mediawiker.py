@@ -870,7 +870,7 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
         self.password = password
         search_pre = ''
         selection = self.view.sel()
-        search_pre = self.view.substr(selection[0]).strip()
+        search_pre = self.view.substr(selection[0]).strip() if selection else ''
         sublime.active_window().show_input_panel('Wiki search:', search_pre, self.show_results, None, None)
 
     def show_results(self, search_value=''):
