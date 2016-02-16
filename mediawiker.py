@@ -184,8 +184,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         is_writable, text = mw.get_page_text(sitecon, title)
 
         if is_writable or text:
-            # self.view.set_syntax_file('Packages/Mediawiker/Mediawiki.tmLanguage')
-            mw.set_syntax()
+            mw.set_syntax(title=title)
             self.view.settings().set('mediawiker_is_here', True)
             self.view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
             self.view.set_name(title)
@@ -1326,7 +1325,6 @@ class MediawikerOpenInlineCommand(sublime_plugin.TextCommand):
         function_name = self.view.substr(self.view.word(position))
 
         title = None
-
         if text.startswith('{{%s' % self.SCRIBUNTO_PREFIX):
             # function scribunto (invoke)
             title = 'Module:%s' % function_name

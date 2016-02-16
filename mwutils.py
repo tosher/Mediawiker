@@ -44,8 +44,15 @@ def set_setting(key, value):
     sublime.save_settings('Mediawiker.sublime-settings')
 
 
-def set_syntax():
-    syntax = get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG.tmLanguage')
+def set_syntax(title=None):
+    if title and title.startswith('Module:'):
+        # Scribunto lua modules
+        if int(sublime.version()) >= 3084:  # dev build, or 3103 in main
+            syntax = 'Packages/Lua/Lua.sublime-syntax'
+        else:
+            syntax = 'Packages/Lua/Lua.tmLanguage'
+    else:
+        syntax = get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG.tmLanguage')
     sublime.active_window().active_view().set_syntax_file(syntax)
 
 
@@ -260,7 +267,7 @@ class WikiConnect(object):
             sublime.status_message('Connection with proxy %s to %s' % (self.proxy_host, self.site))
 
         try:
-            sitecon = mwclient.Site(host=self.host, path=self.path, do_ssl_cert_verify=self.is_ssl_cert_verify, proxies=self.proxies)
+            sitecon = mwclient.Site(host=self.host, path=self.path, verify=self.is_ssl_cert_verify, proxies=self.proxies)
         except requests.exceptions.HTTPError as e:
             is_use_http_auth = self.site_params.get('use_http_auth', False)
             if e.response.status_code == 401 and is_use_http_auth:
@@ -315,7 +322,7 @@ class WikiConnect(object):
                 httpauth = requests.auth.HTTPDigestAuth(self.http_auth_login, self.http_auth_password)
 
             if httpauth:
-                sitecon = mwclient.Site(host=self.host, path=self.path, httpauth=httpauth, do_ssl_cert_verify=self.is_ssl_cert_verify, proxies=self.proxies)
+                sitecon = mwclient.Site(host=self.host, path=self.path, httpauth=httpauth, verify=self.is_ssl_cert_verify, proxies=self.proxies)
         else:
             error_message = 'HTTP connection failed: Unknown realm.'
             sublime.status_message(error_message)
