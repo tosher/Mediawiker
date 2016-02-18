@@ -45,7 +45,7 @@ def set_setting(key, value):
 
 
 def set_syntax(title=None):
-    if title and title.startswith('Module:') and not title.find('/'):
+    if title and title.startswith('Module:') and not title.find('/doc'):
         # Scribunto lua modules
         if int(sublime.version()) >= 3084:  # dev build, or 3103 in main
             syntax = 'Packages/Lua/Lua.sublime-syntax'
