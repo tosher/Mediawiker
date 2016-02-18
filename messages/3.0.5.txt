@@ -1,0 +1,4 @@
+Mediawiker 3.0.5:
+
+* Experimental **Open inline** command - context menu item for opening pages under cursor. 
+* Automatic activation of Lua language syntax for Scribunto module pages (thnx. to [@Adadov](https://github.com/Adadov) for idea and [pull-request](https://github.com/tosher/Mediawiker/pull/59)).

@@ -184,8 +184,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         is_writable, text = mw.get_page_text(sitecon, title)
 
         if is_writable or text:
-            # self.view.set_syntax_file('Packages/Mediawiker/Mediawiki.tmLanguage')
-            mw.set_syntax()
+            mw.set_syntax(title=title)
             self.view.settings().set('mediawiker_is_here', True)
             self.view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
             self.view.set_name(title)
@@ -876,7 +875,7 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
         self.password = password
         search_pre = ''
         selection = self.view.sel()
-        search_pre = self.view.substr(selection[0]).strip()
+        search_pre = self.view.substr(selection[0]).strip() if selection else ''
         sublime.active_window().show_input_panel('Wiki search:', search_pre, self.show_results, None, None)
 
     def show_results(self, search_value=''):
@@ -1331,7 +1330,6 @@ class MediawikerOpenInlineCommand(sublime_plugin.TextCommand):
         function_name = self.view.substr(self.view.word(position))
 
         title = None
-
         if text.startswith('{{%s' % self.SCRIBUNTO_PREFIX):
             # function scribunto (invoke)
             title = 'Module:%s' % function_name
