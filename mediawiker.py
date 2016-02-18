@@ -199,11 +199,6 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
             self.view.set_scratch(True)
             # own is_changed flag instead of is_dirty for possib. to reset..
             self.view.settings().set('is_changed', False)
-
-            isModule = re.match(r'^Module\:.*', title)
-            if isModule:
-                sublime.active_window().active_view().set_syntax_file('Packages/Lua/Lua.sublime-syntax')
-
         else:
             sublime.message_dialog('You have not rights to view this page.')
             self.view.close()
