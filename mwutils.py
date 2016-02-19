@@ -32,6 +32,11 @@ else:
     from HTMLParser import HTMLParser
     import mwclient
 
+CATEGORY_NAMESPACE = 14  # category namespace number
+IMAGE_NAMESPACE = 6  # image namespace number
+TEMPLATE_NAMESPACE = 10  # template namespace number
+SCRIBUNTO_NAMESPACE = 828  # scribunto module namespace number
+
 
 def get_setting(key, default_value=None):
     settings = sublime.load_settings('Mediawiker.sublime-settings')
@@ -44,12 +49,12 @@ def set_setting(key, value):
     sublime.save_settings('Mediawiker.sublime-settings')
 
 
-def set_syntax(title=None):
+def set_syntax(page=None):
     syntax = get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG.tmLanguage')
 
-    if title:
-        # Scribunto lua modules, excepts doc subpage
-        if title.startswith('Module:') and not title.endswith('/doc'):
+    if page:
+        # Scribunto lua modules, except doc subpage
+        if page.namespace == SCRIBUNTO_NAMESPACE and not page.name.lower().endswith('/doc'):
             if int(sublime.version()) >= 3084:  # dev build, or 3103 in main
                 syntax = 'Packages/Lua/Lua.sublime-syntax'
             else:
@@ -140,21 +145,27 @@ def get_connect(password=None):
 
 
 # wiki related functions..
-def get_page_text(site, title):
-    denied_message = 'You have not rights to edit this page. Click OK button to view its source.'
-    page = site.Pages[title]
 
-    if page.can('edit'):
-        sublime.active_window().active_view().settings().set('page_revision', page.revision)
-        return True, page.text()
-    else:
-        if sublime.ok_cancel_dialog(denied_message):
-            if page.can('read'):
-                return False, page.text()
+def get_page(site, title):
+    return site.Pages[title]
+
+
+def get_page_text(page):
+    if page:
+        denied_message = 'You have not rights to edit this page. Click OK button to view its source.'
+
+        if page.can('edit'):
+            sublime.active_window().active_view().settings().set('page_revision', page.revision)
+            return True, page.text()
+        else:
+            if sublime.ok_cancel_dialog(denied_message):
+                if page.can('read'):
+                    return False, page.text()
+                else:
+                    return False, ''
             else:
                 return False, ''
-        else:
-            return False, ''
+    return False, ''
 
 
 def save_mypages(title, storage_name='mediawiker_pagelist'):

@@ -23,10 +23,6 @@ if pythonver >= 3:
 else:
     import mwutils as mw
 
-CATEGORY_NAMESPACE = 14  # category namespace number
-IMAGE_NAMESPACE = 6  # image namespace number
-TEMPLATE_NAMESPACE = 10  # template namespace number
-
 
 class MediawikerInsertTextCommand(sublime_plugin.TextCommand):
 
@@ -181,10 +177,11 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
     def run(self, edit, title, password):
         is_writable = False
         sitecon = mw.get_connect(password)
-        is_writable, text = mw.get_page_text(sitecon, title)
+        page = mw.get_page(sitecon, title)
+        is_writable, text = mw.get_page_text(page)
 
         if is_writable or text:
-            mw.set_syntax(title=title)
+            mw.set_syntax(page=page)
             self.view.settings().set('mediawiker_is_here', True)
             self.view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
             self.view.set_name(title)
@@ -217,7 +214,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
         self.sitecon = mw.get_connect(password)
         self.title = mw.get_title()
         if self.title:
-            self.page = self.sitecon.Pages[self.title]  # TODO: remove with mwutils func and replace get_page_text with get_page..
+            self.page = mw.get_page(self.sitecon, self.title)
 
             if self.page.can('edit'):
 
@@ -489,7 +486,7 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
         self.categories_list_values = []
 
         for page in category:
-            if page.namespace == CATEGORY_NAMESPACE:
+            if page.namespace == mw.CATEGORY_NAMESPACE:
                 self.categories_list_values.append(page.name)
                 self.categories_list_names.append(page.name[page.name.find(':') + 1:])
         sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.categories_list_names, self.on_done), 1)
@@ -792,10 +789,10 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
             self.update_category_path('%s:%s' % (self.get_category_prefix(), category_root))
 
         if len(self.category_path) > 1:
-            self.add_page(self.get_category_prev(), CATEGORY_NAMESPACE, False)
+            self.add_page(self.get_category_prev(), mw.CATEGORY_NAMESPACE, False)
 
         for page in self.get_list_data(category_root):
-            if page.namespace == CATEGORY_NAMESPACE and not self.category_prefix:
+            if page.namespace == mw.CATEGORY_NAMESPACE and not self.category_prefix:
                     self.category_prefix = mw.get_category(page.name)[0]
             self.add_page(page.name, page.namespace, True)
         if self.pages:
@@ -806,7 +803,7 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
 
     def add_page(self, page_name, page_namespace, as_next=True):
         page_name_menu = page_name
-        if page_namespace == CATEGORY_NAMESPACE:
+        if page_namespace == mw.CATEGORY_NAMESPACE:
             page_name_menu = self.get_category_as_next(page_name) if as_next else self.get_category_as_prev(page_name)
         self.pages[page_name] = page_namespace
         self.pages_names.append(page_name_menu)
@@ -849,7 +846,7 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
         if index >= 0:
             # escape from quick panel return -1
             page_name = self.category_strip_special_prefix(self.pages_names[index])
-            if self.pages[page_name] == CATEGORY_NAMESPACE:
+            if self.pages[page_name] == mw.CATEGORY_NAMESPACE:
                 self.update_category_path(page_name)
                 self.show_list(page_name)
             else:
@@ -935,7 +932,7 @@ class MediawikerAddImageCommand(sublime_plugin.TextCommand):
     def show_list(self, image_prefix):
         if len(image_prefix) >= self.image_prefix_min_lenght:
             sitecon = mw.get_connect(self.password)
-            images = sitecon.allpages(prefix=image_prefix, namespace=IMAGE_NAMESPACE)  # images list by prefix
+            images = sitecon.allpages(prefix=image_prefix, namespace=mw.IMAGE_NAMESPACE)  # images list by prefix
             # self.images_names = map(self.get_page_title, images)
             self.images_names = [self.get_page_title(x) for x in images]
             sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.images_names, self.on_done), 1)
@@ -963,7 +960,7 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
     def show_list(self, image_prefix):
         self.templates_names = []
         self.sitecon = mw.get_connect(self.password)
-        templates = self.sitecon.allpages(prefix=image_prefix, namespace=TEMPLATE_NAMESPACE)  # images list by prefix
+        templates = self.sitecon.allpages(prefix=image_prefix, namespace=mw.TEMPLATE_NAMESPACE)  # images list by prefix
         for template in templates:
             self.templates_names.append(template.page_title)
         sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.templates_names, self.on_done), 1)
