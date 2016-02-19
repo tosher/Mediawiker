@@ -45,14 +45,16 @@ def set_setting(key, value):
 
 
 def set_syntax(title=None):
-    if title and title.startswith('Module:'):
-        # Scribunto lua modules
-        if int(sublime.version()) >= 3084:  # dev build, or 3103 in main
-            syntax = 'Packages/Lua/Lua.sublime-syntax'
-        else:
-            syntax = 'Packages/Lua/Lua.tmLanguage'
-    else:
-        syntax = get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG.tmLanguage')
+    syntax = get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG.tmLanguage')
+
+    if title:
+        # Scribunto lua modules, excepts doc subpage
+        if title.startswith('Module:') and not title.endswith('/doc'):
+            if int(sublime.version()) >= 3084:  # dev build, or 3103 in main
+                syntax = 'Packages/Lua/Lua.sublime-syntax'
+            else:
+                syntax = 'Packages/Lua/Lua.tmLanguage'
+
     sublime.active_window().active_view().set_syntax_file(syntax)
 
 
