@@ -1,9 +1,9 @@
 <snippet>
 	<content><![CDATA[
-== ${1/(^=+\s*|\s*=+$)//g:$TM_SELECTED_TEXT} ==
+===== ${1/(^=+\s*|\s*=+$)//g:$TM_SELECTED_TEXT} =====
 ]]></content>
-<tabTrigger>wh2</tabTrigger>
+<tabTrigger>wh5</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 <scope>text.html.mediawiki</scope>
-<description>Mediawiker: Header level 2</description>
+<description>Mediawiker: Header level 5</description>
 </snippet>
