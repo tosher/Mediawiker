@@ -59,6 +59,8 @@ def set_syntax(page=None):
                 syntax = 'Packages/Lua/Lua.sublime-syntax'
             else:
                 syntax = 'Packages/Lua/Lua.tmLanguage'
+        elif page.name.lower().endswith('css'):
+            syntax = 'Packages/CSS/CSS.tmLanguage'
 
     sublime.active_window().active_view().set_syntax_file(syntax)
 
