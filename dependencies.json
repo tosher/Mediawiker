@@ -24,7 +24,6 @@
         ],
         "<3000": [
             "requests",
-            "fileio",
             "ordereddict"
         ]
    }
