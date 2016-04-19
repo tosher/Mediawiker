@@ -5,6 +5,7 @@ import sys
 from os.path import basename
 pythonver = sys.version_info[0]
 
+import tempfile
 import webbrowser
 import re
 import sublime
@@ -146,6 +147,13 @@ class MediawikerSearchStringCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         self.window.run_command("mediawiker_page", {"action": "mediawiker_search_string_list"})
+
+
+class MediawikerPreviewCommand(sublime_plugin.WindowCommand):
+    ''' alias to Preview page command '''
+
+    def run(self):
+        self.window.run_command("mediawiker_page", {"action": "mediawiker_preview_page"})
 
 
 class MediawikerPageListCommand(sublime_plugin.WindowCommand):
@@ -1333,3 +1341,39 @@ class MediawikerOpenInlineCommand(sublime_plugin.TextCommand):
 
         if title:
             sublime.active_window().run_command("mediawiker_page", {"title": title, "action": "mediawiker_show_page"})
+
+
+class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
+    '''
+    Very restricted HTML Preview
+    '''
+
+    def run(self, edit, title, password):
+        sitecon = mw.get_connect(password)
+        text = self.view.substr(sublime.Region(0, self.view.size()))
+
+        site_active = mw.get_view_site()
+        site_list = mw.get_setting('mediawiki_site')
+        site = site_list[site_active]['host']
+        site_http = 'https' if site_list[site_active].get('https', False) else 'http'
+
+        html_header = '''
+        <html>
+        <head>
+        <meta charset="UTF-8"/>
+        <link rel="stylesheet" href="%(http)s://%(site)s/w/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=styles&amp;skin=vector"/>
+        <link rel="stylesheet" href="%(http)s://%(site)s/w/load.php?debug=false&amp;lang=ru&amp;modules=ext.geshi|ext.visualEditor.viewPageTarget.noscript|mediawiki.legacy.commonPrint,shared|mediawiki.sectionAnchor|mediawiki.skinning.interface|mediawiki.ui.button|skins.vector.styles&amp;only=styles&amp;skin=vector&amp;*" />
+        </head>
+        <body style="margin:20px;">
+        ''' % {'http': site_http, 'site': site}
+        html_footer = '</body></html>'
+
+        html = sitecon.parse(text=text, title=mw.get_title(), disableeditsection=True).get('text', {}).get('*', '')
+        html = html.replace('"//', '"%s://' % site_http)
+
+        prefix = 'Wiki_page_preview_'
+        with tempfile.NamedTemporaryFile(mode='w+t', suffix='.html', prefix=prefix, dir=None, delete=False, encoding='utf-8') as tf:
+            tf.write(html_header)
+            tf.write(html)
+            tf.write(html_footer)
+            webbrowser.open(tf.name)

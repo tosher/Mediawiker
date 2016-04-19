@@ -1,0 +1,3 @@
+Mediawiker 3.0.8:
+
+* New command: **Page preview** (beta)
