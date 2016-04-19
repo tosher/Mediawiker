@@ -551,8 +551,8 @@ class Site(object):
             if self.handle_api_result(info, kwargs=predata, sleeper=sleeper):
                 return info.get('upload', {})
 
-    def parse(self, text=None, title=None, page=None):
-        kwargs = {}
+    def parse(self, text=None, title=None, page=None, **kwargs):
+        # kwargs = {}
         if text is not None:
             kwargs['text'] = text
         if title is not None:
