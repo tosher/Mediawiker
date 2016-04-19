@@ -1372,8 +1372,15 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         html = html.replace('"//', '"%s://' % site_http)
 
         prefix = 'Wiki_page_preview_'
-        with tempfile.NamedTemporaryFile(mode='w+t', suffix='.html', prefix=prefix, dir=None, delete=False, encoding='utf-8') as tf:
-            tf.write(html_header)
-            tf.write(html)
-            tf.write(html_footer)
-            webbrowser.open(tf.name)
+        if pythonver >= 3:
+            with tempfile.NamedTemporaryFile(mode='w+t', suffix='.html', prefix=prefix, dir=None, delete=False, encoding='utf-8') as tf:
+                tf.write(html_header)
+                tf.write(html)
+                tf.write(html_footer)
+                webbrowser.open(tf.name)
+        else:
+            with tempfile.NamedTemporaryFile(mode='w+t', suffix='.html', prefix=prefix, dir=None, delete=False) as tf:
+                tf.write(html_header)
+                tf.write(html.encode('utf-8'))
+                tf.write(html_footer)
+                webbrowser.open(tf.name)
