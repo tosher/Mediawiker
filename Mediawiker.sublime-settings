@@ -27,6 +27,8 @@
     "mediawiki_validate_revision_on_post": true,
     "mediawiki_linkstopage_limit": 50,
     "mediawiki_search_syntax": "Packages/Markdown/Markdown.tmLanguage",
+    "mediawiki_preview_file": "Wiki_page_preview_",
+    "mediawiki_preview_lang": "en",
     "mediawiker_wikitable_properties":
     {
         "class": "wikitable"
@@ -74,6 +76,5 @@
         {"caption": "Keyboard", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_kbd.sublime-snippet"},
         {"caption": "Nowiki", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_nowiki.sublime-snippet"}
     ]
-
 }
 

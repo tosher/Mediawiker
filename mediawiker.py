@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from os.path import basename
+from os.path import basename, join
 pythonver = sys.version_info[0]
 
 import tempfile
@@ -1355,32 +1355,51 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         site_active = mw.get_view_site()
         site_list = mw.get_setting('mediawiki_site')
         site = site_list[site_active]['host']
+        path = site_list[site_active]['path']
+        lang = mw.get_setting('mediawiki_preview_lang', 'en')
+        preview_file = mw.get_setting('mediawiki_preview_file', 'Wiki_page_preview_')
         site_http = 'https' if site_list[site_active].get('https', False) else 'http'
 
         html_header = '''
+        <!DOCTYPE html>
         <html>
         <head>
         <meta charset="UTF-8"/>
-        <link rel="stylesheet" href="%(http)s://%(site)s/w/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=styles&amp;skin=vector"/>
-        <link rel="stylesheet" href="%(http)s://%(site)s/w/load.php?debug=false&amp;lang=ru&amp;modules=ext.geshi|ext.visualEditor.viewPageTarget.noscript|mediawiki.legacy.commonPrint,shared|mediawiki.sectionAnchor|mediawiki.skinning.interface|mediawiki.ui.button|skins.vector.styles&amp;only=styles&amp;skin=vector&amp;*" />
+        <link rel="stylesheet" href="%(http)s://%(site)s%(path)sload.php?debug=false&amp;lang=%(lang)s&amp;modules=site&amp;only=styles&amp;skin=vector"/>
+        <link rel="stylesheet" href="%(http)s://%(site)s%(path)sload.php?debug=false&amp;lang=%(lang)s&amp;modules=ext.visualEditor.viewPageTarget.noscript|mediawiki.legacy.commonPrint,shared|mediawiki.sectionAnchor|mediawiki.skinning.interface|mediawiki.ui.button|skins.vector.styles&amp;only=styles&amp;skin=vector&amp;*" />
         </head>
         <body style="margin:20px;">
-        ''' % {'http': site_http, 'site': site}
+        ''' % {'http': site_http, 'site': site, 'path': path, 'lang': lang}
         html_footer = '</body></html>'
 
         html = sitecon.parse(text=text, title=mw.get_title(), disableeditsection=True).get('text', {}).get('*', '')
-        html = html.replace('"//', '"%s://' % site_http)
+        html = html.replace('"//', '"%s://' % site_http)  # internal links: images,..
+        html = html.replace('"/', '"%s://%s/' % (site_http, site))  # internal local links: images,..
 
-        prefix = 'Wiki_page_preview_'
-        if pythonver >= 3:
-            with tempfile.NamedTemporaryFile(mode='w+t', suffix='.html', prefix=prefix, dir=None, delete=False, encoding='utf-8') as tf:
-                tf.write(html_header)
-                tf.write(html)
-                tf.write(html_footer)
-                webbrowser.open(tf.name)
+        if preview_file.endswith('.html'):
+            preview_file = join(sublime.packages_path(), 'User', preview_file)
+            # fixed file in User folder
+            if pythonver >= 3:
+                with open(preview_file, 'w', encoding='utf-8') as tf:
+                    tf.write(html_header)
+                    tf.write(html)
+                    tf.write(html_footer)
+            else:
+                with open(preview_file, 'w') as tf:
+                    tf.write(html_header)
+                    tf.write(html.encode('utf-8'))
+                    tf.write(html_footer)
         else:
-            with tempfile.NamedTemporaryFile(mode='w+t', suffix='.html', prefix=prefix, dir=None, delete=False) as tf:
-                tf.write(html_header)
-                tf.write(html.encode('utf-8'))
-                tf.write(html_footer)
-                webbrowser.open(tf.name)
+            # temporary file
+            if pythonver >= 3:
+                with tempfile.NamedTemporaryFile(mode='w+t', suffix='.html', prefix=preview_file, dir=None, delete=False, encoding='utf-8') as tf:
+                    tf.write(html_header)
+                    tf.write(html)
+                    tf.write(html_footer)
+            else:
+                with tempfile.NamedTemporaryFile(mode='w+t', suffix='.html', prefix=preview_file, dir=None, delete=False) as tf:
+                    tf.write(html_header)
+                    tf.write(html.encode('utf-8'))
+                    tf.write(html_footer)
+        webbrowser.open(tf.name)
+
