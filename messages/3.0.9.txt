@@ -1,0 +1,25 @@
+## Mediawiker 3.0.9
+
+### Page preview (beta)
+
+* Option **mediawiki_preview_lang** (default: `en`) - language value, used in preview
+* Option **mediawiki_preview_file** (default: `Wiki_page_preview_`):
+    - If defined as prefix (default) - preview will be generated as temporary file - new on each try.
+    - If defined as filename (like `Wiki_page_preview.html`) - html preview-file will be generated in `User` folder, opened in new tab and first time in browser. But if preview-tab is already exists - html file will be regenerated only, without opening in browser - for possibility to just use **Reload** in browser or some auto-reloading plugins.
+
+### Open inline (beta)
+As command or from Context menu.
+
+* Selected text opening as page.
+* Internal link opening by cursor position on it (links with spaces are not supported).
+* Templates in **Template** and **Main** (starts with `:` prefix) namespaces.
+* [Scribunto](https://www.mediawiki.org/wiki/Extension:Scribunto) functions
+
+### Get notifications (beta)
+Show [notifications](https://www.mediawiki.org/wiki/Notifications) as menu.
+
+**Note**: must be supported by wiki-site (extension installed or with in-core support).
+
+* Option **mediawiki_notifications_show_all** (default: `true`) - show all or only unread notifications.
+* On opening any page from site - plugin runs the check for new unread notifications.
+

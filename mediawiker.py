@@ -86,6 +86,22 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
         self.window.active_view().settings().set('mediawiker_site', self.site_active)
         self.window.active_view().run_command(self.action, {"title": self.title, "password": password})
 
+        # check notifications on page open command
+        if self.action == 'mediawiker_show_page':
+            sitecon = mw.get_connect(password)
+            ns = sitecon.notifications()
+            is_notify_exists = False
+            for n in ns.keys():
+                msg = ns.get(n, {})
+                msg_read = msg.get('read', '')
+                if not msg_read:
+                    is_notify_exists = True
+                    break
+            if is_notify_exists:
+                show_notify = sublime.ok_cancel_dialog('You have new notifications.')
+                if show_notify:
+                    self.window.run_command("mediawiker_get_notifications", {"title": None, "password": password})
+
 
 class MediawikerOpenPageCommand(sublime_plugin.WindowCommand):
     ''' alias to Get page command '''
@@ -154,6 +170,13 @@ class MediawikerPreviewCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         self.window.run_command("mediawiker_page", {"action": "mediawiker_preview_page"})
+
+
+class MediawikerNotificationsCommand(sublime_plugin.WindowCommand):
+    ''' alias to GetNotifications command '''
+
+    def run(self):
+        self.window.run_command("mediawiker_page", {"action": "mediawiker_get_notifications"})
 
 
 class MediawikerPageListCommand(sublime_plugin.WindowCommand):
@@ -1315,11 +1338,15 @@ class MediawikerOpenInlineCommand(sublime_plugin.TextCommand):
     Open inline template or Scribunto module
     Tag "{{" must be on the same line as function name
     Cursor must be pointed to the funcion name
+    NOTE: Beta
     '''
 
     SCRIBUNTO_PREFIX = '#invoke'
+    CHARS_TPL = '{{'
+    CHARS_LINK = '[['
 
     def run(self, edit):
+
         if not self.view.settings().get('mediawiker_is_here', False):
             return
 
@@ -1327,25 +1354,39 @@ class MediawikerOpenInlineCommand(sublime_plugin.TextCommand):
         position = self.view.sel()[0].begin()
         text_region = sublime.Region(self.view.line(position).a, self.view.word(position).end())
         text = self.view.substr(text_region)
-        function_name = self.view.substr(self.view.word(position))
+        text = text[self.get_idx(text):]
+        # function_name = self.view.substr(self.view.word(position))
 
         title = None
-        if text.startswith('{{%s' % self.SCRIBUNTO_PREFIX):
-            # function scribunto (invoke)
-            title = 'Module:%s' % function_name
-        elif text.startswith('{{'):
-            # template
-            title = 'Template:%s' % function_name
-        elif selection:
+        if selection:
+            # selected text: opening as page
             title = selection
+        elif text.startswith('%s%s' % (self.CHARS_TPL, self.SCRIBUNTO_PREFIX)):
+            # function scribunto (invoke)
+            function_name = text[2:]
+            title = 'Module:%s' % function_name
+        elif text.startswith(self.CHARS_TPL):
+            # template
+            function_name = text[2:]
+            title = 'Template:%s' % function_name if not function_name.startswith(':') else function_name
+        elif text.startswith(self.CHARS_LINK):
+            # internal link
+            function_name = text[2:].split('|')[0]
+            title = function_name
 
         if title:
             sublime.active_window().run_command("mediawiker_page", {"title": title, "action": "mediawiker_show_page"})
+
+    def get_idx(self, str_value):
+        idx_tpl = str_value.rfind(self.CHARS_TPL)
+        idx_link = str_value.rfind(self.CHARS_LINK)
+        return idx_tpl if idx_tpl > idx_link else idx_link
 
 
 class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
     '''
     Very restricted HTML Preview
+    NOTE: Beta
     '''
 
     def run(self, edit, title, password):
@@ -1360,16 +1401,18 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         preview_file = mw.get_setting('mediawiki_preview_file', 'Wiki_page_preview_')
         site_http = 'https' if site_list[site_active].get('https', False) else 'http'
 
-        html_header = '''
-        <!DOCTYPE html>
-        <html>
-        <head>
-        <meta charset="UTF-8"/>
-        <link rel="stylesheet" href="%(http)s://%(site)s%(path)sload.php?debug=false&amp;lang=%(lang)s&amp;modules=site&amp;only=styles&amp;skin=vector"/>
-        <link rel="stylesheet" href="%(http)s://%(site)s%(path)sload.php?debug=false&amp;lang=%(lang)s&amp;modules=ext.visualEditor.viewPageTarget.noscript|mediawiki.legacy.commonPrint,shared|mediawiki.sectionAnchor|mediawiki.skinning.interface|mediawiki.ui.button|skins.vector.styles&amp;only=styles&amp;skin=vector&amp;*" />
-        </head>
-        <body style="margin:20px;">
-        ''' % {'http': site_http, 'site': site, 'path': path, 'lang': lang}
+        html_header_lines = [
+            '<!DOCTYPE html>',
+            '<html>',
+            '<head>',
+            '<meta charset="UTF-8"/>',
+            '<link rel="stylesheet" href="%(http)s://%(site)s%(path)sload.php?debug=false&amp;lang=%(lang)s&amp;modules=site&amp;only=styles&amp;skin=vector"/>',
+            '<link rel="stylesheet" href="%(http)s://%(site)s%(path)sload.php?debug=false&amp;lang=%(lang)s&amp;modules=ext.visualEditor.viewPageTarget.noscript|mediawiki.legacy.commonPrint,shared|mediawiki.sectionAnchor|mediawiki.skinning.interface|mediawiki.ui.button|skins.vector.styles&amp;only=styles&amp;skin=vector&amp;*" />',
+            '</head>',
+            '<body style="margin:20px;">'
+        ]
+
+        html_header = '\n'.join(html_header_lines) % {'http': site_http, 'site': site, 'path': path, 'lang': lang}
         html_footer = '</body></html>'
 
         html = sitecon.parse(text=text, title=mw.get_title(), disableeditsection=True).get('text', {}).get('*', '')
@@ -1389,6 +1432,12 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
                     tf.write(html_header)
                     tf.write(html.encode('utf-8'))
                     tf.write(html_footer)
+            html_view = sublime.active_window().find_open_file(preview_file)
+            if html_view:
+                sublime.active_window().focus_view(html_view)
+            else:
+                sublime.active_window().open_file(preview_file)
+                webbrowser.open(tf.name)
         else:
             # temporary file
             if pythonver >= 3:
@@ -1401,5 +1450,48 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
                     tf.write(html_header)
                     tf.write(html.encode('utf-8'))
                     tf.write(html_footer)
-        webbrowser.open(tf.name)
+            webbrowser.open(tf.name)
 
+
+class MediawikerOpenIssueCommand(sublime_plugin.WindowCommand):
+
+    def run(self):
+        webbrowser.open('https://github.com/tosher/Mediawiker/issues')
+
+
+class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
+    '''
+    https://www.mediawiki.org/wiki/Notifications
+    https://www.mediawiki.org/wiki/Extension:Echo
+    NOTE: Beta
+    '''
+
+    def run(self, edit, title, password):
+        notifications_type = mw.get_setting('mediawiki_notifications_show_all', True)
+        sitecon = mw.get_connect(password)
+        ns = sitecon.notifications()
+        self.msgs = []
+        for n in ns.keys():
+            msg = ns.get(n, {})
+            msg_read = msg.get('read', '')
+            if notifications_type or not msg_read:
+                _ = {}
+                _['title'] = msg.get('title', {}).get('full')
+                _['type'] = msg.get('type', None)
+                _['timestamp'] = msg.get('timestamp', {}).get('date', None)
+                _['agent'] = msg.get('agent', {}).get('name', None)
+                _['read'] = u' \u2713' if msg_read else ''
+                self.msgs.append(_)
+
+        n_list = ['All in browser'] + ['%s, %s: %s (%s)%s' % (m['title'], m['agent'], m['timestamp'], m['type'], m['read']) for m in self.msgs]
+        sublime.active_window().show_quick_panel(n_list, self.on_done)
+
+    def on_done(self, idx):
+        if idx > -1:
+            if idx == 0:
+                url = mw.get_page_url(page_name='Special:Notifications')
+                webbrowser.open(url)
+            else:
+                title = self.msgs[idx - 1].get('title', None)
+                if title:
+                    sublime.active_window().run_command("mediawiker_page", {"title": title, "action": "mediawiker_show_page"})

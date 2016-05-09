@@ -25,5 +25,6 @@
     { "caption": "Mediawiker: Show language links", "command": "mediawiker_show_page_langlinks"},
     { "caption": "Mediawiker: Show links to page", "command": "mediawiker_show_page_backlinks"},
     { "caption": "Mediawiker: Open inline", "command": "mediawiker_open_inline"},
-    { "caption": "Mediawiker: Page preview", "command": "mediawiker_preview"}
+    { "caption": "Mediawiker: Page preview", "command": "mediawiker_preview"},
+    { "caption": "Mediawiker: Get notifications", "command": "mediawiker_notifications"}
 ]

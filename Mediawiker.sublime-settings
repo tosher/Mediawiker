@@ -29,6 +29,7 @@
     "mediawiki_search_syntax": "Packages/Markdown/Markdown.tmLanguage",
     "mediawiki_preview_file": "Wiki_page_preview_",
     "mediawiki_preview_lang": "en",
+    "mediawiki_notifications_show_all": true,
     "mediawiker_wikitable_properties":
     {
         "class": "wikitable"
@@ -61,6 +62,8 @@
         {"caption": "Wiki table to Simple (for plugin TableEdit)", "type": "text_command", "value": "mediawiker_table_wiki_to_simple"},
         {"caption": "Simple table to wiki (for plugin TableEdit)", "type": "text_command", "value": "mediawiker_table_simple_to_wiki"},
         {"caption": "Page preview", "type": "window_command", "value": "mediawiker_preview"},
+        {"caption": "Get Notifications", "type": "window_command", "value": "mediawiker_notifications"},
+        {"caption": "Create/edit an issue", "type": "window_command", "value": "mediawiker_open_issue"},
         {"caption": "Heading 2", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_h2.sublime-snippet"},
         {"caption": "Heading 3", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_h3.sublime-snippet"},
         {"caption": "Heading 4", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_h4.sublime-snippet"},

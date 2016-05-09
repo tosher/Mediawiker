@@ -57,7 +57,7 @@ class Site(object):
     def __init__(self, host, path='/w/', ext='.php', pool=None, retry_timeout=30,
                  max_retries=25, wait_callback=lambda *x: None, clients_useragent=None,
                  max_lag=3, compress=True, force_login=True, do_init=True, httpauth=None,
-                 requests=None):
+                 **kwargs):
         # Setup member variables
         self.host = host
         self.path = path
@@ -66,7 +66,7 @@ class Site(object):
         self.compress = compress
         self.max_lag = text_type(max_lag)
         self.force_login = force_login
-        self.requests = requests or {}
+        self.requests = kwargs.get('requests', {})
 
         if isinstance(httpauth, (list, tuple)):
             self.httpauth = HTTPBasicAuth(*httpauth)
@@ -561,6 +561,17 @@ class Site(object):
             kwargs['page'] = page
         result = self.api('parse', **kwargs)
         return result['parse']
+
+    def notifications(self, **kwargs):
+        '''  https://www.mediawiki.org/wiki/Notifications/API '''
+
+        mark_read = kwargs.get('echomarkread', None)
+        if mark_read:
+            result = self.api('echomarkread', all='1', **kwargs)
+            return result.get('query', {}).get('echomarkread', {}).get('result').lower() == 'success'
+        else:
+            result = self.api('query', meta='notifications', **kwargs)
+            return result.get('query', {}).get('notifications', {}).get('list', {})
 
     # def block(self): TODO?
     # def unblock: TODO?
