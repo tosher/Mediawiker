@@ -282,7 +282,7 @@ class WikiConnect(object):
             sublime.status_message('Connection with proxy %s to %s' % (self.proxy_host, self.site))
 
         try:
-            sitecon = mwclient.Site(host=self.host, path=self.path, verify=self.is_ssl_cert_verify, proxies=self.proxies)
+            sitecon = mwclient.Site(host=self.host, path=self.path, requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
         except requests.exceptions.HTTPError as e:
             is_use_http_auth = self.site_params.get('use_http_auth', False)
             if e.response.status_code == 401 and is_use_http_auth:
@@ -337,7 +337,7 @@ class WikiConnect(object):
                 httpauth = requests.auth.HTTPDigestAuth(self.http_auth_login, self.http_auth_password)
 
             if httpauth:
-                sitecon = mwclient.Site(host=self.host, path=self.path, httpauth=httpauth, verify=self.is_ssl_cert_verify, proxies=self.proxies)
+                sitecon = mwclient.Site(host=self.host, path=self.path, httpauth=httpauth, requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
         else:
             error_message = 'HTTP connection failed: Unknown realm.'
             sublime.status_message(error_message)
