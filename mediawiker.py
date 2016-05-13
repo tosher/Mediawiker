@@ -42,10 +42,12 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
 
     run_in_new_window = False
     title = None
+    check_notifications = True
 
     def run(self, action, title='', site_active=None, **kwargs):
         self.site_active = site_active
         self.action = action
+        self.check_notifications = kwargs.get('check_notifications', True)
 
         if self.action == 'mediawiker_show_page':
             if mw.get_setting('mediawiker_newtab_ongetpage'):
@@ -85,18 +87,31 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
 
         self.window.active_view().settings().set('mediawiker_site', self.site_active)
         self.window.active_view().run_command(self.action, {"title": self.title, "password": password})
+        try:
+            self.get_notifications(password, self.check_notifications)
+        except Exception as e:
+            print('Mediawiker exception: %s' % e)
 
+    def get_notifications(self, password, check_notifications=True):
         # check notifications on page open command
-        if self.action == 'mediawiker_show_page':
+        if self.action == 'mediawiker_show_page' and check_notifications:
             sitecon = mw.get_connect(password)
             ns = sitecon.notifications()
             is_notify_exists = False
-            for n in ns.keys():
-                msg = ns.get(n, {})
-                msg_read = msg.get('read', '')
-                if not msg_read:
-                    is_notify_exists = True
-                    break
+            if ns:
+                if isinstance(ns, dict):
+                    for n in ns.keys():
+                        msg = ns.get(n, {})
+                        msg_read = msg.get('read', None)
+                        if not msg_read:
+                            is_notify_exists = True
+                            break
+                elif isinstance(ns, list):
+                    for msg in ns:
+                        msg_read = msg.get('read', None)
+                        if not msg_read:
+                            is_notify_exists = True
+                            break
             if is_notify_exists:
                 show_notify = sublime.ok_cancel_dialog('You have new notifications.')
                 if show_notify:
@@ -1471,20 +1486,30 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
         sitecon = mw.get_connect(password)
         ns = sitecon.notifications()
         self.msgs = []
-        for n in ns.keys():
-            msg = ns.get(n, {})
-            msg_read = msg.get('read', '')
-            if notifications_type or not msg_read:
-                _ = {}
-                _['title'] = msg.get('title', {}).get('full')
-                _['type'] = msg.get('type', None)
-                _['timestamp'] = msg.get('timestamp', {}).get('date', None)
-                _['agent'] = msg.get('agent', {}).get('name', None)
-                _['read'] = u' \u2713' if msg_read else ''
-                self.msgs.append(_)
+        if ns:
+            if isinstance(ns, dict):
+                for n in ns.keys():
+                    msg = ns.get(n, {})
+                    msg_read = msg.get('read', '')
+                    if notifications_type or not msg_read:
+                        self.msgs.append(self._get_data(msg))
+            elif isinstance(ns, list):
+                for msg in ns:
+                    msg_read = msg.get('read', '')
+                    if notifications_type or not msg_read:
+                        self.msgs.append(self._get_data(msg))
 
         n_list = ['All in browser'] + ['%s, %s: %s (%s)%s' % (m['title'], m['agent'], m['timestamp'], m['type'], m['read']) for m in self.msgs]
         sublime.active_window().show_quick_panel(n_list, self.on_done)
+
+    def _get_data(self, msg):
+        _ = {}
+        _['title'] = msg.get('title', {}).get('full')
+        _['type'] = msg.get('type', None)
+        _['timestamp'] = msg.get('timestamp', {}).get('date', None)
+        _['agent'] = msg.get('agent', {}).get('name', None)
+        _['read'] = u' \u2713' if msg.get('read', None) else ''
+        return _
 
     def on_done(self, idx):
         if idx > -1:
@@ -1494,4 +1519,7 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
             else:
                 title = self.msgs[idx - 1].get('title', None)
                 if title:
-                    sublime.active_window().run_command("mediawiker_page", {"title": title, "action": "mediawiker_show_page"})
+                    sublime.active_window().run_command("mediawiker_page", {
+                        "title": title,
+                        "action": "mediawiker_show_page",
+                        "check_notifications": False})
