@@ -88,13 +88,13 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
         self.window.active_view().settings().set('mediawiker_site', self.site_active)
         self.window.active_view().run_command(self.action, {"title": self.title, "password": password})
         try:
-            self.get_notifications(password, self.check_notifications)
+            self.get_notifications(password)
         except Exception as e:
             print('Mediawiker exception: %s' % e)
 
-    def get_notifications(self, password, check_notifications=True):
+    def get_notifications(self, password):
         # check notifications on page open command
-        if self.action == 'mediawiker_show_page' and check_notifications:
+        if self.action == 'mediawiker_show_page' and self.check_notifications:
             sitecon = mw.get_connect(password)
             ns = sitecon.notifications()
             is_notify_exists = False
@@ -1359,6 +1359,7 @@ class MediawikerOpenInlineCommand(sublime_plugin.TextCommand):
     SCRIBUNTO_PREFIX = '#invoke'
     CHARS_TPL = '{{'
     CHARS_LINK = '[['
+    CHARS_LINK_CLOSE = ']]'
 
     def run(self, edit):
 
@@ -1386,6 +1387,8 @@ class MediawikerOpenInlineCommand(sublime_plugin.TextCommand):
             title = 'Template:%s' % function_name if not function_name.startswith(':') else function_name
         elif text.startswith(self.CHARS_LINK):
             # internal link
+            text_line_right = self.view.substr(sublime.Region(self.view.word(position).end(), self.view.line(position).b))
+            text = '%s%s' % (text, self.get_internal_link_right_text(text_line_right))
             function_name = text[2:].split('|')[0]
             title = function_name
 
@@ -1396,6 +1399,13 @@ class MediawikerOpenInlineCommand(sublime_plugin.TextCommand):
         idx_tpl = str_value.rfind(self.CHARS_TPL)
         idx_link = str_value.rfind(self.CHARS_LINK)
         return idx_tpl if idx_tpl > idx_link else idx_link
+
+    def get_internal_link_right_text(self, str_value):
+        idx_link = str_value.find(self.CHARS_LINK_CLOSE)
+        if idx_link != -1:
+            return str_value[:idx_link]
+        else:
+            return str_value
 
 
 class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
