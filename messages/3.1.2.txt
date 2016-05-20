@@ -18,7 +18,7 @@ Parameter **preview_custom_head** with list of lines, for example:
             "username": "",
             "preview_custom_head": [
                 "<link rel=\"stylesheet\" href=\"/w/load.php?debug=false&amp;lang=%(lang)s&amp;modules=site&amp;only=styles&amp;skin=vector\"/>", 
-                "<link rel=\"stylesheet\" href=\"/w/load.php?debug=false&amp;lang=%(lang)s&amp;modules=user.groups&amp;only=styles&amp;skin=vector&amp;user=Tshr&amp;version=IA9sV8WJ\"/>",
+                "<link rel=\"stylesheet\" href=\"/w/load.php?debug=false&amp;lang=%(lang)s&amp;modules=user.groups&amp;only=styles&amp;skin=vector&amp;\"/>",
                 "<script async=\"\" src=\"%(http)s://%(host)s%(path)sload.php?debug=false&amp;lang=%(lang)s&amp;modules=startup&amp;only=scripts&amp;skin=vector\"></script>"
             ]
         }
