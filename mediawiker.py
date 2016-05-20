@@ -1493,6 +1493,7 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, title, password):
         notifications_type = mw.get_setting('mediawiki_notifications_show_all', True)
+        self.read_sign = mw.get_setting('mediawiki_notifications_read_sign', ' [+]')
         sitecon = mw.get_connect(password)
         ns = sitecon.notifications()
         self.msgs = []
@@ -1509,6 +1510,7 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
                     if notifications_type or not msg_read:
                         self.msgs.append(self._get_data(msg))
 
+        self.msgs = sorted(self.msgs, key=lambda k: k['read'])
         n_list = ['All in browser'] + ['%s, %s: %s (%s)%s' % (m['title'], m['agent'], m['timestamp'], m['type'], m['read']) for m in self.msgs]
         sublime.active_window().show_quick_panel(n_list, self.on_done)
 
@@ -1518,7 +1520,7 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
         _['type'] = msg.get('type', None)
         _['timestamp'] = msg.get('timestamp', {}).get('date', None)
         _['agent'] = msg.get('agent', {}).get('name', None)
-        _['read'] = u' \u2713' if msg.get('read', None) else ''
+        _['read'] = self.read_sign if msg.get('read', None) else ''
         return _
 
     def on_done(self, idx):

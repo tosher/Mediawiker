@@ -30,6 +30,7 @@
     "mediawiki_preview_file": "Wiki_page_preview_",
     "mediawiki_preview_lang": "en",
     "mediawiki_notifications_show_all": true,
+    "mediawiki_notifications_read_sign": " \u2713",
     "mediawiker_wikitable_properties":
     {
         "class": "wikitable"

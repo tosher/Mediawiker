@@ -1,0 +1,5 @@
+## Mediawiker 3.1.1
+
+## Get notifications command
+* Notifications sorting by *read* property.
+* Notifications *read* sign characters in the settings. Parameter **mediawiki_notifications_read_sign**, default value: ` \u2713` (&#10003;).
