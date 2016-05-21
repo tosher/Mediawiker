@@ -1,0 +1,11 @@
+## Mediawiker 3.1.3
+
+## Page preview command
+* Parameter **preview_custom_head** is a [Jinja2](http://jinja.pocoo.org/docs/dev/) template (splitted by lines).
+
+### Variables changed
+Variables are Jinja2 template [variables](http://jinja.pocoo.org/docs/dev/templates/#variables):
+* `{{ http }}` - site protocol value (`http`/`https`), based on **https** parameter.
+* `{{ host }}` - site address value, based on **host** parameter.
+* `{{ path }}` - api path value, based on **path** parameter.
+* `{{ lang }}` - lang value, based on global **mediawiki_preview_lang** parameter.

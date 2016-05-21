@@ -1,29 +1,41 @@
 {
    "windows": {
         "*": [
-            "requests"
+            "requests",
+            "python-jinja2",
+            "markupsafe"
         ],
         "<3000": [
             "requests",
+            "python-jinja2",
+            "markupsafe",
             "ordereddict"
         ]
    },
    "linux": {
         "*": [
-            "requests"
+            "requests",
+            "python-jinja2",
+            "markupsafe"
         ],
         "<3000": [
             "requests",
+            "python-jinja2",
+            "markupsafe",
             "fileio",
             "ordereddict"
         ]
    },
    "osx": {
         "*": [
-            "requests"
+            "requests",
+            "python-jinja2",
+            "markupsafe"
         ],
         "<3000": [
             "requests",
+            "python-jinja2",
+            "markupsafe",
             "ordereddict"
         ]
    }

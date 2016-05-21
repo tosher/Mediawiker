@@ -10,6 +10,7 @@ import webbrowser
 import re
 import sublime
 import sublime_plugin
+from jinja2 import Template
 
 # https://github.com/wbond/sublime_package_control/wiki/Sublime-Text-3-Compatible-Packages
 # http://www.sublimetext.com/docs/2/api_reference.html
@@ -1439,9 +1440,10 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
             '<body style="margin:20px;">'
         ]
 
-        geshi_css = self.get_geshi_langs(text)
-        head = head % {'http': site_http, 'host': host, 'path': path, 'lang': lang}
-        html_header = '\n'.join(html_header_lines) % {'http': site_http, 'host': host, 'path': path, 'lang': lang, 'geshi_css': geshi_css, 'head': head}
+        geshi_css = self.get_geshi_langs()
+        head_tpl = Template(head)
+        head_str = head_tpl.render(http=site_http, host=host, path=path, lang=lang)
+        html_header = '\n'.join(html_header_lines) % {'http': site_http, 'host': host, 'path': path, 'lang': lang, 'geshi_css': geshi_css, 'head': head_str}
         html_footer = '</body></html>'
 
         html = sitecon.parse(text=text, title=mw.get_title(), disableeditsection=True).get('text', {}).get('*', '')
@@ -1481,7 +1483,7 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
                     tf.write(html_footer)
             webbrowser.open(tf.name)
 
-    def get_geshi_langs(self, text):
+    def get_geshi_langs(self):
         langs = []
         pattern = r'<source lang="(.*?)"(.*?)>'
         self.regions = self.view.find_all(pattern)
