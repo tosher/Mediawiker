@@ -1423,7 +1423,8 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         site_list = mw.get_setting('mediawiki_site')
         host = site_list[site_active]['host']
         path = site_list[site_active]['path']
-        head = '\n'.join(site_list[site_active].get('preview_custom_head', []))
+        head_default = mw.get_setting('mediawiki_preview_head')
+        head = '\n'.join(site_list[site_active].get('preview_custom_head', head_default))
         lang = mw.get_setting('mediawiki_preview_lang', 'en')
         preview_file = mw.get_setting('mediawiki_preview_file', 'Wiki_page_preview_')
         site_http = 'https' if site_list[site_active].get('https', False) else 'http'
@@ -1432,9 +1433,6 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
             '<!DOCTYPE html>',
             '<html>',
             '<head>',
-            '<meta charset="UTF-8"/>',
-            '<link rel="stylesheet" href="%(http)s://%(host)s%(path)sload.php?debug=false&amp;lang=%(lang)s&amp;modules=site&amp;only=styles&amp;skin=vector"/>',
-            '<link rel="stylesheet" href="%(http)s://%(host)s%(path)sload.php?debug=false&amp;lang=%(lang)s&amp;modules=%(geshi_css)sext.visualEditor.viewPageTarget.noscript|mediawiki.legacy.commonPrint,shared|mediawiki.sectionAnchor|mediawiki.skinning.interface|mediawiki.ui.button|skins.vector.styles&amp;only=styles&amp;skin=vector&amp;*" />',
             '%(head)s',
             '</head>',
             '<body style="margin:20px;">'
@@ -1442,8 +1440,8 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
 
         geshi_css = self.get_geshi_langs()
         head_tpl = Template(head)
-        head_str = head_tpl.render(http=site_http, host=host, path=path, lang=lang)
-        html_header = '\n'.join(html_header_lines) % {'http': site_http, 'host': host, 'path': path, 'lang': lang, 'geshi_css': geshi_css, 'head': head_str}
+        head_str = head_tpl.render(http=site_http, host=host, path=path, lang=lang, geshi_css=geshi_css)
+        html_header = '\n'.join(html_header_lines) % {'head': head_str}
         html_footer = '</body></html>'
 
         html = sitecon.parse(text=text, title=mw.get_title(), disableeditsection=True).get('text', {}).get('*', '')
@@ -1485,10 +1483,10 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
 
     def get_geshi_langs(self):
         langs = []
-        pattern = r'<source lang="(.*?)"(.*?)>'
+        pattern = r'<(source|syntaxhighlight) lang="(.*?)"(.*?)>'
         self.regions = self.view.find_all(pattern)
         for r in self.regions:
-            lang = re.sub(pattern, r'\1', self.view.substr(r))
+            lang = re.sub(pattern, r'\2', self.view.substr(r))
             langs.append(lang)
         return 'ext.geshi.language.%s|' % ','.join(set(langs)) if langs else ''
 

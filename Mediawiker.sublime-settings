@@ -29,6 +29,11 @@
     "mediawiki_search_syntax": "Packages/Markdown/Markdown.tmLanguage",
     "mediawiki_preview_file": "Wiki_page_preview_",
     "mediawiki_preview_lang": "en",
+    "mediawiki_preview_head": [
+        "<meta charset=\"UTF-8\"/>",
+        "<link rel=\"stylesheet\" href=\"{{ http }}://{{ host }}{{ path }}load.php?debug=false&amp;lang={{ lang }}&amp;modules=site&amp;only=styles&amp;skin=vector\"/>",
+        "<link rel=\"stylesheet\" href=\"{{ http }}://{{ host }}{{ path }}load.php?debug=false&amp;lang={{ lang }}&amp;modules={{ geshi_css }}ext.visualEditor.viewPageTarget.noscript|mediawiki.legacy.commonPrint,shared|mediawiki.sectionAnchor|mediawiki.skinning.interface|mediawiki.ui.button|skins.vector.styles&amp;only=styles&amp;skin=vector&amp;*\" />"
+    ],
     "mediawiki_notifications_show_all": true,
     "mediawiki_notifications_read_sign": " \u2713",
     "mediawiker_wikitable_properties":

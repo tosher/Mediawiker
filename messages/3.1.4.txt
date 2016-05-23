@@ -1,0 +1,10 @@
+## Mediawiker 3.1.4
+
+## Page preview command
+
+* Default `<head>` part of preview html was moved to settings parameter **mediawiki_preview_head** as [Jinja2](http://jinja.pocoo.org/docs/dev/) template. 
+
+**Note!** Data, defined by **preview_custom_head** parameter (in wiki host's parameters) will be used instead of data, defined by **mediawiki_preview_head**. If both values are required, needs to define all lines in **preview_custom_head**.
+
+### New variable
+* `{{ geshi_css }}` - dynamic [GeSHi Source Highlighting](https://www.mediawiki.org/wiki/Extension:SyntaxHighlight) css rules, based on page's source (both tags `source` and `syntaxhighlight` are supported).
