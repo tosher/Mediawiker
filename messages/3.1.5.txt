@@ -1,0 +1,32 @@
+## Mediawiker 3.1.5
+
+## Text blocks folding possibilities
+Support folding/unfolding for:
+* Headings - by target header, by header level (2, 3, 4, 5).
+* Templates
+* Tags (customizable list of tags, check `mediawiker_fold_tags` option). Default: `source`, `syntaxhighlight`, `div`, `pre`.
+* All text blocks - all templates, tags.
+
+## Standard shortcuts:
+* Fold block: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>[</kbd>
+* Unfold block: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>]</kbd>
+
+## Gutters folding
+* `mediawiker_use_gutters_folding` option for switching on/off gutters for text blocks. Default: `true`
+* Fold text block by moving mouse over the gutter.
+
+## New commands
+**Note**! Also available in **Tools** menu.
+
+* Fold
+* Fold Level 2
+* Fold Level 3
+* Fold Level 4
+* Fold Level 5
+* Fold text blocks
+* Unfold
+* Unfold Level 2
+* Unfold Level 3
+* Unfold Level 4
+* Unfold Level 5
+* Unfold text blocks

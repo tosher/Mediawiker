@@ -19,6 +19,7 @@ from jinja2 import Template
 
 # TODO: Move rename page
 # TODO: links (internal, external) based on api..
+# TODO: https://github.com/mwclient/mwclient/commit/b4640d3b2537cfd6d17e2034ee53480b5ed2d4fe
 
 if pythonver >= 3:
     from . import mwutils as mw
@@ -45,9 +46,10 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
     title = None
     check_notifications = True
 
-    def run(self, action, title='', site_active=None, **kwargs):
+    def run(self, action, title='', site_active=None, action_params=None, **kwargs):
         self.site_active = site_active
         self.action = action
+        self.action_params = action_params
         self.check_notifications = kwargs.get('check_notifications', True)
 
         if self.action == 'mediawiker_show_page':
@@ -87,7 +89,11 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
             self.run_in_new_window = False
 
         self.window.active_view().settings().set('mediawiker_site', self.site_active)
-        self.window.active_view().run_command(self.action, {"title": self.title, "password": password})
+        args = {"title": self.title, "password": password}
+        if self.action_params:
+            for key in self.action_params.keys():
+                args[key] = self.action_params[key]
+        self.window.active_view().run_command(self.action, args)
         try:
             self.get_notifications(password)
         except Exception as e:
@@ -1136,6 +1142,10 @@ class MediawikerLoad(sublime_plugin.EventListener):
 
             view.settings().set('mediawiker_site', current_site)
 
+            # folding gutters
+            if mw.get_setting('mediawiker_use_gutters_folding', True):
+                sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse"})
+
     def on_modified(self, view):
         if view.settings().get('mediawiker_is_here', False):
             is_changed = view.settings().get('is_changed', False)
@@ -1145,11 +1155,19 @@ class MediawikerLoad(sublime_plugin.EventListener):
             else:
                 view.settings().set('is_changed', True)
 
+            # folding gutters update
+            if mw.get_setting('mediawiker_use_gutters_folding', True):
+                sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse"})
+
     def on_post_save(self, view):
         view.settings().set('mediawiker_wiki_instead_editor', False)
 
     def on_post_save_async(self, view):
         view.settings().set('mediawiker_wiki_instead_editor', False)
+
+    def on_hover(self, view, point, hover_zone):
+        if view.settings().get('mediawiker_is_here', False) and hover_zone == sublime.HOVER_GUTTER and mw.get_setting('mediawiker_use_gutters_folding', True):
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "cursor": point}})
 
 
 class MediawikerCompletionsEvent(sublime_plugin.EventListener):
@@ -1548,3 +1566,214 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
                         "title": title,
                         "action": "mediawiker_show_page",
                         "check_notifications": False})
+
+
+class MediawikerColapseCommand(sublime_plugin.TextCommand):
+
+    # DRAW_TYPE = sublime.DRAW_NO_FILL + sublime.DRAW_SOLID_UNDERLINE + sublime.PERSISTENT
+    DRAW_TYPE = sublime.HIDDEN + sublime.PERSISTENT
+
+    def get_header_regions(self, level):
+        _regions = []
+        pattern = r'={%(level)s}[^=]+={%(level)s}\s?\n((.|\n)*?)(?=(\n=|\Z))' % {'level': level}
+        _regions = self.view.find_all(pattern)
+        colapse_paragraphs = []
+        if _regions:
+            for r in _regions:
+                header_line = self.view.substr(r).split('\n')[0]
+                _a, _b = r.a + len(header_line), r.b
+                colapse_paragraphs.append((r.a, sublime.Region(_a, _b)))
+
+            if self.use_gutters_folding:
+                self.view.add_regions('h_%s' % level, [r[1] for r in colapse_paragraphs], 'comment', 'Packages/Mediawiker/img/gutter_h%s.png' % level, self.DRAW_TYPE)
+
+        return colapse_paragraphs
+
+    def get_templates_regions(self):
+        pattern_templates = r'\{{2}((.|\n)*?)\}{2}'
+        _regions = self.view.find_all(pattern_templates)
+        colapse_templates = []
+        if _regions:
+            for r in _regions:
+                _a, _b = r.a + 2, r.b - 2
+                colapse_templates.append(sublime.Region(_a, _b))
+
+            if self.use_gutters_folding:
+                self.view.add_regions('templates', colapse_templates, 'comment', 'Packages/Mediawiker/img/gutter_t.png', self.DRAW_TYPE)
+        return colapse_templates
+
+    def get_tables_regions(self):
+        pattern_tables = r'\{\|((.|\n)*?)\|\}'
+        _regions = self.view.find_all(pattern_tables)
+        colapse_tables = []
+        if _regions:
+            for r in _regions:
+                _a, _b = r.a + 2, r.b - 2
+                colapse_tables.append(sublime.Region(_a, _b))
+
+            if self.use_gutters_folding:
+                self.view.add_regions('tables', colapse_tables, 'comment', 'Packages/Mediawiker/img/gutter_t.png', self.DRAW_TYPE)
+        return colapse_tables
+
+    def get_tag_regions(self, tag):
+        pattern_tag = r'<%(tag)s((.|\n)*?)</%(tag)s>' % {'tag': tag}
+        _regions = self.view.find_all(pattern_tag)
+        colapse_tag = []
+        if _regions:
+            for r in _regions:
+                header_line = self.view.substr(r).split('>')[0]
+                _a, _b = r.a + len(header_line) + 1, r.b - len('</%s>' % tag)
+                colapse_tag.append((r.a, sublime.Region(_a, _b)))
+
+            if self.use_gutters_folding:
+                self.view.add_regions(tag, [r[1] for r in colapse_tag], 'comment', 'Packages/Mediawiker/img/gutter_tag.png', self.DRAW_TYPE)
+        return colapse_tag
+
+    def is_cursor_inheader(self, cursor, rt):
+        '''
+        cursor: current cursor position
+        rt: tuple (h_start, h_region)
+        '''
+        region = rt[1]
+        r_full = sublime.Region(rt[0], region.b)
+        if r_full.contains(cursor):
+            return True
+        return False
+
+    def is_cursor_intemplate(self, cursor, region):
+        r_full = sublime.Region(region.a - 2, region.b + 2)
+        if r_full.contains(cursor):
+            return True
+        return False
+
+    def is_cursor_intag(self, cursor, rt, tag):
+        r_full = sublime.Region(rt[0], rt[1].b + len('</%s>' % tag))
+        if r_full.contains(cursor):
+            return True
+        return False
+
+    def get_first_header_region_by_cursor(self, cursor, headers):
+        for level_tuple in headers.keys():
+            if headers[level_tuple]:
+                for rt in headers[level_tuple]:
+                    if self.is_cursor_inheader(cursor, rt):
+                        return rt[1]
+
+    def run(self, edit, title, password, **kwargs):
+
+        _fold_type = kwargs.get('type', None) if kwargs else None
+        _cursor = kwargs.get('cursor', None) if kwargs else None
+        fold_tags = mw.get_setting("mediawiker_fold_tags", ["source", "syntaxhighlight", "div", "pre"])
+        self.use_gutters_folding = mw.get_setting('mediawiker_use_gutters_folding', True)
+
+        headers = {}
+        for _h in range(2, 5):
+            headers[_h] = self.get_header_regions(level=_h)
+
+        t = self.get_templates_regions()
+        tbl = self.get_tables_regions()
+        tags = {}
+        for _t in fold_tags:
+            tags[_t] = self.get_tag_regions(_t)
+
+        self.is_cursor_intable = self.is_cursor_intemplate
+
+        cursor = _cursor if _cursor is not None else self.view.sel()[0].begin()
+
+        if _fold_type is None:
+            return
+
+        elif _fold_type == 'fold':
+
+            for tag in tags.keys():
+                for r in tags[tag]:
+                    if self.is_cursor_intag(cursor, r, tag):
+                        self.view.fold(r[1])
+                        return
+
+            for r in tbl:
+                if self.is_cursor_intable(cursor, r):
+                    self.view.fold(r)
+                    return
+
+            for r in t:
+                if self.is_cursor_intemplate(cursor, r):
+                    self.view.fold(r)
+                    return
+
+            r = self.get_first_header_region_by_cursor(cursor, headers)
+            if r:
+                self.view.fold(r)
+                return
+
+        elif _fold_type == 'unfold':
+
+            for tag in tags.keys():
+                for r in tags[tag]:
+                    if self.is_cursor_intag(cursor, r, tag):
+                        self.view.unfold(r[1])
+                        return
+
+            for r in tbl:
+                if self.is_cursor_intable(cursor, r):
+                    self.view.unfold(r)
+                    self.view.show_at_center(cursor)
+                    return
+
+            for r in t:
+                if self.is_cursor_intemplate(cursor, r):
+                    self.view.unfold(r)
+                    self.view.show_at_center(cursor)
+                    return
+
+            r = self.get_first_header_region_by_cursor(cursor, headers)
+            if r:
+                self.view.unfold(r)
+                self.view.show_at_center(cursor)
+                return
+
+        elif _fold_type.startswith('fold_'):
+            try:
+                level = int(_fold_type.split('_')[-1])
+            except:
+                level = 2
+
+            for _l in range(level, 5):
+                for r in headers[_l]:
+                    if r:
+                        self.view.fold(r[1])
+
+        elif _fold_type.startswith('unfold_'):
+            try:
+                level = int(_fold_type.split('_')[-1])
+            except:
+                level = 2
+
+            for _l in reversed(range(level, 5)):
+                for r in headers[_l]:
+                    if r:
+                        self.view.unfold(r[1])
+
+        elif _fold_type.startswith('foldwiki'):
+
+            for tag in tags.keys():
+                for r in tags[tag]:
+                    self.view.fold(r[1])
+
+            for r in tbl:
+                self.view.fold(r)
+
+            for r in t:
+                self.view.fold(r)
+
+        elif _fold_type.startswith('unfoldwiki'):
+
+            for tag in tags.keys():
+                for r in tags[tag]:
+                    self.view.unfold(r[1])
+
+            for r in tbl:
+                self.view.unfold(r)
+
+            for r in t:
+                self.view.unfold(r)
