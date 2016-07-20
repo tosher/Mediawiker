@@ -84,7 +84,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
         if not self.site_active:
             self.site_active = mw.get_view_site()
 
-        if self.run_in_new_window:
+        if self.action == 'mediawiker_show_page' and self.run_in_new_window:
             self.window.new_file()
             self.run_in_new_window = False
 
@@ -1142,8 +1142,12 @@ class MediawikerLoad(sublime_plugin.EventListener):
 
             view.settings().set('mediawiker_site', current_site)
 
+    def on_activated_async(self, view):
+        ''' unsupported on ST2, gutters too - skipping.. '''
+        current_syntax = view.settings().get('syntax')
+        if current_syntax is not None and current_syntax.endswith(('Mediawiker/Mediawiki.tmLanguage', 'Mediawiker/MediawikiNG.tmLanguage')):
             # folding gutters
-            if mw.get_setting('mediawiker_use_gutters_folding', True):
+            if view.settings().get('mediawiker_is_here', False) and mw.get_setting('mediawiker_use_gutters_folding', True):
                 sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse"})
 
     def on_modified(self, view):
@@ -1167,7 +1171,7 @@ class MediawikerLoad(sublime_plugin.EventListener):
 
     def on_hover(self, view, point, hover_zone):
         if view.settings().get('mediawiker_is_here', False) and hover_zone == sublime.HOVER_GUTTER and mw.get_setting('mediawiker_use_gutters_folding', True):
-            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "cursor": point}})
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "point": point}})
 
 
 class MediawikerCompletionsEvent(sublime_plugin.EventListener):
@@ -1572,6 +1576,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
 
     # DRAW_TYPE = sublime.DRAW_NO_FILL + sublime.DRAW_SOLID_UNDERLINE + sublime.PERSISTENT
     DRAW_TYPE = sublime.HIDDEN + sublime.PERSISTENT
+    point = None
 
     def get_header_regions(self, level):
         _regions = []
@@ -1589,17 +1594,61 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
 
         return colapse_paragraphs
 
-    def get_templates_regions(self):
-        pattern_templates = r'\{{2}((.|\n)*?)\}{2}'
-        _regions = self.view.find_all(pattern_templates)
-        colapse_templates = []
-        if _regions:
-            for r in _regions:
-                _a, _b = r.a + 2, r.b - 2
-                colapse_templates.append(sublime.Region(_a, _b))
+    def get_templates(self):
 
-            if self.use_gutters_folding:
-                self.view.add_regions('templates', colapse_templates, 'comment', 'Packages/Mediawiker/img/gutter_t.png', self.DRAW_TYPE)
+        # TODO: make universal for other blocks with includes: tables, etc.
+        # TODO: recalc on modified check
+
+        TPL_START = r'{{'
+        TPL_STOP = r'}}'
+        TYPE_START = 'start'
+        TYPE_STOP = 'stop'
+        text_region = sublime.Region(0, self.view.size())
+        line_regions = self.view.split_by_newlines(text_region)
+        # print(line_regions)
+        lines_data = []
+        templates = []
+        for region in line_regions:
+            line_text = self.view.substr(region)
+            starts = [region.a + m.start() for m in re.finditer(TPL_START, line_text)]
+            stops = [region.a + m.start() for m in re.finditer(TPL_STOP, line_text)]
+
+            line_index = {}
+            for i in starts:
+                line_index[i] = TYPE_START
+            for i in stops:
+                line_index[i] = TYPE_STOP
+
+            if starts or stops:
+                lines_data.append(line_index)
+
+        _templates = []
+        for d in lines_data:
+            line_indexes = list(d.keys())
+            line_indexes.sort()
+            for i in line_indexes:
+                if d[i] == TYPE_START:
+                    t = sublime.Region(i + 2, i + 2)  # unknown end
+                    _templates.append(t)
+                elif d[i] == TYPE_STOP:
+                    _templates[-1].b = i
+                    templates.append((_templates[-1], len(_templates)))  # template region and includes level
+                    _templates = _templates[:-1]
+        return templates
+
+    def get_templates_regions(self):
+        _regions = self.get_templates()
+        colapse_templates = {}
+        if _regions:
+            for _r in _regions:
+                line_idx = self.view.line(_r[0]).a
+                if line_idx in colapse_templates:
+                    colapse_templates[line_idx].append(_r[0])
+                else:
+                    colapse_templates[line_idx] = [_r[0]]
+                if self.use_gutters_folding:
+                    # create gutter by first region in line..
+                    self.view.add_regions('templates_%s' % _r[1], [rl[0] for rl in list(colapse_templates.values())], 'comment', 'Packages/Mediawiker/img/gutter_t.png', self.DRAW_TYPE)
         return colapse_templates
 
     def get_tables_regions(self):
@@ -1662,7 +1711,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
     def run(self, edit, title, password, **kwargs):
 
         _fold_type = kwargs.get('type', None) if kwargs else None
-        _cursor = kwargs.get('cursor', None) if kwargs else None
+        point = kwargs.get('point', None) if kwargs else None
         fold_tags = mw.get_setting("mediawiker_fold_tags", ["source", "syntaxhighlight", "div", "pre"])
         self.use_gutters_folding = mw.get_setting('mediawiker_use_gutters_folding', True)
 
@@ -1678,7 +1727,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
 
         self.is_cursor_intable = self.is_cursor_intemplate
 
-        cursor = _cursor if _cursor is not None else self.view.sel()[0].begin()
+        cursor = point if point is not None else self.view.sel()[0].begin()
 
         if _fold_type is None:
             return
@@ -1696,10 +1745,21 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                     self.view.fold(r)
                     return
 
-            for r in t:
-                if self.is_cursor_intemplate(cursor, r):
-                    self.view.fold(r)
-                    return
+            # if fires from on_hover, check region, started in point line
+            if point is not None:
+                for r in t.keys():
+                    if point == r:
+                        for _r in t[r]:
+                            self.view.fold(_r)
+                        return
+
+            t_lines = list(t.keys())
+            t_lines.sort()
+            for r in reversed(t_lines):
+                for _r in t[r]:
+                    if self.is_cursor_intemplate(cursor, _r):
+                        self.view.fold(_r)
+                        return
 
             r = self.get_first_header_region_by_cursor(cursor, headers)
             if r:
@@ -1720,11 +1780,14 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                     self.view.show_at_center(cursor)
                     return
 
-            for r in t:
-                if self.is_cursor_intemplate(cursor, r):
-                    self.view.unfold(r)
-                    self.view.show_at_center(cursor)
-                    return
+            t_lines = list(t.keys())
+            t_lines.sort()
+            for r in reversed(t_lines):
+                for _r in t[r]:
+                    if self.is_cursor_intemplate(cursor, t[r]):
+                        self.view.unfold(t[r])
+                        self.view.show_at_center(cursor)
+                        return
 
             r = self.get_first_header_region_by_cursor(cursor, headers)
             if r:
@@ -1763,8 +1826,9 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
             for r in tbl:
                 self.view.fold(r)
 
-            for r in t:
-                self.view.fold(r)
+            for r in t.keys():
+                for _r in t[r]:
+                    self.view.fold(_r)
 
         elif _fold_type.startswith('unfoldwiki'):
 
@@ -1775,5 +1839,6 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
             for r in tbl:
                 self.view.unfold(r)
 
-            for r in t:
-                self.view.unfold(r)
+            for r in t.keys():
+                for _r in t[r]:
+                    self.view.unfold(_r)

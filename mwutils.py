@@ -227,7 +227,6 @@ def get_page_url(page_name=''):
 
 
 # classes..
-
 class WikiConnect(object):
 
     conns = {}

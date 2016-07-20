@@ -1,0 +1,4 @@
+## Mediawiker 3.1.6
+
+* Fixed bug for page opening with folding gutters.
+* Improved logic for templates folding.
