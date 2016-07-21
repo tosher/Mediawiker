@@ -51,19 +51,13 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
         self.action = action
         self.action_params = action_params
         self.check_notifications = kwargs.get('check_notifications', True)
+        self.kwargs = kwargs
 
         if self.action == 'mediawiker_show_page':
-            if mw.get_setting('mediawiker_newtab_ongetpage'):
-                self.run_in_new_window = True
-
             panel = mw.InputPanelPageTitle()
             panel.on_done = self.on_done
             panel.get_title(title)
-
         else:
-            if self.action == 'mediawiker_reopen_page':
-                self.run_in_new_window = kwargs.get('new_tab', False)
-                self.action = 'mediawiker_show_page'
             title = title if title else mw.get_title()
             self.on_done(title)
 
@@ -84,11 +78,18 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
         if not self.site_active:
             self.site_active = mw.get_view_site()
 
-        if self.action == 'mediawiker_show_page' and self.run_in_new_window:
+        if self.action == 'mediawiker_show_page' and mw.get_setting('mediawiker_newtab_ongetpage', False):
+            self.run_in_new_window = True
+        elif self.action == 'mediawiker_reopen_page':
+            self.action = 'mediawiker_show_page'
+            self.run_in_new_window = self.kwargs.get('new_tab', False)
+
+        if self.run_in_new_window:
             self.window.new_file()
             self.run_in_new_window = False
 
         self.window.active_view().settings().set('mediawiker_site', self.site_active)
+
         args = {"title": self.title, "password": password}
         if self.action_params:
             for key in self.action_params.keys():
@@ -228,16 +229,16 @@ class MediawikerPageListCommand(sublime_plugin.WindowCommand):
 class MediawikerShowPageCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, title, password):
+
+        if not title:
+            return
+
         is_writable = False
         sitecon = mw.get_connect(password)
         page = mw.get_page(sitecon, title)
         is_writable, text = mw.get_page_text(page)
 
         if is_writable or text:
-            mw.set_syntax(page=page)
-            self.view.settings().set('mediawiker_is_here', True)
-            self.view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
-            self.view.set_name(title)
 
             if is_writable and not text:
                 sublime.status_message('Wiki page %s is not exists. You can create new..' % (title))
@@ -246,6 +247,11 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
             self.view.erase(edit, sublime.Region(0, self.view.size()))
             self.view.run_command('mediawiker_insert_text', {'position': 0, 'text': text})
             sublime.status_message('Page %s was opened successfully from %s.' % (title, mw.get_view_site()))
+            mw.set_syntax(page=page)
+            self.view.settings().set('mediawiker_is_here', True)
+            self.view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
+            self.view.set_name(title)
+
             self.view.set_scratch(True)
             # own is_changed flag instead of is_dirty for possib. to reset..
             self.view.settings().set('is_changed', False)
@@ -1144,11 +1150,9 @@ class MediawikerLoad(sublime_plugin.EventListener):
 
     def on_activated_async(self, view):
         ''' unsupported on ST2, gutters too - skipping.. '''
-        current_syntax = view.settings().get('syntax')
-        if current_syntax is not None and current_syntax.endswith(('Mediawiker/Mediawiki.tmLanguage', 'Mediawiker/MediawikiNG.tmLanguage')):
-            # folding gutters
-            if view.settings().get('mediawiker_is_here', False) and mw.get_setting('mediawiker_use_gutters_folding', True):
-                sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse"})
+        # folding gutters
+        if view.settings().get('mediawiker_is_here', False) and mw.get_setting('mediawiker_use_gutters_folding', True):
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse"})
 
     def on_modified(self, view):
         if view.settings().get('mediawiker_is_here', False):
