@@ -199,6 +199,17 @@ repository:
     - include: '#table'
     - include: '#comments'
 
+  block_pre_spaced_in_templates:
+    patterns:
+    - comment: "Code blocks inside templates. Terminates by | params delimiter too."
+      name: markup.raw.block.mediawiki
+      begin: ^ (?=\s*\S)
+      end: (?=^[^ ]|\|)
+      patterns:
+      - include: '#inline'
+    - include: '#table'
+    - include: '#comments'
+
   block_html:
     comment: "The available block HTML tags supported are:
               * blockquote, center, pre, div, hr, p
@@ -238,6 +249,34 @@ repository:
         '3': {name: meta.tag.inline.ref.mediawiki}
       patterns:
       - include: '#inline'
+    - comment: '<blockquote>content</blockquote>'
+      contentName: meta.reference.blockquote.content.mediawiki
+      begin: (<)(blockquote)(>)
+      beginCaptures:
+        '1': {name: meta.tag.inline.ref.mediawiki}
+        '2': {name: entity.name.tag.ref.mediawiki}
+        '3': {name: meta.tag.inline.ref.mediawiki}
+      end: (</)(blockquote)(>)
+      endCaptures:
+        '1': {name: meta.tag.inline.ref.mediawiki}
+        '2': {name: entity.name.tag.ref.mediawiki}
+        '3': {name: meta.tag.inline.ref.mediawiki}
+      patterns:
+      - include: '#inline'
+    - comment: '<center>content</center>'
+      contentName: meta.reference.center.content.mediawiki
+      begin: (<)(center)(>)
+      beginCaptures:
+        '1': {name: meta.tag.inline.ref.mediawiki}
+        '2': {name: entity.name.tag.ref.mediawiki}
+        '3': {name: meta.tag.inline.ref.mediawiki}
+      end: (</)(center)(>)
+      endCaptures:
+        '1': {name: meta.tag.inline.ref.mediawiki}
+        '2': {name: entity.name.tag.ref.mediawiki}
+        '3': {name: meta.tag.inline.ref.mediawiki}
+      patterns:
+      - include: '#inline'
     - comment: <ref name="label"/>
       name: meta.reference.named.cite.mediawiki
       match: (<)(ref) *((name) *(=) *([^>]*))(/>)
@@ -258,22 +297,30 @@ repository:
         '5': {name: meta.tag.inline.ref.mediawiki}
         '6': {name: string.quoted.ref.name.mediawiki}
         '7': {name: meta.tag.inline.ref.mediawiki}
-      end: (</ref>)
+      end: (</)(ref)(>)
       endCaptures:
         '1': {name: meta.tag.inline.ref.mediawiki}
+        '2': {name: entity.name.tag.ref.mediawiki}
+        '3': {name: meta.tag.inline.ref.mediawiki}
       patterns:
       - include: '#inline'
     - contentName: meta.gallery.mediawiki
-      begin: (<gallery[^>]*>)
-      end: (</gallery>)
-      captures:
+      begin: (<)(gallery[^>]*)(>)
+      end: (</)(gallery)(>)
+      beginCaptures:
         '1': {name: meta.tag.inline.ref.mediawiki}
+        '2': {name: entity.name.tag.ref.mediawiki}
+        '3': {name: meta.tag.inline.ref.mediawiki}
+      endCaptures:
+        '1': {name: meta.tag.inline.ref.mediawiki}
+        '2': {name: entity.name.tag.ref.mediawiki}
+        '3': {name: meta.tag.inline.ref.mediawiki}
       patterns:
       - name: meta.item.gallery.mediawiki
         begin: |-
           (?x)
           ^(?!\s*\n)                      (?# not an empty line)
-          ( [ ]*(([Ff]ile|[Ii]mage)(:))   (?# spaces, image, colon)
+          ( [ ]*(([Ff]ile|[Ii]mage)(:))?   (?# spaces, image, colon, The "File:" prefix can be omitted.)
           ([^\[\]|]+)                     (?# anything: filename)
           ((\|)([^\n]*))?                 (?# pipe, anything: description)
           (?<!\s)[ ]*                     (?# spaces)
@@ -897,12 +944,12 @@ repository:
   table:
     patterns:
     - contentName: meta.table.mediawiki
-      begin: ^(\{\|)
-      end: (^\|\})
+      begin: (\{\|)
+      end: (\|\})
       beginCaptures:
-        '1': {name: markup.other.special.table.mediawiki}
+        '1': {name: markup.other.special.start-delimiter.table.mediawiki}
       endCaptures:
-        '1': {name: markup.other.special.table.mediawiki}
+        '1': {name: markup.other.special.stop-delimiter.table.mediawiki}
       patterns:
       - name: meta.table.attributes.mediawiki
         match: (\S+)(=["']?)((?:.?(?!["']?\s+(?:\S+)=|[>"']))*.?)(["']?)
@@ -916,33 +963,31 @@ repository:
         captures:
           '1': {name: markup.other.special.table.caption.mediawiki}
           '2': {name: variable.parameter.name.string.mediawiki}
-      - name: markup.other.table.row.mediawiki
-        begin: ^(\|\-)
-        end: ^(?=\|-|^\|\})
+      - name: markup.other.special.row-delimiter.table.mediawiki
+        match: \|\-
+      - name: text.cellcontents.table.mediawiki
+        # begin: ^\s*([\|!]|(?<=\|)\||(?<=!)!)
+        # end: (\||!(?=\||!)|^(\s*)(?=\|\-)|^(\s*)(?=\|\})|(^\s*\|(?!\-|\})))  # || or !! or |- or |}
+        begin: (^\s*\|(?!\-|\})|^\s*!|\|\||!!)  # starts from ^| or ^! or || or !!
+        end: (?=^\s*\||^\s*!|\|\||!!|\|\-|\|\})
         beginCaptures:
-          '1': {name: markup.other.special.table.mediawiki}
+          '1': {name: markup.other.special.cell-delimiter.table.mediawiki}
+        # endCaptures:
+        #   '1': {name: markup.other.special.cell-delimiter.table.mediawiki}
         patterns:
-        - contentName: string.other.table.cellcontents.mediawiki
-          begin: (^[\|!]|(?<=\|)\||(?<=!)!)
-          end: (\|(?=\|)|!(?=!)|(?=^\|-)|(?=^\|\}))
+        - include: '#inline'
+        - contentName: entity.other.attributes.table.cellcontents.cell-html-value.validhtml.mediawiki
+          begin: (\S+)(=["']?)
+          end: (["'])|(?=\s+\S+=|\s*\|)(?!\|)
           beginCaptures:
-            '1': {name: markup.other.special.table.cellwall.mediawiki}
+            '1': {name: entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki}
+            '2': {name: entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki}
           endCaptures:
-            '1': {name: markup.other.special.table.cellwall.mediawiki}
+            '1': {name: entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki}
           patterns:
           - include: '#inline'
-          - contentName: entity.other.attributes.table.cellcontents.validhtml.mediawiki
-            begin: (\S+)(=["']?)
-            end: (["'])|(?=\s+\S+=|\s*\|)
-            beginCaptures:
-              '1': {name: entity.other.attributes.table.cellcontents.validhtml.mediawiki}
-              '2': {name: entity.other.attributes.table.cellcontents.validhtml.mediawiki}
-            endCaptures:
-              '1': {name: entity.other.attributes.table.cellcontents.validhtml.mediawiki}
-            patterns:
-            - include: '#inline'
-          - name: entity.other.attributes.table.cellcontents.validhtml.mediawiki
-            match: \|
+        - name: entity.other.attributes.table.cellcontents.cell-html-delimiter.validhtml.mediawiki
+          match: \|
 
   template_parameters:
     comment: Template parameters in template declaration (on template page)
@@ -973,35 +1018,32 @@ repository:
     #  patterns:
     #  - include: '#inline'
     - comment: scope as meta.function-call as the closest thing to a template with parameters, etc.
-      name: meta.template.mediawiki
-      begin: (\{\{)([^\{\}\|]+)?
-      end: (\}\})
+      contentName: meta.template.mediawiki
+      begin: (?<![^\{]\{)(\{{2})(?!\{[^\{])
+      end: (?<![^\}]\})(\}{2})(?!\}([^\}]|$))
       beginCaptures:
-        '1': {name: meta.tag.inline.template.mediawiki}
-        '2': {name: entity.name.function.template.mediawiki}
+        '1': {name: meta.tag.inline.start.template.mediawiki}
       endCaptures:
-        '1': {name: meta.tag.inline.template.mediawiki}
+        '1': {name: meta.tag.inline.stop.template.mediawiki}
       patterns:
+      # hack: prevent first param line if starts with space to match as markup.raw.block.mediawiki (block_pre_spaced)
+      - name: markup.non-raw.template.mediawiki
+        match: ^\s*(?=\|)
       - include: '#comments'
       - include: "$self"
       - include: "#template_parameters"
-      - contentName: comment.block.template-hack.mediawiki
-        begin: (\|)\s*(=)
-        beginCaptures:
-          '1': {name: punctuation.fix_this_later.pipe.mediawiki}
-          '2': {name: punctuation.fix_this_later.equals-sign.mediawiki}
-        end: (?=[\|\}])
+      - name: entity.name.function.template.mediawiki
+        match: (?<=\{{2})\s*([^\{\}\|]+)
+      - name: meta.tag.param-delimiter.template.mediawiki
+        match: (\|)
       - contentName: meta.function.parameters.template.mediawiki
-        begin: (\|)(([^\{\}\|=]+)(=))?
+        begin: (?<=\|)\s*(([^\{\}\|=]+)(=))?
         beginCaptures:
-          '1': {name: punctuation.fix_this_later.pipe.mediawiki}
           '2': {name: variable.parameter.template.mediawiki}
-          '3': {name: punctuation.fix_this_later.equals-sign.mediawiki}
-        end: (?=[\|\}])
+          '3': {name: punctuation.equals-sign.template.mediawiki}
+        end: (?=\||\}{2})
         patterns:
         - include: '#inline'
         - include: '#block'
-        - include: '#block_pre_spaced'
-      - name: punctuation.fix_this_later.pipe.mediawiki
-        match: \|
+        - include: '#block_pre_spaced_in_templates'
 keyEquivalent: ^~M

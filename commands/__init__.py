@@ -1,0 +1,29 @@
+﻿#!/usr/bin/env python\n
+# -*- coding: utf-8 -*-
+
+from .add_category import MediawikerAddCategoryCommand, MediawikerSetCategoryCommand
+from .add_image import MediawikerAddImageCommand, MediawikerInsertImageCommand
+from .add_template import MediawikerAddTemplateCommand, MediawikerInsertTemplateCommand
+from .category_list import MediawikerCategoryListCommand, MediawikerCategoryTreeCommand
+from .cli import MediawikerCliCommand
+from .colapse import MediawikerColapseCommand
+from .edit_panel import MediawikerEditPanelCommand
+from .enumerate_toc import MediawikerEnumerateTocCommand
+from .favorites import MediawikerFavoritesAddCommand, MediawikerFavoritesOpenCommand
+from .get_notifications import MediawikerNotificationsCommand, MediawikerGetNotificationsCommand
+from .open_issue import MediawikerOpenIssueCommand
+from .open_page_in_browser import MediawikerOpenPageInBrowserCommand
+from .page_actions import MediawikerPageCommand
+from .page_backlinks import MediawikerPageBacklinksCommand
+from .page_langlinks import MediawikerPageLanglinksCommand
+from .page_list import MediawikerPageListCommand
+from .preview_page import MediawikerPreviewPageCommand, MediawikerPreviewCommand
+from .search_string import MediawikerSearchStringCommand, MediawikerSearchStringListCommand
+from .set_active_site import MediawikerSetActiveSiteCommand
+from .show_external_links import MediawikerShowExternalLinksCommand
+from .show_internal_links import MediawikerShowInternalLinksCommand
+from .show_toc import MediawikerShowTocCommand
+from .table import MediawikerCsvTableCommand, MediawikerTableSimpleToWikiCommand, MediawikerTableWikiToSimpleCommand
+from .text_commands import MediawikerInsertTextCommand, MediawikerReplaceTextCommand
+from .upload import MediawikerUploadCommand, MediawikerFileUploadCommand
+

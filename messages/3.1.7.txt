@@ -1,0 +1,27 @@
+## Mediawiker 3.1.7
+
+### Source refactoring
+* All commands was moved to its own modules.
+
+### Syntax highlighting fixes, improvements
+* Fix: Table highlighting with first row tag omitted (`|-`).
+* Fix: Highlighting of template parameters lines started from new line with space char before `|` delimiter - the conflict with space-predefined text.
+* Fix: `<gallery>` tag with `File:\Image:` prefix omitted.
+* Fix: `<ref>` tag highlighting.
+* New: `<blockquote>`, `<center>` tags support.
+
+### Popup menu
+* Popup menu for selected text.
+* Popup menu for text markup blocks.
+
+### Folding
+* Mouse over the gutters folding was replaced with popup menu options.
+* **Open inline** command was replaced with popup menu options.
+
+### Snippets
+* New `<code>` snippet
+
+### Known bugs
+* Sublime crash on opening some templates from popup menu without write-permissions.
+
+**Note**: Restart required after update.

@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import sys
-pythonver = sys.version_info[0]
 
 from os.path import splitext, basename
 import re
 import urllib
+import webbrowser
 
 try:
     # Python 2.7+
@@ -18,6 +18,7 @@ except ImportError:
 import sublime
 import requests
 
+pythonver = sys.version_info[0]
 if pythonver >= 3:
     # NOTE: load from package, not used now because custom ssl
     # current_dir = dirname(__file__)
@@ -224,6 +225,209 @@ def get_page_url(page_name=''):
         return '%s://%s%s%s' % (proto, site, pagepath, page_name)
     else:
         return ''
+
+
+def get_internal_links_regions(view):
+
+    def get_header(region):
+        return strunquote(re.sub(pattern, r'\1', view.substr(region)))
+
+    pattern = r'\[{2}(.*?)(\|.*?)?\]{2}'
+    regions = view.find_all(pattern)
+    return [(get_header(r), r) for r in regions]
+
+
+def on_hover_selected(view, point):
+
+    def on_navigate_selected(link):
+        if link == 'bold':
+            sublime.active_window().run_command("insert_snippet", {"contents": "'''${0:$SELECTION}'''"})
+        elif link == 'italic':
+            sublime.active_window().run_command("insert_snippet", {"contents": "''${0:$SELECTION}''"})
+        elif link == 'code':
+            sublime.active_window().run_command("insert_snippet", {"contents": "<code>${0:$SELECTION}</code>"})
+        elif link == 'pre':
+            sublime.active_window().run_command("insert_snippet", {"contents": "<pre>${0:$SELECTION}</pre>"})
+        elif link == 'nowiki':
+            sublime.active_window().run_command("insert_snippet", {"contents": "<nowiki>${0:$SELECTION}</nowiki>"})
+        elif link == 'kbd':
+            sublime.active_window().run_command("insert_snippet", {"contents": "<kbd>${0:$SELECTION}</kbd>"})
+        elif link == 'strike':
+            sublime.active_window().run_command("insert_snippet", {"contents": "<s>${0:$SELECTION}</s>"})
+
+    selected = view.sel()
+    for r in selected:
+        if r.contains(point):
+            content = '''
+            Format:
+            <ul>
+            <li><a href="bold">Bold</a>
+            <li><a href="italic">Italic</a>
+            <li><a href="code">Code</a>
+            <li><a href="pre">Predefined</a>
+            <li><a href="nowiki">Nowiki</a>
+            <li><a href="kbd">Keyboard</a>
+            <li><a href="strike">Strike</a>
+            </ul>
+            '''
+            view.show_popup(content=content, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate_selected)
+            return True
+
+    return False
+
+
+def on_hover_internal_link(view, point):
+
+    def on_navigate(link):
+        page_name = link.split('|', 1)[-1].replace(' ', '_')
+        if link.startswith('open|'):
+            view.window().run_command("mediawiker_page", {"action": "mediawiker_show_page", "title": page_name})
+        elif link.startswith('browse|'):
+            url = get_page_url(page_name)
+            webbrowser.open(url)
+
+    links = get_internal_links_regions(view)
+    for r in links:
+        if r[1].contains(point):
+            content = [
+                'Process page "%s"' % r[0],
+                '<ul>',
+                '<li><a href="open|%s">Open in editor</a>' % r[0],
+                '<li><a href="browse|%s">Open in browser</a>' % r[0],
+                '</ul>'
+            ]
+            content_html = ''.join(content)
+
+            view.show_popup(content=content_html, location=point, max_width=500, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate)
+            return True
+
+    return False
+
+
+def on_hover_template(view, point):
+
+    def on_navigate(link):
+        if link.startswith('fold'):
+            point = int(link.split(':')[-1])
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "point": point}})
+        elif link.startswith('unfold'):
+            point = int(link.split(':')[-1])
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "unfold", "point": point}})
+        else:
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_show_page", "title": link.replace(' ', '_')})
+
+    SCRIBUNTO_PREFIX = '#invoke'
+    tpl_regions = []
+    lvl = 1
+    while True:
+        _rs = view.get_regions('templates_%s' % lvl)
+        if _rs:
+            tpl_regions = tpl_regions + _rs
+            lvl += 1
+        else:
+            break
+
+    for r in tpl_regions:
+        if r.contains(point):
+
+            template_name = view.substr(r).split('|')[0].strip()
+            if template_name.startswith(SCRIBUNTO_PREFIX):
+                # #invoke:ScribuntoTest
+                template_name = template_name.split(':')[-1]
+                template_link = 'Module:%s' % template_name
+                template_type = 'scribunto module'
+            else:
+                template_link = 'Template:%s' % template_name
+                template_type = 'template'
+
+            content = [
+                '<a href="%s">Open %s "%s"</a>' % (template_link, template_type, template_name),
+                '',
+                'Folding',
+                '<ul style="margin:0;">',
+                '<li><a href="fold:%s">Fold</a>' % point,
+                '<li><a href="unfold:%s">Unfold</a>' % point,
+                '</ul>'
+            ]
+            content_html = '<br>'.join(content)
+
+            view.show_popup(content=content_html, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate)
+            return True
+    return False
+
+
+def on_hover_heading(view, point):
+
+    def on_navigate(link):
+        if link.startswith('fold'):
+            point = int(link.split(':')[-1])
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "point": point}})
+        elif link.startswith('unfold'):
+            point = int(link.split(':')[-1])
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "unfold", "point": point}})
+
+    h_regions = []
+    for lvl in range(2, 6):
+        _rs = view.get_regions('h_%s' % lvl)
+        if _rs:
+            h_regions = h_regions + _rs
+
+    for r in h_regions:
+        _r = sublime.Region(view.line(r).a, r.a)
+        if _r.contains(point):
+
+            h_name = view.substr(_r).replace('=', '').strip()
+            content = [
+                'Heading "%s"' % (h_name),
+                '',
+                'Folding',
+                '<ul style="margin:0;">',
+                '<li><a href="fold:%s">Fold</a>' % point,
+                '<li><a href="unfold:%s">Unfold</a>' % point,
+                '</ul>'
+            ]
+            content_html = '<br>'.join(content)
+
+            view.show_popup(content=content_html, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate)
+            return True
+    return False
+
+
+def on_hover_tag(view, point):
+
+    def on_navigate(link):
+        if link.startswith('fold'):
+            point = int(link.split(':')[-1])
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "point": point}})
+        elif link.startswith('unfold'):
+            point = int(link.split(':')[-1])
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "unfold", "point": point}})
+
+    fold_tags = get_setting("mediawiker_fold_tags", ["source", "syntaxhighlight", "div", "pre"])
+    tag_regions = []
+
+    for tag in fold_tags:
+        regs = view.get_regions(tag)
+        for r in regs:
+            tag_regions.append((tag, r))
+
+    for r in tag_regions:
+        if r[1].contains(point):
+
+            content = [
+                '%s<br>' % r[0].title(),
+                '<br>',
+                'Folding<br>',
+                '<ul style="margin:0;">',
+                '<li><a href="fold:%s">Fold</a>' % point,
+                '<li><a href="unfold:%s">Unfold</a>' % point,
+                '</ul>'
+            ]
+            content_html = ''.join(content)
+
+            view.show_popup(content=content_html, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate)
+            return True
+    return False
 
 
 # classes..

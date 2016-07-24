@@ -546,6 +546,112 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 					</array>
 				</dict>
 				<dict>
+					<key>begin</key>
+					<string>(&lt;)(blockquote)(&gt;)</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.ref.mediawiki</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.ref.mediawiki</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.ref.mediawiki</string>
+						</dict>
+					</dict>
+					<key>comment</key>
+					<string>&lt;blockquote&gt;content&lt;/blockquote&gt;</string>
+					<key>contentName</key>
+					<string>meta.reference.blockquote.content.mediawiki</string>
+					<key>end</key>
+					<string>(&lt;/)(blockquote)(&gt;)</string>
+					<key>endCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.ref.mediawiki</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.ref.mediawiki</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.ref.mediawiki</string>
+						</dict>
+					</dict>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>#inline</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>(&lt;)(center)(&gt;)</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.ref.mediawiki</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.ref.mediawiki</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.ref.mediawiki</string>
+						</dict>
+					</dict>
+					<key>comment</key>
+					<string>&lt;center&gt;content&lt;/center&gt;</string>
+					<key>contentName</key>
+					<string>meta.reference.center.content.mediawiki</string>
+					<key>end</key>
+					<string>(&lt;/)(center)(&gt;)</string>
+					<key>endCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.ref.mediawiki</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.ref.mediawiki</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.ref.mediawiki</string>
+						</dict>
+					</dict>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>#inline</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
 					<key>captures</key>
 					<dict>
 						<key>1</key>
@@ -627,10 +733,20 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 					<key>contentName</key>
 					<string>meta.reference.content.labelled.mediawiki</string>
 					<key>end</key>
-					<string>(&lt;/ref&gt;)</string>
+					<string>(&lt;/)(ref)(&gt;)</string>
 					<key>endCaptures</key>
 					<dict>
 						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.ref.mediawiki</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.ref.mediawiki</string>
+						</dict>
+						<key>3</key>
 						<dict>
 							<key>name</key>
 							<string>meta.tag.inline.ref.mediawiki</string>
@@ -646,10 +762,20 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 				</dict>
 				<dict>
 					<key>begin</key>
-					<string>(&lt;gallery[^&gt;]*&gt;)</string>
-					<key>captures</key>
+					<string>(&lt;)(gallery[^&gt;]*)(&gt;)</string>
+					<key>beginCaptures</key>
 					<dict>
 						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.ref.mediawiki</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.ref.mediawiki</string>
+						</dict>
+						<key>3</key>
 						<dict>
 							<key>name</key>
 							<string>meta.tag.inline.ref.mediawiki</string>
@@ -658,14 +784,32 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 					<key>contentName</key>
 					<string>meta.gallery.mediawiki</string>
 					<key>end</key>
-					<string>(&lt;/gallery&gt;)</string>
+					<string>(&lt;/)(gallery)(&gt;)</string>
+					<key>endCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.ref.mediawiki</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.tag.ref.mediawiki</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>meta.tag.inline.ref.mediawiki</string>
+						</dict>
+					</dict>
 					<key>patterns</key>
 					<array>
 						<dict>
 							<key>begin</key>
 							<string>(?x)
 ^(?!\s*\n)                      (?# not an empty line)
-( [ ]*(([Ff]ile|[Ii]mage)(:))   (?# spaces, image, colon)
+( [ ]*(([Ff]ile|[Ii]mage)(:))?   (?# spaces, image, colon, The "File:" prefix can be omitted.)
 ([^\[\]|]+)                     (?# anything: filename)
 ((\|)([^\n]*))?                 (?# pipe, anything: description)
 (?&lt;!\s)[ ]*                     (?# spaces)
@@ -745,6 +889,37 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 					<string>Code blocks start with one space.  Wiki text and html are still interpreted in MediaWiki, unlike in mediawiki.</string>
 					<key>end</key>
 					<string>^(?=[^ ])</string>
+					<key>name</key>
+					<string>markup.raw.block.mediawiki</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>#inline</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#table</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#comments</string>
+				</dict>
+			</array>
+		</dict>
+		<key>block_pre_spaced_in_templates</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>begin</key>
+					<string>^ (?=\s*\S)</string>
+					<key>comment</key>
+					<string>Code blocks inside templates. Terminates by | params delimiter too.</string>
+					<key>end</key>
+					<string>(?=^[^ ]|\|)</string>
 					<key>name</key>
 					<string>markup.raw.block.mediawiki</string>
 					<key>patterns</key>
@@ -2658,25 +2833,25 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 			<array>
 				<dict>
 					<key>begin</key>
-					<string>^(\{\|)</string>
+					<string>(\{\|)</string>
 					<key>beginCaptures</key>
 					<dict>
 						<key>1</key>
 						<dict>
 							<key>name</key>
-							<string>markup.other.special.table.mediawiki</string>
+							<string>markup.other.special.start-delimiter.table.mediawiki</string>
 						</dict>
 					</dict>
 					<key>contentName</key>
 					<string>meta.table.mediawiki</string>
 					<key>end</key>
-					<string>(^\|\})</string>
+					<string>(\|\})</string>
 					<key>endCaptures</key>
 					<dict>
 						<key>1</key>
 						<dict>
 							<key>name</key>
-							<string>markup.other.special.table.mediawiki</string>
+							<string>markup.other.special.stop-delimiter.table.mediawiki</string>
 						</dict>
 					</dict>
 					<key>patterns</key>
@@ -2730,43 +2905,58 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 							<string>meta.table.caption.mediawiki</string>
 						</dict>
 						<dict>
+							<key>match</key>
+							<string>\|\-</string>
+							<key>name</key>
+							<string>markup.other.special.row-delimiter.table.mediawiki</string>
+						</dict>
+						<dict>
 							<key>begin</key>
-							<string>^(\|\-)</string>
+							<string>(^\s*\|(?!\-|\})|^\s*!|\|\||!!)</string>
 							<key>beginCaptures</key>
 							<dict>
 								<key>1</key>
 								<dict>
 									<key>name</key>
-									<string>markup.other.special.table.mediawiki</string>
+									<string>markup.other.special.cell-delimiter.table.mediawiki</string>
 								</dict>
 							</dict>
 							<key>end</key>
-							<string>^(?=\|-|^\|\})</string>
+							<string>(?=^\s*\||^\s*!|\|\||!!|\|\-|\|\})</string>
 							<key>name</key>
-							<string>markup.other.table.row.mediawiki</string>
+							<string>text.cellcontents.table.mediawiki</string>
 							<key>patterns</key>
 							<array>
 								<dict>
+									<key>include</key>
+									<string>#inline</string>
+								</dict>
+								<dict>
 									<key>begin</key>
-									<string>(^[\|!]|(?&lt;=\|)\||(?&lt;=!)!)</string>
+									<string>(\S+)(=["']?)</string>
 									<key>beginCaptures</key>
 									<dict>
 										<key>1</key>
 										<dict>
 											<key>name</key>
-											<string>markup.other.special.table.cellwall.mediawiki</string>
+											<string>entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki</string>
+										</dict>
+										<key>2</key>
+										<dict>
+											<key>name</key>
+											<string>entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki</string>
 										</dict>
 									</dict>
 									<key>contentName</key>
-									<string>string.other.table.cellcontents.mediawiki</string>
+									<string>entity.other.attributes.table.cellcontents.cell-html-value.validhtml.mediawiki</string>
 									<key>end</key>
-									<string>(\|(?=\|)|!(?=!)|(?=^\|-)|(?=^\|\}))</string>
+									<string>(["'])|(?=\s+\S+=|\s*\|)(?!\|)</string>
 									<key>endCaptures</key>
 									<dict>
 										<key>1</key>
 										<dict>
 											<key>name</key>
-											<string>markup.other.special.table.cellwall.mediawiki</string>
+											<string>entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki</string>
 										</dict>
 									</dict>
 									<key>patterns</key>
@@ -2775,49 +2965,13 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 											<key>include</key>
 											<string>#inline</string>
 										</dict>
-										<dict>
-											<key>begin</key>
-											<string>(\S+)(=["']?)</string>
-											<key>beginCaptures</key>
-											<dict>
-												<key>1</key>
-												<dict>
-													<key>name</key>
-													<string>entity.other.attributes.table.cellcontents.validhtml.mediawiki</string>
-												</dict>
-												<key>2</key>
-												<dict>
-													<key>name</key>
-													<string>entity.other.attributes.table.cellcontents.validhtml.mediawiki</string>
-												</dict>
-											</dict>
-											<key>contentName</key>
-											<string>entity.other.attributes.table.cellcontents.validhtml.mediawiki</string>
-											<key>end</key>
-											<string>(["'])|(?=\s+\S+=|\s*\|)</string>
-											<key>endCaptures</key>
-											<dict>
-												<key>1</key>
-												<dict>
-													<key>name</key>
-													<string>entity.other.attributes.table.cellcontents.validhtml.mediawiki</string>
-												</dict>
-											</dict>
-											<key>patterns</key>
-											<array>
-												<dict>
-													<key>include</key>
-													<string>#inline</string>
-												</dict>
-											</array>
-										</dict>
-										<dict>
-											<key>match</key>
-											<string>\|</string>
-											<key>name</key>
-											<string>entity.other.attributes.table.cellcontents.validhtml.mediawiki</string>
-										</dict>
 									</array>
+								</dict>
+								<dict>
+									<key>match</key>
+									<string>\|</string>
+									<key>name</key>
+									<string>entity.other.attributes.table.cellcontents.cell-html-delimiter.validhtml.mediawiki</string>
 								</dict>
 							</array>
 						</dict>
@@ -2833,36 +2987,37 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 			<array>
 				<dict>
 					<key>begin</key>
-					<string>(\{\{)([^\{\}\|]+)?</string>
+					<string>(?&lt;![^\{]\{)(\{{2})(?!\{[^\{])</string>
 					<key>beginCaptures</key>
 					<dict>
 						<key>1</key>
 						<dict>
 							<key>name</key>
-							<string>meta.tag.inline.template.mediawiki</string>
-						</dict>
-						<key>2</key>
-						<dict>
-							<key>name</key>
-							<string>entity.name.function.template.mediawiki</string>
+							<string>meta.tag.inline.start.template.mediawiki</string>
 						</dict>
 					</dict>
 					<key>comment</key>
 					<string>scope as meta.function-call as the closest thing to a template with parameters, etc.</string>
+					<key>contentName</key>
+					<string>meta.template.mediawiki</string>
 					<key>end</key>
-					<string>(\}\})</string>
+					<string>(?&lt;![^\}]\})(\}{2})(?!\}([^\}]|$))</string>
 					<key>endCaptures</key>
 					<dict>
 						<key>1</key>
 						<dict>
 							<key>name</key>
-							<string>meta.tag.inline.template.mediawiki</string>
+							<string>meta.tag.inline.stop.template.mediawiki</string>
 						</dict>
 					</dict>
-					<key>name</key>
-					<string>meta.template.mediawiki</string>
 					<key>patterns</key>
 					<array>
+						<dict>
+							<key>match</key>
+							<string>^\s*(?=\|)</string>
+							<key>name</key>
+							<string>markup.non-raw.template.mediawiki</string>
+						</dict>
 						<dict>
 							<key>include</key>
 							<string>#comments</string>
@@ -2876,36 +3031,22 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 							<string>#template_parameters</string>
 						</dict>
 						<dict>
-							<key>begin</key>
-							<string>(\|)\s*(=)</string>
-							<key>beginCaptures</key>
-							<dict>
-								<key>1</key>
-								<dict>
-									<key>name</key>
-									<string>punctuation.fix_this_later.pipe.mediawiki</string>
-								</dict>
-								<key>2</key>
-								<dict>
-									<key>name</key>
-									<string>punctuation.fix_this_later.equals-sign.mediawiki</string>
-								</dict>
-							</dict>
-							<key>contentName</key>
-							<string>comment.block.template-hack.mediawiki</string>
-							<key>end</key>
-							<string>(?=[\|\}])</string>
+							<key>match</key>
+							<string>(?&lt;=\{{2})\s*([^\{\}\|]+)</string>
+							<key>name</key>
+							<string>entity.name.function.template.mediawiki</string>
+						</dict>
+						<dict>
+							<key>match</key>
+							<string>(\|)</string>
+							<key>name</key>
+							<string>meta.tag.param-delimiter.template.mediawiki</string>
 						</dict>
 						<dict>
 							<key>begin</key>
-							<string>(\|)(([^\{\}\|=]+)(=))?</string>
+							<string>(?&lt;=\|)\s*(([^\{\}\|=]+)(=))?</string>
 							<key>beginCaptures</key>
 							<dict>
-								<key>1</key>
-								<dict>
-									<key>name</key>
-									<string>punctuation.fix_this_later.pipe.mediawiki</string>
-								</dict>
 								<key>2</key>
 								<dict>
 									<key>name</key>
@@ -2914,13 +3055,13 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 								<key>3</key>
 								<dict>
 									<key>name</key>
-									<string>punctuation.fix_this_later.equals-sign.mediawiki</string>
+									<string>punctuation.equals-sign.template.mediawiki</string>
 								</dict>
 							</dict>
 							<key>contentName</key>
 							<string>meta.function.parameters.template.mediawiki</string>
 							<key>end</key>
-							<string>(?=[\|\}])</string>
+							<string>(?=\||\}{2})</string>
 							<key>patterns</key>
 							<array>
 								<dict>
@@ -2933,15 +3074,9 @@ FINISHED: 2. Add support for LaTeX math mode inside of &lt;math&gt;&lt;/math&gt;
 								</dict>
 								<dict>
 									<key>include</key>
-									<string>#block_pre_spaced</string>
+									<string>#block_pre_spaced_in_templates</string>
 								</dict>
 							</array>
-						</dict>
-						<dict>
-							<key>match</key>
-							<string>\|</string>
-							<key>name</key>
-							<string>punctuation.fix_this_later.pipe.mediawiki</string>
 						</dict>
 					</array>
 				</dict>
