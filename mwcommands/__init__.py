@@ -14,8 +14,8 @@ from .mw_get_notifications import MediawikerNotificationsCommand, MediawikerGetN
 from .mw_open_issue import MediawikerOpenIssueCommand
 from .mw_open_page_in_browser import MediawikerOpenPageInBrowserCommand
 from .mw_page_actions import MediawikerPageCommand
-from .mw_page_backlinks import MediawikerPageBacklinksCommand
-from .mw_page_langlinks import MediawikerPageLanglinksCommand
+from .mw_page_backlinks import MediawikerShowPageBacklinksCommand, MediawikerPageBacklinksCommand
+from .mw_page_langlinks import MediawikerShowPageLanglinksCommand, MediawikerPageLanglinksCommand
 from .mw_page_list import MediawikerPageListCommand
 from .mw_preview_page import MediawikerPreviewPageCommand, MediawikerPreviewCommand
 from .mw_search_string import MediawikerSearchStringCommand, MediawikerSearchStringListCommand
@@ -48,7 +48,9 @@ __all__ = [
     'MediawikerOpenIssueCommand',
     'MediawikerOpenPageInBrowserCommand',
     'MediawikerPageCommand',
+    'MediawikerShowPageBacklinksCommand',
     'MediawikerPageBacklinksCommand',
+    'MediawikerShowPageLanglinksCommand',
     'MediawikerPageLanglinksCommand',
     'MediawikerPageListCommand',
     'MediawikerPreviewPageCommand',
