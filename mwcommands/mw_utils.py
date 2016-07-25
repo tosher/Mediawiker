@@ -92,7 +92,7 @@ def strunquote(string_value):
     if pythonver >= 3:
         return urllib.parse.unquote(string_value)
     else:
-        return urllib.unquote(string_value.encode('ascii')).decode('utf-8')
+        return urllib.unquote(string_value.encode('utf-8')).decode('utf-8')
 
 
 def strquote(string_value):

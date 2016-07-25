@@ -17,11 +17,11 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mwutils as mw
-    from .commands import *
+    from .mwcommands import mw_utils as mw
+    from .mwcommands import *
 else:
-    import mwutils as mw
-    from commands import *
+    from mwcommands import mw_utils as mw
+    from mwcommands import *
 
 
 class MediawikerOpenPageCommand(sublime_plugin.WindowCommand):
@@ -158,7 +158,7 @@ class MediawikerEvents(sublime_plugin.EventListener):
     def on_activated_async(self, view):
         ''' unsupported on ST2, gutters too - skipping.. '''
         # folding gutters
-        if view.settings().get('mediawiker_is_here', False) and mw.get_setting('mediawiker_use_gutters_folding', True):
+        if view.settings().get('mediawiker_is_here', False):
             sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse"})
 
     def on_modified(self, view):
@@ -171,8 +171,7 @@ class MediawikerEvents(sublime_plugin.EventListener):
                 view.settings().set('is_changed', True)
 
             # folding gutters update
-            if mw.get_setting('mediawiker_use_gutters_folding', True):
-                sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse"})
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse"})
 
     def on_post_save(self, view):
         view.settings().set('mediawiker_wiki_instead_editor', False)
@@ -181,6 +180,7 @@ class MediawikerEvents(sublime_plugin.EventListener):
         view.settings().set('mediawiker_wiki_instead_editor', False)
 
     def on_hover(self, view, point, hover_zone):
+        # not fires in ST2
         # mouse_over folding: replaced by hover_text options
         # if view.settings().get('mediawiker_is_here', False) and hover_zone == sublime.HOVER_GUTTER and mw.get_setting('mediawiker_use_gutters_folding', True):
         #     sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "point": point}})

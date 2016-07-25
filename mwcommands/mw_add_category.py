@@ -8,9 +8,9 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from .. import mwutils as mw
+    from .. import mw_utils as mw
 else:
-    import mwutils as mw
+    import mw_utils as mw
 
 
 class MediawikerSetCategoryCommand(sublime_plugin.WindowCommand):

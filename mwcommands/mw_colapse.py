@@ -9,9 +9,9 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from .. import mwutils as mw
+    from .. import mw_utils as mw
 else:
-    import mwutils as mw
+    import mw_utils as mw
 
 
 class MediawikerColapseCommand(sublime_plugin.TextCommand):
@@ -31,8 +31,8 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                 _a, _b = r.a + len(header_line), r.b
                 colapse_paragraphs.append((r.a, sublime.Region(_a, _b)))
 
-            if self.use_gutters_folding:
-                self.view.add_regions('h_%s' % level, [r[1] for r in colapse_paragraphs], 'comment', 'Packages/Mediawiker/img/gutter_h%s.png' % level, self.DRAW_TYPE)
+            gutter_png = 'Packages/Mediawiker/img/gutter_h%s.png' % level if pythonver >= 3 else ''
+            self.view.add_regions('h_%s' % level, [r[1] for r in colapse_paragraphs], 'comment', gutter_png, self.DRAW_TYPE)
 
         return colapse_paragraphs
 
@@ -70,7 +70,9 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                     t = sublime.Region(i + 2, i + 2)  # unknown end
                     _templates.append(t)
                 elif d[i] == TYPE_STOP:
-                    _templates[-1].b = i
+                    # ST2 compat Region update
+                    # _templates[-1].b = i
+                    _templates[-1] = sublime.Region(_templates[-1].a, i)
                     templates.append((_templates[-1], len(_templates)))  # template region and includes level
                     _templates = _templates[:-1]
         return templates
@@ -85,9 +87,10 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                     colapse_templates[line_idx].append(_r[0])
                 else:
                     colapse_templates[line_idx] = [_r[0]]
-            if self.use_gutters_folding:
-                # create gutter by first region in line..
-                self.view.add_regions('templates_%s' % _r[1], [rl[0] for rl in list(colapse_templates.values())], 'comment', 'Packages/Mediawiker/img/gutter_t.png', self.DRAW_TYPE)
+
+            # create gutter by first region in line..
+            gutter_png = 'Packages/Mediawiker/img/gutter_t.png' if pythonver >= 3 else ''
+            self.view.add_regions('templates_%s' % _r[1], [rl[0] for rl in list(colapse_templates.values())], 'comment', gutter_png, self.DRAW_TYPE)
         return colapse_templates
 
     def get_tables_regions(self):
@@ -99,8 +102,8 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                 _a, _b = r.a + 2, r.b - 2
                 colapse_tables.append(sublime.Region(_a, _b))
 
-            if self.use_gutters_folding:
-                self.view.add_regions('tables', colapse_tables, 'comment', 'Packages/Mediawiker/img/gutter_t.png', self.DRAW_TYPE)
+            gutter_png = 'Packages/Mediawiker/img/gutter_t.png' if pythonver >= 3 else ''
+            self.view.add_regions('tables', colapse_tables, 'comment', gutter_png, self.DRAW_TYPE)
         return colapse_tables
 
     def get_tag_regions(self, tag):
@@ -113,8 +116,8 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                 _a, _b = r.a + len(header_line) + 1, r.b - len('</%s>' % tag)
                 colapse_tag.append((r.a, sublime.Region(_a, _b)))
 
-            if self.use_gutters_folding:
-                self.view.add_regions(tag, [r[1] for r in colapse_tag], 'comment', 'Packages/Mediawiker/img/gutter_tag.png', self.DRAW_TYPE)
+            gutter_png = 'Packages/Mediawiker/img/gutter_tag.png' if pythonver >= 3 else ''
+            self.view.add_regions(tag, [r[1] for r in colapse_tag], 'comment', gutter_png, self.DRAW_TYPE)
         return colapse_tag
 
     def is_cursor_inheader(self, cursor, rt):
@@ -149,8 +152,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, title, password, **kwargs):
 
-        self.use_gutters_folding = mw.get_setting('mediawiker_use_gutters_folding', True)
-        if not self.view.settings().get('mediawiker_is_here', False) or not self.use_gutters_folding:
+        if not self.view.settings().get('mediawiker_is_here', False):
             return
 
         _fold_type = kwargs.get('type', None) if kwargs else None
