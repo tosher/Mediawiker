@@ -28,7 +28,7 @@ if pythonver >= 3:
     # else:
     #     from . import mwclient
     from html.parser import HTMLParser
-    from . import mwclient
+    from .. import mwclient
 else:
     from HTMLParser import HTMLParser
     import mwclient
@@ -258,19 +258,21 @@ def on_hover_selected(view, point):
     selected = view.sel()
     for r in selected:
         if r.contains(point):
-            content = '''
-            Format:
-            <ul>
-            <li><a href="bold">Bold</a>
-            <li><a href="italic">Italic</a>
-            <li><a href="code">Code</a>
-            <li><a href="pre">Predefined</a>
-            <li><a href="nowiki">Nowiki</a>
-            <li><a href="kbd">Keyboard</a>
-            <li><a href="strike">Strike</a>
-            </ul>
-            '''
-            view.show_popup(content=content, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate_selected)
+            content = [
+                'Format:',
+                '<br>'
+                '<ul>',
+                '<li><a href="bold">Bold</a>',
+                '<li><a href="italic">Italic</a>',
+                '<li><a href="code">Code</a>',
+                '<li><a href="pre">Predefined</a>',
+                '<li><a href="nowiki">Nowiki</a>',
+                '<li><a href="kbd">Keyboard</a>',
+                '<li><a href="strike">Strike</a>',
+                '</ul>'
+            ]
+            content_html = ''.join(content)
+            view.show_popup(content=content_html, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate_selected)
             return True
 
     return False
