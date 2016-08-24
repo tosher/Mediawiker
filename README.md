@@ -20,10 +20,9 @@
 * Connectivity - http/https, direct/proxy connection with basic/digest web-server authorization.
 * Connection manager - add new wiki sites, and switch between them.
 * Page preview - possibility to preview page before posting with some preview customization options.
-* Text folding - folding/unfolding page blocks by headers, tags, templates.
+* Text folding - folding/unfolding page blocks by headers, tags, templates, html comments.
 * Notifications - show [notifications](https://www.mediawiki.org/wiki/Notifications) as menu.
 * Context opening - possibility to open included page, template, function by inline context.
-* Notes - internal notes for selected text blocks.
 
 ![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/Mediawiker_Dark.png)
 *Screenshot using the Mediawiker_Dark color scheme*
