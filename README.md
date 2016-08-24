@@ -4,7 +4,7 @@
 
 ## Main features
 * [MWClient](https://github.com/mwclient/mwclient) library based.
-* Syntax highlighting - based on [Textmate Mediawiki bundle](https://github.com/textmate/mediawiki.tmbundle).
+* Syntax highlighting - improved version of the [Textmate Mediawiki bundle](https://github.com/textmate/mediawiki.tmbundle).
 * Editor - create new pages, edit existing and post it to wiki.
 * Completions - auto completions for internal wiki links
 * History - list of edited pages
@@ -23,6 +23,7 @@
 * Text folding - folding/unfolding page blocks by headers, tags, templates.
 * Notifications - show [notifications](https://www.mediawiki.org/wiki/Notifications) as menu.
 * Context opening - possibility to open included page, template, function by inline context.
+* Notes - internal notes for selected text blocks.
 
 ![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/Mediawiker_Dark.png)
 *Screenshot using the Mediawiker_Dark color scheme*

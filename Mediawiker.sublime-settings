@@ -1,11 +1,11 @@
 {
     "mediawiki_site":
     {
-        "English wikipedia": { "host": "en.wikipedia.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "" },
-        "Russian wikipedia": { "host": "ru.wikipedia.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "" },
-        "Mediawiki": { "host": "www.mediawiki.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "" }
+        "English wikipedia": { "host": "en.wikipedia.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "", "https": true},
+        "Russian wikipedia": { "host": "ru.wikipedia.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "", "https": true},
+        "Mediawiki": { "host": "www.mediawiki.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "", "https": true}
     },
-    "mediawiki_syntax": "Packages/Mediawiker/MediawikiNG.tmLanguage",
+    "mediawiki_syntax": "Packages/Mediawiker/MediawikiNG.sublime-syntax",
     "mediawiki_site_active": "English wikipedia",
     "mediawiker_summary_postfix": " (by SublimeText.Mediawiker)",
     "mediawiker_skip_summary": false,

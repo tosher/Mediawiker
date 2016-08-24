@@ -1,0 +1,20 @@
+## Mediawiker 3.1.8
+
+### Mwclient library update
+* Mwclient internal library was partly synced with latest original [version](http://mwclient.readthedocs.io/en/latest/index.html).
+
+### Syntax highlighting
+* New highlighting scheme in new **sublime-syntax** engine (for ST3) as a default scheme.
+    - Improvements in highlighting
+    - Tests for validation (`syntax_test_mediawikerng.mediawiki`)
+    - Old tmLanguage versions for ST2 compatibility only - needs to set correct value in configuration (`Mediawiki_ST2.tmLanguage` or `MediawikiNG_ST2.tmLanguage`).
+
+### Comments (pre-beta, unfinished)
+* Possibility to create/edit internal notes for selected text blocks - notes will be stored in Sublime text only.
+    - Some magic words are supported in notes: `TODO`, `NOTE`, `WARNING`.
+
+### OAuth authorization
+* [OAuth authorization](http://mwclient.readthedocs.io/en/latest/user/connecting.html#oauth) support.
+
+### HTTPS as default proto
+* For sites without https support, option `"https": false` is required.

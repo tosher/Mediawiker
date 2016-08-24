@@ -69,6 +69,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
             self.view.settings().set('mediawiker_is_here', True)
             self.view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
             self.view.set_name(title)
+            mw.show_comments(self.view)
 
             self.view.set_scratch(True)
             # own is_changed flag instead of is_dirty for possib. to reset..
@@ -115,6 +116,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             return
 
     def on_done(self, summary):
+        self.update_comments()
         summary = '%s%s' % (summary, mw.get_setting('mediawiker_summary_postfix', ' (by SublimeText.Mediawiker)'))
         mark_as_minor = mw.get_setting('mediawiker_mark_as_minor')
         try:
@@ -137,6 +139,38 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                 sublime.status_message('You have not rights to edit this page')
         except mw.mwclient.EditError as e:
             sublime.status_message('Can\'t publish page %s (%s)' % (self.title, e))
+
+    def update_comments(self):
+
+        # update comments regions
+        sublime.status_message('Updating comments regions..')
+        site = mw.get_view_site()
+        title = mw.get_title()
+        mediawiker_comments = mw.get_comments('mediawiker_comments', {})
+        site_comments = mediawiker_comments.get(site, {})
+        comments = site_comments.get(title, {})
+
+        comment_regions = []
+        for k in comments.keys():
+            a, b = (int(v) for v in k.split(':'))
+            r = sublime.Region(a, b)
+            comment_regions.append(r)
+
+        view_regions = self.view.get_regions('comment')
+        view_regions.sort()
+
+        if comment_regions and len(comment_regions) == len(view_regions):
+            comment_regions.sort()
+
+            for i, r in enumerate(view_regions):
+                _key_c = '%s:%s' % (comment_regions[i].a, comment_regions[i].b)
+                _key_v = '%s:%s' % (view_regions[i].a, view_regions[i].b)
+                if _key_c != _key_v:
+                    _text_c = comments[_key_c]
+                    comments[_key_v] = str(_text_c)
+                    del(comments[_key_c])
+            mediawiker_comments[site][title] = comments
+            mw.set_comments('mediawiker_comments', mediawiker_comments)
 
 
 class MediawikerEvents(sublime_plugin.EventListener):
@@ -186,6 +220,9 @@ class MediawikerEvents(sublime_plugin.EventListener):
         #     sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "point": point}})
 
         if view.settings().get('mediawiker_is_here', False) and hover_zone == sublime.HOVER_TEXT:
+
+            if mw.on_hover_comment(view, point):
+                return
 
             if mw.on_hover_selected(view, point):
                 return

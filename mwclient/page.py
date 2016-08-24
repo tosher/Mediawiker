@@ -100,9 +100,10 @@ class Page(object):
         return title
 
     def can(self, action):
-        """
-        Check if the current user has the right to carry out some action with the current page.
+        """Check if the current user has the right to carry out some action
+        with the current page.
 
+        Example:
             >>> page.can('edit')
             True
 
@@ -125,13 +126,14 @@ class Page(object):
 
     def edit(self, *args, **kwargs):
         """Deprecated. Use page.text() instead"""
-        warnings.warn("page.edit() was deprecated in mwclient 0.7.0 and will be removed in 0.8.0, please use page.text() instead.",
+        warnings.warn("page.edit() was deprecated in mwclient 0.7.0 "
+                      "and will be removed in 0.9.0, please use page.text() instead.",
                       category=DeprecationWarning, stacklevel=2)
         return self.text(*args, **kwargs)
 
     def text(self, section=None, expandtemplates=False, cache=True):
-        """
-        Get the current wikitext of the page, or of a specific section.
+        """Get the current wikitext of the page, or of a specific section.
+
         If the page does not exist, an empty string is returned. By
         default, results will be cached and if you call text() again
         with the same section and expandtemplates the result will come

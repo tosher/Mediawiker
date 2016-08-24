@@ -38,6 +38,8 @@ IMAGE_NAMESPACE = 6  # image namespace number
 TEMPLATE_NAMESPACE = 10  # template namespace number
 SCRIBUNTO_NAMESPACE = 828  # scribunto module namespace number
 
+COMMENT_REGIONS_KEY = 'comment'
+
 
 def get_setting(key, default_value=None):
     settings = sublime.load_settings('Mediawiker.sublime-settings')
@@ -48,6 +50,53 @@ def set_setting(key, value):
     settings = sublime.load_settings('Mediawiker.sublime-settings')
     settings.set(key, value)
     sublime.save_settings('Mediawiker.sublime-settings')
+
+
+def get_comments(key, default_value=None):
+    settings = sublime.load_settings('MediawikerComments.sublime-settings')
+    return settings.get(key, default_value)
+
+
+def get_comments_page():
+    site = get_view_site()
+    title = get_title()
+    comments = get_comments('mediawiker_comments', {})
+    site_comments = comments.get(site, {})
+    return site_comments.get(title, {})
+
+
+def get_comment_by_region(region):
+
+    # TODO: Failed when notes was moved, but page was not saved, because of search based on old value in config. Maybe needs to save old and new region values..
+
+    site = get_view_site()
+    title = get_title()
+    comments = get_comments('mediawiker_comments', {})
+    site_comments = comments.get(site, {})
+    page_comments = site_comments.get(title, {})
+    r_key = ('%s:%s' % (region.a, region.b))
+    return page_comments.get(r_key, None)
+
+
+def set_comments(key, value):
+    settings = sublime.load_settings('MediawikerComments.sublime-settings')
+    settings.set(key, value)
+    sublime.save_settings('MediawikerComments.sublime-settings')
+
+
+def show_comments(view):
+    site = get_view_site()
+    title = get_title()
+    comments = get_comments('mediawiker_comments', {})
+    site_comments = comments.get(site, {})
+    page_comments = site_comments.get(title, {})
+    page_comments_regions = []
+    for r in page_comments.keys():
+        a, b = r.split(':')
+        page_comments_regions.append(sublime.Region(int(a), int(b)))
+
+    gutter_png = 'Packages/Theme - Default/dot.png' if pythonver >= 3 else ''
+    view.add_regions(COMMENT_REGIONS_KEY, page_comments_regions, 'comment', gutter_png, sublime.PERSISTENT)
 
 
 def set_syntax(page=None):
@@ -254,13 +303,15 @@ def on_hover_selected(view, point):
             sublime.active_window().run_command("insert_snippet", {"contents": "<kbd>${0:$SELECTION}</kbd>"})
         elif link == 'strike':
             sublime.active_window().run_command("insert_snippet", {"contents": "<s>${0:$SELECTION}</s>"})
+        elif link.startswith('comment'):
+            a, b = link.split(':')[-2:]
+            sublime.active_window().run_command("mediawiker_edit_comment", {"a": int(a), "b": int(b)})
 
     selected = view.sel()
     for r in selected:
         if r.contains(point):
             content = [
                 'Format:',
-                '<br>'
                 '<ul>',
                 '<li><a href="bold">Bold</a>',
                 '<li><a href="italic">Italic</a>',
@@ -269,6 +320,7 @@ def on_hover_selected(view, point):
                 '<li><a href="nowiki">Nowiki</a>',
                 '<li><a href="kbd">Keyboard</a>',
                 '<li><a href="strike">Strike</a>',
+                '<li><a href="comment:%s:%s">Comment</a>' % (r.a, r.b),
                 '</ul>'
             ]
             content_html = ''.join(content)
@@ -281,10 +333,10 @@ def on_hover_selected(view, point):
 def on_hover_internal_link(view, point):
 
     def on_navigate(link):
-        page_name = link.split('|', 1)[-1].replace(' ', '_')
-        if link.startswith('open|'):
+        page_name = link.split(':', 1)[-1].replace(' ', '_')
+        if link.startswith('open'):
             view.window().run_command("mediawiker_page", {"action": "mediawiker_show_page", "title": page_name})
-        elif link.startswith('browse|'):
+        elif link.startswith('browse'):
             url = get_page_url(page_name)
             webbrowser.open(url)
 
@@ -292,11 +344,9 @@ def on_hover_internal_link(view, point):
     for r in links:
         if r[1].contains(point):
             content = [
-                'Process page "%s"' % r[0],
-                '<ul>',
-                '<li><a href="open|%s">Open in editor</a>' % r[0],
-                '<li><a href="browse|%s">Open in browser</a>' % r[0],
-                '</ul>'
+                'Page "%s"' % r[0],
+                '<br><br>',
+                '<a href="open:%(point)s">Open</a> | <a href="browse:%(point)s">View in browser</a>' % {'point': r[0]}
             ]
             content_html = ''.join(content)
 
@@ -337,21 +387,17 @@ def on_hover_template(view, point):
                 # #invoke:ScribuntoTest
                 template_name = template_name.split(':')[-1]
                 template_link = 'Module:%s' % template_name
-                template_type = 'scribunto module'
+                template_type = 'Scribunto module'
             else:
                 template_link = 'Template:%s' % template_name
-                template_type = 'template'
+                template_type = 'Template'
 
             content = [
-                '<a href="%s">Open %s "%s"</a>' % (template_link, template_type, template_name),
-                '',
-                'Folding',
-                '<ul style="margin:0;">',
-                '<li><a href="fold:%s">Fold</a>' % point,
-                '<li><a href="unfold:%s">Unfold</a>' % point,
-                '</ul>'
+                '%s "%s"' % (template_type, template_name),
+                '<br><br>',
+                '<a href="%(link)s">Open</a> | <a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'link': template_link, 'point': point}
             ]
-            content_html = '<br>'.join(content)
+            content_html = ''.join(content)
 
             view.show_popup(content=content_html, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate)
             return True
@@ -381,14 +427,10 @@ def on_hover_heading(view, point):
             h_name = view.substr(_r).replace('=', '').strip()
             content = [
                 'Heading "%s"' % (h_name),
-                '',
-                'Folding',
-                '<ul style="margin:0;">',
-                '<li><a href="fold:%s">Fold</a>' % point,
-                '<li><a href="unfold:%s">Unfold</a>' % point,
-                '</ul>'
+                '<br><br>',
+                '<a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'point': point}
             ]
-            content_html = '<br>'.join(content)
+            content_html = ''.join(content)
 
             view.show_popup(content=content_html, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate)
             return True
@@ -419,11 +461,47 @@ def on_hover_tag(view, point):
             content = [
                 '%s<br>' % r[0].title(),
                 '<br>',
-                'Folding<br>',
-                '<ul style="margin:0;">',
-                '<li><a href="fold:%s">Fold</a>' % point,
-                '<li><a href="unfold:%s">Unfold</a>' % point,
-                '</ul>'
+                '<a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'point': point}
+            ]
+            content_html = ''.join(content)
+
+            view.show_popup(content=content_html, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate)
+            return True
+    return False
+
+
+def on_hover_comment(view, point):
+
+    def on_navigate(link):
+        a, b = link.split(':')[-2:]
+        if link.startswith('edit'):
+            sublime.active_window().run_command("mediawiker_edit_comment", {"a": int(a), "b": int(b)})
+        elif link.startswith('del'):
+            # TODO: delete method
+            sublime.active_window().run_command("mediawiker_edit_comment", {"a": int(a), "b": int(b), 'isdel': True})
+
+    def get_text_pretty(text):
+        text = text.replace('TODO', '<strong style="color:#E08283;">TODO</strong>')
+        text = text.replace('NOTE', '<strong style="color:#26A65B;">NOTE</strong>')
+        text = text.replace('WARNING', '<strong style="color:#C0392B;">WARNING</strong>')
+        text = text.replace('\n', '<br>')
+        return text
+
+    comment_regions = view.get_regions('comment')
+
+    if not comment_regions:
+        return False
+
+    for r in comment_regions:
+        if r.contains(point):
+
+            comment_text = get_text_pretty(get_comment_by_region(r))
+            content = [
+                'Note',
+                '<br><br>',
+                '%s' % comment_text,
+                '<br><br>',
+                '<a href="edit:%(r_a)s:%(r_b)s">Edit</a> | <a href="del:%(r_a)s:%(r_b)s">Delete</a>' % {'r_a': r.a, 'r_b': r.b}
             ]
             content_html = ''.join(content)
 
@@ -451,19 +529,26 @@ class WikiConnect(object):
         self.proxy_host = self.site_params.get('proxy_host', '')
         self.http_auth_login = self.site_params.get('http_auth_login', '')
         self.http_auth_password = self.site_params.get('http_auth_password', '')
-        self.is_https = self.site_params.get('https', False)
+        self.is_https = self.site_params.get('https', True)
         self.is_ssl_cert_verify = self.site_params.get('is_ssl_cert_verify', True)
-        self.host = self.site if not self.is_https else ('https', self.site)
+        # self.host = self.site if not self.is_https else ('https', self.site)
+        http_proto = 'https' if self.is_https else 'http'
+        self.host = (http_proto, self.site)
         self.proxies = None
+        # oauth params
+        self.oauth_consumer_token = self.site_params.get('oauth_consumer_token', None)
+        self.oauth_consumer_secret = self.site_params.get('oauth_consumer_secret', None)
+        self.oauth_access_token = self.site_params.get('oauth_access_token', None)
+        self.oauth_access_secret = self.site_params.get('oauth_access_secret', None)
+
         if self.proxy_host:
             # proxy host like: http(s)://user:pass@10.10.1.10:3128
             # NOTE: PC uses requests ver. 2.7.0. Per-host proxies supported from 2.8.0 version only.
             # http://docs.python-requests.org/en/latest/community/updates/#id4
             # host_key = '%s://%s' % ('https' if self.is_https else 'http', self.site)
             # using proto only..
-            host_key = 'https' if self.is_https else 'http'
             self.proxies = {
-                host_key: self.proxy_host
+                http_proto: self.proxy_host
             }
 
     def get_site(self, password=None):
@@ -486,34 +571,50 @@ class WikiConnect(object):
         if self.proxy_host:
             sublime.status_message('Connection with proxy %s to %s' % (self.proxy_host, self.site))
 
-        try:
-            sitecon = mwclient.Site(host=self.host, path=self.path, requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
-        except requests.exceptions.HTTPError as e:
-            is_use_http_auth = self.site_params.get('use_http_auth', False)
-            if e.response.status_code == 401 and is_use_http_auth:
-                http_auth_header = e.response.headers.get('www-authenticate', '')
-                sitecon = self._http_auth(http_auth_header)
-            else:
-                sublime.message_dialog('HTTP connection failed: %s' % e[1])
-                raise Exception('HTTP connection failed.')
-        except Exception as e:
-            sublime.message_dialog('Connection failed for %s: %s' % (self.host, e))
-            raise Exception('HTTP connection failed: %s' % e)
-
-        # if login is not empty - auth required
-        if self.username:
+        # oauth authorization
+        is_oauth = True if all([self.oauth_consumer_token, self.oauth_consumer_secret, self.oauth_access_token, self.oauth_access_secret]) else False
+        if is_oauth:
             try:
-                if sitecon is not None:
-                    sitecon.login(username=self.username, password=self.password, domain=self.domain)
-                    sublime.status_message('Logon successfully.')
-                else:
-                    sublime.status_message('Login failed: connection unavailable.')
-            except mwclient.LoginError as exc:
+                sitecon = mwclient.Site(host=self.host, path=self.path,
+                                        consumer_token=self.oauth_consumer_token,
+                                        consumer_secret=self.oauth_consumer_secret,
+                                        access_token=self.oauth_access_token,
+                                        access_secret=self.oauth_access_secret,
+                                        requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
+            except mwclient.OAuthAuthorizationError as exc:
                 e = exc.args if pythonver >= 3 else exc
-                sublime.status_message('Login failed: %s' % e[1]['result'])
+                sublime.status_message('Login failed: %s' % e[1])
                 return
         else:
-            sublime.status_message('Connection without authorization')
+
+            try:
+                sitecon = mwclient.Site(host=self.host, path=self.path, requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
+            except requests.exceptions.HTTPError as e:
+                is_use_http_auth = self.site_params.get('use_http_auth', False)
+                if e.response.status_code == 401 and is_use_http_auth:
+                    http_auth_header = e.response.headers.get('www-authenticate', '')
+                    sitecon = self._http_auth(http_auth_header)
+                else:
+                    sublime.message_dialog('HTTP connection failed: %s' % e[1])
+                    raise Exception('HTTP connection failed.')
+            except Exception as e:
+                sublime.message_dialog('Connection failed for %s: %s' % (self.host, e))
+                raise Exception('HTTP connection failed: %s' % e)
+
+            # if login is not empty - auth required
+            if self.username:
+                try:
+                    if sitecon is not None:
+                        sitecon.login(username=self.username, password=self.password, domain=self.domain)
+                        sublime.status_message('Logon successfully.')
+                    else:
+                        sublime.status_message('Login failed: connection unavailable.')
+                except mwclient.LoginError as exc:
+                    e = exc.args if pythonver >= 3 else exc
+                    sublime.status_message('Login failed: %s' % e[1]['result'])
+                    return
+            else:
+                sublime.status_message('Connection without authorization')
 
         if sitecon:
             self.conns[self.site] = sitecon

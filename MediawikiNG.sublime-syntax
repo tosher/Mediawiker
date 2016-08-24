@@ -1,0 +1,1194 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Mediawiki NG
+file_extensions: [mediawiki, wikipedia, wiki]
+scope: text.html.mediawiki
+
+variables:
+  src_tag_before_lang: '(<)(source|syntaxhighlight)[ \t]+(lang)(=)(")'
+  src_tag_after_lang: '(")(>)'
+
+contexts:
+  main:
+    - include: block
+    - include: block_pre_spaced
+    - include: inline
+
+  block:
+    - match: ^\s*(?i)(#redirect)
+      captures:
+        1: keyword.control.redirect.mediawiki
+      push:
+        - meta_scope: meta.redirect.mediawiki
+        - match: \n
+          pop: true
+        - include: link
+
+    - match: '{{src_tag_before_lang}}'
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.source.mediawiki
+        3: entity.other.attribute-name.mediawiki
+        4: entity.other.attributes.validhtml.mediawiki
+        5: entity.other.quote.validhtml.mediawiki
+      push:
+        - match: '(python){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.python
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(ini){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.ini
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(javascript){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.js
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(c){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.c
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(actionscript){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.actionscript
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(applescript){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.applescript
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        # - match: '(asp){{src_tag_after_lang}}'
+        #   # conflicts with text.html.basic
+        #   captures:
+        #     1: string.quoted.mediawiki
+        #     2: entity.other.quote.validhtml.mediawiki
+        #     3: meta.tag.validhtml.mediawiki
+        #   push: scope:source.asp
+        #   with_prototype:
+        #     - match: (?=</(source|syntaxhighlight)>)
+        #       pop: true
+        - match: '(dos){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.dosbatch
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(csharp){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.cs
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(cpp){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.c++
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(clojure){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.clojure
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(css){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.css
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(d){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.d
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(erlang){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.erlang
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(go){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.go
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(haskell){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.haskell
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(java){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.java
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(groovy){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.groovy
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(latex){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.latex
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(lisp){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.lisp
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(lua){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.lua
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(make){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.makefile
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(matlab){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.matlab
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(objc){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.objc
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(ocaml){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.ocaml
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(pascal){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.pascal
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(perl){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.perl
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(php){{src_tag_after_lang}}'
+          # conflicts with text.html.basic
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.php
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(r){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.r
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(rails){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.ruby.rails
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(ruby){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.ruby
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(scala){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.scala
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(bash){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.shell
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(sql){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.sql
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(tsql){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.tsql
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(tcl){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.tcl
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(xml){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.xml
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: '(yaml){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push: scope:source.yaml
+          with_prototype:
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        # - match: '(html5){{src_tag_after_lang}}'
+        #   # conflicts with php and asp
+        #   captures:
+        #     1: string.quoted.mediawiki
+        #     2: entity.other.quote.validhtml.mediawiki
+        #     3: meta.tag.validhtml.mediawiki
+        #   push: scope:text.html.basic
+        #   with_prototype:
+        #     - match: (?=</(source|syntaxhighlight)>)
+        #       pop: true
+        - match: '([^"]+){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          push:
+            - meta_content_scope: meta.tag.source.unknown.validhtml.mediawiki
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+        - match: (</)(source|syntaxhighlight)(>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.source.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          pop: true
+
+    - match: " ?(<)(uml)(>)"
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.source.mediawiki
+        3: meta.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: meta.tag.source.mediawiki
+        - match: " ?(</)(uml)(>)"
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.source.mediawiki
+            3: meta.tag.validhtml.mediawiki
+          pop: true
+    - match: '^(={1})(?!=)([^=]+)(={1})(?!=)\s*$'
+      captures:
+        1: markup.heading.tag.mediawiki
+        2: markup.heading.1.mediawiki
+        3: markup.heading.tag.mediawiki
+      push:
+          - include: inline
+          - match: ""
+            pop: true
+    - match: '^(={2})(?!=)([^=]+)(={2})(?!=)\s*$'
+      captures:
+        1: markup.heading.tag.mediawiki
+        2: markup.heading.2.mediawiki
+        3: markup.heading.tag.mediawiki
+      push:
+          - include: inline
+          - match: ""
+            pop: true
+    - match: '^(={3})(?!=)([^=]+)(={3})(?!=)\s*$'
+      captures:
+        1: markup.heading.tag.mediawiki
+        2: markup.heading.3.mediawiki
+        3: markup.heading.tag.mediawiki
+      push:
+          - include: inline
+          - match: ""
+            pop: true
+    - match: '^(={4})(?!=)([^=]+)(={4})(?!=)\s*$'
+      captures:
+        1: markup.heading.tag.mediawiki
+        2: markup.heading.4.mediawiki
+        3: markup.heading.tag.mediawiki
+      push:
+          - include: inline
+          - match: ""
+            pop: true
+    - match: '^(={5})(?!=)([^=]+)(={5})(?!=)\s*$'
+      captures:
+        1: markup.heading.tag.mediawiki
+        2: markup.heading.5.mediawiki
+        3: markup.heading.tag.mediawiki
+      push:
+          - include: inline
+          - match: ""
+            pop: true
+    - match: '^-{4,}[ \t]*($\n)?'
+      # comment: "A separator is made up of 4 or more -s alone on a line by themselves."
+      scope: meta.separator.mediawiki
+    - match: "^([#*]+)"
+      # comment: "numbered-unnumbered lists"
+      captures:
+        1: markup.other.special.mediawiki
+      push:
+        - meta_scope: markup.list.mediawiki
+        - match: \n
+          pop: true
+        - include: block_item_definition_list
+        - include: inline
+    - include: block_item_definition_list
+    - include: table
+    - include: comments
+
+  block_item_definition_list:
+    # comment: "definition lists"
+    - meta_scope: markup.list.definition.mediawiki
+    - match: '(;)(?!=;:#*)'  # starts from ; with not next lists chars
+      captures:
+        1: markup.other.special.definition-start.mediawiki
+      push:
+        - meta_content_scope: markup.list.definition.item.mediawiki
+        - match: '^([#*]+)(?=[;:])' # * or # in start of line - numbered|unnambered chars: match and go next..
+          scope: markup.other.special.mediawiki
+        - match: '^(:)(?=:|;)'  # : in start of line - is a colon char, not definition delimiter
+          scope: markup.other.special.colon.mediawiki
+        - match: '(?=;)'  # item stops if get ;
+          pop: true
+        - match: (?=^\n|^[^#*:;])  # item stops if in start of line get \n or non-list chars - global list stop
+          pop: true
+        - match: '(:)(?!=;|:)'  # : - definition delimiter as equal sign
+          captures:
+            1: markup.other.special.equal-sign.mediawiki
+          push:
+            - meta_scope: markup.list.definition.value.mediawiki
+            - match: (?=\n)  # item definition stops at the end of line
+              pop: true
+
+  block_html:
+    # comment: "The available block HTML tags supported are:
+    #           * blockquote, center, pre, div, hr, p
+    #           * tables: table, th, tr, td, caption
+    #           * lists: ul, ol, li
+    #           * definition lists: dl, dt, dd
+    #           * headers: h1, h2, h3, h4, h5, h6
+    #           * br"
+
+    - match: (<math>)
+      captures:
+        0: punctuation.section.embedded.tex.math
+        1: meta.tag.inline.math.mediawiki
+        2: source.tex.math
+      push:
+        - meta_scope: meta.embedded.tex.math
+        - meta_content_scope: source.tex.math
+        - match: ((<)/math>)
+          captures:
+            0: punctuation.section.embedded.tex.math
+            1: meta.tag.inline.math.mediawiki
+            2: source.tex.math
+          pop: true
+        - include: scope:text.tex.math
+    - match: "<table[^>]*>"
+      push:
+        - meta_scope: meta.embedded.html.table
+        - meta_content_scope: source.html
+        - match: </table>
+          pop: true
+        - include: scope:text.html
+    - match: (<)(ref)(>)
+      captures:
+        1: meta.tag.inline.ref.mediawiki
+        2: entity.name.tag.ref.mediawiki
+        3: meta.tag.inline.ref.mediawiki
+      push:
+        - meta_content_scope: meta.reference.content.mediawiki
+        - match: (</)(ref)(>)
+          captures:
+            1: meta.tag.inline.ref.mediawiki
+            2: entity.name.tag.ref.mediawiki
+            3: meta.tag.inline.ref.mediawiki
+          pop: true
+        - include: inline
+    - match: (<)(blockquote)(>)
+      captures:
+        1: meta.tag.inline.ref.mediawiki
+        2: entity.name.tag.ref.mediawiki
+        3: meta.tag.inline.ref.mediawiki
+      push:
+        - meta_content_scope: meta.reference.blockquote.content.mediawiki
+        - match: (</)(blockquote)(>)
+          captures:
+            1: meta.tag.inline.ref.mediawiki
+            2: entity.name.tag.ref.mediawiki
+            3: meta.tag.inline.ref.mediawiki
+          pop: true
+        - include: inline
+    - match: (<)(center)(>)
+      captures:
+        1: meta.tag.inline.ref.mediawiki
+        2: entity.name.tag.ref.mediawiki
+        3: meta.tag.inline.ref.mediawiki
+      push:
+        - meta_content_scope: meta.reference.center.content.mediawiki
+        - match: (</)(center)(>)
+          captures:
+            1: meta.tag.inline.ref.mediawiki
+            2: entity.name.tag.ref.mediawiki
+            3: meta.tag.inline.ref.mediawiki
+          pop: true
+        - include: inline
+    - match: "(<)(ref) *((name) *(=) *([^>]*))(/>)"
+      # comment: <ref name="label"/>
+      scope: meta.reference.named.cite.mediawiki
+      captures:
+        1: meta.tag.inline.ref.mediawiki
+        2: entity.name.tag.ref.mediawiki
+        4: entity.name.tag.name.mediawiki
+        5: meta.tag.inline.ref.mediawiki
+        6: string.quoted.ref.name.mediawiki
+        7: meta.tag.inline.ref.mediawiki
+    - match: "(<)(ref) *((name) *(=) *([^>]*))(>)"
+      captures:
+        1: meta.tag.inline.ref.mediawiki
+        2: entity.name.tag.ref.mediawiki
+        4: entity.name.tag.name.mediawiki
+        5: meta.tag.inline.ref.mediawiki
+        6: string.quoted.ref.name.mediawiki
+        7: meta.tag.inline.ref.mediawiki
+      push:
+        - meta_content_scope: meta.reference.content.labelled.mediawiki
+        # comment: <ref name="label">content</ref>
+        - match: (</)(ref)(>)
+          captures:
+            1: meta.tag.inline.ref.mediawiki
+            2: entity.name.tag.ref.mediawiki
+            3: meta.tag.inline.ref.mediawiki
+          pop: true
+        - include: inline
+    - match: "(<)(gallery[^>]*)(>)"
+      captures:
+        1: meta.tag.inline.ref.mediawiki
+        2: entity.name.tag.ref.mediawiki
+        3: meta.tag.inline.ref.mediawiki
+      push:
+        - meta_content_scope: meta.gallery.mediawiki
+        - match: (</)(gallery)(>)
+          captures:
+            1: meta.tag.inline.ref.mediawiki
+            2: entity.name.tag.ref.mediawiki
+            3: meta.tag.inline.ref.mediawiki
+          pop: true
+        - match: '^\s*(([Ff]ile|[Ii]mage)(:))?([^\[\]\|\n]+)'
+          captures:
+            2: markup.underline.link.internal.namespace.mediawiki
+            3: punctuation.definition.tag.colon.mediawiki
+            4: markup.underline.link.internal.mediawiki
+          push:
+            - meta_scope: meta.item.gallery.mediawiki
+            - match: \n
+              pop: true
+            - match: (\|)
+              captures:
+                1: meta.tag.gallery.pipe.mediawiki
+              push:
+                # order important
+                - include: inline
+                - match: (?=\n|\|)
+                  pop: true
+
+  block_pre_spaced:
+    - match: ^ (?=\s*\S)
+      # comment: "Code blocks start with one space.  Wiki text and html are still interpreted in MediaWiki, unlike in mediawiki."
+      push:
+        - meta_scope: markup.raw.block.mediawiki
+        - match: "^(?=[^ ])"
+          pop: true
+        - include: inline
+    - include: table
+    - include: comments
+
+  block_pre_spaced_in_templates:
+    - match: ^ (?=\s*\S)
+      # comment: "Code blocks inside templates. Terminates by | params delimiter too."
+      push:
+        - meta_scope: markup.raw.block.mediawiki
+        - match: '(?=^[^ ]|\|)'
+          pop: true
+        - include: inline
+    - include: table
+    - include: comments
+
+  comments:
+    - match: <!--
+      push:
+        - meta_scope: comment.block.html.mediawiki
+        - match: '--\s*>'
+          pop: true
+        - match: "--"
+          scope: invalid.illegal.bad-comments-or-CDATA.html.mediawiki
+
+  entities:
+    # comment: "Mediawiki supports Unicode, so these should not usually be necessary, but they do show up on pages from time to time"
+    - match: "&([a-zA-Z0-9]+|#[0-9]+|#x[0-9a-fA-F]+);"
+      scope: constant.character.entity.html.mediawiki
+    - match: "&"
+      scope: invalid.illegal.bad-ampersand.html.mediawiki
+
+  inline:
+    - match: "(~~~~~)(~{0,2})(?!~)"
+      captures:
+        1: constant.other.date-time.mediawiki
+        2: invalid.illegal.too-many-tildes.mediawiki
+    - match: ~~~~?
+      scope: constant.other.signature.mediawiki
+      # comment: 3 ~s for sig, 4 for sig + timestamp
+    # order is important!
+    - include: link
+    - include: style
+    - include: table
+    - include: template_parameters
+    - include: template
+    - include: block_html
+    - include: comments
+    - include: magic_words
+
+  link:
+    # files, images
+    - match: |-
+        (?x:(\[\[)                    (?# opening brackets)
+        ( [ ]*(([Ff]ile|[Ii]mage)(:)) (?# spaces, image, colon)
+        ([^\[\]|]+)                   (?# anything)
+        ))
+      captures:
+        1: meta.tag.inline.any.mediawiki
+        4: constant.other.namespace.image.mediawiki
+        5: punctuation.definition.tag.colon.mediawiki
+        6: constant.other.wiki-link.image.mediawiki
+      push:
+        - meta_scope: meta.image.wiki.mediawiki
+        - match: |-
+            (?x)
+            (\|)[ ]*
+            ( (thumbnail|thumb|frameless|frame|border)
+             |(right|left|center|none)
+             |(baseline|sub|super|top|text-top|middle|bottom|text-bottom)
+             |([0-9]+)?(x?)([0-9]+)?(px)
+             |(link=)([^|]+)?
+             |(alt=)([^|]+)?
+             |(class=)([^|]+)?
+             |([^|\]]+)
+            )[ ]*
+          captures:
+            1: punctuation.definition.tag.pipe.mediawiki
+            2: keyword.control.image.formatting.mediawiki
+            3: keyword.control.image.frame.mediawiki
+            4: keyword.control.image.alignment.mediawiki
+            5: keyword.control.image.alignment-vertical.mediawiki
+            6: constant.numeric.image.width.mediawiki
+            7: punctuation.other.unit.image.size.mediawiki
+            8: constant.numeric.image.height.mediawiki
+            9: keyword.control.image.size.mediawiki
+            10: keyword.control.image.link.mediawiki
+            11: constant.other.wiki-link.mediawiki
+            12: keyword.control.image.alt.mediawiki
+            13: constant.other.image.alt.mediawiki
+            14: keyword.control.image.css-class.mediawiki
+            15: constant.other.image.css-class.mediawiki
+            16: string.other.image.caption.mediawiki
+        - match: \|
+          scope: punctuation.definition.tag.pipe.mediawiki
+        - include: style_in_link
+        - match: |-
+            (?x:
+            ((\|)[ ]*( [^\[\]|]+ )[ ]*)?  (?# pipe, spaces, anything, spaces)
+            (\]\])                        (?# closing brackets)
+            )
+          captures:
+            2: punctuation.definition.tag.pipe.mediawiki
+            3: string.other.title.link.wiki-link.mediawiki
+            4: meta.tag.inline.any.mediawiki
+          pop: true
+    - match: |-
+        (?x:
+        ({{)                        (?# opening brackets)
+        ([Rr]edirect|subst:.*)      (?# redirect?)
+        [ ]*                        (?# spaces)
+        (\\
+        |)                          (?# pipe)
+        )
+      captures:
+        1: meta.tag.inline.redirect.mediawiki
+        2: keyword.operator.wiki-link.redirect.mediawiki
+        3: constant.other.pipe.mediawiki
+      push:
+        - meta_scope: meta.link.wiki.redirect.mediawiki
+        - match: |-
+            (?x:
+            (([\\|}]+)(\\|)([\\|}]+))?    (?#  from | to)
+            ([^}]*)                       (?# anything)
+            (}})                          (?# closing brackets)
+            )
+          captures:
+            2: meta.tag.inline.any.mediawiki
+            3: markup.underline.link.internal.mediawiki
+            4: constant.other.pipe.mediawiki
+            6: meta.tag.inline.redirect.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: |-
+        (?x:
+        (\[\[)                      (?# opening brackets)
+        (:)?                        (?# colon to suppress image or category?)
+        ((\s+):[^\[\]]*(?=\]\]))?   (?# a colon after spaces is invalid)
+        \s*                         (?# spaces)
+        ( (([^\[\]|]+)(:))?         (?# namespace)
+        ([^\[\]|]+)\s*              (?# link name)
+        )?
+        )
+      captures:
+        1: meta.tag.inline.link.mediawiki
+        2: keyword.operator.suppress-image-or-category.link.internal.mediawiki
+        4: invalid.illegal.whitespace.mediawiki
+        7: markup.underline.link.internal.namespace.mediawiki
+        8: punctuation.definition.tag.colon.mediawiki
+        9: markup.underline.link.internal.mediawiki
+      push:
+        - meta_scope: meta.tag.link.wiki.mediawiki
+        - match: (\]\])
+          captures:
+            1: meta.tag.inline.link.mediawiki
+          pop: true
+        - match: \|
+          scope: punctuation.definition.tag.pipe.mediawiki
+          push:
+            - meta_content_scope: string.other.title.link.internal.mediawiki
+            - match: (?=\]\])
+              pop: true
+            - include: style_in_link
+
+    - match: '(\[)((\w[\w\d+-\.]+://|mailto:)[-:@\w.~%+/?=&#]+)\s*(?=[^\]]*\])'
+      # comment: external link like [http://example.com/example.html Example]
+      captures:
+        1: meta.tag.inline.link.mediawiki
+        2: markup.underline.link.external.mediawiki
+      push:
+        - meta_scope: meta.link.inline.external.mediawiki
+        - meta_content_scope: string.other.title.link.external.mediawiki
+        - match: '(\])'
+          captures:
+            1: meta.tag.inline.link.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: '(\w[\w\d+-\.]+://|mailto:)[-:@\w.~%+/?=&#]+'
+      scope: markup.underline.link.external.mediawiki
+      # comment: 'external link like just http://example.com/example.html.
+      #           Proto valid chars: The scheme should start with a letter (upper or lower case),
+      #           and can contains letters (still upper and lower case), number, "+", "-" and "."
+      #           * http://www.ietf.org/rfc/rfc2396.txt
+      #           * http://stackoverflow.com/questions/3641722/valid-characters-for-uri-schemes'
+
+  magic_words:
+    - match: (__NOTOC__|__FORCETOC__|__TOC__|__NOEDITSECTION__|__NEWSECTIONLINK__|__NONEWSECTIONLINK__|__NOGALLERY__|__HIDDENCAT__|__NOCONTENTCONVERT__|__NOCC__|__NOTITLECONVERT__|__NOTC__|__START__|__END__|__INDEX__|__NOINDEX__|__STATICREDIRECT__|__DISAMBIG__|)
+      # comment: add other types of magic words..
+      scope: keyword.control.mediawiki
+
+  style:
+    - match: (''')
+      captures:
+        1: markup.other.special.mediawiki
+      push:
+        - meta_content_scope: markup.bold.html.mediawiki
+        - match: (''')
+          captures:
+            1: markup.other.special.mediawiki
+          pop: true
+        - include: inline
+    - match: ('')
+      captures:
+        1: markup.other.special.mediawiki
+      push:
+        - meta_content_scope: markup.italic.html.mediawiki
+        - match: "(''(?!'[^']))"
+          captures:
+            1: markup.other.special.mediawiki
+          pop: true
+        - include: inline
+    - match: (?i:(<(b|strong)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.bold.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: inline
+    - match: '(?i:(<(i|em)(\b[^>]*)>))'
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.1.mediawiki
+        3: entity.other.attributes.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.italic.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.2.mediawiki
+          pop: true
+        - include: inline
+    - match: (?i:(<(s|strike)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.other.strikethrough.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: inline
+    - match: (?i:(<(u)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.underline.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: inline
+    - match: (?i:(<(tt|code|kbd)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.raw.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: inline
+    - match: (?i:(<(big|small|sub|sup)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.other.inline-styles.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: inline
+    - match: '(?i:(<(span|font|div)(\b[^>]*)>))'
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+        3: entity.other.attributes.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.other.inline-styles.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: inline
+        - include: block
+        - include: block_pre_spaced
+    - match: '(?i:(<(pre)(\b[^>]*)>))'
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+        3: entity.other.attributes.validhtml.mediawiki
+      push:
+        - meta_content_scope: meta.tag.source.validhtml.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+          # no markup in pre
+          # - include: '#inline'
+    - match: (?i:(<(nowiki|noinclude|includeonly)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: meta.tag.source.validhtml.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+    - match: '(?i:(<(br)(\b[^>]*)\/?>))'
+      scope: meta.tag.validhtml.mediawiki
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+        3: entity.other.attributes.validhtml.mediawiki
+
+  style_in_link:
+    - match: (''')
+      captures:
+        1: markup.other.special.mediawiki
+      push:
+        - meta_content_scope: markup.bold.mediawiki
+        - match: (''')
+          captures:
+            1: markup.other.special.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: ('')
+      captures:
+        1: markup.other.special.mediawiki
+      push:
+        - meta_content_scope: markup.italic.mediawiki
+        - match: ('')
+          captures:
+            1: markup.other.special.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: (?i:(<(b|strong)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.bold.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: '(?i:(<(i|em)(\b[^>]*)>))'
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+        3: entity.other.attributes.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.italic.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: (?i:(<(s|strike)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.other.strikethrough.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: (?i:(<(u)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.underline.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: (?i:(<(tt|code|keyboard)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.raw.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: (?i:(<(big|small|sub|sup)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.other.inline-styles.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: '(?i:(<(span|font|div)(\b[^>]*)>))'
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+        3: entity.other.attributes.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.other.inline-styles.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: inline
+        - include: block
+        - include: block_pre_spaced
+    - match: '(?i:(<(pre)(\b[^>]*)>))'
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+        3: entity.other.attributes.validhtml.mediawiki
+      push:
+        - meta_content_scope: meta.tag.source.validhtml.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+          # no markup in pre
+          # - include: '#inline'
+    - include: comments
+
+  table:
+    - match: '(\{\|)'
+      captures:
+        1: markup.other.special.start-delimiter.table.mediawiki
+      push:
+        - meta_content_scope: meta.table.mediawiki
+        - match: '(\|\})'
+          captures:
+            1: markup.other.special.stop-delimiter.table.mediawiki
+          pop: true
+        - match: '(\S+)(=["'']?)((?:.?(?!["'']?\s+(?:\S+)=|[>"'']))*.?)(["'']?)'
+          scope: meta.table.attributes.mediawiki
+          captures:
+            1: entity.other.attributes.validhtml.mediawiki
+            2: entity.other.attributes.table.cellcontents.validhtml.mediawiki
+            3: entity.other.attributes.validhtml.mediawiki
+            4: entity.other.attributes.table.cellcontents.validhtml.mediawiki
+        - match: '^(\|\+)[\t ]*(.*)$'
+          scope: meta.table.caption.mediawiki
+          captures:
+            1: markup.other.special.table.caption.mediawiki
+            2: variable.parameter.name.string.mediawiki
+        - match: \|\-
+          scope: markup.other.special.row-delimiter.table.mediawiki
+        - match: '(^\s*\|(?!\-|\})|^\s*!|\|\||!!)'
+          # starts from ^| or ^! or || or !!
+          captures:
+            1: markup.other.special.cell-delimiter.table.mediawiki
+          push:
+            - meta_scope: text.cellcontents.table.mediawiki
+            - match: '(?=^\s*\||^\s*!|\|\||!!|\|\-|\|\})'
+              pop: true
+            - include: inline
+            - match: '(\S+)(=["'']?)'
+              captures:
+                1: entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki
+                2: entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki
+              push:
+                - meta_content_scope: entity.other.attributes.table.cellcontents.cell-html-value.validhtml.mediawiki
+                - match: '(["''])|(?=\s+\S+=|\s*\|)(?!\|)'
+                  captures:
+                    1: entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki
+                  pop: true
+                - include: inline
+            - match: \|
+              scope: entity.other.attributes.table.cellcontents.cell-html-delimiter.validhtml.mediawiki
+  template:
+    # comment: "This repository item covers templates and parser functions."
+    - match: '(?![^\{]\{)(\{{2})(?!\{[^\{])'
+      captures:
+        1: meta.tag.inline.start.template.mediawiki
+      push:
+        - meta_content_scope: meta.template.mediawiki
+        # comment: scope as meta.function-call as the closest thing to a template with parameters, etc.
+        - match: '(?![^\}]\})(\}{2})(?!\}([^\}]|$))'
+          captures:
+            1: meta.tag.inline.stop.template.mediawiki
+          pop: true
+        - match: ^\s*(?=\|)
+          # hack: prevent first param line if starts with space to match as markup.raw.block.mediawiki (block_pre_spaced)
+          scope: markup.non-raw.template.mediawiki
+        - include: comments
+        - include: main
+        - include: template_parameters
+        - match: '\s*([^\{\}\|]+)'
+          scope: entity.name.function.template.mediawiki
+        - match: '(\|)\s*(([^\{\}\|=]+)(=))?'
+          captures:
+            1: meta.tag.param-delimiter.template.mediawiki
+            3: variable.parameter.template.mediawiki
+            4: punctuation.definition.tag.equals-sign.template.mediawiki
+          push:
+            - meta_content_scope: meta.function.parameters.template.mediawiki
+            - match: '(?=\||\}{2})'  # | or }}
+              pop: true
+            - include: block_pre_spaced_in_templates
+            - include: inline
+            - include: block
+
+  template_parameters:
+    # comment: Template parameters in template declaration (on template page)
+    - meta_content_scope: meta.template-parameter.mediawiki
+    - match: '(\{{3})\s*([0-9]+)\s*(\}{3})'
+      # comment: numeric parameter in template body (not in transclusion!)
+      captures:
+        1: meta.tag.inline.template.parameter.mediawiki
+        2: variable.parameter.template.numeric.mediawiki
+        3: meta.tag.inline.template.parameter.mediawiki
+    - match: '(\{{3})\s*([^\}\{\|]+)((\|)[^\}\{]+)?\s*(\}{3})'  # TODO: Replace .* with non }
+      # comment: named parameter in template body (not in transclusion!)
+      captures:
+        1: meta.tag.inline.template.parameter.mediawiki
+        2: variable.parameter.template.named.mediawiki
+        3: variable.parameter.default-value.template.named.mediawiki
+        4: punctuation.definition.tag.pipe.mediawiki
+        5: meta.tag.inline.template.parameter.mediawiki
