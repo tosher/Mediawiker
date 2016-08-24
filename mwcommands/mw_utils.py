@@ -52,53 +52,6 @@ def set_setting(key, value):
     sublime.save_settings('Mediawiker.sublime-settings')
 
 
-def get_comments(key, default_value=None):
-    settings = sublime.load_settings('MediawikerComments.sublime-settings')
-    return settings.get(key, default_value)
-
-
-def get_comments_page():
-    site = get_view_site()
-    title = get_title()
-    comments = get_comments('mediawiker_comments', {})
-    site_comments = comments.get(site, {})
-    return site_comments.get(title, {})
-
-
-def get_comment_by_region(region):
-
-    # TODO: Failed when notes was moved, but page was not saved, because of search based on old value in config. Maybe needs to save old and new region values..
-
-    site = get_view_site()
-    title = get_title()
-    comments = get_comments('mediawiker_comments', {})
-    site_comments = comments.get(site, {})
-    page_comments = site_comments.get(title, {})
-    r_key = ('%s:%s' % (region.a, region.b))
-    return page_comments.get(r_key, None)
-
-
-def set_comments(key, value):
-    settings = sublime.load_settings('MediawikerComments.sublime-settings')
-    settings.set(key, value)
-    sublime.save_settings('MediawikerComments.sublime-settings')
-
-
-def show_comments(view):
-    site = get_view_site()
-    title = get_title()
-    comments = get_comments('mediawiker_comments', {})
-    site_comments = comments.get(site, {})
-    page_comments = site_comments.get(title, {})
-    page_comments_regions = []
-    for r in page_comments.keys():
-        a, b = r.split(':')
-        page_comments_regions.append(sublime.Region(int(a), int(b)))
-
-    gutter_png = 'Packages/Theme - Default/dot.png' if pythonver >= 3 else ''
-    view.add_regions(COMMENT_REGIONS_KEY, page_comments_regions, 'comment', gutter_png, sublime.PERSISTENT)
-
-
 def set_syntax(page=None):
     syntax = get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG.tmLanguage')
 
@@ -473,14 +426,15 @@ def on_hover_tag(view, point):
 def on_hover_comment(view, point):
 
     def on_navigate(link):
-        a, b = link.split(':')[-2:]
-        if link.startswith('edit'):
-            sublime.active_window().run_command("mediawiker_edit_comment", {"a": int(a), "b": int(b)})
-        elif link.startswith('del'):
-            # TODO: delete method
-            sublime.active_window().run_command("mediawiker_edit_comment", {"a": int(a), "b": int(b), 'isdel': True})
+        if link.startswith('fold'):
+            point = int(link.split(':')[-1])
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "point": point}})
+        elif link.startswith('unfold'):
+            point = int(link.split(':')[-1])
+            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "unfold", "point": point}})
 
-    def get_text_pretty(text):
+    def get_text_pretty(r):
+        text = view.substr(r).strip().lstrip('<!--').rstrip('-->')
         text = text.replace('TODO', '<strong style="color:#E08283;">TODO</strong>')
         text = text.replace('NOTE', '<strong style="color:#26A65B;">NOTE</strong>')
         text = text.replace('WARNING', '<strong style="color:#C0392B;">WARNING</strong>')
@@ -495,13 +449,13 @@ def on_hover_comment(view, point):
     for r in comment_regions:
         if r.contains(point):
 
-            comment_text = get_text_pretty(get_comment_by_region(r))
+            comment_text = get_text_pretty(r)
             content = [
                 'Note',
                 '<br><br>',
                 '%s' % comment_text,
                 '<br><br>',
-                '<a href="edit:%(r_a)s:%(r_b)s">Edit</a> | <a href="del:%(r_a)s:%(r_b)s">Delete</a>' % {'r_a': r.a, 'r_b': r.b}
+                '<a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'point': point}
             ]
             content_html = ''.join(content)
 

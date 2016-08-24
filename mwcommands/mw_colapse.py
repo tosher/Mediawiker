@@ -93,19 +93,6 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
             self.view.add_regions('templates_%s' % _r[1], [rl[0] for rl in list(colapse_templates.values())], 'comment', gutter_png, self.DRAW_TYPE)
         return colapse_templates
 
-    def get_tables_regions(self):
-        pattern_tables = r'\{\|((.|\n)*?)\|\}'
-        _regions = self.view.find_all(pattern_tables)
-        colapse_tables = []
-        if _regions:
-            for r in _regions:
-                _a, _b = r.a + 2, r.b - 2
-                colapse_tables.append(sublime.Region(_a, _b))
-
-            gutter_png = 'Packages/Mediawiker/img/gutter_t.png' if pythonver >= 3 else ''
-            self.view.add_regions('tables', colapse_tables, 'comment', gutter_png, self.DRAW_TYPE)
-        return colapse_tables
-
     def get_tag_regions(self, tag):
         pattern_tag = r'<%(tag)s((.|\n)*?)</%(tag)s>' % {'tag': tag}
         _regions = self.view.find_all(pattern_tag)
@@ -119,6 +106,34 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
             gutter_png = 'Packages/Mediawiker/img/gutter_tag.png' if pythonver >= 3 else ''
             self.view.add_regions(tag, [r[1] for r in colapse_tag], 'comment', gutter_png, self.DRAW_TYPE)
         return colapse_tag
+
+    def get_tables_regions(self):
+        pattern_tables = r'\{\|((.|\n)*?)\|\}'
+        _regions = self.view.find_all(pattern_tables)
+        colapse_tables = []
+        if _regions:
+            for r in _regions:
+                _a, _b = r.a + 2, r.b - 2
+                colapse_tables.append(sublime.Region(_a, _b))
+
+            gutter_png = 'Packages/Mediawiker/img/gutter_t.png' if pythonver >= 3 else ''
+            self.view.add_regions('tables', colapse_tables, 'comment', gutter_png, self.DRAW_TYPE)
+        return colapse_tables
+
+    def get_comment_regions(self):
+        C_START = r'<!--'
+        C_STOP = r'-->'
+        pattern_comment = r'%s((.|\n)*?)%s' % (C_START, C_STOP)
+        _regions = self.view.find_all(pattern_comment)
+        colapse_comment = []
+        if _regions:
+            for r in _regions:
+                r_new = sublime.Region(r.a + len(C_START), r.b - len(C_STOP))
+                colapse_comment.append(r_new)
+
+            gutter_png = 'Packages/Mediawiker/img/gutter_tag.png' if pythonver >= 3 else ''
+            self.view.add_regions('comment', colapse_comment, 'comment', gutter_png, self.DRAW_TYPE)
+        return colapse_comment
 
     def is_cursor_inheader(self, cursor, rt):
         '''
@@ -139,6 +154,15 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
 
     def is_cursor_intag(self, cursor, rt, tag):
         r_full = sublime.Region(rt[0], rt[1].b + len('</%s>' % tag))
+        if r_full.contains(cursor):
+            return True
+        return False
+
+    def is_cursor_incomment(self, cursor, r):
+        C_START = '<!--'
+        C_STOP = '-->'
+
+        r_full = sublime.Region(r.a - len(C_START), r.b + len(C_STOP))
         if r_full.contains(cursor):
             return True
         return False
@@ -168,6 +192,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
         tags = {}
         for _t in fold_tags:
             tags[_t] = self.get_tag_regions(_t)
+        comments = self.get_comment_regions()
 
         self.is_cursor_intable = self.is_cursor_intemplate
 
@@ -179,6 +204,11 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
         elif _fold_type == 'fold':
 
             # TODO: get regions from all type, get min of them, then fold! But it's slowly..
+
+            for r in comments:
+                if self.is_cursor_incomment(cursor, r):
+                    self.view.fold(r)
+                    return
 
             for tag in tags.keys():
                 for r in tags[tag]:
@@ -213,6 +243,11 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                 return
 
         elif _fold_type == 'unfold':
+
+            for r in comments:
+                if self.is_cursor_incomment(cursor, r):
+                    self.view.unfold(r)
+                    return
 
             for tag in tags.keys():
                 for r in tags[tag]:
