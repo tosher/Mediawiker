@@ -69,7 +69,6 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
             self.view.settings().set('mediawiker_is_here', True)
             self.view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
             self.view.set_name(title)
-            mw.show_comments(self.view)
 
             self.view.set_scratch(True)
             # own is_changed flag instead of is_dirty for possib. to reset..
