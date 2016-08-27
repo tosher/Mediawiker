@@ -606,8 +606,8 @@ class Site(object):
                 return info.get('upload', {})
 
     def parse(self, text=None, title=None, page=None, prop=None,
-              redirects=False, mobileformat=False):
-        kwargs = {}
+              redirects=False, mobileformat=False, **kwargs):
+        # kwargs = {}
         if text is not None:
             kwargs['text'] = text
         if title is not None:

@@ -1,4 +1,4 @@
-## Mediawiker 3.1.8
+## Mediawiker 3.1.9
 
 ### Mwclient library update
 * Mwclient internal library was partly synced with latest original [version](http://mwclient.readthedocs.io/en/latest/index.html).
