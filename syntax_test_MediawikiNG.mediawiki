@@ -1,0 +1,211 @@
+// SYNTAX TEST "Packages/Mediawiker/MediawikiNG.sublime-syntax"
+
+<nowiki>
+// <- meta.tag.validhtml.mediawiki
+ // <- entity.name.tag.validhtml.mediawiki
+''' bold no wiki '''
+// <- meta.tag.source.validhtml.mediawiki
+</nowiki>
+// <- meta.tag.validhtml.mediawiki
+  // <- entity.name.tag.validhtml.mediawiki
+
+= Header1 Test =
+// <- markup.heading.tag.mediawiki
+  // <- markup.heading.1.mediawiki
+//             ^ markup.heading.tag.mediawiki
+
+== Header2 Test ==
+// <- markup.heading.tag.mediawiki
+   // <- markup.heading.2.mediawiki
+//              ^ markup.heading.tag.mediawiki
+
+=== Header3 Test ===
+// <- markup.heading.tag.mediawiki
+    // <- markup.heading.3.mediawiki
+//               ^ markup.heading.tag.mediawiki
+
+==== Header4 Test ====
+// <- markup.heading.tag.mediawiki
+//   ^ markup.heading.4.mediawiki
+//                ^ markup.heading.tag.mediawiki
+
+===== Header5 Test =====
+// <- markup.heading.tag.mediawiki
+//    ^ markup.heading.5.mediawiki
+//                 ^ markup.heading.tag.mediawiki
+
+== Lists ==
+# Numberred list item 1<!--
+// <- markup.other.special.mediawiki
+  // <- markup.list.mediawiki
+-->
+## Numberred list item 2.1<!--
+ // <- markup.other.special.mediawiki
+// ^ markup.list.mediawiki
+-->
+* A newline<!--
+// <- markup.other.special.mediawiki
+-->
+* in a list<!--
+ // <- markup.list.mediawiki
+-->
+marks the end of the list.<!--
+// <- text.html.mediawiki
+-->
+Of course
+* you can start again.
+** and continue..<!--
+// ^ markup.list.mediawiki
+-->
+
+; Definition lists<!--
+// <- markup.other.special.definition-start.mediawiki
+  // <- markup.list.definition.item.mediawiki
+-->
+; item : definition<!--
+  // <- markup.list.definition.item.mediawiki
+//     ^ markup.other.special.equal-sign.mediawiki
+//       ^ markup.list.definition.value.mediawiki
+-->
+; semicolon plus term
+: colon plus definition
+
+; Mixed definition lists
+; item 1 : definition
+
+:; sub-item 1 plus term<!--
+ // <- markup.other.special.definition-start.mediawiki
+// ^ markup.list.definition.item.mediawiki
+-->
+:: two colons plus definition <!--
+ // <- markup.other.special.equal-sign.mediawiki
+// ^ markup.list.definition.value.mediawiki
+-->
+
+:; sub-item 2 : colon plus definition
+; item 2
+: back to the main list
+
+* Or create mixed lists
+*# and nest them
+*#* like this
+*#*; definitions
+*#*: work:<!--
+// <- markup.other.special.mediawiki
+ // <- markup.other.special.mediawiki
+  // <- markup.other.special.mediawiki
+// ^ markup.other.special.equal-sign.mediawiki
+-->
+
+*#*; apple<!--
+// ^ markup.other.special.definition-start.mediawiki
+-->
+
+*#*; banana <!--
+// ^ markup.other.special.definition-start.mediawiki
+//   ^ markup.list.definition.item.mediawiki
+-->
+*#*: fruits <!--
+// ^ markup.other.special.equal-sign.mediawiki
+//  ^ markup.list.definition.value.mediawiki
+-->
+
+## semicolon in text; hmm.. <!--
+//                  ^ markup.list.mediawiki - markup.other.special.definition-start.mediawiki
+-->
+
+## and then: <!--
+//         ^ markup.list.mediawiki - markup.list.definition.item.mediawiki - markup.list.definition.value.mediawiki - markup.other.special.equal-sign.mediawiki
+-->
+## is not definition list <!--
+// ^ markup.list.mediawiki - markup.list.definition.item.mediawiki - markup.list.definition.value.mediawiki
+-->
+
+<gallery mode="packed-hover">
+//                           ^ meta.gallery.mediawiki
+Linne num 2.jpg
+// <- meta.item.gallery.mediawiki
+// <- markup.underline.link.internal.mediawiki
+Image:Astronotus_ocellatus.jpg | ''[[commons:Astronotus ocellatus|Astronotus ocellatus]]'' (Oscar)
+// <- markup.underline.link.internal.namespace.mediawiki
+//   ^ punctuation.definition.tag.colon.mediawiki
+//    ^ markup.underline.link.internal.mediawiki
+Salmonlarvakils.jpg | ''[[commons:Salmo salar|Salmo salar]]''|250px
+//                  ^ meta.tag.gallery.pipe.mediawiki
+//                                                           ^ meta.tag.gallery.pipe.mediawiki
+//                        ^ markup.underline.link.internal.namespace.mediawiki
+File:Australian blenny.jpg|''[[commons:Category:Ecsenius|Ecsenius axelrodi]]''
+//                                                      ^ meta.tag.link.wiki.mediawiki
+//                                                       ^ string.other.title.link.internal.mediawiki
+</gallery>
+  // <- entity.name.tag.ref.mediawiki
+
+[[Image:test_image.png]] / [[File:test_file.pdf]]
+  // <- meta.image.wiki.mediawiki
+  // <- constant.other.namespace.image.mediawiki
+//     ^ punctuation.definition.tag.colon.mediawiki
+//      ^ constant.other.wiki-link.image.mediawiki
+//                    ^ meta.image.wiki.mediawiki meta.tag.inline.any.mediawiki
+Inline [[namespace:Internal link/Subpage#anchor|Link '''bold''' te|xt]] in string.
+//       ^ markup.underline.link.internal.namespace.mediawiki
+//                ^ punctuation.definition.tag.colon.mediawiki
+//                 ^ markup.underline.link.internal.mediawiki
+//                                             ^ punctuation.definition.tag.pipe.mediawiki
+//                                              ^ string.other.title.link.internal.mediawiki
+//                                                      ^ markup.bold.mediawiki
+//                                                                ^ string.other.title.link.internal.mediawiki
+//                                                                   ^ meta.tag.inline.link.mediawiki
+
+* [https://meta.wikimedia.org:9723/wiki/Help:Link/ru?a=9&test=abs#anchor Example with inline '''style''']
+// ^ markup.underline.link.external.mediawiki
+//                                                                       ^ string.other.title.link.external.mediawiki
+//                                                                                              ^ markup.bold.mediawiki
+//                                                                                                      ^ meta.tag.inline.link.mediawiki
+
+https://meta.wikimedia.org:9723/wiki/Help:Link/ru?a=9&test=abs#anchor
+// <- markup.underline.link.external.mediawiki
+
+Before template {{Context|add=inline value
+//              ^ meta.tag.inline.start.template.mediawiki
+//               ^ meta.tag.inline.start.template.mediawiki
+//                ^ entity.name.function.template.mediawiki
+//                       ^ meta.tag.param-delimiter.template.mediawiki
+//                        ^ variable.parameter.template.mediawiki
+//                           ^ punctuation.definition.tag.equals-sign.template.mediawiki
+//                            ^ meta.function.parameters.template.mediawiki
+ |objname=next value, space in start don't breaks template
+ // <- meta.tag.param-delimiter.template.mediawiki
+  // <- variable.parameter.template.mediawiki
+|change=multiline value with '''bold text''' and
+//                              ^ meta.function.parameters.template.mediawiki markup.bold.html.mediawiki
+continued
+ with pre text and inline now works
+ // <- meta.function.parameters.template.mediawiki markup.raw.block.mediawiki
+|del=next value
+// <- meta.tag.param-delimiter.template.mediawiki
+//  ^ punctuation.definition.tag.equals-sign.template.mediawiki
+ |p1=last value
+ // <- meta.tag.param-delimiter.template.mediawiki
+}} after template.
+// <- meta.tag.inline.stop.template.mediawiki
+ // <- meta.tag.inline.stop.template.mediawiki
+// ^ text.html.mediawiki
+
+<source lang="python">
+// <- meta.tag.validhtml.mediawiki
+ // <- entity.name.tag.source.mediawiki
+//      ^ entity.other.attribute-name.mediawiki
+//            ^ string.quoted.mediawiki
+//                   ^meta.tag.validhtml.mediawiki
+
+# id:1, width_max: 76
+// <- comment.line.number-sign.python
+
+from __future__ import with_statement
+// <- keyword.control.flow.python
+//              ^^^^^^ keyword.control.import.python
+
+</source>
+// <- meta.tag.validhtml.mediawiki
+  // <- entity.name.tag.source.mediawiki
+//      ^ meta.tag.validhtml.mediawiki

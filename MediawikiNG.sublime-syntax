@@ -464,15 +464,16 @@ contexts:
     - match: '^-{4,}[ \t]*($\n)?'
       # comment: "A separator is made up of 4 or more -s alone on a line by themselves."
       scope: meta.separator.mediawiki
-    - match: "^([#*]+)"
+    - match: "^(?=[#*]+)"
       # comment: "numbered-unnumbered lists"
-      captures:
-        1: markup.other.special.mediawiki
       push:
         - meta_scope: markup.list.mediawiki
+        - include: block_item_definition_list
         - match: \n
           pop: true
-        - include: block_item_definition_list
+        - match: '([#*]+)'
+          captures:
+            1: markup.other.special.mediawiki
         - include: inline
     - include: block_item_definition_list
     - include: table
@@ -481,9 +482,11 @@ contexts:
   block_item_definition_list:
     # comment: "definition lists"
     - meta_scope: markup.list.definition.mediawiki
-    - match: '(;)(?!=;:#*)'  # starts from ; with not next lists chars
+    - match: '^(([*#]*)|([:]*))(;)(?!=;:#*)'  # starts from ; with not next lists chars
       captures:
-        1: markup.other.special.definition-start.mediawiki
+        2: markup.other.special.mediawiki
+        3: markup.other.special.colon.mediawiki
+        4: markup.other.special.definition-start.mediawiki
       push:
         - meta_content_scope: markup.list.definition.item.mediawiki
         - match: '^([#*]+)(?=[;:])' # * or # in start of line - numbered|unnambered chars: match and go next..
@@ -494,6 +497,7 @@ contexts:
           pop: true
         - match: (?=^\n|^[^#*:;])  # item stops if in start of line get \n or non-list chars - global list stop
           pop: true
+        - include: comments
         - match: '(:)(?!=;|:)'  # : - definition delimiter as equal sign
           captures:
             1: markup.other.special.equal-sign.mediawiki
@@ -501,6 +505,7 @@ contexts:
             - meta_scope: markup.list.definition.value.mediawiki
             - match: (?=\n)  # item definition stops at the end of line
               pop: true
+            - include: comments
 
   block_html:
     # comment: "The available block HTML tags supported are:
@@ -959,6 +964,7 @@ contexts:
         2: entity.name.tag.validhtml.mediawiki
       push:
         - meta_content_scope: meta.tag.source.validhtml.mediawiki
+        - include: inline
         - match: (</(\2)>)
           captures:
             1: meta.tag.validhtml.mediawiki
