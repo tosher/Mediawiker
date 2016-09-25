@@ -277,16 +277,16 @@ contexts:
           with_prototype:
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
-        - match: '(php){{src_tag_after_lang}}'
-          # conflicts with text.html.basic
-          captures:
-            1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.php
-          with_prototype:
-            - match: (?=</(source|syntaxhighlight)>)
-              pop: true
+        # - match: '(php){{src_tag_after_lang}}'
+        #   # conflicts with text.html.basic
+        #   captures:
+        #     1: string.quoted.mediawiki
+        #     2: entity.other.quote.validhtml.mediawiki
+        #     3: meta.tag.validhtml.mediawiki
+        #   push: scope:source.php
+        #   with_prototype:
+        #     - match: (?=</(source|syntaxhighlight)>)
+        #       pop: true
         - match: '(r){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
@@ -1135,7 +1135,7 @@ contexts:
             - match: '(?=^\s*\||^\s*!|\|\||!!|\|\-|\|\})'
               pop: true
             - include: inline
-            - match: '(\S+)(=["'']?)'
+            - match: '([^\s])(=["'']?)'
               captures:
                 1: entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki
                 2: entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki
@@ -1148,6 +1148,7 @@ contexts:
                 - include: inline
             - match: \|
               scope: entity.other.attributes.table.cellcontents.cell-html-delimiter.validhtml.mediawiki
+
   template:
     # comment: "This repository item covers templates and parser functions."
     - match: '(?![^\{]\{)(\{{2})(?!\{[^\{])'
