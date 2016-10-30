@@ -48,7 +48,6 @@
             "requests-oauthlib",
             "python-jinja2",
             "markupsafe",
-            "fileio",
             "mdpopups",
             "python-markdown"
         ]
