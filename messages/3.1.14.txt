@@ -1,0 +1,5 @@
+## Mediawiker 3.1.14
+
+* Deprecation warnings from mwclient were suppressed.
+* New popup configurator for most important settings (**Configurator** command).
+* Asynchronous page publishing.

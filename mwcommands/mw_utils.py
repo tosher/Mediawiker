@@ -52,18 +52,30 @@ def set_setting(key, value):
     sublime.save_settings('Mediawiker.sublime-settings')
 
 
+def del_setting(key):
+    settings = sublime.load_settings('Mediawiker.sublime-settings')
+    settings.erase(key)
+    sublime.save_settings('Mediawiker.sublime-settings')
+
+
+def get_default_setting(key, default_value=None):
+    settings = sublime.decode_value(sublime.load_resource('Packages/Mediawiker/Mediawiker.sublime-settings'))
+    return settings.get(key, default_value)
+
+
 def set_syntax(page=None):
     syntax = get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG.tmLanguage')
 
     if page:
+        syntax_ext = 'sublime-syntax' if int(sublime.version()) >= 3084 else 'tmLanguage'
+
         # Scribunto lua modules, except doc subpage
         if page.namespace == SCRIBUNTO_NAMESPACE and not page.name.lower().endswith('/doc'):
-            if int(sublime.version()) >= 3084:  # dev build, or 3103 in main
-                syntax = 'Packages/Lua/Lua.sublime-syntax'
-            else:
-                syntax = 'Packages/Lua/Lua.tmLanguage'
-        elif page.name.lower().endswith('css'):
-            syntax = 'Packages/CSS/CSS.tmLanguage'
+            syntax = 'Packages/Lua/Lua.%s' % syntax_ext
+        elif page.name.lower().endswith('.css'):
+            syntax = 'Packages/CSS/CSS.%s' % syntax_ext
+        elif page.name.lower().endswith('.js'):
+            syntax = 'Packages/Javascript/Javascript.%s' % syntax_ext
 
     sublime.active_window().active_view().set_syntax_file(syntax)
 

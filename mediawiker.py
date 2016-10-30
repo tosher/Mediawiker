@@ -5,6 +5,7 @@ import sys
 
 import sublime
 import sublime_plugin
+import threading
 
 # https://github.com/wbond/sublime_package_control/wiki/Sublime-Text-3-Compatible-Packages
 # http://www.sublimetext.com/docs/2/api_reference.html
@@ -22,6 +23,10 @@ if pythonver >= 3:
 else:
     from mwcommands import mw_utils as mw
     from mwcommands import *
+
+# suppress deprecation warnings (turned on in mwclient lib: mwclient/__init__.py)
+import warnings
+warnings.simplefilter("ignore", DeprecationWarning)
 
 
 class MediawikerOpenPageCommand(sublime_plugin.WindowCommand):
@@ -114,25 +119,31 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             sublime.status_message('Can\'t publish page with empty title')
             return
 
-    def on_done(self, summary):
+    def post_page(self, summary):
         summary = '%s%s' % (summary, mw.get_setting('mediawiker_summary_postfix', ' (by SublimeText.Mediawiker)'))
         mark_as_minor = mw.get_setting('mediawiker_mark_as_minor')
+        # invert minor settings command '!'
+        if summary[0] == '!':
+            mark_as_minor = not mark_as_minor
+            summary = summary[1:]
+        self.page.save(self.current_text, summary=summary.strip(), minor=mark_as_minor)
+
+        # update revision for page in view
+        self.page = self.sitecon.Pages[self.title]
+        self.view.settings().set('page_revision', self.page.revision)
+
+        self.view.set_scratch(True)
+        self.view.settings().set('is_changed', False)  # reset is_changed flag
+        sublime.status_message('Wiki page %s was successfully published to wiki.' % (self.title))
+        mw.save_mypages(self.title)
+
+    def on_done(self, summary):
+        summary = '%s%s' % (summary, mw.get_setting('mediawiker_summary_postfix', ' (by SublimeText.Mediawiker)'))
+        # mark_as_minor = mw.get_setting('mediawiker_mark_as_minor')
         try:
             if self.page.can('edit'):
-                # invert minor settings command '!'
-                if summary[0] == '!':
-                    mark_as_minor = not mark_as_minor
-                    summary = summary[1:]
-                self.page.save(self.current_text, summary=summary.strip(), minor=mark_as_minor)
-
-                # update revision for page in view
-                self.page = self.sitecon.Pages[self.title]
-                self.view.settings().set('page_revision', self.page.revision)
-
-                self.view.set_scratch(True)
-                self.view.settings().set('is_changed', False)  # reset is_changed flag
-                sublime.status_message('Wiki page %s was successfully published to wiki.' % (self.title))
-                mw.save_mypages(self.title)
+                thread_save = threading.Thread(target=self.post_page, args=(summary,))
+                thread_save.start()
             else:
                 sublime.status_message('You have not rights to edit this page')
         except mw.mwclient.EditError as e:
@@ -143,8 +154,12 @@ class MediawikerEvents(sublime_plugin.EventListener):
     def on_activated(self, view):
         current_syntax = view.settings().get('syntax')
         current_site = mw.get_view_site()
+
         # TODO: move method to check mediawiker view to mwutils
-        if current_syntax is not None and current_syntax.endswith(('Mediawiker/Mediawiki.tmLanguage', 'Mediawiker/MediawikiNG.tmLanguage')):
+        if (current_syntax is not None and
+                current_syntax.startswith('Packages/Mediawiker/Mediawiki') and
+                current_syntax.endswith(('.tmLanguage', '.sublime-syntax'))):
+
             # Mediawiki mode
             view.settings().set('mediawiker_is_here', True)
 

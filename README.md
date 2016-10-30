@@ -23,6 +23,7 @@
 * Text folding - folding/unfolding page blocks by headers, tags, templates, html comments.
 * Notifications - show [notifications](https://www.mediawiki.org/wiki/Notifications) as menu.
 * Context opening - possibility to open included page, template, function by inline context.
+* Configurator - visual configuration of important settings.
 
 ![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/Mediawiker_Dark.png)
 *Screenshot using the Mediawiker_Dark color scheme*
@@ -63,6 +64,11 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
  * If user-name is empty, then authorization will not be used.
  * If user-name is not empty, but user-password is empty, you will be prompted for password on action.
 * All settings are available under the Main menu / Preferences / Package Settings / Mediawiker.
+
+### Configurator
+GUI configurator for important settings.
+
+![Mediawiker configurator](https://github.com/tosher/Mediawiker/wiki/Mediawiker_Configurator.png)
 
 ### Commands
 * **Edit panel** with all commands and snippets in ordered list (can be customized in the settings).

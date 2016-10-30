@@ -27,6 +27,7 @@ from .mw_table import MediawikerCsvTableCommand, MediawikerTableSimpleToWikiComm
 from .mw_text_commands import MediawikerInsertTextCommand, MediawikerReplaceTextCommand
 from .mw_upload import MediawikerUploadCommand, MediawikerFileUploadCommand
 from .mw_setup import MediawikerProcessSiteCommand
+from .mw_configurator import MediawikerConfiguratorCommand
 
 __all__ = [
     'MediawikerAddCategoryCommand',
@@ -68,5 +69,6 @@ __all__ = [
     'MediawikerReplaceTextCommand',
     'MediawikerUploadCommand',
     'MediawikerFileUploadCommand',
-    'MediawikerProcessSiteCommand'
+    'MediawikerProcessSiteCommand',
+    'MediawikerConfiguratorCommand'
 ]

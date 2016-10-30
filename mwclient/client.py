@@ -25,6 +25,7 @@ from requests_oauthlib import OAuth1
 from . import errors
 from . import listing
 from .sleep import Sleepers
+from .util import parse_timestamp
 
 try:
     import gzip
@@ -483,7 +484,7 @@ class Site(object):
         if self.version[:2] >= (1, 24):
             # The 'csrf' (cross-site request forgery) token introduced in 1.24 replaces
             # the majority of older tokens, like edittoken and movetoken.
-            if type not in {'watch', 'patrol', 'rollback', 'userrights'}:
+            if type not in set(['watch', 'patrol', 'rollback', 'userrights']):
                 type = 'csrf'
 
         if type not in self.tokens:

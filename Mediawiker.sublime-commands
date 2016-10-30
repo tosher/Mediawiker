@@ -37,5 +37,6 @@
     { "caption": "Mediawiker: Fold Level 5", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "fold_5"}}},
     { "caption": "Mediawiker: Unfold Level 5", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "unfold_5"}}},
     { "caption": "Mediawiker: Fold text blocks", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "foldwiki"}}},
-    { "caption": "Mediawiker: Unfold text blocks", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "unfoldwiki"}}}
+    { "caption": "Mediawiker: Unfold text blocks", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "unfoldwiki"}}},
+    { "caption": "Mediawiker: Configurator", "command": "mediawiker_configurator"}
 ]
