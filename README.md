@@ -32,9 +32,9 @@
 
 ### Package Control
 
-    Package Control 3.0 now required for work on Linux.
+    Package Control 3.0 now required for work.
 
-The easiest way to install this is with [Package Control](http://wbond.net/sublime\_packages/package\_control).
+The easiest way to install this is with [Package Control](https://packagecontrol.io/).
 
  * If you just went and installed Package Control, you probably need to restart Sublime Text 2 before doing this next bit.
  * Bring up the Command Palette (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on OS X, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on Linux/Windows).
@@ -42,19 +42,6 @@ The easiest way to install this is with [Package Control](http://wbond.net/subli
  * Select Mediawiker when the list appears.
 
 Package Control will automatically keep Mediawiker up to date with the latest version.
-
-### Other methods
-First find your Sublime Text 2 Packages folder:
-
-    - OS X: ~/Library/Application Support/Sublime Text 2/Packages/
-    - Windows: %APPDATA%/Sublime Text 2/Packages/
-    - Linux: ~/.Sublime Text 2/Packages/
-
-If you have Git, you can clone this repo to "/packages-folder/Mediawiker/"
-
-or,
-
-Download this repo using the "ZIP" button above, unzip and place the files in "/packages-folder/Mediawiker/"
 
 ## Documentation
 * **Note**: Not all color schemes fully supports syntax highlighting scopes required by markup languages like Mediawiki or Markdown. On this moment, color schemes with better support are: **Twilight**, **Sunburst**, **Eiffel**. Also, Mediawiker package includes **Twilight (Mediawiki)**, **Eiffel (Mediawiki)** and **Mediawiker_Dark**/**Mediawiker_Light** schemes with improved highlighting for mediawiki syntax. 
