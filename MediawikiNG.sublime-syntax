@@ -14,17 +14,9 @@ contexts:
     - include: block
     - include: block_pre_spaced
     - include: inline
+    - include: block_highlight
 
-  block:
-    - match: ^\s*(?i)(#redirect)
-      captures:
-        1: keyword.control.redirect.mediawiki
-      push:
-        - meta_scope: meta.redirect.mediawiki
-        - match: \n
-          pop: true
-        - include: link
-
+  block_highlight:
     - match: '{{src_tag_before_lang}}'
       captures:
         1: meta.tag.validhtml.mediawiki
@@ -402,7 +394,15 @@ contexts:
             2: entity.name.tag.source.mediawiki
             3: meta.tag.validhtml.mediawiki
           pop: true
-
+  block:
+    - match: ^\s*(?i)(#redirect)
+      captures:
+        1: keyword.control.redirect.mediawiki
+      push:
+        - meta_scope: meta.redirect.mediawiki
+        - match: \n
+          pop: true
+        - include: link
     - match: " ?(<)(uml)(>)"
       captures:
         1: meta.tag.validhtml.mediawiki
@@ -464,17 +464,18 @@ contexts:
     - match: '^-{4,}[ \t]*($\n)?'
       # comment: "A separator is made up of 4 or more -s alone on a line by themselves."
       scope: meta.separator.mediawiki
-    - match: "^(?=[#*]+)"
+    - match: "^(?=:?[#*]+:?)"
       # comment: "numbered-unnumbered lists"
       push:
         - meta_scope: markup.list.mediawiki
         - include: block_item_definition_list
         - match: \n
           pop: true
-        - match: '([#*]+)'
+        - match: '(:?[#*]+:?)'
           captures:
             1: markup.other.special.mediawiki
         - include: inline
+        - include: block_highlight
     - include: block_item_definition_list
     - include: table
     - include: comments
@@ -537,7 +538,7 @@ contexts:
         - meta_content_scope: source.html
         - match: </table>
           pop: true
-        - include: scope:text.html
+        - include: scope:text.html.basic
     - match: (<)(ref)(>)
       captures:
         1: meta.tag.inline.ref.mediawiki

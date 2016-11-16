@@ -54,6 +54,7 @@ marks the end of the list.<!--
 -->
 Of course
 * you can start again.
+*: you can start again.
 ** and continue..<!--
 // ^ markup.list.mediawiki
 -->
@@ -209,3 +210,12 @@ from __future__ import with_statement
 // <- meta.tag.validhtml.mediawiki
   // <- entity.name.tag.source.mediawiki
 //      ^ meta.tag.validhtml.mediawiki
+
+* list element
+:* test
+// <- markup.other.special.mediawiki
+*: <source lang="python">
+ // <- markup.other.special.mediawiki
+// ^ meta.tag.validhtml.mediawiki
+//  ^ entity.name.tag.source.mediawiki
+</source>
