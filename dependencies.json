@@ -5,7 +5,8 @@
             "oauthlib",
             "requests-oauthlib",
             "python-jinja2",
-            "markupsafe"
+            "markupsafe",
+            "python-pywin32"
         ],
         "<3000": [
             "requests",
@@ -14,16 +15,6 @@
             "python-jinja2",
             "markupsafe",
             "ordereddict"
-        ],
-        ">=3103": [
-            "requests",
-            "oauthlib",
-            "requests-oauthlib",
-            "python-jinja2",
-            "markupsafe",
-            "mdpopups",
-            "pygments",
-            "python-markdown"
         ]
    },
    "linux": {
@@ -42,18 +33,7 @@
             "markupsafe",
             "fileio",
             "ordereddict"
-        ],
-        ">=3103": [
-            "requests",
-            "oauthlib",
-            "requests-oauthlib",
-            "python-jinja2",
-            "markupsafe",
-            "mdpopups",
-            "pygments",
-            "python-markdown"
         ]
-
    },
    "osx": {
         "*": [
@@ -70,16 +50,6 @@
             "python-jinja2",
             "markupsafe",
             "ordereddict"
-        ],
-        ">=3103": [
-            "requests",
-            "oauthlib",
-            "requests-oauthlib",
-            "python-jinja2",
-            "markupsafe",
-            "mdpopups",
-            "pygments",
-            "python-markdown"
         ]
-   }
+    }
 }

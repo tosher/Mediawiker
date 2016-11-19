@@ -28,10 +28,12 @@ if pythonver >= 3:
     # else:
     #     from . import mwclient
     from html.parser import HTMLParser
-    from .. import mwclient
+    from ..lib import mwclient
+    from ..lib import browser_cookie3
 else:
     from HTMLParser import HTMLParser
-    import mwclient
+    from lib import mwclient
+
 
 CATEGORY_NAMESPACE = 14  # category namespace number
 IMAGE_NAMESPACE = 6  # image namespace number
@@ -153,7 +155,6 @@ def pagename_clear(pagename):
     if site in pagename:
         pagename = re.sub(r'(https?://)?%s%s' % (site, pagepath), '', pagename)
 
-    sublime.status_message('Page name was cleared.')
     return pagename
 
 
@@ -480,12 +481,36 @@ def on_hover_comment(view, point):
 class WikiConnect(object):
 
     conns = {}
+    cj = None  # cookies
+    AUTH_TYPE_LOGIN = 'login'
+    AUTH_TYPE_OAUTH = 'oauth'
+    AUTH_TYPE_COOKIES = 'cookies'
 
     def _site_preinit(self):
         site_active = get_view_site()
         site_list = get_setting('mediawiki_site')
         self.site_params = site_list.get(site_active, {})
         self.site = self.site_params['host']
+        self.auth_type = self.site_params.get('authorization_type', self.AUTH_TYPE_LOGIN)
+        self.cookies_browser = self.site_params.get('cookies_browser', 'chrome') if self.auth_type == self.AUTH_TYPE_COOKIES else None
+
+    def try_cookie(self):
+        if self.auth_type != self.AUTH_TYPE_COOKIES:
+            return None
+
+        if self.cookies_browser == "firefox":
+            return browser_cookie3.firefox(domain_name=self.site)
+        elif self.cookies_browser == 'chrome':
+            return browser_cookie3.chrome(domain_name=self.site)
+        else:
+            sublime.message_dialog("Incompatible browser for cookie: [%s]" % (self.cookies_browser or "Not defined"))
+
+        return None
+
+    def is_eq_cookies(self, cj1, cj2):
+        cj1_set = set((c.domain, c.path, c.name, c.value) for c in cj1) if cj1 else set()
+        cj2_set = set((c.domain, c.path, c.name, c.value) for c in cj2) if cj2 else set()
+        return not bool(cj1_set - cj2_set or cj2_set - cj1_set)
 
     def _site_init(self):
         self.path = self.site_params['path']
@@ -521,15 +546,16 @@ class WikiConnect(object):
 
         self._site_preinit()
 
-        sitecon = self.conns.get(self.site, None)
-        if sitecon:
-            # print('return cached connection', sitecon)
-            return sitecon
+        cj = self.try_cookie() if self.auth_type == self.AUTH_TYPE_COOKIES else None
+
+        if self.auth_type == self.AUTH_TYPE_COOKIES and not self.is_eq_cookies(self.cj, cj):
+            self.cj = cj
+        else:
+            sitecon = self.conns.get(self.site, None)
+            if sitecon:
+                return sitecon
 
         self._site_init()
-
-        if password is not None:
-            self.password = password
 
         if self.is_https:
             sublime.status_message('Trying to get https connection to https://%s' % self.site)
@@ -538,8 +564,7 @@ class WikiConnect(object):
             sublime.status_message('Connection with proxy %s to %s' % (self.proxy_host, self.site))
 
         # oauth authorization
-        is_oauth = True if all([self.oauth_consumer_token, self.oauth_consumer_secret, self.oauth_access_token, self.oauth_access_secret]) else False
-        if is_oauth:
+        if self.auth_type == self.AUTH_TYPE_OAUTH and all([self.oauth_consumer_token, self.oauth_consumer_secret, self.oauth_access_token, self.oauth_access_secret]):
             try:
                 sitecon = mwclient.Site(host=self.host, path=self.path,
                                         consumer_token=self.oauth_consumer_token,
@@ -553,10 +578,12 @@ class WikiConnect(object):
                 return
         else:
 
+            # Site connection
             try:
                 sitecon = mwclient.Site(host=self.host, path=self.path, requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
             except requests.exceptions.HTTPError as e:
                 is_use_http_auth = self.site_params.get('use_http_auth', False)
+                # additional http auth (basic, digest)
                 if e.response.status_code == 401 and is_use_http_auth:
                     http_auth_header = e.response.headers.get('www-authenticate', '')
                     sitecon = self._http_auth(http_auth_header)
@@ -567,10 +594,24 @@ class WikiConnect(object):
                 sublime.message_dialog('Connection failed for %s: %s' % (self.host, e))
                 raise Exception('HTTP connection failed: %s' % e)
 
-            # if login is not empty - auth required
-            if self.username:
+            # Cookie auth
+            if self.auth_type == self.AUTH_TYPE_COOKIES and self.cj:
                 try:
                     if sitecon is not None:
+                        sitecon.login(cookies=self.cj, domain=self.domain)
+                        sublime.status_message('Logon successfully with cookies from %s browser.' % self.cookies_browser.title())
+                    else:
+                        sublime.status_message('Login failed: connection unavailable.')
+                except mwclient.LoginError as exc:
+                    e = exc.args if pythonver >= 3 else exc
+                    sublime.status_message('Login failed: %s' % e[1]['result'])
+                    return
+            # Login/Password auth
+            elif self.auth_type == self.AUTH_TYPE_LOGIN and self.username:
+                try:
+                    if sitecon is not None:
+                        if password is not None:
+                            self.password = password
                         sitecon.login(username=self.username, password=self.password, domain=self.domain)
                         sublime.status_message('Logon successfully.')
                     else:
@@ -623,12 +664,15 @@ class InputPanel(object):
         self.window = sublime.active_window()
 
     def show_input(self, panel_title='Input', value_pre=''):
-        self.window.show_input_panel(panel_title, value_pre, self.on_done, self.on_change, None)
+        self.window.show_input_panel(panel_title, value_pre, self.on_done, self.on_change, self.on_cancel)
 
     def on_done(self, value):
         pass
 
     def on_change(self, value):
+        pass
+
+    def on_cancel(self, value):
         pass
 
 

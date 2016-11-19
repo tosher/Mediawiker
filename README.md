@@ -17,7 +17,10 @@
 * Snippets - basic wiki marking tags - bold, italic, headings, etc.
 * Edit panel - all commands and snippets available through one panel. 
 * Shortcuts - possibility to create plugin specific shortcuts to all commands and snippets to create word-like editor.
-* Connectivity - http/https, direct/proxy connection with basic/digest web-server authorization.
+* Connectivity - http/https, direct/proxy connection with basic/digest web-server authorization. Types of authorization: 
+    - Login/Password;
+    - OAuth;
+    - Browser's cookie based - Firefox or Chrome.
 * Connection manager - add new wiki sites, and switch between them.
 * Page preview - possibility to preview page before posting with some preview customization options.
 * Text folding - folding/unfolding page blocks by headers, tags, templates, html comments.
@@ -28,13 +31,28 @@
 ![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/Mediawiker_Dark.png)
 *Screenshot using the Mediawiker_Dark color scheme*
 
+## External dependencies (with modifications or not)
+* [Mwclient](https://github.com/mwclient/mwclient) - the Corrrre!
+* [Browsercookie](https://bitbucket.org/richardpenman/browsercookie), [Browser_cookie3](https://github.com/borisbabic/browser_cookie3)
+    - [Keyring](https://pypi.python.org/pypi/keyring)
+    - [Pbkdf2](https://pypi.python.org/pypi/pbkdf2)
+    - [Pyaes](https://pypi.python.org/pypi/pyaes)
+
+### Dependencies, supported by Package control
+* [Requests](https://github.com/packagecontrol/requests)
+* [Requests-oauthlib](https://github.com/packagecontrol/requests-oauthlib)
+* [OAuthlib](https://github.com/packagecontrol/oauthlib)
+* [python-jinja2](https://bitbucket.org/teddy_beer_maniac/sublime-text-dependency-jinja2)
+* [markupsafe](https://bitbucket.org/teddy_beer_maniac/sublime-text-dependency-markupsafe)
+* [python-pywin32](https://github.com/randy3k/sublime-pywin32)
+
 ## Install
 
 ### Package Control
 
-    Package Control 3.0 now required for work.
+    Package Control 3.0 now required for work on Linux.
 
-The easiest way to install this is with [Package Control](https://packagecontrol.io/).
+The easiest way to install this is with [Package Control](http://wbond.net/sublime\_packages/package\_control).
 
  * If you just went and installed Package Control, you probably need to restart Sublime Text 2 before doing this next bit.
  * Bring up the Command Palette (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on OS X, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on Linux/Windows).
@@ -42,6 +60,19 @@ The easiest way to install this is with [Package Control](https://packagecontrol
  * Select Mediawiker when the list appears.
 
 Package Control will automatically keep Mediawiker up to date with the latest version.
+
+### Other methods
+First find your Sublime Text 2 Packages folder:
+
+    - OS X: ~/Library/Application Support/Sublime Text 2/Packages/
+    - Windows: %APPDATA%/Sublime Text 2/Packages/
+    - Linux: ~/.Sublime Text 2/Packages/
+
+If you have Git, you can clone this repo to "/packages-folder/Mediawiker/"
+
+or,
+
+Download this repo using the "ZIP" button above, unzip and place the files in "/packages-folder/Mediawiker/"
 
 ## Documentation
 * **Note**: Not all color schemes fully supports syntax highlighting scopes required by markup languages like Mediawiki or Markdown. On this moment, color schemes with better support are: **Twilight**, **Sunburst**, **Eiffel**. Also, Mediawiker package includes **Twilight (Mediawiki)**, **Eiffel (Mediawiki)** and **Mediawiker_Dark**/**Mediawiker_Light** schemes with improved highlighting for mediawiki syntax. 

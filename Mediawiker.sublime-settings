@@ -1,9 +1,70 @@
 {
     "mediawiki_site":
     {
-        "English wikipedia": { "host": "en.wikipedia.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "", "https": true},
-        "Russian wikipedia": { "host": "ru.wikipedia.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "", "https": true},
-        "Mediawiki": { "host": "www.mediawiki.org", "path": "/w/", "pagepath": "/wiki/", "username": "", "password": "", "domain": "", "https": true}
+        "English wikipedia": {
+            "authorization_type": "login",  // Authorization type: "login" / "oauth" / "cookies"
+            "host": "en.wikipedia.org",  // Site url
+            "path": "/w/",  // API path (https://en.wikipedia.org/wiki/Special:Version)
+            "pagepath": "/wiki/",  // Pages path (https://en.wikipedia.org/wiki/Special:Version)
+            "username": "",  // Login authorization type
+            "password": "", // Login authorization type
+            "domain": "",  // Domain for corp. wikies with LDAP authorization
+            "https": true,  // Using HTTPS protocol instead of HTTP
+            "is_ssl_cert_verify": true,  // Verify server SSL certificates on connection
+            "proxy_host": "",  // Connection through proxy server: like http[s]://[login:password@]domain.com[:3128]
+            "use_http_auth": false,  // Additional HTTP authorization: Basic or Digest
+            "http_auth_login": "",  // Additional HTTP authorization: Basic or Digest
+            "http_auth_password": "",  // Additional HTTP authorization: Basic or Digest
+            "oauth_access_secret": "",  // OAuth authorization type
+            "oauth_access_token": "",  // OAuth authorization type
+            "oauth_consumer_secret": "",  // OAuth authorization type
+            "oauth_consumer_token": "",  // OAuth authorization type
+            "cookies_browser": "chrome",  // Cookies authorization type: "chrome" or "firefox"
+            "preview_custom_head": []  // List of custom html head tags for preview generation
+        },
+        "Russian wikipedia": {
+            "authorization_type": "login",
+            "host": "ru.wikipedia.org",
+            "path": "/w/",
+            "pagepath": "/wiki/",
+            "username": "",
+            "password": "",
+            "domain": "",
+            "https": true,
+            "is_ssl_cert_verify": true,
+            "proxy_host": "",
+            "use_http_auth": false,
+            "http_auth_login": "",
+            "http_auth_password": "",
+            "oauth_access_secret": "",
+            "oauth_access_token": "",
+            "oauth_consumer_secret": "",
+            "oauth_consumer_token": "",
+            "cookies_browser": "chrome",
+            "preview_custom_head": []
+
+        },
+        "Mediawiki": {
+            "authorization_type": "login",
+            "host": "www.mediawiki.org",
+            "path": "/w/",
+            "pagepath": "/wiki/",
+            "username": "",
+            "password": "",
+            "domain": "",
+            "https": true,
+            "is_ssl_cert_verify": true,
+            "proxy_host": "",
+            "use_http_auth": false,
+            "http_auth_login": "",
+            "http_auth_password": "",
+            "oauth_access_secret": "",
+            "oauth_access_token": "",
+            "oauth_consumer_secret": "",
+            "oauth_consumer_token": "",
+            "cookies_browser": "chrome",
+            "preview_custom_head": []
+        }
     },
     "mediawiki_syntax": "Packages/Mediawiker/MediawikiNG.sublime-syntax",
     "mediawiki_site_active": "English wikipedia",
@@ -20,14 +81,14 @@
     "mediawiker_category_root": "Category:Help",
     "mediawiker_mark_as_minor": false,
     "mediawiker_csvtable_delimiter": "|",
-    "mediawiker_search_namespaces": "0,6,14",
+    "mediawiker_search_namespaces": "0,6,14",  // Wiki namespaces for search
     "mediawiker_search_results_count": 50,
     "mediawiker_image_prefix_min_length": 0,
     "mediawiker_wiki_instead_editor": true,
     "mediawiki_validate_revision_on_post": true,
     "mediawiki_linkstopage_limit": 50,
     "mediawiki_search_syntax": "Packages/Markdown/Markdown.tmLanguage",
-    "mediawiki_preview_file": "Wiki_page_preview_",
+    "mediawiki_preview_file": "Wiki_page_preview_",  // Prefix or full file name - if full, html file will be generated in User folder, otherwise - temporary.
     "mediawiki_preview_lang": "en",
     "mediawiker_fold_tags": ["source", "syntaxhighlight", "div", "pre"],
     "mediawiki_preview_head": [
@@ -42,6 +103,20 @@
         "class": "wikitable"
     },
     "mediawiker_wikitable_cell_properties": {},
+    "mediawiker_config_icon_checked": "✓",
+    "mediawiker_config_icon_unchecked": "✗",
+    "mediawiker_config_icon_radio_checked": "✓",
+    "mediawiker_config_icon_radio_unchecked": "⭕",
+    "mediawiker_config_icon_edit": "🖉",
+    "mediawiker_config_html": {
+        "html_background_color": "#2c3e50",
+        "body_color": "white",
+        "a_color": "#C5EFF7",
+        "code_color": "#c0c0c0",
+        "h_color": "#DADFE1",
+        "class_error_color": "#c0392b",
+        "class_success_color": "#27ae60"
+    },
     "mediawiker_panel":
     [
         {"caption": "Open page", "type": "window_command", "value": "mediawiker_open_page"},

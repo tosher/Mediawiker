@@ -5,7 +5,6 @@ import sys
 
 import sublime
 import sublime_plugin
-import threading
 
 # https://github.com/wbond/sublime_package_control/wiki/Sublime-Text-3-Compatible-Packages
 # http://www.sublimetext.com/docs/2/api_reference.html
@@ -18,6 +17,7 @@ import threading
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
+    import threading
     from .mwcommands import mw_utils as mw
     from .mwcommands import *
 else:
@@ -142,8 +142,11 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
         # mark_as_minor = mw.get_setting('mediawiker_mark_as_minor')
         try:
             if self.page.can('edit'):
-                thread_save = threading.Thread(target=self.post_page, args=(summary,))
-                thread_save.start()
+                if pythonver >= 3:
+                    thread_save = threading.Thread(target=self.post_page, args=(summary,))
+                    thread_save.start()
+                else:
+                    self.post_page(summary=summary)
             else:
                 sublime.status_message('You have not rights to edit this page')
         except mw.mwclient.EditError as e:
