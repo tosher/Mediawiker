@@ -11,7 +11,8 @@ if pythonver >= 3:
     from . import mw_utils as mw
     from distutils.util import strtobool
     from collections import OrderedDict
-
+else:
+    import mw_utils as mw
 
 class MWHTML(object):
 

@@ -486,34 +486,39 @@ def on_hover_comment(view, point):
 
 
 def status_message(message, replace=None):
-    is_use_message_panel = get_setting('use_status_messages_panel', True)
 
-    if is_use_message_panel:
-        panel_name = 'mediawiker_panel'
-        panel = sublime.active_window().find_output_panel(panel_name)
-        if not panel:
-            if int(sublime.version()) >= 3000:
-                panel = sublime.active_window().create_output_panel(panel_name)
-            else:
-                panel = sublime.active_window().get_output_panel(panel_name)
-            # panel props
-            # https://forum.sublimetext.com/t/style-the-output-panel/10316/6
-            # panel.settings().set("rulers", [2])
-            if pythonver >= 3:
-                panel.set_syntax_file(get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiPanel.sublime-syntax'))
-            else:
-                panel.set_syntax_file(get_setting('mediawiki_syntax', 'Packages/Text/Plain Text.tmLanguage'))
-        panel.set_read_only(False)
-        panel.run_command('mediawiker_insert_text', {'position': panel.size(), 'text': '%s\n' % message})
-        panel.set_read_only(True)
-        # panel.show_at_center(panel.size())
-        # panel.show(panel.size())
-        sublime.active_window().run_command("show_panel", {"panel": "output." + panel_name})
-    else:
+    def status_message_sublime(message, replace=None):
         if replace:
             for r in replace:
                 message = message.replace(r, '')
         sublime.status_message(message)
+
+    is_use_message_panel = get_setting('use_status_messages_panel', True)
+
+    if is_use_message_panel:
+        panel_name = 'mediawiker_panel'
+        if int(sublime.version()) >= 3000:
+            panel = sublime.active_window().find_output_panel(panel_name)
+            if panel is None:
+                panel = sublime.active_window().create_output_panel(panel_name)
+            # https://forum.sublimetext.com/t/style-the-output-panel/10316/6
+            if panel is not None:
+                panel.set_syntax_file(get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiPanel.sublime-syntax'))
+        else:
+            panel = sublime.active_window().get_output_panel(panel_name)
+            if panel is not None:
+                panel.set_syntax_file(get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG_ST2.tmLanguage'))
+
+        if panel is not None:
+            panel.set_read_only(False)
+            panel.run_command('mediawiker_insert_text', {'position': panel.size(), 'text': '%s\n' % message})
+            panel.set_read_only(True)
+            # panel.show(panel.size())
+            sublime.active_window().run_command("show_panel", {"panel": "output.%s" % panel_name})
+        else:
+            status_message_sublime(message, replace)
+    else:
+        status_message_sublime(message, replace)
 
 
 # classes..
