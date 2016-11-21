@@ -64,12 +64,12 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         if is_writable or text:
 
             if is_writable and not text:
-                sublime.status_message('Wiki page %s is not exists. You can create new..' % (title))
+                mw.status_message('Wiki page %s is not exists. You can create new..' % (title))
                 text = '<!-- New wiki page: Remove this with text of the new page -->'
             # insert text
             self.view.erase(edit, sublime.Region(0, self.view.size()))
             self.view.run_command('mediawiker_insert_text', {'position': 0, 'text': text})
-            sublime.status_message('Page %s was opened successfully from %s.' % (title, mw.get_view_site()))
+            mw.status_message('Page [[%s]] was opened successfully from "%s".' % (title, mw.get_view_site()), replace=['[', ']'])
             mw.set_syntax(page=page)
             self.view.settings().set('mediawiker_is_here', True)
             self.view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
@@ -90,7 +90,6 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
     current_text = ''
 
     def run(self, edit, title, password):
-
         is_process_post = True
         is_skip_summary = mw.get_setting('mediawiker_skip_summary', False)
         self.sitecon = mw.get_connect(password)
@@ -114,9 +113,9 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                 else:
                     self.view.window().run_command('mediawiker_page', {'action': 'mediawiker_reopen_page', 'new_tab': True})
             else:
-                sublime.status_message('You have not rights to edit this page')
+                mw.status_message('You have not rights to edit this page')
         else:
-            sublime.status_message('Can\'t publish page with empty title')
+            mw.status_message('Can\'t publish page with empty title')
             return
 
     def post_page(self, summary):
@@ -134,7 +133,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 
         self.view.set_scratch(True)
         self.view.settings().set('is_changed', False)  # reset is_changed flag
-        sublime.status_message('Wiki page %s was successfully published to wiki.' % (self.title))
+        mw.status_message('Wiki page [[%s]] was successfully published to wiki.' % (self.title), replace=['[', ']'])
         mw.save_mypages(self.title)
 
     def on_done(self, summary):
@@ -148,9 +147,9 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                 else:
                     self.post_page(summary=summary)
             else:
-                sublime.status_message('You have not rights to edit this page')
+                mw.status_message('You have not rights to edit this page')
         except mw.mwclient.EditError as e:
-            sublime.status_message('Can\'t publish page %s (%s)' % (self.title, e))
+            mw.status_message('Can\'t publish page [[%s]] (%s)' % (self.title, e), replace=['[', ']'])
 
 
 class MediawikerEvents(sublime_plugin.EventListener):

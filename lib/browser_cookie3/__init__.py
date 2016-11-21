@@ -360,16 +360,16 @@ def create_cookie(host, path, secure, expires, name, value):
     return cookielib.Cookie(0, name, value, None, False, host, host.startswith('.'), host.startswith('.'), path, True, secure, expires, False, None, None, {})
 
 
-def chrome(cookie_file=None, domain_name=None):
+def chrome(cookie_files=None, domain_name=None):
     """Returns a cookiejar of the cookies used by Chrome
     """
-    return Chrome(cookie_file, domain_name).load()
+    return Chrome(cookie_files, domain_name).load()
 
 
-def firefox(cookie_file=None, domain_name=None):
+def firefox(cookie_files=None, domain_name=None):
     """Returns a cookiejar of the cookies and sessions used by Firefox
     """
-    return Firefox(cookie_file, domain_name).load()
+    return Firefox(cookie_files, domain_name).load()
 
 
 def _get_cookies():

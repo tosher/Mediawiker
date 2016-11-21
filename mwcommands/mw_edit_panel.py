@@ -40,4 +40,4 @@ class MediawikerEditPanelCommand(sublime_plugin.WindowCommand):
                     # run command
                     self.window.active_view().run_command(action_value)
             except ValueError as e:
-                sublime.status_message(e)
+                mw.status_message(e)

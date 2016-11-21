@@ -38,7 +38,7 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
         if self.links_names:
             sublime.active_window().show_quick_panel(self.links_names, self.on_done)
         else:
-            sublime.status_message('Unable to find laguage links for "%s"' % title)
+            mw.status_message('Unable to find laguage links for "%s"' % title)
 
     def mw_get_page_langlinks(self, site, title):
         self.links = {}
@@ -78,6 +78,6 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
                 # open page with force site_active_new
                 sublime.active_window().run_command("mediawiker_page", {"title": self.page_name, "action": "mediawiker_show_page", "site_active": site_active_new})
             else:
-                sublime.status_message('Settings not found for host %s.' % (host_new))
+                mw.status_message('Settings not found for host %s.' % (host_new))
         elif index == 1:
             self.view.run_command('mediawiker_replace_text', {'text': self.page_name})

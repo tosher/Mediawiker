@@ -20,5 +20,5 @@ class MediawikerOpenPageInBrowserCommand(sublime_plugin.WindowCommand):
         if url:
             webbrowser.open(url)
         else:
-            sublime.status_message('Can\'t open page with empty title')
+            mw.status_message('Can\'t open page with empty title')
             return

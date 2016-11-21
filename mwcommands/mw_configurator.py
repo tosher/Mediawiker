@@ -105,7 +105,8 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
         self.UNMARKED = mw.get_setting('mediawiker_config_icon_unchecked', '✗')
         self.RADIO_MARKED = mw.get_setting('mediawiker_config_icon_radio_checked', '✓')
         self.RADIO_UNMARKED = mw.get_setting('mediawiker_config_icon_radio_unchecked', '⭕')
-        self.EDIT_ICON = mw.get_setting('mediawiker_config_icon_edit', '🖉')
+        self.EDIT_ICON = mw.get_setting('mediawiker_config_icon_edit', '→')
+        self.BACK_ICON = mw.get_setting('mediawiker_config_icon_back', '←')
 
         config_html = mw.get_setting('mediawiker_config_html', {})
         self.html = MWHTML(**config_html)
@@ -121,7 +122,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
             link = self.html.link(
                 url=self.FORMAT_URL % {'section': 'BACK', 'value': 'BACK', 'params': '', 'goto': 'Main'},
-                text=self.FORMAT_SECTION % {'name': '%s Back' % self.icon('←')}
+                text=self.FORMAT_SECTION % {'name': '%s Back' % self.icon(self.BACK_ICON)}
             )
             menu.append(self.html.li(link))
         return menu
@@ -316,8 +317,6 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
     def show_menu(self, popup):
         if not popup:
             return
-
-        print(self.html.build(popup))
 
         self.view.show_popup(
             content=self.html.build(popup),

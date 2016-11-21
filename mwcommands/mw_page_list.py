@@ -25,7 +25,7 @@ class MediawikerPageListCommand(sublime_plugin.WindowCommand):
             # error 'Quick panel unavailable' fix with timeout..
             sublime.set_timeout(lambda: self.window.show_quick_panel(self.my_pages, self.on_done), 1)
         else:
-            sublime.status_message('List of pages for wiki "%s" is empty.' % (site_name_active))
+            mw.status_message('List of pages for wiki "%s" is empty.' % (site_name_active))
 
     def on_done(self, index):
         if index >= 0:

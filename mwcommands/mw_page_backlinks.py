@@ -29,7 +29,7 @@ class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):
         if self.links:
             sublime.active_window().show_quick_panel(self.links, self.on_done)
         else:
-            sublime.status_message('Unable to find links to this page')
+            mw.status_message('Unable to find links to this page')
 
     def mw_get_page_backlinks(self, site, title):
         self.links = []

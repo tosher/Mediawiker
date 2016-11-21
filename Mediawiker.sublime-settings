@@ -20,7 +20,8 @@
             "oauth_consumer_secret": "",  // OAuth authorization type
             "oauth_consumer_token": "",  // OAuth authorization type
             "cookies_browser": "chrome",  // Cookies authorization type: "chrome" or "firefox"
-            "preview_custom_head": []  // List of custom html head tags for preview generation
+            "preview_custom_head": [],  // List of custom html head tags for preview generation
+            "retry_timeout": 30 // Timeout in seconds for http requests
         },
         "Russian wikipedia": {
             "authorization_type": "login",
@@ -41,7 +42,8 @@
             "oauth_consumer_secret": "",
             "oauth_consumer_token": "",
             "cookies_browser": "chrome",
-            "preview_custom_head": []
+            "preview_custom_head": [],
+            "retry_timeout": 30
 
         },
         "Mediawiki": {
@@ -63,7 +65,8 @@
             "oauth_consumer_secret": "",
             "oauth_consumer_token": "",
             "cookies_browser": "chrome",
-            "preview_custom_head": []
+            "preview_custom_head": [],
+            "retry_timeout": 30
         }
     },
     "mediawiki_syntax": "Packages/Mediawiker/MediawikiNG.sublime-syntax",
@@ -103,11 +106,15 @@
         "class": "wikitable"
     },
     "mediawiker_wikitable_cell_properties": {},
+    "use_status_messages_panel": true,
+    "mediawiker_firefox_cookie_files": [],
+    "mediawiker_chrome_cookie_files": [],
     "mediawiker_config_icon_checked": "✓",
     "mediawiker_config_icon_unchecked": "✗",
     "mediawiker_config_icon_radio_checked": "✓",
     "mediawiker_config_icon_radio_unchecked": "⭕",
-    "mediawiker_config_icon_edit": "🖉",
+    "mediawiker_config_icon_edit": "→",
+    "mediawiker_config_icon_back": "←",
     "mediawiker_config_html": {
         "html_background_color": "#2c3e50",
         "body_color": "white",

@@ -16,6 +16,7 @@ except ImportError:
     from ordereddict import OrderedDict
 
 import sublime
+import sublime_plugin
 import requests
 
 pythonver = sys.version_info[0]
@@ -133,7 +134,7 @@ def get_title():
             if ext[1:] in wiki_extensions and title:
                 return title
             else:
-                sublime.status_message('Unauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
+                status_message('Unauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
                 return ''
     return ''
 
@@ -143,8 +144,15 @@ def pagename_clear(pagename):
     # site_active = get_setting('mediawiki_site_active')
     site_active = get_view_site()
     site_list = get_setting('mediawiki_site')
-    site = site_list[site_active]['host']
-    pagepath = site_list[site_active]['pagepath']
+    site = site_list.get(site_active, {}).get('host', None)
+
+    if not site:
+        return pagename
+
+    pagepath = site_list.get(site_active, {}).get('pagepath', None)
+    if not pagepath:
+        return pagename
+
     try:
         pagename = strunquote(pagename)
     except UnicodeEncodeError:
@@ -275,7 +283,7 @@ def on_hover_selected(view, point):
 
     selected = view.sel()
     for r in selected:
-        if r.contains(point):
+        if r and r.contains(point):
             content = [
                 'Format:',
                 '<ul>',
@@ -477,6 +485,37 @@ def on_hover_comment(view, point):
     return False
 
 
+def status_message(message, replace=None):
+    is_use_message_panel = get_setting('use_status_messages_panel', True)
+
+    if is_use_message_panel:
+        panel_name = 'mediawiker_panel'
+        panel = sublime.active_window().find_output_panel(panel_name)
+        if not panel:
+            if int(sublime.version()) >= 3000:
+                panel = sublime.active_window().create_output_panel(panel_name)
+            else:
+                panel = sublime.active_window().get_output_panel(panel_name)
+            # panel props
+            # https://forum.sublimetext.com/t/style-the-output-panel/10316/6
+            # panel.settings().set("rulers", [2])
+            if pythonver >= 3:
+                panel.set_syntax_file(get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiPanel.sublime-syntax'))
+            else:
+                panel.set_syntax_file(get_setting('mediawiki_syntax', 'Packages/Text/Plain Text.tmLanguage'))
+        panel.set_read_only(False)
+        panel.run_command('mediawiker_insert_text', {'position': panel.size(), 'text': '%s\n' % message})
+        panel.set_read_only(True)
+        # panel.show_at_center(panel.size())
+        # panel.show(panel.size())
+        sublime.active_window().run_command("show_panel", {"panel": "output." + panel_name})
+    else:
+        if replace:
+            for r in replace:
+                message = message.replace(r, '')
+        sublime.status_message(message)
+
+
 # classes..
 class WikiConnect(object):
 
@@ -490,7 +529,9 @@ class WikiConnect(object):
         site_active = get_view_site()
         site_list = get_setting('mediawiki_site')
         self.site_params = site_list.get(site_active, {})
-        self.site = self.site_params['host']
+        self.site = self.site_params.get('host', None)
+        if not self.site:
+            sublime.message_dialog('Host is not defined for site %s' % site_active)
         self.auth_type = self.site_params.get('authorization_type', self.AUTH_TYPE_LOGIN)
         self.cookies_browser = self.site_params.get('cookies_browser', 'chrome') if self.auth_type == self.AUTH_TYPE_COOKIES else None
 
@@ -498,12 +539,16 @@ class WikiConnect(object):
         if self.auth_type != self.AUTH_TYPE_COOKIES:
             return None
 
+        cookie_files = get_setting('mediawiker_%s_cookie_files' % self.cookies_browser, [])
+        if not cookie_files:
+            cookie_files = None
+
         if self.cookies_browser == "firefox":
-            return browser_cookie3.firefox(domain_name=self.site)
+            return browser_cookie3.firefox(cookie_files=cookie_files, domain_name=self.site)
         elif self.cookies_browser == 'chrome':
-            return browser_cookie3.chrome(domain_name=self.site)
+            return browser_cookie3.chrome(cookie_files=cookie_files, domain_name=self.site)
         else:
-            sublime.message_dialog("Incompatible browser for cookie: [%s]" % (self.cookies_browser or "Not defined"))
+            sublime.message_dialog("Incompatible browser for cookie: %s" % (self.cookies_browser or "Not defined"))
 
         return None
 
@@ -513,10 +558,10 @@ class WikiConnect(object):
         return not bool(cj1_set - cj2_set or cj2_set - cj1_set)
 
     def _site_init(self):
-        self.path = self.site_params['path']
-        self.username = self.site_params['username']
-        self.password = self.site_params['password']
-        self.domain = self.site_params['domain']
+        self.path = self.site_params.get('path', '/w/')
+        self.username = self.site_params.get('username', '')
+        self.password = self.site_params.get('password', '')
+        self.domain = self.site_params.get('domain', '')
         self.proxy_host = self.site_params.get('proxy_host', '')
         self.http_auth_login = self.site_params.get('http_auth_login', '')
         self.http_auth_password = self.site_params.get('http_auth_password', '')
@@ -531,6 +576,7 @@ class WikiConnect(object):
         self.oauth_consumer_secret = self.site_params.get('oauth_consumer_secret', None)
         self.oauth_access_token = self.site_params.get('oauth_access_token', None)
         self.oauth_access_secret = self.site_params.get('oauth_access_secret', None)
+        self.retry_timeout = self.site_params.get('retry_timeout', 30)
 
         if self.proxy_host:
             # proxy host like: http(s)://user:pass@10.10.1.10:3128
@@ -558,15 +604,16 @@ class WikiConnect(object):
         self._site_init()
 
         if self.is_https:
-            sublime.status_message('Trying to get https connection to https://%s' % self.site)
+            status_message('Trying to get https connection to [https://%s]' % self.site)
 
         if self.proxy_host:
-            sublime.status_message('Connection with proxy %s to %s' % (self.proxy_host, self.site))
+            status_message('Connection with proxy [%s] to [%s]' % (self.proxy_host, self.site))
 
         # oauth authorization
         if self.auth_type == self.AUTH_TYPE_OAUTH and all([self.oauth_consumer_token, self.oauth_consumer_secret, self.oauth_access_token, self.oauth_access_secret]):
             try:
                 sitecon = mwclient.Site(host=self.host, path=self.path,
+                                        retry_timeout=self.retry_timeout,
                                         consumer_token=self.oauth_consumer_token,
                                         consumer_secret=self.oauth_consumer_secret,
                                         access_token=self.oauth_access_token,
@@ -574,13 +621,15 @@ class WikiConnect(object):
                                         requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
             except mwclient.OAuthAuthorizationError as exc:
                 e = exc.args if pythonver >= 3 else exc
-                sublime.status_message('Login failed: %s' % e[1])
+                status_message('Login failed: %s' % e[1])
                 return
         else:
 
             # Site connection
             try:
-                sitecon = mwclient.Site(host=self.host, path=self.path, requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
+                sitecon = mwclient.Site(host=self.host, path=self.path,
+                                        retry_timeout=self.retry_timeout,
+                                        requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
             except requests.exceptions.HTTPError as e:
                 is_use_http_auth = self.site_params.get('use_http_auth', False)
                 # additional http auth (basic, digest)
@@ -599,12 +648,12 @@ class WikiConnect(object):
                 try:
                     if sitecon is not None:
                         sitecon.login(cookies=self.cj, domain=self.domain)
-                        sublime.status_message('Logon successfully with cookies from %s browser.' % self.cookies_browser.title())
+                        status_message('Logon successfully with cookies from %s browser.' % self.cookies_browser.title())
                     else:
-                        sublime.status_message('Login failed: connection unavailable.')
+                        status_message('Login failed: connection unavailable.')
                 except mwclient.LoginError as exc:
                     e = exc.args if pythonver >= 3 else exc
-                    sublime.status_message('Login failed: %s' % e[1]['result'])
+                    status_message('Login failed: %s' % e[1]['result'])
                     return
             # Login/Password auth
             elif self.auth_type == self.AUTH_TYPE_LOGIN and self.username:
@@ -613,15 +662,15 @@ class WikiConnect(object):
                         if password is not None:
                             self.password = password
                         sitecon.login(username=self.username, password=self.password, domain=self.domain)
-                        sublime.status_message('Logon successfully.')
+                        status_message('Logon successfully.')
                     else:
-                        sublime.status_message('Login failed: connection unavailable.')
+                        status_message('Login failed: connection unavailable.')
                 except mwclient.LoginError as exc:
                     e = exc.args if pythonver >= 3 else exc
-                    sublime.status_message('Login failed: %s' % e[1]['result'])
+                    status_message('Login failed: %s' % e[1]['result'])
                     return
             else:
-                sublime.status_message('Connection without authorization')
+                status_message('Connection without authorization')
 
         if sitecon:
             self.conns[self.site] = sitecon
@@ -653,7 +702,7 @@ class WikiConnect(object):
                 sitecon = mwclient.Site(host=self.host, path=self.path, httpauth=httpauth, requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
         else:
             error_message = 'HTTP connection failed: Unknown realm.'
-            sublime.status_message(error_message)
+            status_message(error_message)
             raise Exception(error_message)
         return sitecon
 
@@ -704,11 +753,16 @@ class InputPanelPassword(InputPanel):
     is_hide_password = False
 
     def get_password(self):
-        # site_active = mw.get_setting('mediawiki_site_active')
+        # TODO: check auth type!
         site_active = get_view_site()
         site_list = get_setting('mediawiki_site')
-        password = site_list[site_active]["password"]
-        if site_list[site_active]["username"]:
+
+        if site_list.get(site_active, {}).get('authorization_type', 'login') != 'login':
+            self.on_done(password=None)
+            return
+
+        password = site_list.get(site_active, {}).get('password', '')
+        if site_list.get(site_active, {}).get("username", ''):
             # auth required if username exists in settings
             if not password:
                 self.is_hide_password = get_setting('mediawiker_password_input_hide')

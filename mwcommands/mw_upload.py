@@ -53,7 +53,7 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
         try:
             with open(self.file_path, 'rb') as f:
                 sitecon.upload(f, self.file_destname, self.file_descr)
-            sublime.status_message('File %s successfully uploaded to wiki as %s' % (self.file_path, self.file_destname))
+            mw.status_message('File %s successfully uploaded to wiki as %s' % (self.file_path, self.file_destname))
         except IOError as e:
             sublime.message_dialog('Upload io error: %s' % e)
         except Exception as e:

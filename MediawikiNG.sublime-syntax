@@ -1048,7 +1048,7 @@ contexts:
             2: entity.name.tag.validhtml.mediawiki
           pop: true
         - include: style_in_link
-    - match: (?i:(<(tt|code|keyboard)>))
+    - match: (?i:(<(tt|code|kbd)>))
       captures:
         1: meta.tag.validhtml.mediawiki
         2: entity.name.tag.validhtml.mediawiki

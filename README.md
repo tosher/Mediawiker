@@ -50,7 +50,7 @@
 
 ### Package Control
 
-    Package Control 3.0 now required for work on Linux.
+    Package Control 3.0 now required for work.
 
 The easiest way to install this is with [Package Control](http://wbond.net/sublime\_packages/package\_control).
 

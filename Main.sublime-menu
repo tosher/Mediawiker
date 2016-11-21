@@ -11,6 +11,7 @@
                     {"command": "mediawiker_edit_panel", "caption": "Edit panel"},
                     {"command": "mediawiker_open_page", "caption": "Open page"},
                     {"command": "mediawiker_post_page", "caption": "Post page"},
+                    {"command": "mediawiker_configurator", "caption": "Configurator"},
                     {
                         "id": "text_folding",
                         "mnemonic": "f",

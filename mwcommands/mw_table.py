@@ -96,7 +96,7 @@ class MediawikerTableWikiToSimpleCommand(sublime_plugin.TextCommand):
             try:
                 self.view.run_command('table_editor_enable_for_current_view', {'prop': 'enable_table_editor'})
             except Exception as e:
-                sublime.status_message('Need to correct install plugin TableEditor: %s' % e)
+                mw.status_message('Need to correct install plugin TableEditor: %s' % e)
 
     def table_get(self, text):
         tbl_row_delimiter = r'\|\-(.*)'
@@ -232,4 +232,4 @@ class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
         try:
             return delimiter.join(' %s%s ' % (cell_properties, cell['cell_data'].strip()) for cell in rowlist)
         except Exception as e:
-            print('Error in data: %s' % e)
+            mw.status_message('Error in data: %s' % e)

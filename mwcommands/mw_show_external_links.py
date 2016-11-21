@@ -32,7 +32,7 @@ class MediawikerShowExternalLinksCommand(sublime_plugin.TextCommand):
         if self.items:
             sublime.set_timeout(lambda: self.view.window().show_quick_panel(self.items, self.on_select), 1)
         else:
-            sublime.status_message('No external links was found.')
+            mw.status_message('No external links was found.')
 
     def prepare_header(self, header):
         maxlen = 70

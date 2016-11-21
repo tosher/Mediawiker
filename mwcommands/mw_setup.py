@@ -123,4 +123,4 @@ class MediawikerProcessSiteCommand(sublime_plugin.WindowCommand):
         if sublime.ok_cancel_dialog('Activate this host?'):
             mw.set_setting("mediawiki_site_active", self.site_name)
 
-        sublime.status_message('Setup finished.')
+        mw.status_message('Setup finished.')

@@ -72,7 +72,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
         try:
             self.get_notifications(password)
         except Exception as e:
-            print('Mediawiker exception: %s' % e)
+            mw.status_message('Mediawiker exception: %s' % e)
 
     def get_notifications(self, password):
         # check notifications on page open command
