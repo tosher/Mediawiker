@@ -27,7 +27,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
             panel_passwd = mw.InputPanelPassword(callback=self.command_run)
             panel_passwd.get_password()
         else:
-            sublime.set_timeout_async(self.command_run, 0)
+            mw.set_timeout_async(self.command_run, 0)
 
     def command_run(self):
 

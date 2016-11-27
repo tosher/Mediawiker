@@ -123,9 +123,9 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                     self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
                     if not is_skip_summary:
                         summary_message = 'Changes summary (%s):' % mw.get_view_site()
-                        sublime.set_timeout_async(self.view.window().show_input_panel(summary_message, '', self.on_done, None, None), 0)
+                        mw.set_timeout_async(self.view.window().show_input_panel(summary_message, '', self.on_done, None, None), 0)
                     else:
-                        sublime.set_timeout_async(self.on_done, 0)
+                        mw.set_timeout_async(self.on_done, 0)
                 else:
                     self.view.window().run_command('mediawiker_page', {'action': 'mediawiker_reopen_page', 'new_tab': True})
             else:

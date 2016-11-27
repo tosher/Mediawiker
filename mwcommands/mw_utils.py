@@ -166,6 +166,7 @@ def pagename_clear(pagename):
     return pagename
 
 
+# TODO: move functions like this to connection class?
 def get_connect():
     sitecon = mwcon.get_site()
     if not sitecon:
@@ -390,6 +391,12 @@ def on_hover_internal_link(view, point):
                 flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
                 on_navigate=on_navigate
             )
+            # TODO: phantoms for images
+            # https://forum.sublimetext.com/t/dev-build-3118/21270
+            # view.add_phantom("test", view.sel()[0], "Hello, World!", sublime.LAYOUT_BLOCK)
+            # view.erase_phantoms("test")
+            # img_html = '<img src="%(uri)s">' % {'uri': img_base64} if img_base64 else ''
+            # view.add_phantom("image", sublime.Region(point, point), img_html, sublime.LAYOUT_BLOCK)
             return True
 
     return False
@@ -655,6 +662,13 @@ def status_message(message, replace=None, is_panel=None):
         status_message_sublime(message, replace)
 
 
+def set_timeout_async(callback, delay):
+    if pythonver >= 3000:
+        sublime.set_timeout_async(callback, delay)
+    else:
+        sublime.set_timeout(callback, delay)
+
+
 # classes..
 class WikiConnect(object):
 
@@ -909,7 +923,7 @@ class InputPanelPageTitle(InputPanel):
                 self.window.show_input_panel('Wiki page name:', pagename_cleared, self.on_done, self.on_change, None)
 
     def on_done(self, title):
-        sublime.set_timeout_async(self.callback(title), 0)
+        set_timeout_async(self.callback(title), 0)
 
 
 class InputPanelPassword(InputPanel):
@@ -951,7 +965,7 @@ class InputPanelPassword(InputPanel):
             password = self.ph.done()
         if password:
             mwcon.set_password(password)
-        sublime.set_timeout_async(self.callback, 0)
+        set_timeout_async(self.callback, 0)
 
 
 class PasswordHider(object):

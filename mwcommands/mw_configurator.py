@@ -404,11 +404,11 @@ class InputValue(mw.InputPanel):
         self.set_setting()
 
     def on_cancel(self):
-        sublime.set_timeout_async(self.callback(self.goto), 0)
+        mw.set_timeout_async(self.callback(self.goto), 0)
 
     def set_setting(self):
         mw.set_setting(self.option, self.value)
-        sublime.set_timeout_async(self.callback(self.goto), 0)
+        mw.set_timeout_async(self.callback(self.goto), 0)
 
 
 class InputSiteValue(mw.InputPanel):
@@ -437,10 +437,10 @@ class InputSiteValue(mw.InputPanel):
         self.set_setting()
 
     def on_cancel(self):
-        sublime.set_timeout_async(self.callback(self.goto), 0)
+        mw.set_timeout_async(self.callback(self.goto), 0)
 
     def set_setting(self):
         settings = mw.get_setting('mediawiki_site')
         settings[self.site][self.option] = self.value if self.value is not None else ''
         mw.set_setting('mediawiki_site', settings)
-        sublime.set_timeout_async(self.callback(self.goto), 0)
+        mw.set_timeout_async(self.callback(self.goto), 0)
