@@ -28,10 +28,10 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
     NOTE: Beta
     '''
 
-    def run(self, edit, title, password):
+    def run(self, edit):
         notifications_type = mw.get_setting('mediawiki_notifications_show_all', True)
         self.read_sign = mw.get_setting('mediawiki_notifications_read_sign', ' [+]')
-        sitecon = mw.get_connect(password)
+        sitecon = mw.get_connect()
         ns = sitecon.notifications()
         self.msgs = []
         if ns:
@@ -69,6 +69,7 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
                 title = self.msgs[idx - 1].get('title', None)
                 if title:
                     sublime.active_window().run_command("mediawiker_page", {
-                        "title": title,
                         "action": "mediawiker_show_page",
-                        "check_notifications": False})
+                        'action_params': {"title": title},
+                        "check_notifications": False
+                    })

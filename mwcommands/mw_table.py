@@ -116,21 +116,21 @@ class MediawikerTableWikiToSimpleCommand(sublime_plugin.TextCommand):
                         tbl_row.append(cell)
                 tbl_full.append(tbl_row)
 
-        tbl_full = self.table_print(tbl_full)
+        tbl_full = self.table_show(tbl_full)
         return tbl_full
 
-    def table_print(self, table_data):
+    def table_show(self, table_data):
         CELL_LEFT_BORDER = '|'
         CELL_RIGHT_BORDER = ''
         ROW_LEFT_BORDER = ''
         ROW_RIGHT_BORDER = '|'
-        tbl_print = ''
+        tbl_data = ''
         for row in table_data:
             if row:
-                row_print = ''.join(['%s%s%s' % (CELL_LEFT_BORDER, cell, CELL_RIGHT_BORDER) for cell in row])
-                row_print = '%s%s%s' % (ROW_LEFT_BORDER, row_print, ROW_RIGHT_BORDER)
-                tbl_print += '%s\n' % (row_print)
-        return tbl_print
+                row_data = ''.join(['%s%s%s' % (CELL_LEFT_BORDER, cell, CELL_RIGHT_BORDER) for cell in row])
+                row_data = '%s%s%s' % (ROW_LEFT_BORDER, row_data, ROW_RIGHT_BORDER)
+                tbl_data += '%s\n' % (row_data)
+        return tbl_data
 
     def table_getregion(self):
         cursor_position = self.view.sel()[0].begin()

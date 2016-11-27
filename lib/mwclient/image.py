@@ -7,9 +7,20 @@ from .page import Page
 
 class Image(Page):
 
-    def __init__(self, site, name, info=None):
-        super(Image, self).__init__(site, name, info,
-                                    extra_properties={'imageinfo': (('iiprop', 'timestamp|user|comment|url|size|sha1|metadata|archivename'), )})
+    def __init__(self, site, name, info=None, extra_properties=None):
+        # super(Image, self).__init__(site, name, info,
+        #                             extra_properties={'imageinfo': (('iiprop', 'timestamp|user|comment|url|size|sha1|metadata|archivename'), )})
+        extra_properties = extra_properties if extra_properties else {
+            'imageinfo': (
+                ('iiprop', 'timestamp|user|comment|url|size|sha1|metadata|archivename'), )
+        }
+
+        super(Image, self).__init__(
+            site,
+            name,
+            info,
+            extra_properties=extra_properties)
+
         self.imagerepository = self._info.get('imagerepository', '')
         self.imageinfo = self._info.get('imageinfo', ({}, ))[0]
 

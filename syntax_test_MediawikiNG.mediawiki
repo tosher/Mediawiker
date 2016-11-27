@@ -24,6 +24,14 @@
     // <- markup.heading.3.mediawiki
 //               ^ markup.heading.tag.mediawiki
 
+=== Heading 3<ref name="imdb">[http://domain.com/path/ Url name]</ref> ===
+// <- markup.heading.tag.mediawiki
+//  ^ markup.heading.3.mediawiki
+//            ^ markup.heading.3.mediawiki entity.name.tag.ref.mediawiki
+//                             ^^^^^^^^^^^^^^^^^^^^^^^ markup.heading.3.mediawiki
+//                             ^^^^^^^^^^^^^^^^^^^^^^^ markup.underline.link.external.mediawiki
+//                                                                     ^ markup.heading.tag.mediawiki
+
 ==== Header4 Test ====
 // <- markup.heading.tag.mediawiki
 //   ^ markup.heading.4.mediawiki
@@ -122,24 +130,41 @@ Of course
 // ^ markup.list.mediawiki - markup.list.definition.item.mediawiki - markup.list.definition.value.mediawiki
 -->
 
-<gallery mode="packed-hover">
+<gallery mode="packed-hover"><!--
 //                           ^ meta.gallery.mediawiki
+-->
 Linne num 2.jpg
 // <- meta.item.gallery.mediawiki
 // <- markup.underline.link.internal.mediawiki
-Image:Astronotus_ocellatus.jpg | ''[[commons:Astronotus ocellatus|Astronotus ocellatus]]'' (Oscar)
+Image:Astronotus_ocellatus.jpg | ''[[commons:Astronotus ocellatus|Astronotus ocellatus]]'' (Oscar)<!--
 // <- markup.underline.link.internal.namespace.mediawiki
 //   ^ punctuation.definition.tag.colon.mediawiki
 //    ^ markup.underline.link.internal.mediawiki
-Salmonlarvakils.jpg | ''[[commons:Salmo salar|Salmo salar]]''|250px
+-->
+Salmonlarvakils.jpg | ''[[commons:Salmo salar|Salmo salar]]''|250px<!--
 //                  ^ meta.tag.gallery.pipe.mediawiki
 //                                                           ^ meta.tag.gallery.pipe.mediawiki
 //                        ^ markup.underline.link.internal.namespace.mediawiki
-File:Australian blenny.jpg|''[[commons:Category:Ecsenius|Ecsenius axelrodi]]''
+-->
+File:Australian blenny.jpg|''[[commons:Category:Ecsenius|Ecsenius axelrodi]]''<!--
 //                                                      ^ meta.tag.link.wiki.mediawiki
 //                                                       ^ string.other.title.link.internal.mediawiki
+-->
 </gallery>
   // <- entity.name.tag.ref.mediawiki
+
+[[Image:Test image 1355.jpg|left|thumb|250px | Simple text ''[[Internal link italic|Link title italic]]'' simple text]]
+//                                                             ^ string.other.image.caption.mediawiki markup.italic.mediawiki
+[[Image:Test image 1355.jpg|left|thumb|250px | Simple text [[Internal link italic|Link title ''italic'']] simple text]]
+  // <- constant.other.namespace.image.mediawiki
+//                              ^ punctuation.definition.tag.pipe.mediawiki
+//                                           ^ punctuation.definition.tag.caption-pipe.mediawiki
+//                                             ^ string.other.image.caption.mediawiki
+//                                                           ^ markup.underline.link.internal.mediawiki
+//                                                                                             ^ markup.italic.mediawiki
+//                                                                                ^ string.other.title.link.internal.mediawiki
+//                                                                                                                   ^ meta.tag.inline.any.mediawiki
+
 
 [[Image:test_image.png]] / [[File:test_file.pdf]]
   // <- meta.image.wiki.mediawiki

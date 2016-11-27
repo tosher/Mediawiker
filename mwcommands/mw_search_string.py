@@ -18,21 +18,18 @@ class MediawikerSearchStringCommand(sublime_plugin.WindowCommand):
     ''' alias to Search string list command '''
 
     def run(self):
-        self.window.run_command("mediawiker_page", {"action": "mediawiker_search_string_list"})
+        self.window.run_command("mediawiker_page", {"action": "mediawiker_search_string_list", "nowiki": True})
 
 
 class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
-    password = ''
-    title = ''
     search_limit = 20
     pages_names = []
     search_result = None
 
-    def run(self, edit, title, password):
-        self.password = password
+    def run(self, edit):
         search_pre = ''
         selection = self.view.sel()
-        search_pre = self.view.substr(selection[0]).strip() if selection else ''
+        search_pre = self.view.substr(selection[0]).strip() if selection and selection[0] else ''
         sublime.active_window().show_input_panel('Wiki search:', search_pre, self.show_results, None, None)
 
     def show_results(self, search_value=''):
@@ -79,6 +76,6 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
         return text
 
     def do_search(self, string_value):
-        sitecon = mw.get_connect(self.password)
+        sitecon = mw.get_connect()
         namespace = mw.get_setting('mediawiker_search_namespaces')
         return sitecon.search(search=string_value, what='text', limit=self.search_limit, namespace=namespace)

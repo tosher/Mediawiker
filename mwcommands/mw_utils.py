@@ -28,6 +28,7 @@ if pythonver >= 3:
     #     import mwclient
     # else:
     #     from . import mwclient
+    import base64
     from html.parser import HTMLParser
     from ..lib import mwclient
     from ..lib import browser_cookie3
@@ -141,7 +142,6 @@ def get_title():
 
 def pagename_clear(pagename):
     """ Return clear pagename if page-url was set instead of.."""
-    # site_active = get_setting('mediawiki_site_active')
     site_active = get_view_site()
     site_list = get_setting('mediawiki_site')
     site = site_list.get(site_active, {}).get('host', None)
@@ -166,8 +166,11 @@ def pagename_clear(pagename):
     return pagename
 
 
-def get_connect(password=None):
-    return mwcon.get_site(password)
+def get_connect():
+    sitecon = mwcon.get_site()
+    if not sitecon:
+        raise Exception("No valid connection available")
+    return sitecon
 
 
 # wiki related functions..
@@ -198,7 +201,6 @@ def save_mypages(title, storage_name='mediawiker_pagelist'):
 
     title = title.replace('_', ' ')  # for wiki '_' and ' ' are equal in page name
     pagelist_maxsize = get_setting('mediawiker_pagelist_maxsize')
-    # site_active = mw.get_setting('mediawiki_site_active')
     site_active = get_view_site()
     mediawiker_pagelist = get_setting(storage_name, {})
 
@@ -231,7 +233,6 @@ def get_category(category_full_name):
 
 
 def get_page_url(page_name=''):
-    # site_active = mw.get_setting('mediawiki_site_active')
     site_active = get_view_site()
     site_list = get_setting('mediawiki_site')
     site = site_list[site_active]["host"]
@@ -260,6 +261,26 @@ def get_internal_links_regions(view):
     return [(get_header(r), r) for r in regions]
 
 
+# ###### Hover functions #######
+HOVER_IMG_SIZE = 300
+
+HOVER_HTML_HEADER = '''
+<html>
+    <style>
+        ul { margin-left: 0; padding-left: 0rem; }
+        li { margin-left: 0; display: block; }
+        a {text-decoration: none; }
+    </style>
+
+    <body id="mediawiker_html">
+'''
+
+HOVER_HTML_FOOTER = '''
+    </body>
+</html>
+'''
+
+
 def on_hover_selected(view, point):
 
     def on_navigate_selected(link):
@@ -285,20 +306,27 @@ def on_hover_selected(view, point):
     for r in selected:
         if r and r.contains(point):
             content = [
+                HOVER_HTML_HEADER,
                 'Format:',
                 '<ul>',
-                '<li><a href="bold">Bold</a>',
-                '<li><a href="italic">Italic</a>',
-                '<li><a href="code">Code</a>',
-                '<li><a href="pre">Predefined</a>',
-                '<li><a href="nowiki">Nowiki</a>',
-                '<li><a href="kbd">Keyboard</a>',
-                '<li><a href="strike">Strike</a>',
-                '<li><a href="comment:%s:%s">Comment</a>' % (r.a, r.b),
-                '</ul>'
+                '<li><a href="bold">Bold</a></li>',
+                '<li><a href="italic">Italic</a></li>',
+                '<li><a href="code">Code</a></li>',
+                '<li><a href="pre">Predefined</a></li>',
+                '<li><a href="nowiki">Nowiki</a></li>',
+                '<li><a href="kbd">Keyboard</a></li>',
+                '<li><a href="strike">Strike</a></li>',
+                '<li><a href="comment:%s:%s">Comment</a></li>' % (r.a, r.b),
+                '</ul>',
+                HOVER_HTML_FOOTER
             ]
             content_html = ''.join(content)
-            view.show_popup(content=content_html, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate_selected)
+            view.show_popup(
+                content=content_html,
+                location=point,
+                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                on_navigate=on_navigate_selected
+            )
             return True
 
     return False
@@ -309,7 +337,10 @@ def on_hover_internal_link(view, point):
     def on_navigate(link):
         page_name = link.split(':', 1)[-1].replace(' ', '_')
         if link.startswith('open'):
-            view.window().run_command("mediawiker_page", {"action": "mediawiker_show_page", "title": page_name})
+            view.window().run_command("mediawiker_page", {
+                'action': 'mediawiker_show_page',
+                'action_params': {'title': page_name}
+            })
         elif link.startswith('browse'):
             url = get_page_url(page_name)
             webbrowser.open(url)
@@ -317,17 +348,94 @@ def on_hover_internal_link(view, point):
     links = get_internal_links_regions(view)
     for r in links:
         if r[1].contains(point):
+
+            is_file = False
+            img_base64 = None
+            if get_setting('mediawiker_show_image_in_popup', True):
+                try:
+                    sitecon = get_connect()
+                    page = get_page(sitecon, r[0])
+                    if page.namespace == IMAGE_NAMESPACE:
+                        is_file = True
+                        extra_properties = {
+                            'imageinfo': (
+                                ('iiprop', 'timestamp|user|comment|url|size|sha1|metadata|archivename'),
+                                ('iiurlwidth', HOVER_IMG_SIZE)
+                            )
+                        }
+                        img = mwclient.Image(site=sitecon, name=r[0], extra_properties=extra_properties)
+                        img_remote_url = img.imageinfo['thumburl']
+                        response = requests.get(img_remote_url)
+                        # "http:" is not works: https://github.com/SublimeTextIssues/Core/issues/1378
+                        img_base64 = "data:" + response.headers['Content-Type'] + ";" + "base64," + str(base64.b64encode(response.content).decode("utf-8"))
+                except:
+                    pass
+
+            h = 'Page "%s"' % r[0] if not is_file else 'File "%s"' % r[0].split(':')[1]
+
             content = [
-                'Page "%s"' % r[0],
-                '<br><br>',
-                '<a href="open:%(point)s">Open</a> | <a href="browse:%(point)s">View in browser</a>' % {'point': r[0]}
+                HOVER_HTML_HEADER,
+                '<h4>%s</h4>' % h,
+                '<img src="%(uri)s">' % {'uri': img_base64} if img_base64 else '',
+                '<ul><li><a href="open:%(point)s">Open</a> | <a href="browse:%(point)s">View in browser</a></li></ul>' % {'point': r[0]},
+                HOVER_HTML_FOOTER
             ]
             content_html = ''.join(content)
 
-            view.show_popup(content=content_html, location=point, max_width=500, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate)
+            view.show_popup(
+                content=content_html,
+                location=point,
+                max_width=500,
+                max_height=500,
+                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                on_navigate=on_navigate
+            )
             return True
 
     return False
+
+
+def get_templates(view):
+
+    TPL_START = r'(?<![^\{]\{)\{{2}(?!\{[^\{])'
+    TPL_STOP = r'(?<![^\}]\})\}{2}(?!\}([^\}]|$))'
+    TYPE_START = 'start'
+    TYPE_STOP = 'stop'
+    text_region = sublime.Region(0, view.size())
+    line_regions = view.split_by_newlines(text_region)
+    # print(line_regions)
+    lines_data = []
+    templates = []
+    for region in line_regions:
+        line_text = view.substr(region)
+        starts = [region.a + m.start() for m in re.finditer(TPL_START, line_text)]
+        stops = [region.a + m.start() for m in re.finditer(TPL_STOP, line_text)]
+
+        line_index = {}
+        for i in starts:
+            line_index[i] = TYPE_START
+        for i in stops:
+            line_index[i] = TYPE_STOP
+
+        if starts or stops:
+            lines_data.append(line_index)
+
+    _templates = []
+    for d in lines_data:
+        line_indexes = list(d.keys())
+        line_indexes.sort()
+        for i in line_indexes:
+            if d[i] == TYPE_START:
+                t = sublime.Region(i + 2, i + 2)  # unknown end
+                _templates.append(t)
+            elif d[i] == TYPE_STOP:
+                # ST2 compat Region update
+                # _templates[-1].b = i
+                if _templates:  # if smth. wrong with parsing early, list can be empty, skipping
+                    _templates[-1] = sublime.Region(_templates[-1].a, i)
+                    templates.append((_templates[-1], len(_templates)))  # template region and includes level
+                    _templates = _templates[:-1]
+    return templates
 
 
 def on_hover_template(view, point):
@@ -335,23 +443,21 @@ def on_hover_template(view, point):
     def on_navigate(link):
         if link.startswith('fold'):
             point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "point": point}})
+            sublime.active_window().run_command("mediawiker_colapse", {"type": "fold", "point": point})
         elif link.startswith('unfold'):
             point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "unfold", "point": point}})
+            sublime.active_window().run_command("mediawiker_colapse", {"type": "unfold", "point": point})
         else:
-            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_show_page", "title": link.replace(' ', '_')})
+            sublime.active_window().run_command("mediawiker_page", {
+                'action': 'mediawiker_show_page',
+                'action_params': {'title': link.replace(' ', '_')}
+            })
 
     SCRIBUNTO_PREFIX = '#invoke'
     tpl_regions = []
-    lvl = 1
-    while True:
-        _rs = view.get_regions('templates_%s' % lvl)
-        if _rs:
-            tpl_regions = tpl_regions + _rs
-            lvl += 1
-        else:
-            break
+    _rs = get_templates(view)
+    for r in _rs:
+        tpl_regions.append(r[0])
 
     for r in tpl_regions:
         if r.contains(point):
@@ -367,13 +473,19 @@ def on_hover_template(view, point):
                 template_type = 'Template'
 
             content = [
-                '%s "%s"' % (template_type, template_name),
-                '<br><br>',
-                '<a href="%(link)s">Open</a> | <a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'link': template_link, 'point': point}
+                HOVER_HTML_HEADER,
+                '<h4>%s "%s"</h4>' % (template_type, template_name),
+                '<a href="%(link)s">Open</a> | <a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'link': template_link, 'point': point},
+                HOVER_HTML_FOOTER
             ]
             content_html = ''.join(content)
 
-            view.show_popup(content=content_html, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate)
+            view.show_popup(
+                content=content_html,
+                location=point,
+                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                on_navigate=on_navigate
+            )
             return True
     return False
 
@@ -383,10 +495,10 @@ def on_hover_heading(view, point):
     def on_navigate(link):
         if link.startswith('fold'):
             point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "point": point}})
+            sublime.active_window().run_command("mediawiker_colapse", {"type": "fold", "point": point})
         elif link.startswith('unfold'):
             point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "unfold", "point": point}})
+            sublime.active_window().run_command("mediawiker_colapse", {"type": "unfold", "point": point})
 
     h_regions = []
     for lvl in range(2, 6):
@@ -400,13 +512,19 @@ def on_hover_heading(view, point):
 
             h_name = view.substr(_r).replace('=', '').strip()
             content = [
-                'Heading "%s"' % (h_name),
-                '<br><br>',
-                '<a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'point': point}
+                HOVER_HTML_HEADER,
+                '<h4>Heading "%s"</h4>' % (h_name),
+                '<a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'point': point},
+                HOVER_HTML_FOOTER
             ]
             content_html = ''.join(content)
 
-            view.show_popup(content=content_html, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate)
+            view.show_popup(
+                content=content_html,
+                location=point,
+                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                on_navigate=on_navigate
+            )
             return True
     return False
 
@@ -416,10 +534,10 @@ def on_hover_tag(view, point):
     def on_navigate(link):
         if link.startswith('fold'):
             point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "point": point}})
+            sublime.active_window().run_command("mediawiker_colapse", {"type": "fold", "point": point})
         elif link.startswith('unfold'):
             point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "unfold", "point": point}})
+            sublime.active_window().run_command("mediawiker_colapse", {"type": "unfold", "point": point})
 
     fold_tags = get_setting("mediawiker_fold_tags", ["source", "syntaxhighlight", "div", "pre"])
     tag_regions = []
@@ -433,13 +551,19 @@ def on_hover_tag(view, point):
         if r[1].contains(point):
 
             content = [
-                '%s<br>' % r[0].title(),
-                '<br>',
-                '<a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'point': point}
+                HOVER_HTML_HEADER,
+                '<h4>%s</h4>' % r[0].title(),
+                '<a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'point': point},
+                HOVER_HTML_FOOTER
             ]
             content_html = ''.join(content)
 
-            view.show_popup(content=content_html, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate)
+            view.show_popup(
+                content=content_html,
+                location=point,
+                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                on_navigate=on_navigate
+            )
             return True
     return False
 
@@ -449,10 +573,10 @@ def on_hover_comment(view, point):
     def on_navigate(link):
         if link.startswith('fold'):
             point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "point": point}})
+            sublime.active_window().run_command("mediawiker_colapse", {"type": "fold", "point": point})
         elif link.startswith('unfold'):
             point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "unfold", "point": point}})
+            sublime.active_window().run_command("mediawiker_colapse", {"type": "unfold", "point": point})
 
     def get_text_pretty(r):
         text = view.substr(r).strip().lstrip('<!--').rstrip('-->')
@@ -472,20 +596,27 @@ def on_hover_comment(view, point):
 
             comment_text = get_text_pretty(r)
             content = [
-                'Note',
-                '<br><br>',
-                '%s' % comment_text,
-                '<br><br>',
-                '<a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'point': point}
+                HOVER_HTML_HEADER,
+                '<h4>Note</h4>',
+                '<ul>'
+                '<li>%s</li>' % comment_text,
+                '<li><a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a></li>' % {'point': point},
+                '</ul>',
+                HOVER_HTML_FOOTER
             ]
             content_html = ''.join(content)
 
-            view.show_popup(content=content_html, location=point, flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY, on_navigate=on_navigate)
+            view.show_popup(
+                content=content_html,
+                location=point,
+                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                on_navigate=on_navigate
+            )
             return True
     return False
 
 
-def status_message(message, replace=None):
+def status_message(message, replace=None, is_panel=None):
 
     def status_message_sublime(message, replace=None):
         if replace:
@@ -493,16 +624,18 @@ def status_message(message, replace=None):
                 message = message.replace(r, '')
         sublime.status_message(message)
 
-    is_use_message_panel = get_setting('use_status_messages_panel', True)
+    is_use_message_panel = is_panel if is_panel is not None else get_setting('use_status_messages_panel', True)
 
     if is_use_message_panel:
         panel_name = 'mediawiker_panel'
         if int(sublime.version()) >= 3000:
             panel = sublime.active_window().find_output_panel(panel_name)
+
             if panel is None:
                 panel = sublime.active_window().create_output_panel(panel_name)
-            # https://forum.sublimetext.com/t/style-the-output-panel/10316/6
+
             if panel is not None:
+                # https://forum.sublimetext.com/t/style-the-output-panel/10316/6
                 panel.set_syntax_file(get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiPanel.sublime-syntax'))
         else:
             panel = sublime.active_window().get_output_panel(panel_name)
@@ -510,11 +643,12 @@ def status_message(message, replace=None):
                 panel.set_syntax_file(get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG_ST2.tmLanguage'))
 
         if panel is not None:
+            sublime.active_window().run_command("show_panel", {"panel": "output.%s" % panel_name})
             panel.set_read_only(False)
             panel.run_command('mediawiker_insert_text', {'position': panel.size(), 'text': '%s\n' % message})
             panel.set_read_only(True)
-            # panel.show(panel.size())
-            sublime.active_window().run_command("show_panel", {"panel": "output.%s" % panel_name})
+            panel.show(panel.size())
+
         else:
             status_message_sublime(message, replace)
     else:
@@ -526,6 +660,8 @@ class WikiConnect(object):
 
     conns = {}
     cj = None  # cookies
+    username = ''
+    password = ''
     AUTH_TYPE_LOGIN = 'login'
     AUTH_TYPE_OAUTH = 'oauth'
     AUTH_TYPE_COOKIES = 'cookies'
@@ -565,14 +701,13 @@ class WikiConnect(object):
     def _site_init(self):
         self.path = self.site_params.get('path', '/w/')
         self.username = self.site_params.get('username', '')
-        self.password = self.site_params.get('password', '')
+        self.password = self.site_params.get('password', '') if not self.password else self.password
         self.domain = self.site_params.get('domain', '')
         self.proxy_host = self.site_params.get('proxy_host', '')
         self.http_auth_login = self.site_params.get('http_auth_login', '')
         self.http_auth_password = self.site_params.get('http_auth_password', '')
         self.is_https = self.site_params.get('https', True)
         self.is_ssl_cert_verify = self.site_params.get('is_ssl_cert_verify', True)
-        # self.host = self.site if not self.is_https else ('https', self.site)
         http_proto = 'https' if self.is_https else 'http'
         self.host = (http_proto, self.site)
         self.proxies = None
@@ -593,7 +728,25 @@ class WikiConnect(object):
                 http_proto: self.proxy_host
             }
 
-    def get_site(self, password=None):
+        self.requests_config = {
+            'verify': self.is_ssl_cert_verify,
+            'proxies': self.proxies,
+            'timeout': (self.retry_timeout, None)
+        }
+
+    def set_password(self, password):
+        if password:
+            self.password = password
+
+    def require_password(self):
+        if self.AUTH_TYPE_LOGIN and not self.password:
+            return True
+        return False
+
+    def url(self):
+        return ''.join([self.host[0], '://', self.host[1]])
+
+    def get_site(self):
 
         self._site_preinit()
 
@@ -601,29 +754,29 @@ class WikiConnect(object):
 
         if self.auth_type == self.AUTH_TYPE_COOKIES and not self.is_eq_cookies(self.cj, cj):
             self.cj = cj
-        else:
+        elif self.auth_type != self.AUTH_TYPE_LOGIN or not self.username or self.password:
             sitecon = self.conns.get(self.site, None)
             if sitecon:
                 return sitecon
 
         self._site_init()
 
-        if self.is_https:
-            status_message('Trying to get https connection to [https://%s]' % self.site)
-
         if self.proxy_host:
-            status_message('Connection with proxy [%s] to [%s]' % (self.proxy_host, self.site))
+            status_message('Connection with proxy %s to %s..' % (self.proxy_host, self.url()))
+        else:
+            status_message('Connecting to %s..' % self.url())
 
         # oauth authorization
         if self.auth_type == self.AUTH_TYPE_OAUTH and all([self.oauth_consumer_token, self.oauth_consumer_secret, self.oauth_access_token, self.oauth_access_secret]):
             try:
                 sitecon = mwclient.Site(host=self.host, path=self.path,
-                                        retry_timeout=self.retry_timeout,
+                                        retry_timeout=None,
+                                        max_retries=None,
                                         consumer_token=self.oauth_consumer_token,
                                         consumer_secret=self.oauth_consumer_secret,
                                         access_token=self.oauth_access_token,
                                         access_secret=self.oauth_access_secret,
-                                        requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
+                                        requests=self.requests_config)
             except mwclient.OAuthAuthorizationError as exc:
                 e = exc.args if pythonver >= 3 else exc
                 status_message('Login failed: %s' % e[1])
@@ -633,8 +786,9 @@ class WikiConnect(object):
             # Site connection
             try:
                 sitecon = mwclient.Site(host=self.host, path=self.path,
-                                        retry_timeout=self.retry_timeout,
-                                        requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
+                                        retry_timeout=None,
+                                        max_retries=None,
+                                        requests=self.requests_config)
             except requests.exceptions.HTTPError as e:
                 is_use_http_auth = self.site_params.get('use_http_auth', False)
                 # additional http auth (basic, digest)
@@ -643,44 +797,43 @@ class WikiConnect(object):
                     sitecon = self._http_auth(http_auth_header)
                 else:
                     sublime.message_dialog('HTTP connection failed: %s' % e[1])
-                    raise Exception('HTTP connection failed.')
+                    # raise Exception('HTTP connection failed.')
+                    return
             except Exception as e:
                 sublime.message_dialog('Connection failed for %s: %s' % (self.host, e))
-                raise Exception('HTTP connection failed: %s' % e)
+                # raise Exception('HTTP connection failed: %s' % e)
+                return
 
+        if sitecon:
+            status_message('Connection done.')
+            status_message('Login in with type %s..' % self.auth_type)
+            success_message = 'Login successfully.'
             # Cookie auth
             if self.auth_type == self.AUTH_TYPE_COOKIES and self.cj:
                 try:
-                    if sitecon is not None:
-                        sitecon.login(cookies=self.cj, domain=self.domain)
-                        status_message('Logon successfully with cookies from %s browser.' % self.cookies_browser.title())
-                    else:
-                        status_message('Login failed: connection unavailable.')
+                    sitecon.login(cookies=self.cj, domain=self.domain)
                 except mwclient.LoginError as exc:
                     e = exc.args if pythonver >= 3 else exc
                     status_message('Login failed: %s' % e[1]['result'])
                     return
             # Login/Password auth
-            elif self.auth_type == self.AUTH_TYPE_LOGIN and self.username:
+            elif self.auth_type == self.AUTH_TYPE_LOGIN and self.username and self.password:
                 try:
-                    if sitecon is not None:
-                        if password is not None:
-                            self.password = password
-                        sitecon.login(username=self.username, password=self.password, domain=self.domain)
-                        status_message('Logon successfully.')
-                    else:
-                        status_message('Login failed: connection unavailable.')
+                    sitecon.login(username=self.username, password=self.password, domain=self.domain)
                 except mwclient.LoginError as exc:
                     e = exc.args if pythonver >= 3 else exc
                     status_message('Login failed: %s' % e[1]['result'])
                     return
+            # elif self.auth_type == self.AUTH_TYPE_OAUTH:
             else:
-                status_message('Connection without authorization')
+                success_message = 'Connection was made without authorization.'
 
-        if sitecon:
+            status_message(success_message)
+
             self.conns[self.site] = sitecon
+            return sitecon
 
-        return sitecon
+        return None
 
     def _http_auth(self, http_auth_header):
         sitecon = None
@@ -704,7 +857,10 @@ class WikiConnect(object):
                 httpauth = requests.auth.HTTPDigestAuth(self.http_auth_login, self.http_auth_password)
 
             if httpauth:
-                sitecon = mwclient.Site(host=self.host, path=self.path, httpauth=httpauth, requests={'verify': self.is_ssl_cert_verify, 'proxies': self.proxies})
+                sitecon = mwclient.Site(
+                    host=self.host, path=self.path,
+                    httpauth=httpauth,
+                    requests=self.requests_config)
         else:
             error_message = 'HTTP connection failed: Unknown realm.'
             status_message(error_message)
@@ -714,7 +870,8 @@ class WikiConnect(object):
 
 class InputPanel(object):
 
-    def __init__(self):
+    def __init__(self, callback=None):
+        self.callback = callback
         self.window = sublime.active_window()
 
     def show_input(self, panel_title='Input', value_pre=''):
@@ -726,7 +883,7 @@ class InputPanel(object):
     def on_change(self, value):
         pass
 
-    def on_cancel(self, value):
+    def on_cancel(self, value=None):
         pass
 
 
@@ -751,6 +908,9 @@ class InputPanelPageTitle(InputPanel):
             if title != pagename_cleared:
                 self.window.show_input_panel('Wiki page name:', pagename_cleared, self.on_done, self.on_change, None)
 
+    def on_done(self, title):
+        sublime.set_timeout_async(self.callback(title), 0)
+
 
 class InputPanelPassword(InputPanel):
 
@@ -758,7 +918,6 @@ class InputPanelPassword(InputPanel):
     is_hide_password = False
 
     def get_password(self):
-        # TODO: check auth type!
         site_active = get_view_site()
         site_list = get_setting('mediawiki_site')
 
@@ -766,50 +925,49 @@ class InputPanelPassword(InputPanel):
             self.on_done(password=None)
             return
 
-        password = site_list.get(site_active, {}).get('password', '')
+        password = site_list.get(site_active, {}).get('password', '') or mwcon.password
         if site_list.get(site_active, {}).get("username", ''):
             # auth required if username exists in settings
             if not password:
                 self.is_hide_password = get_setting('mediawiker_password_input_hide')
                 if self.is_hide_password:
                     self.ph = PasswordHider()
-                # need to ask for password
-                # window.show_input_panel('Password:', '', self.on_done, self.on_change, None)
                 self.show_input('Password:', '')
             else:
                 # return password
-                self.on_done(password)
+                self.on_done(password=None)
         else:
             # auth is not required
             self.on_done('')
 
     def on_change(self, str_val):
-        if str_val and self.is_hide_password and self.ph:
+        if str_val is not None and self.is_hide_password and self.ph:
             password = self.ph.hide(str_val)
             if password != str_val:
-                # self.window.show_input_panel('Password:', password, self.on_done, self.on_change, None)
                 self.show_input('Password:', password)
 
     def on_done(self, password):
         if password and self.is_hide_password and self.ph:
             password = self.ph.done()
-        self.command_run(password)  # defined in executor
+        if password:
+            mwcon.set_password(password)
+        sublime.set_timeout_async(self.callback, 0)
 
 
 class PasswordHider(object):
 
     password = ''
-    PASSWORD_CHAR = u'\u25CF'
 
     def hide(self, password):
+        password_char = get_setting('mediawiker_password_char', '*')
         if len(password) < len(self.password):
             self.password = self.password[:len(password)]
         else:
             try:
-                self.password = '%s%s' % (self.password, password.replace(self.PASSWORD_CHAR, ''))
+                self.password = '%s%s' % (self.password, password.replace(password_char, ''))
             except:
                 pass
-        return self.PASSWORD_CHAR * len(self.password)
+        return password_char * len(self.password)
 
     def done(self):
         try:

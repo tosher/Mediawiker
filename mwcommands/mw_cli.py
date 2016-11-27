@@ -10,7 +10,7 @@ class MediawikerCliCommand(sublime_plugin.WindowCommand):
     def run(self, url):
         if url:
             # print('Opening page: %s' % url)
-            sublime.set_timeout(lambda: self.window.run_command("mediawiker_page", {"action": "mediawiker_show_page", "title": self.proto_replacer(url)}), 1)
+            sublime.set_timeout(lambda: self.window.run_command('mediawiker_page', {'action': 'mediawiker_show_page', 'action_params': {'title': self.proto_replacer(url)}}), 1)
 
     def proto_replacer(self, url):
         if sublime.platform() == 'windows' and url.endswith('/'):

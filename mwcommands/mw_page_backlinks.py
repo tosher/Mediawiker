@@ -22,8 +22,9 @@ class MediawikerShowPageBacklinksCommand(sublime_plugin.WindowCommand):
 
 class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):
 
-    def run(self, edit, title, password):
-        sitecon = mw.get_connect(password)
+    def run(self, edit):
+        title = mw.get_title()
+        sitecon = mw.get_connect()
         self.mw_get_page_backlinks(sitecon, title)
 
         if self.links:
@@ -60,4 +61,4 @@ class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):
         if index >= 0:
             self.page_name = self.links[index]
 
-            sublime.active_window().run_command("mediawiker_page", {"title": self.page_name, "action": "mediawiker_show_page"})
+            sublime.active_window().run_command('mediawiker_page', {'action': 'mediawiker_show_page', 'action_params': {'title': self.page_name}})

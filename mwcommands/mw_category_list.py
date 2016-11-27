@@ -21,7 +21,6 @@ class MediawikerCategoryTreeCommand(sublime_plugin.WindowCommand):
 
 
 class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
-    password = ''
     pages = {}  # pagenames -> namespaces
     pages_names = []  # pagenames for menu
     category_path = []
@@ -29,8 +28,7 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
     CATEGORY_PREV_PREFIX_MENU = '. . '
     category_prefix = ''  # "Category" namespace name as returned language..
 
-    def run(self, edit, title, password):
-        self.password = password
+    def run(self, edit):
         if self.category_path:
             category_root = mw.get_category(self.get_category_current())[1]
         else:
@@ -70,7 +68,7 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
 
     def get_list_data(self, category_root):
         ''' get objects list by category name '''
-        sitecon = mw.get_connect(self.password)
+        sitecon = mw.get_connect()
         return sitecon.Categories[category_root]
 
     def get_category_as_next(self, category_string):
@@ -111,7 +109,7 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
                 self.show_list(page_name)
             else:
                 try:
-                    sublime.active_window().run_command("mediawiker_page", {"title": page_name, "action": "mediawiker_show_page"})
+                    sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_show_page", 'action_params': {"title": page_name}})
                 except ValueError as e:
                     sublime.message_dialog(e)
 

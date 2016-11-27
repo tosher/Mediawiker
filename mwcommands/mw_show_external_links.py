@@ -18,7 +18,7 @@ else:
 class MediawikerShowExternalLinksCommand(sublime_plugin.TextCommand):
     items = []
     regions = []
-    pattern = r'[^\[]\[{1}(\w.*?)(\s.*?)?\]{1}[^\]]'
+    pattern = r'[^\[]\[{1}(\w.*?)(\s.*?)?\]{1}[^\]]?'
     actions = ['Goto external link', 'Open link in browser']
     selected = None
 

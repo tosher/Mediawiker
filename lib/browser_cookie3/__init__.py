@@ -182,7 +182,10 @@ def create_local_copy(cookie_file):
 class BrowserCookieLoader(object):
     def __init__(self, cookie_files=None, domain_name=None):
         cookie_files = cookie_files or self.find_cookie_files()
-        self.cookie_files = list(cookie_files)
+        if isinstance(cookie_files, list):
+            self.cookie_files = cookie_files
+        else:
+            self.cookie_files = [cookie_files]
         self.domain_name_tld = TLDLazy().get_tld_domain(domain_name) if domain_name else None
 
     def find_cookie_files(self):

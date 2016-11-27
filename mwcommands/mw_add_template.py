@@ -22,17 +22,15 @@ class MediawikerInsertTemplateCommand(sublime_plugin.WindowCommand):
 
 
 class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
-    password = ''
     templates_names = []
     sitecon = None
 
-    def run(self, edit, password, title=''):
-        self.password = password
+    def run(self, edit):
         sublime.active_window().show_input_panel('Wiki template prefix:', '', self.show_list, None, None)
 
     def show_list(self, image_prefix):
         self.templates_names = []
-        self.sitecon = mw.get_connect(self.password)
+        self.sitecon = mw.get_connect()
         templates = self.sitecon.allpages(prefix=image_prefix, namespace=mw.TEMPLATE_NAMESPACE)  # images list by prefix
         for template in templates:
             self.templates_names.append(template.page_title)

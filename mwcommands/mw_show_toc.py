@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 # import sys
-import re
-
 import sublime
 import sublime_plugin
 
@@ -17,7 +15,7 @@ import sublime_plugin
 class MediawikerShowTocCommand(sublime_plugin.TextCommand):
     items = []
     regions = []
-    pattern = r'^(={1,5})\s?(.*?)\s?={1,5}'
+    pattern = r'^(={1,5})\s?(.*?)\s?={1,5}$'
 
     def run(self, edit):
         self.items = []
@@ -28,8 +26,15 @@ class MediawikerShowTocCommand(sublime_plugin.TextCommand):
         sublime.set_timeout(lambda: self.view.window().show_quick_panel(self.items, self.on_done), 1)
 
     def get_header(self, region):
-        TAB_SIZE = ' ' * 4
-        return re.sub(self.pattern, r'\1\2', self.view.substr(region)).replace('=', TAB_SIZE)[len(TAB_SIZE):]
+        TAB = ' ' * 4
+        h = self.view.substr(region).rstrip('=')
+        h_as_list = list(h)
+        for i, char in enumerate(h_as_list):
+            if char == '=':
+                h_as_list[i] = TAB
+            else:
+                break
+        return ''.join(h_as_list)
 
     def on_done(self, index):
         if index >= 0:

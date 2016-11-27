@@ -18,18 +18,18 @@
                         "caption": "Text folding",
                         "children":
                         [
-                            { "caption": "Mediawiker: Fold", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "fold"}}},
-                            { "caption": "Mediawiker: Fold Level 2", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "fold_2"}}},
-                            { "caption": "Mediawiker: Fold Level 3", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "fold_3"}}},
-                            { "caption": "Mediawiker: Fold Level 4", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "fold_4"}}},
-                            { "caption": "Mediawiker: Fold Level 5", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "fold_5"}}},
-                            { "caption": "Mediawiker: Fold text blocks", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "foldwiki"}}},
-                            { "caption": "Mediawiker: Unfold", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "unfold"}}},
-                            { "caption": "Mediawiker: Unfold Level 2", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "unfold_2"}}},
-                            { "caption": "Mediawiker: Unfold Level 3", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "unfold_3"}}},
-                            { "caption": "Mediawiker: Unfold Level 4", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "unfold_4"}}},
-                            { "caption": "Mediawiker: Unfold Level 5", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "unfold_5"}}},
-                            { "caption": "Mediawiker: Unfold text blocks", "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "unfoldwiki"}}}
+                            { "caption": "Mediawiker: Fold", "command": "mediawiker_colapse", "args": {"type": "fold"}},
+                            { "caption": "Mediawiker: Fold Level 2", "command": "mediawiker_colapse", "args": {"type": "fold_2"}},
+                            { "caption": "Mediawiker: Fold Level 3", "command": "mediawiker_colapse", "args": {"type": "fold_3"}},
+                            { "caption": "Mediawiker: Fold Level 4", "command": "mediawiker_colapse", "args": {"type": "fold_4"}},
+                            { "caption": "Mediawiker: Fold Level 5", "command": "mediawiker_colapse", "args": {"type": "fold_5"}},
+                            { "caption": "Mediawiker: Fold text blocks", "command": "mediawiker_colapse", "args": {"type": "foldwiki"}},
+                            { "caption": "Mediawiker: Unfold", "command": "mediawiker_colapse", "args": {"type": "unfold"}},
+                            { "caption": "Mediawiker: Unfold Level 2", "command": "mediawiker_colapse", "args": {"type": "unfold_2"}},
+                            { "caption": "Mediawiker: Unfold Level 3", "command": "mediawiker_colapse", "args": {"type": "unfold_3"}},
+                            { "caption": "Mediawiker: Unfold Level 4", "command": "mediawiker_colapse", "args": {"type": "unfold_4"}},
+                            { "caption": "Mediawiker: Unfold Level 5", "command": "mediawiker_colapse", "args": {"type": "unfold_5"}},
+                            { "caption": "Mediawiker: Unfold text blocks", "command": "mediawiker_colapse", "args": {"type": "unfoldwiki"}}
                         ]
                     }
 

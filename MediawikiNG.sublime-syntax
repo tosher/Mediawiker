@@ -416,51 +416,51 @@ contexts:
             2: entity.name.tag.source.mediawiki
             3: meta.tag.validhtml.mediawiki
           pop: true
-    - match: '^(={1})(?!=)([^=]+)(={1})(?!=)\s*$'
+    - match: '^(={1})(?=[^=].*[^=]\={1}\s*$)'
       captures:
         1: markup.heading.tag.mediawiki
-        2: markup.heading.1.mediawiki
-        3: markup.heading.tag.mediawiki
       push:
-          - include: inline
-          - match: ""
-            pop: true
-    - match: '^(={2})(?!=)([^=]+)(={2})(?!=)\s*$'
+        - meta_content_scope: markup.heading.1.mediawiki
+        - include: inline
+        - match: '={1}\s*$'
+          scope: markup.heading.tag.mediawiki
+          pop: true
+    - match: '^(={2})(?=[^=].*[^=]\={2}\s*$)'
       captures:
         1: markup.heading.tag.mediawiki
-        2: markup.heading.2.mediawiki
-        3: markup.heading.tag.mediawiki
       push:
-          - include: inline
-          - match: ""
-            pop: true
-    - match: '^(={3})(?!=)([^=]+)(={3})(?!=)\s*$'
+        - meta_content_scope: markup.heading.2.mediawiki
+        - include: inline
+        - match: '={2}\s*$'
+          scope: markup.heading.tag.mediawiki
+          pop: true
+    - match: '^(={3})(?=[^=].*[^=]\={3}\s*$)'
       captures:
         1: markup.heading.tag.mediawiki
-        2: markup.heading.3.mediawiki
-        3: markup.heading.tag.mediawiki
       push:
-          - include: inline
-          - match: ""
-            pop: true
-    - match: '^(={4})(?!=)([^=]+)(={4})(?!=)\s*$'
+        - meta_content_scope: markup.heading.3.mediawiki
+        - include: inline
+        - match: '={3}\s*$'
+          scope: markup.heading.tag.mediawiki
+          pop: true
+    - match: '^(={4})(?=[^=].*[^=]\={4}\s*$)'
       captures:
         1: markup.heading.tag.mediawiki
-        2: markup.heading.4.mediawiki
-        3: markup.heading.tag.mediawiki
       push:
-          - include: inline
-          - match: ""
-            pop: true
-    - match: '^(={5})(?!=)([^=]+)(={5})(?!=)\s*$'
+        - meta_content_scope: markup.heading.4.mediawiki
+        - include: inline
+        - match: '={4}\s*$'
+          scope: markup.heading.tag.mediawiki
+          pop: true
+    - match: '^(={5})(?=[^=].*[^=]\={5}\s*$)'
       captures:
         1: markup.heading.tag.mediawiki
-        2: markup.heading.5.mediawiki
-        3: markup.heading.tag.mediawiki
       push:
-          - include: inline
-          - match: ""
-            pop: true
+        - meta_content_scope: markup.heading.5.mediawiki
+        - include: inline
+        - match: '={5}\s*$'
+          scope: markup.heading.tag.mediawiki
+          pop: true
     - match: '^-{4,}[ \t]*($\n)?'
       # comment: "A separator is made up of 4 or more -s alone on a line by themselves."
       scope: meta.separator.mediawiki
@@ -581,7 +581,7 @@ contexts:
             3: meta.tag.inline.ref.mediawiki
           pop: true
         - include: inline
-    - match: "(<)(ref) *((name) *(=) *([^>]*))(/>)"
+    - match: '(<)(ref)\s*((name)\s*(=)\s*([^>]*))(/>)'
       # comment: <ref name="label"/>
       scope: meta.reference.named.cite.mediawiki
       captures:
@@ -591,7 +591,7 @@ contexts:
         5: meta.tag.inline.ref.mediawiki
         6: string.quoted.ref.name.mediawiki
         7: meta.tag.inline.ref.mediawiki
-    - match: "(<)(ref) *((name) *(=) *([^>]*))(>)"
+    - match: '(<)(ref)\s*((name)\s*(=)\s*([^>]*))(>)'
       captures:
         1: meta.tag.inline.ref.mediawiki
         2: entity.name.tag.ref.mediawiki
@@ -639,6 +639,7 @@ contexts:
                 - include: inline
                 - match: (?=\n|\|)
                   pop: true
+        - include: comments
 
   block_pre_spaced:
     - match: ^ (?=\s*\S)
@@ -699,7 +700,8 @@ contexts:
   link:
     # files, images
     - match: |-
-        (?x:(\[\[)                    (?# opening brackets)
+        (?x:
+        (\[\[)                    (?# opening brackets)
         ( [ ]*(([Ff]ile|[Ii]mage)(:)) (?# spaces, image, colon)
         ([^\[\]|]+)                   (?# anything)
         ))
@@ -720,7 +722,6 @@ contexts:
              |(link=)([^|]+)?
              |(alt=)([^|]+)?
              |(class=)([^|]+)?
-             |([^|\]]+)
             )[ ]*
           captures:
             1: punctuation.definition.tag.pipe.mediawiki
@@ -738,20 +739,23 @@ contexts:
             13: constant.other.image.alt.mediawiki
             14: keyword.control.image.css-class.mediawiki
             15: constant.other.image.css-class.mediawiki
-            16: string.other.image.caption.mediawiki
-        - match: \|
-          scope: punctuation.definition.tag.pipe.mediawiki
-        - include: style_in_link
-        - match: |-
-            (?x:
-            ((\|)[ ]*( [^\[\]|]+ )[ ]*)?  (?# pipe, spaces, anything, spaces)
-            (\]\])                        (?# closing brackets)
-            )
+        - match: '(\]{2})'
           captures:
-            2: punctuation.definition.tag.pipe.mediawiki
-            3: string.other.title.link.wiki-link.mediawiki
-            4: meta.tag.inline.any.mediawiki
+            1: meta.tag.inline.any.mediawiki
           pop: true
+        - match: '(\|)'
+          scope: punctuation.definition.tag.caption-pipe.mediawiki
+          push:
+            - meta_scope: string.other.image.caption.mediawiki
+            - include: link
+            # check test file
+            # style: [[Image:Test image 1355.jpg|left|thumb|250px | Simple text ''[[Internal link italic|Link title italic]]'' simple text]]
+            # works everywhere, but it's wrong to format whole url tag
+            # style_in_link: [[Image:Test image 1355.jpg|left|thumb|250px | Simple text [[Internal link italic|Link title ''italic'']] simple text]]
+            # works only inside link caption
+            - include: style_in_link
+            - match: (?=\]{2})
+              pop: true
     - match: |-
         (?x:
         ({{)                        (?# opening brackets)

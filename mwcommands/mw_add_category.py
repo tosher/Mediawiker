@@ -22,7 +22,6 @@ class MediawikerSetCategoryCommand(sublime_plugin.WindowCommand):
 
 class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
     categories_list = None
-    title = ''
     sitecon = None
 
     category_root = ''
@@ -30,8 +29,8 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
 
     # TODO: back in category tree..
 
-    def run(self, edit, title, password):
-        self.sitecon = mw.get_connect(password)
+    def run(self, edit):
+        self.sitecon = mw.get_connect()
         self.category_root = mw.get_category(mw.get_setting('mediawiker_category_root'))[1]
         sublime.active_window().show_input_panel('Wiki root category:', self.category_root, self.get_category_menu, None, None)
         # self.get_category_menu(self.category_root)
@@ -59,6 +58,7 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
             # set category
             index_of_textend = self.view.size()
             self.view.run_command('mediawiker_insert_text', {'position': index_of_textend, 'text': '[[%s]]' % self.category_options[idx][1]})
+            self.view.show(self.view.size())
         elif idx == 1:
             self.get_category_menu(self.category_options[idx][1])
         else:

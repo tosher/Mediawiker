@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python\n
+#!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
 import sys
@@ -13,6 +13,7 @@ if pythonver >= 3:
     from collections import OrderedDict
 else:
     import mw_utils as mw
+
 
 class MWHTML(object):
 
@@ -224,7 +225,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
             site_active = mw.get_view_site()
 
             popup.append(self.html.ul())
-            for site in sites.keys():
+            for site in sorted(sites.keys(), key=str.lower):
                 link = self.html.link(
                     url=self.FORMAT_URL % {'section': section, 'value': 'edit', 'params': self.escaped(site), 'goto': 'Edit site/%s' % self.escaped(site)},
                     text=self.icon(self.EDIT_ICON)
@@ -361,7 +362,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
             elif option_type in ('text', 'int'):
                 is_async = True
                 option_pretty = self.pretty(option)
-                panel = InputValue(option=option, goto=goto, callback=self.show, option_type=option_type)
+                panel = InputValue(callback=self.show, option=option, goto=goto, option_type=option_type)
                 panel.show_input(panel_title=option_pretty, value_pre=value)
         elif section == 'Select wiki':
             if value != 'edit':
@@ -377,7 +378,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
             elif option_type in ('text', 'passwd'):
                 is_async = True
                 option_pretty = self.pretty(option)
-                panel = InputSiteValue(site=site, option=option, goto=goto, callback=self.show)
+                panel = InputSiteValue(callback=self.show, site=site, option=option, goto=goto)
                 if option_type == 'text':
                     panel.show_input(panel_title=option_pretty, value_pre=value)
                 elif option_type == 'passwd':
@@ -391,8 +392,8 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
 class InputValue(mw.InputPanel):
 
-    def __init__(self, option, goto, callback, option_type='text'):
-        super(InputValue, self).__init__()
+    def __init__(self, callback, option, goto, option_type='text'):
+        super(InputValue, self).__init__(callback=callback)
         self.option = option
         self.goto = goto
         self.callback = callback
@@ -403,17 +404,17 @@ class InputValue(mw.InputPanel):
         self.set_setting()
 
     def on_cancel(self):
-        self.callback(self.goto)
+        sublime.set_timeout_async(self.callback(self.goto), 0)
 
     def set_setting(self):
         mw.set_setting(self.option, self.value)
-        self.callback(self.goto)
+        sublime.set_timeout_async(self.callback(self.goto), 0)
 
 
 class InputSiteValue(mw.InputPanel):
 
-    def __init__(self, site, option, goto, callback):
-        super(InputSiteValue, self).__init__()
+    def __init__(self, callback, site, option, goto):
+        super(InputSiteValue, self).__init__(callback=callback)
         self.site = site
         self.option = option
         self.goto = goto
@@ -426,7 +427,7 @@ class InputSiteValue(mw.InputPanel):
         self.show_input(panel_title='Password', value_pre=password)
 
     def on_change(self, str_val):
-        if str_val and self.ph:
+        if str_val is not None and self.ph:
             password = self.ph.hide(str_val)
             if password != str_val:
                 self.show_input('Password:', password)
@@ -436,10 +437,10 @@ class InputSiteValue(mw.InputPanel):
         self.set_setting()
 
     def on_cancel(self):
-        self.callback(self.goto)
+        sublime.set_timeout_async(self.callback(self.goto), 0)
 
     def set_setting(self):
         settings = mw.get_setting('mediawiki_site')
         settings[self.site][self.option] = self.value if self.value is not None else ''
         mw.set_setting('mediawiki_site', settings)
-        self.callback(self.goto)
+        sublime.set_timeout_async(self.callback(self.goto), 0)

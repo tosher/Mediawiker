@@ -13,11 +13,9 @@ import sublime_plugin
 
 # TODO: Move rename page
 # TODO: links (internal, external) based on api..
-# TODO: https://github.com/mwclient/mwclient/commit/b4640d3b2537cfd6d17e2034ee53480b5ed2d4fe
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    import threading
     from .mwcommands import mw_utils as mw
     from .mwcommands import *
 else:
@@ -39,7 +37,11 @@ class MediawikerOpenPageCommand(sublime_plugin.WindowCommand):
 class MediawikerReopenPageCommand(sublime_plugin.WindowCommand):
 
     def run(self):
-        self.window.run_command("mediawiker_page", {"action": "mediawiker_reopen_page"})
+        title = mw.get_title()
+        self.window.run_command("mediawiker_page", {
+            'action': 'mediawiker_show_page',
+            'action_params': {'title': title, 'new_tab': False}
+        })
 
 
 class MediawikerPostPageCommand(sublime_plugin.WindowCommand):
@@ -51,13 +53,29 @@ class MediawikerPostPageCommand(sublime_plugin.WindowCommand):
 
 class MediawikerShowPageCommand(sublime_plugin.TextCommand):
 
-    def run(self, edit, title, password):
+    def run(self, edit, title=None, new_tab=None, site_active=None):
 
-        if not title:
-            return
+        self.new_tab = new_tab if new_tab is not None else mw.get_setting('mediawiker_newtab_ongetpage', False)
+
+        # cases:
+        # from view with page, opened from other site_active than in global settings - new page will be from the same site
+        # from view with page, open page with another lang site - site param must be defined, will set it
+        # from view with undefined site (new) open page by global site_active setting
+        self.site_active = site_active if site_active else mw.get_view_site()
+
+        panel = mw.InputPanelPageTitle(callback=self.page_open)
+        panel.get_title(title)
+
+    def page_open(self, title):
+
+        if self.new_tab:
+            view = sublime.active_window().new_file()
+            view.settings().set('mediawiker_site', self.site_active)
+        else:
+            view = self.view
 
         is_writable = False
-        sitecon = mw.get_connect(password)
+        sitecon = mw.get_connect()
         page = mw.get_page(sitecon, title)
         is_writable, text = mw.get_page_text(page)
 
@@ -67,20 +85,19 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
                 mw.status_message('Wiki page %s is not exists. You can create new..' % (title))
                 text = '<!-- New wiki page: Remove this with text of the new page -->'
             # insert text
-            self.view.erase(edit, sublime.Region(0, self.view.size()))
-            self.view.run_command('mediawiker_insert_text', {'position': 0, 'text': text})
+            view.run_command('mediawiker_insert_text', {'position': 0, 'text': text, 'with_erase': True})
             mw.status_message('Page [[%s]] was opened successfully from "%s".' % (title, mw.get_view_site()), replace=['[', ']'])
             mw.set_syntax(page=page)
-            self.view.settings().set('mediawiker_is_here', True)
-            self.view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
-            self.view.set_name(title)
+            view.settings().set('mediawiker_is_here', True)
+            view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
+            view.set_name(title)
 
-            self.view.set_scratch(True)
+            view.set_scratch(True)
             # own is_changed flag instead of is_dirty for possib. to reset..
-            self.view.settings().set('is_changed', False)
+            view.settings().set('is_changed', False)
         else:
             sublime.message_dialog('You have not rights to view this page.')
-            self.view.close()
+            view.close()
 
 
 class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
@@ -89,10 +106,10 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
     title = ''
     current_text = ''
 
-    def run(self, edit, title, password):
+    def run(self, edit):
         is_process_post = True
         is_skip_summary = mw.get_setting('mediawiker_skip_summary', False)
-        self.sitecon = mw.get_connect(password)
+        self.sitecon = mw.get_connect()
         self.title = mw.get_title()
         if self.title:
             self.page = mw.get_page(self.sitecon, self.title)
@@ -105,11 +122,10 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                 if is_process_post:
                     self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
                     if not is_skip_summary:
-                        # summary_message = 'Changes summary (%s):' % mw.get_setting('mediawiki_site_active')
                         summary_message = 'Changes summary (%s):' % mw.get_view_site()
-                        self.view.window().show_input_panel(summary_message, '', self.on_done, None, None)
+                        sublime.set_timeout_async(self.view.window().show_input_panel(summary_message, '', self.on_done, None, None), 0)
                     else:
-                        self.on_done('')
+                        sublime.set_timeout_async(self.on_done, 0)
                 else:
                     self.view.window().run_command('mediawiker_page', {'action': 'mediawiker_reopen_page', 'new_tab': True})
             else:
@@ -133,19 +149,16 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 
         self.view.set_scratch(True)
         self.view.settings().set('is_changed', False)  # reset is_changed flag
-        mw.status_message('Wiki page [[%s]] was successfully published to wiki.' % (self.title), replace=['[', ']'])
+        mw.status_message('Wiki page [[%s]] was successfully published to wiki "%s".' % (self.title, mw.get_view_site()), replace=['[', ']'])
         mw.save_mypages(self.title)
 
-    def on_done(self, summary):
+    def on_done(self, summary=None):
+        if summary is None:
+            summary = ''
         summary = '%s%s' % (summary, mw.get_setting('mediawiker_summary_postfix', ' (by SublimeText.Mediawiker)'))
-        # mark_as_minor = mw.get_setting('mediawiker_mark_as_minor')
         try:
             if self.page.can('edit'):
-                if pythonver >= 3:
-                    thread_save = threading.Thread(target=self.post_page, args=(summary,))
-                    thread_save.start()
-                else:
-                    self.post_page(summary=summary)
+                self.post_page(summary=summary)
             else:
                 mw.status_message('You have not rights to edit this page')
         except mw.mwclient.EditError as e:
@@ -176,7 +189,7 @@ class MediawikerEvents(sublime_plugin.EventListener):
         ''' unsupported on ST2, gutters too - skipping.. '''
         # folding gutters
         if view.settings().get('mediawiker_is_here', False):
-            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse"})
+            sublime.active_window().run_command("mediawiker_colapse")
 
     def on_modified(self, view):
         if view.settings().get('mediawiker_is_here', False):
@@ -188,7 +201,7 @@ class MediawikerEvents(sublime_plugin.EventListener):
                 view.settings().set('is_changed', True)
 
             # folding gutters update
-            sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse"})
+            sublime.active_window().run_command("mediawiker_colapse")
 
     def on_post_save(self, view):
         view.settings().set('mediawiker_wiki_instead_editor', False)
@@ -222,7 +235,7 @@ class MediawikerEvents(sublime_plugin.EventListener):
             if mw.on_hover_heading(view, point):
                 return
 
-            # TODO: external links..
+            # TODO: external links..?
 
     def on_query_completions(self, view, prefix, locations):
         if view.settings().get('mediawiker_is_here', False):

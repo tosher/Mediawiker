@@ -32,6 +32,9 @@ class MediawikerPageListCommand(sublime_plugin.WindowCommand):
             # escape from quick panel return -1
             title = self.my_pages[index]
             try:
-                self.window.run_command("mediawiker_page", {"title": title, "action": "mediawiker_show_page"})
+                self.window.run_command('mediawiker_page', {
+                    'action': 'mediawiker_show_page',
+                    'action_params': {'title': title}
+                })
             except ValueError as e:
                 sublime.message_dialog(e)

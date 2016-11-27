@@ -31,8 +31,8 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
     NOTE: Beta
     '''
 
-    def run(self, edit, title, password):
-        sitecon = mw.get_connect(password)
+    def run(self, edit):
+        sitecon = mw.get_connect()
         text = self.view.substr(sublime.Region(0, self.view.size()))
 
         site_active = mw.get_view_site()

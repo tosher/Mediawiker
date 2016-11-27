@@ -23,4 +23,4 @@ class MediawikerFavoritesAddCommand(sublime_plugin.WindowCommand):
 class MediawikerFavoritesOpenCommand(sublime_plugin.WindowCommand):
 
     def run(self):
-        self.window.run_command("mediawiker_page_list", {"storage_name": 'mediawiker_favorites'})
+        self.window.run_command('mediawiker_page_list', {'storage_name': 'mediawiker_favorites'})

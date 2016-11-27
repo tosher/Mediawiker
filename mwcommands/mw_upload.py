@@ -23,13 +23,11 @@ class MediawikerFileUploadCommand(sublime_plugin.WindowCommand):
 
 class MediawikerUploadCommand(sublime_plugin.TextCommand):
 
-    password = None
     file_path = None
     file_destname = None
     file_descr = None
 
-    def run(self, edit, password, title=''):
-        self.password = password
+    def run(self, edit):
         sublime.active_window().show_input_panel('File path:', '', self.get_destfilename, None, None)
 
     def get_destfilename(self, file_path):
@@ -45,7 +43,7 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
         sublime.active_window().show_input_panel('File description:', '', self.on_done, None, None)
 
     def on_done(self, file_descr=''):
-        sitecon = mw.get_connect(self.password)
+        sitecon = mw.get_connect()
         if file_descr:
             self.file_descr = file_descr
         else:

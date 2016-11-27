@@ -1,9 +1,9 @@
 %YAML 1.2
 ---
 # http://www.sublimetext.com/docs/3/syntax.html
-name: Mediawiki NG
-file_extensions: [mediawiki, wikipedia, wiki]
+name: MediawikerOut
 scope: text.html.mediawiki
+hidden: true
 
 contexts:
   main:

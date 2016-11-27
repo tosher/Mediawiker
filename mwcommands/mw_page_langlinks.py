@@ -22,12 +22,10 @@ class MediawikerShowPageLanglinksCommand(sublime_plugin.WindowCommand):
 
 class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
 
-    def run(self, edit, title, password):
-        sitecon = mw.get_connect(password)
-        # selection = self.view.sel()
-        # search_pre = self.view.substr(selection[0]).strip()
+    def run(self, edit):
+        sitecon = mw.get_connect()
         selected_text = self.view.substr(self.view.sel()[0]).strip()
-        title = selected_text if selected_text else title
+        title = selected_text if selected_text else mw.get_title()
         self.mw_get_page_langlinks(sitecon, title)
 
         self.lang_prefixes = []
@@ -76,7 +74,10 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
                     break
             if site_active_new:
                 # open page with force site_active_new
-                sublime.active_window().run_command("mediawiker_page", {"title": self.page_name, "action": "mediawiker_show_page", "site_active": site_active_new})
+                sublime.active_window().run_command("mediawiker_page", {
+                    'action': 'mediawiker_show_page',
+                    'action_params': {'title': self.page_name, 'site_active': site_active_new}
+                })
             else:
                 mw.status_message('Settings not found for host %s.' % (host_new))
         elif index == 1:

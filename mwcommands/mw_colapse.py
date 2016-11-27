@@ -36,49 +36,8 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
 
         return colapse_paragraphs
 
-    def get_templates(self):
-
-        TPL_START = r'(?<![^\{]\{)\{{2}(?!\{[^\{])'
-        TPL_STOP = r'(?<![^\}]\})\}{2}(?!\}([^\}]|$))'
-        TYPE_START = 'start'
-        TYPE_STOP = 'stop'
-        text_region = sublime.Region(0, self.view.size())
-        line_regions = self.view.split_by_newlines(text_region)
-        # print(line_regions)
-        lines_data = []
-        templates = []
-        for region in line_regions:
-            line_text = self.view.substr(region)
-            starts = [region.a + m.start() for m in re.finditer(TPL_START, line_text)]
-            stops = [region.a + m.start() for m in re.finditer(TPL_STOP, line_text)]
-
-            line_index = {}
-            for i in starts:
-                line_index[i] = TYPE_START
-            for i in stops:
-                line_index[i] = TYPE_STOP
-
-            if starts or stops:
-                lines_data.append(line_index)
-
-        _templates = []
-        for d in lines_data:
-            line_indexes = list(d.keys())
-            line_indexes.sort()
-            for i in line_indexes:
-                if d[i] == TYPE_START:
-                    t = sublime.Region(i + 2, i + 2)  # unknown end
-                    _templates.append(t)
-                elif d[i] == TYPE_STOP:
-                    # ST2 compat Region update
-                    # _templates[-1].b = i
-                    _templates[-1] = sublime.Region(_templates[-1].a, i)
-                    templates.append((_templates[-1], len(_templates)))  # template region and includes level
-                    _templates = _templates[:-1]
-        return templates
-
     def get_templates_regions(self):
-        _regions = self.get_templates()
+        _regions = mw.get_templates(self.view)
         colapse_templates = {}
         if _regions:
             for _r in _regions:
@@ -174,7 +133,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                     if self.is_cursor_inheader(cursor, rt):
                         return rt[1]
 
-    def run(self, edit, title, password, **kwargs):
+    def run(self, edit, **kwargs):
 
         if not self.view.settings().get('mediawiker_is_here', False):
             return

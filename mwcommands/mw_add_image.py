@@ -21,18 +21,16 @@ class MediawikerInsertImageCommand(sublime_plugin.WindowCommand):
 
 
 class MediawikerAddImageCommand(sublime_plugin.TextCommand):
-    password = ''
     image_prefix_min_lenght = 4
     images_names = []
 
-    def run(self, edit, password, title=''):
-        self.password = password
+    def run(self, edit):
         self.image_prefix_min_lenght = mw.get_setting('mediawiker_image_prefix_min_length', 4)
         sublime.active_window().show_input_panel('Wiki image prefix (min %s):' % self.image_prefix_min_lenght, '', self.show_list, None, None)
 
     def show_list(self, image_prefix):
         if len(image_prefix) >= self.image_prefix_min_lenght:
-            sitecon = mw.get_connect(self.password)
+            sitecon = mw.get_connect()
             images = sitecon.allpages(prefix=image_prefix, namespace=mw.IMAGE_NAMESPACE)  # images list by prefix
             # self.images_names = map(self.get_page_title, images)
             self.images_names = [self.get_page_title(x) for x in images]
