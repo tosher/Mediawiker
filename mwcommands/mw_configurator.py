@@ -260,7 +260,8 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
                 ('oauth_consumer_secret', (False, '')),
                 ('oauth_consumer_token', (False, '')),
                 ('authorization_type', (False, 'login')),
-                ('cookies_browser', (False, 'chrome'))
+                ('cookies_browser', (False, 'chrome')),
+                ('is_wikia', (True, False))
             ])
 
             popup.append(self.html.ul())

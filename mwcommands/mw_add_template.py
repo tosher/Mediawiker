@@ -22,18 +22,17 @@ class MediawikerInsertTemplateCommand(sublime_plugin.WindowCommand):
 
 
 class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
+
     templates_names = []
-    sitecon = None
 
     def run(self, edit):
         sublime.active_window().show_input_panel('Wiki template prefix:', '', self.show_list, None, None)
 
-    def show_list(self, image_prefix):
+    def show_list(self, tpl_prefix):
         self.templates_names = []
-        self.sitecon = mw.get_connect()
-        templates = self.sitecon.allpages(prefix=image_prefix, namespace=mw.TEMPLATE_NAMESPACE)  # images list by prefix
+        templates = mw.api.call('get_pages', prefix=tpl_prefix, namespace=mw.TEMPLATE_NAMESPACE)
         for template in templates:
-            self.templates_names.append(template.page_title)
+            self.templates_names.append(mw.api.page_attr(template, 'page_title'))
         sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.templates_names, self.on_done), 1)
 
     def get_template_params(self, text):
@@ -69,9 +68,12 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
 
     def on_done(self, idx):
         if idx >= 0:
-            template = self.sitecon.Pages['Template:%s' % self.templates_names[idx]]
-            text = template.text()
-            params_text = self.get_template_params(text)
-            index_of_cursor = self.view.sel()[0].begin()
-            template_text = '{{%s%s}}' % (self.templates_names[idx], params_text)
-            self.view.run_command('mediawiker_insert_text', {'position': index_of_cursor, 'text': template_text})
+            template = mw.api.get_page('Template:%s' % self.templates_names[idx])
+            if mw.api.page_can_read(template):
+                text = mw.api.page_get_text(page=template)
+                params_text = self.get_template_params(text)
+                index_of_cursor = self.view.sel()[0].begin()
+                template_text = '{{%s%s}}' % (self.templates_names[idx], params_text)
+                self.view.run_command('mediawiker_insert_text', {'position': index_of_cursor, 'text': template_text})
+            else:
+                mw.status_message('')

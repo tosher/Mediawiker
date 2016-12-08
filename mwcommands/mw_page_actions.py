@@ -31,23 +31,19 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
 
     def command_run(self):
 
-        pre_sitecon = mw.get_connect()
-        # TODO: refact.. now: setup connection here.. next steps will reuse it.. else exit..
-        #   otherwise we have trying to connect 2 times if connection unavailable (command, then notif..)
-        if pre_sitecon:
-            self.window.active_view().run_command(self.action, self.action_params)
-            try:
-                self.get_notifications()
-            except Exception as e:
-                mw.status_message('Mediawiker exception: %s' % e)
+        self.window.active_view().run_command(self.action, self.action_params)
+        try:
+            self.get_notifications()
+        except Exception as e:
+            mw.status_message('Mediawiker notifications exception: %s' % e)
 
     def get_notifications(self):
         # check notifications on page open command
         if self.action == 'mediawiker_show_page' and self.check_notifications:
-            sitecon = mw.get_connect()
-            ns = sitecon.notifications()
+            ns = mw.api.call('get_notifications')
             is_notify_exists = False
             if ns:
+                # TODO: move to PreAPI
                 if isinstance(ns, dict):
                     for n in ns.keys():
                         msg = ns.get(n, {})

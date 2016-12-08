@@ -22,6 +22,9 @@ try:
 except ImportError:
     import sqlite3
 
+import warnings
+warnings.simplefilter("ignore", DeprecationWarning)
+
 # modified modules
 # https://bitbucket.org/richardpenman/browsercookie
 # https://github.com/borisbabic/browser_cookie3

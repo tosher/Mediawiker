@@ -28,11 +28,9 @@ class MediawikerPreviewCommand(sublime_plugin.WindowCommand):
 class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
     '''
     Very restricted HTML Preview
-    NOTE: Beta
     '''
 
     def run(self, edit):
-        sitecon = mw.get_connect()
         text = self.view.substr(sublime.Region(0, self.view.size()))
 
         site_active = mw.get_view_site()
@@ -60,7 +58,7 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         html_header = '\n'.join(html_header_lines) % {'head': head_str}
         html_footer = '</body></html>'
 
-        html = sitecon.parse(text=text, title=mw.get_title(), disableeditsection=True).get('text', {}).get('*', '')
+        html = mw.api.call('get_parse_result', text=text, title=mw.get_title())
         html = html.replace('"//', '"%s://' % site_http)  # internal links: images,..
         html = html.replace('"/', '"%s://%s/' % (site_http, host))  # internal local links: images,..
 

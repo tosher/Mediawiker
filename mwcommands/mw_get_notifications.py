@@ -31,12 +31,12 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         notifications_type = mw.get_setting('mediawiki_notifications_show_all', True)
         self.read_sign = mw.get_setting('mediawiki_notifications_read_sign', ' [+]')
-        sitecon = mw.get_connect()
-        ns = sitecon.notifications()
+        ns = mw.api.call('get_notifications')
         self.msgs = []
         if ns:
             if isinstance(ns, dict):
                 for n in ns.keys():
+                    # TODO: move to PreAPI
                     msg = ns.get(n, {})
                     msg_read = msg.get('read', '')
                     if notifications_type or not msg_read:

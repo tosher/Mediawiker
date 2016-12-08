@@ -151,6 +151,7 @@ class MediawikerTableWikiToSimpleCommand(sublime_plugin.TextCommand):
 
 class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
     ''' convert selected (or under cursor) Simple table (TableEditor plugin) to wiki table '''
+
     def run(self, edit):
         selection = self.view.sel()
         table_region = None

@@ -23,10 +23,9 @@ class MediawikerShowPageLanglinksCommand(sublime_plugin.WindowCommand):
 class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        sitecon = mw.get_connect()
         selected_text = self.view.substr(self.view.sel()[0]).strip()
         title = selected_text if selected_text else mw.get_title()
-        self.mw_get_page_langlinks(sitecon, title)
+        self.mw_get_page_langlinks(title)
 
         self.lang_prefixes = []
         for lang_prefix in self.links.keys():
@@ -40,8 +39,9 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
 
     def mw_get_page_langlinks(self, site, title):
         self.links = {}
-        page = site.Pages[title]
-        linksgen = page.langlinks()
+        page = mw.api.get_page(title)
+
+        linksgen = mw.api.get_page_langlinks(page)
         if linksgen:
             while True:
                 try:

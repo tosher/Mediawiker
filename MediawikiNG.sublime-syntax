@@ -814,7 +814,7 @@ contexts:
               pop: true
             - include: style_in_link
 
-    - match: '(\[)((\w[\w\d+-\.]+://|mailto:)[-:@\w.~%+/?=&#]+)\s*(?=[^\]]*\])'
+    - match: '(\[)((\w[\w\d+-\.]+://|mailto:)[-:@\w.,~%+/?=&#()]+)\s*(?=[^\]]*\])'
       # comment: external link like [http://example.com/example.html Example]
       captures:
         1: meta.tag.inline.link.mediawiki
@@ -827,7 +827,7 @@ contexts:
             1: meta.tag.inline.link.mediawiki
           pop: true
         - include: style_in_link
-    - match: '(\w[\w\d+-\.]+://|mailto:)[-:@\w.~%+/?=&#]+'
+    - match: '(\w[\w\d+-\.]+://|mailto:)[-:@\w.,~%+/?=&#\(\)]+'
       scope: markup.underline.link.external.mediawiki
       # comment: 'external link like just http://example.com/example.html.
       #           Proto valid chars: The scheme should start with a letter (upper or lower case),

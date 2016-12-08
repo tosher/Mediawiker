@@ -20,10 +20,8 @@ class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
     site_active = ''
 
     def run(self):
-        # self.site_active = mw.get_setting('mediawiki_site_active')
         self.site_active = mw.get_view_site()
         sites = mw.get_setting('mediawiki_site')
-        # self.site_keys = map(self.is_checked, list(sites.keys()))
         self.site_keys = [self.is_checked(x) for x in sorted(sites.keys(), key=str.lower)]
         sublime.set_timeout(lambda: self.window.show_quick_panel(self.site_keys, self.on_done), 1)
 

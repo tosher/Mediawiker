@@ -21,7 +21,8 @@
             "oauth_consumer_token": "",  // OAuth authorization type
             "cookies_browser": "chrome",  // Cookies authorization type: "chrome" or "firefox"
             "preview_custom_head": [],  // List of custom html head tags for preview generation
-            "retry_timeout": 30 // Timeout in seconds for http requests
+            "retry_timeout": 30, // Timeout in seconds for http requests
+            "is_wikia": false  // is wikia site
         },
         "Russian wikipedia": {
             "authorization_type": "login",
@@ -43,7 +44,8 @@
             "oauth_consumer_token": "",
             "cookies_browser": "chrome",
             "preview_custom_head": [],
-            "retry_timeout": 30
+            "retry_timeout": 30,
+            "is_wikia": false
 
         },
         "Mediawiki": {
@@ -66,7 +68,8 @@
             "oauth_consumer_token": "",
             "cookies_browser": "chrome",
             "preview_custom_head": [],
-            "retry_timeout": 30
+            "retry_timeout": 30,
+            "is_wikia": false
         }
     },
     "mediawiki_syntax": "Packages/Mediawiker/MediawikiNG.sublime-syntax",
@@ -91,7 +94,6 @@
     "mediawiker_show_image_in_popup": true,
     "mediawiki_validate_revision_on_post": true,
     "mediawiki_linkstopage_limit": 50,
-    "mediawiki_search_syntax": "Packages/Markdown/Markdown.tmLanguage",
     "mediawiki_preview_file": "Wiki_page_preview_",  // Prefix or full file name - if full, html file will be generated in User folder, otherwise - temporary.
     "mediawiki_preview_lang": "en",
     "mediawiker_fold_tags": ["source", "syntaxhighlight", "div", "pre"],

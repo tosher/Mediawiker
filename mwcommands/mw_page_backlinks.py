@@ -24,36 +24,35 @@ class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         title = mw.get_title()
-        sitecon = mw.get_connect()
-        self.mw_get_page_backlinks(sitecon, title)
+        self.mw_get_page_backlinks(title)
 
         if self.links:
             sublime.active_window().show_quick_panel(self.links, self.on_done)
         else:
             mw.status_message('Unable to find links to this page')
 
-    def mw_get_page_backlinks(self, site, title):
+    def mw_get_page_backlinks(self, title):
         self.links = []
         links_limit = mw.get_setting('mediawiki_linkstopage_limit', 5)
-        page = site.Pages[title]
+        page = mw.api.get_page(title)
 
         # backlinks to page
-        linksgen = page.backlinks(limit=links_limit)
+        linksgen = mw.api.get_page_backlinks(page, links_limit)
         if linksgen:
             while True:
                 try:
                     prop = linksgen.next()
-                    self.links.append(prop.name)
+                    self.links.append(mw.api.page_attr(prop, 'name'))
                 except StopIteration:
                     break
 
         # pages, transcludes this
-        linksgen = page.embeddedin(limit=links_limit)
+        linksgen = mw.api.get_page_embeddedin(page, links_limit)
         if linksgen:
             while True:
                 try:
                     prop = linksgen.next()
-                    self.links.append(prop.name)
+                    self.links.append(mw.api.page_attr(prop, 'name'))
                 except StopIteration:
                     break
 

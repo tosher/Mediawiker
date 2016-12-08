@@ -50,9 +50,11 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
             self.add_page(self.get_category_prev(), mw.CATEGORY_NAMESPACE, False)
 
         for page in self.get_list_data(category_root):
-            if page.namespace == mw.CATEGORY_NAMESPACE and not self.category_prefix:
-                    self.category_prefix = mw.get_category(page.name)[0]
-            self.add_page(page.name, page.namespace, True)
+            page_name = mw.api.page_attr(page, 'name')
+            page_namespace = mw.api.page_attr(page, 'namespace')
+            if page_namespace == mw.CATEGORY_NAMESPACE and not self.category_prefix:
+                self.category_prefix = mw.get_category(page_name)[0]
+            self.add_page(page_name, page_namespace, True)
         if self.pages:
             self.pages_names.sort()
             sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.pages_names, self.get_page), 1)
@@ -68,8 +70,7 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
 
     def get_list_data(self, category_root):
         ''' get objects list by category name '''
-        sitecon = mw.get_connect()
-        return sitecon.Categories[category_root]
+        return mw.api.get_subcategories(category_root=category_root)
 
     def get_category_as_next(self, category_string):
         return '%s%s' % (self.CATEGORY_NEXT_PREFIX_MENU, category_string)

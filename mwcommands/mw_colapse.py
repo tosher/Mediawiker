@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import re
+# import re
 
 import sublime
 import sublime_plugin
@@ -10,8 +10,10 @@ import sublime_plugin
 pythonver = sys.version_info[0]
 if pythonver >= 3:
     from . import mw_utils as mw
+    from . import mw_hovers as hovers
 else:
     import mw_utils as mw
+    import mw_hovers as hovers
 
 
 class MediawikerColapseCommand(sublime_plugin.TextCommand):
@@ -37,7 +39,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
         return colapse_paragraphs
 
     def get_templates_regions(self):
-        _regions = mw.get_templates(self.view)
+        _regions = hovers.get_templates(self.view)
         colapse_templates = {}
         if _regions:
             for _r in _regions:

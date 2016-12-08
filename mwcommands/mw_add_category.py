@@ -22,7 +22,6 @@ class MediawikerSetCategoryCommand(sublime_plugin.WindowCommand):
 
 class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
     categories_list = None
-    sitecon = None
 
     category_root = ''
     category_options = [['Set category', ''], ['Open category', ''], ['Back to root', '']]
@@ -30,20 +29,18 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
     # TODO: back in category tree..
 
     def run(self, edit):
-        self.sitecon = mw.get_connect()
         self.category_root = mw.get_category(mw.get_setting('mediawiker_category_root'))[1]
         sublime.active_window().show_input_panel('Wiki root category:', self.category_root, self.get_category_menu, None, None)
-        # self.get_category_menu(self.category_root)
 
     def get_category_menu(self, category_root):
-        category = self.sitecon.Categories.get(category_root)
+        categories = mw.api.call('get_subcategories', category_root=category_root)
         self.categories_list_names = []
         self.categories_list_values = []
 
-        for page in category:
-            if page.namespace == mw.CATEGORY_NAMESPACE:
-                self.categories_list_values.append(page.name)
-                self.categories_list_names.append(page.name[page.name.find(':') + 1:])
+        for category in categories:
+            if mw.api.page_attr(category, 'namespace') == mw.CATEGORY_NAMESPACE:
+                self.categories_list_values.append(mw.api.page_attr(category, 'name'))
+                self.categories_list_names.append(mw.api.page_attr(category, 'page_title'))
         sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.categories_list_names, self.on_done), 1)
 
     def on_done(self, idx):

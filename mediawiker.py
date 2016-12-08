@@ -13,18 +13,21 @@ import sublime_plugin
 
 # TODO: Move rename page
 # TODO: links (internal, external) based on api..
-
-pythonver = sys.version_info[0]
-if pythonver >= 3:
-    from .mwcommands import mw_utils as mw
-    from .mwcommands import *
-else:
-    from mwcommands import mw_utils as mw
-    from mwcommands import *
+# TODO: Search results to wiki syntax..
 
 # suppress deprecation warnings (turned on in mwclient lib: mwclient/__init__.py)
 import warnings
 warnings.simplefilter("ignore", DeprecationWarning)
+
+pythonver = sys.version_info[0]
+if pythonver >= 3:
+    from .mwcommands import mw_utils as mw
+    from .mwcommands import mw_hovers as hovers
+    from .mwcommands import *
+else:
+    from mwcommands import mw_utils as mw
+    from mwcommands import mw_hovers as hovers
+    from mwcommands import *
 
 
 class MediawikerOpenPageCommand(sublime_plugin.WindowCommand):
@@ -74,30 +77,39 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         else:
             view = self.view
 
-        is_writable = False
-        sitecon = mw.get_connect()
-        page = mw.get_page(sitecon, title)
-        is_writable, text = mw.get_page_text(page)
+        page = mw.api.call('get_page', title=title)
 
-        if is_writable or text:
-
-            if is_writable and not text:
-                mw.status_message('Wiki page %s is not exists. You can create new..' % (title))
-                text = '<!-- New wiki page: Remove this with text of the new page -->'
-            # insert text
-            view.run_command('mediawiker_insert_text', {'position': 0, 'text': text, 'with_erase': True})
-            mw.status_message('Page [[%s]] was opened successfully from "%s".' % (title, mw.get_view_site()), replace=['[', ']'])
-            mw.set_syntax(page=page)
-            view.settings().set('mediawiker_is_here', True)
-            view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
-            view.set_name(title)
-
-            view.set_scratch(True)
-            # own is_changed flag instead of is_dirty for possib. to reset..
-            view.settings().set('is_changed', False)
-        else:
-            sublime.message_dialog('You have not rights to view this page.')
+        if mw.api.page_can_edit(page):
+            # can read and edit
+            view.settings().set('page_revision', mw.api.page_attr(page, 'revision'))
+        elif not mw.api.page_can_read(page):
+            # can not read and edit
+            sublime.message_dialog(mw.PAGE_CANNOT_READ_MESSAGE)
             view.close()
+            return
+        elif not sublime.ok_cancel_dialog('%s Click OK button to view its source.' % mw.PAGE_CANNOT_EDIT_MESSAGE):
+            # can not edit, but can read, but not want
+            view.close()
+            return
+
+        text = mw.api.page_get_text(page)
+        page_namespace = mw.api.page_attr(page, 'namespace')
+
+        if not text:
+            mw.status_message('Wiki page %s is not exists. You can create new..' % (title))
+            text = '<!-- New wiki page: Remove this with text of the new page -->'
+        else:
+            view.run_command('mediawiker_insert_text', {'position': 0, 'text': text, 'with_erase': True})
+
+        mw.status_message('Page [[%s]] was opened successfully from "%s".' % (title, mw.get_view_site()), replace=['[', ']'])
+        mw.set_syntax(title, page_namespace)
+        view.settings().set('mediawiker_is_here', True)
+        view.settings().set('mediawiker_wiki_instead_editor', mw.get_setting('mediawiker_wiki_instead_editor'))
+        view.set_name(title)
+
+        view.set_scratch(True)
+        # own is_changed flag instead of is_dirty for possib. to reset..
+        view.settings().set('is_changed', False)
 
 
 class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
@@ -109,14 +121,13 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         is_process_post = True
         is_skip_summary = mw.get_setting('mediawiker_skip_summary', False)
-        self.sitecon = mw.get_connect()
         self.title = mw.get_title()
         if self.title:
-            self.page = mw.get_page(self.sitecon, self.title)
+            self.page = mw.api.get_page(self.title)
 
-            if self.page.can('edit'):
+            if mw.api.page_can_edit(self.page):
 
-                if mw.get_setting('mediawiki_validate_revision_on_post', True) and self.view.settings().get('page_revision', 0) != self.page.revision:
+                if mw.get_setting('mediawiki_validate_revision_on_post', True) and self.view.settings().get('page_revision', 0) != mw.api.page_attr(self.page, 'revision'):
                     is_process_post = sublime.ok_cancel_dialog('Page was changed on server, post page anyway? If not, new revision will be opened in new tab.')
 
                 if is_process_post:
@@ -127,7 +138,10 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                     else:
                         mw.set_timeout_async(self.on_done, 0)
                 else:
-                    self.view.window().run_command('mediawiker_page', {'action': 'mediawiker_reopen_page', 'new_tab': True})
+                    self.view.window().run_command('mediawiker_page', {
+                        'action': 'mediawiker_show_page',
+                        'action_params': {'title': self.title, 'new_tab': True}
+                    })
             else:
                 mw.status_message('You have not rights to edit this page')
         else:
@@ -141,11 +155,11 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
         if summary[0] == '!':
             mark_as_minor = not mark_as_minor
             summary = summary[1:]
-        self.page.save(self.current_text, summary=summary.strip(), minor=mark_as_minor)
+        mw.api.save_page(self.page, self.current_text, summary, mark_as_minor)
 
         # update revision for page in view
-        self.page = self.sitecon.Pages[self.title]
-        self.view.settings().set('page_revision', self.page.revision)
+        self.page = mw.api.get_page(self.title)
+        self.view.settings().set('page_revision', mw.api.page_attr(self.page, 'revision'))
 
         self.view.set_scratch(True)
         self.view.settings().set('is_changed', False)  # reset is_changed flag
@@ -157,10 +171,10 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             summary = ''
         summary = '%s%s' % (summary, mw.get_setting('mediawiker_summary_postfix', ' (by SublimeText.Mediawiker)'))
         try:
-            if self.page.can('edit'):
+            if mw.api.page_can_edit(self.page):
                 self.post_page(summary=summary)
             else:
-                mw.status_message('You have not rights to edit this page')
+                mw.status_message(mw.PAGE_CANNOT_EDIT_MESSAGE)
         except mw.mwclient.EditError as e:
             mw.status_message('Can\'t publish page [[%s]] (%s)' % (self.title, e), replace=['[', ']'])
 
@@ -211,36 +225,31 @@ class MediawikerEvents(sublime_plugin.EventListener):
 
     def on_hover(self, view, point, hover_zone):
         # not fires in ST2
-        # mouse_over folding: replaced by hover_text options
-        # if view.settings().get('mediawiker_is_here', False) and hover_zone == sublime.HOVER_GUTTER and mw.get_setting('mediawiker_use_gutters_folding', True):
-        #     sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_colapse", "action_params": {"type": "fold", "point": point}})
 
         if view.settings().get('mediawiker_is_here', False) and hover_zone == sublime.HOVER_TEXT:
 
-            if mw.on_hover_comment(view, point):
+            if hovers.on_hover_comment(view, point):
                 return
 
-            if mw.on_hover_selected(view, point):
+            if hovers.on_hover_selected(view, point):
                 return
 
-            if mw.on_hover_tag(view, point):
+            if hovers.on_hover_tag(view, point):
                 return
 
-            if mw.on_hover_internal_link(view, point):
+            if hovers.on_hover_internal_link(view, point):
                 return
 
-            if mw.on_hover_template(view, point):
+            if hovers.on_hover_template(view, point):
                 return
 
-            if mw.on_hover_heading(view, point):
+            if hovers.on_hover_heading(view, point):
                 return
 
             # TODO: external links..?
 
     def on_query_completions(self, view, prefix, locations):
         if view.settings().get('mediawiker_is_here', False):
-            INTERNAL_LINK_SPLITTER = u'|'
-            NAMESPACE_SPLITTER = u':'
             view = sublime.active_window().active_view()
 
             # internal links completions
@@ -251,7 +260,7 @@ class MediawikerEvents(sublime_plugin.EventListener):
             if line_before_position.rfind('[[') > line_before_position.rfind(']]'):
                 internal_link = line_before_position[line_before_position.rfind('[[') + 2:]
 
-            if INTERNAL_LINK_SPLITTER in internal_link:
+            if mw.INTERNAL_LINK_SPLITTER in internal_link:
                 # cursor at custom url text zone..
                 return []
 
@@ -261,19 +270,20 @@ class MediawikerEvents(sublime_plugin.EventListener):
                 ns_text = None
                 ns_text_number = None
 
-                if NAMESPACE_SPLITTER in internal_link:
-                    ns_text, internal_link = internal_link.split(NAMESPACE_SPLITTER)
+                if mw.NAMESPACE_SPLITTER in internal_link:
+                    ns_text, internal_link = internal_link.split(mw.NAMESPACE_SPLITTER)
 
                 if len(internal_link) >= word_cursor_min_len:
                     namespaces_search = [ns.strip() for ns in mw.get_setting('mediawiker_search_namespaces').split(',')]
-                    self.sitecon = mw.get_connect()
                     if ns_text:
-                        ns_text_number = self.get_ns_number(ns_text)
+                        ns_text_number = mw.api.call('get_namespace_number', name=ns_text)
+
+                    # TODO: recheck completions
 
                     pages = []
                     for ns in namespaces_search:
                         if not ns_text or ns_text_number and int(ns_text_number) == int(ns):
-                            pages = self.sitecon.allpages(prefix=internal_link, namespace=ns)
+                            pages = mw.api.call('get_pages', prefix=internal_link, namespace=ns)
                             for p in pages:
                                 # name - full page name with namespace
                                 # page_title - title of the page wo namespace
@@ -281,30 +291,17 @@ class MediawikerEvents(sublime_plugin.EventListener):
                                 # For Image, Category namespaces, shows [page_title namespace], makes [[name]]
                                 # For other namespace, shows [page_title namespace], makes [[name|page_title]]
                                 if int(ns):
-                                    ns_name = p.name.split(':')[0]
-                                    page_name = p.name if not self.is_equal_ns(ns_text, ns_name) else p.name.split(':')[1]
-                                    if ns in ('6', '14'):  # file, category
+                                    ns_name = mw.api.page_attr(p, 'namespace_name')
+                                    page_name = mw.api.page_attr(p, 'name') if not mw.api.is_equal_ns(ns_text, ns_name) else mw.api.page_attr(p, 'page_title')
+                                    if int(ns) in (mw.CATEGORY_NAMESPACE, mw.IMAGE_NAMESPACE):
                                         page_insert = page_name
                                     else:
-                                        page_insert = '%s|%s' % (page_name, p.page_title)
+                                        page_insert = '%s|%s' % (page_name, mw.api.page_attr(p, 'page_title'))
                                 else:
                                     ns_name = '(Main)'
-                                    page_insert = p.page_title
-                                page_show = '%s\t%s' % (p.page_title, ns_name)
+                                    page_insert = mw.api.page_attr(p, 'page_title')
+                                page_show = '%s\t%s' % (mw.api.page_attr(p, 'page_title'), ns_name)
                                 completions.append((page_show, page_insert))
 
             return completions
         return []
-
-    def get_ns_number(self, ns_name):
-        return self.sitecon.namespaces_canonical_invert.get(
-            ns_name, self.sitecon.namespaces_invert.get(
-                ns_name, self.sitecon.namespaces_aliases_invert.get(
-                    ns_name, None)))
-
-    def is_equal_ns(self, ns_name1, ns_name2):
-        ns_name1_number = self.get_ns_number(ns_name1)
-        ns_name2_number = self.get_ns_number(ns_name2)
-        if ns_name1_number and ns_name2_number and int(self.get_ns_number(ns_name1)) == int(self.get_ns_number(ns_name2)):
-            return True
-        return False

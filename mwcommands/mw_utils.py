@@ -5,8 +5,7 @@ import sys
 
 from os.path import splitext, basename
 import re
-import urllib
-import webbrowser
+import urllib.parse
 
 try:
     # Python 2.7+
@@ -16,7 +15,7 @@ except ImportError:
     from ordereddict import OrderedDict
 
 import sublime
-import sublime_plugin
+# import sublime_plugin
 import requests
 
 pythonver = sys.version_info[0]
@@ -28,7 +27,6 @@ if pythonver >= 3:
     #     import mwclient
     # else:
     #     from . import mwclient
-    import base64
     from html.parser import HTMLParser
     from ..lib import mwclient
     from ..lib import browser_cookie3
@@ -38,11 +36,17 @@ else:
 
 
 CATEGORY_NAMESPACE = 14  # category namespace number
-IMAGE_NAMESPACE = 6  # image namespace number
+IMAGE_NAMESPACE = 6  # file/image namespace number
 TEMPLATE_NAMESPACE = 10  # template namespace number
 SCRIBUNTO_NAMESPACE = 828  # scribunto module namespace number
 
 COMMENT_REGIONS_KEY = 'comment'
+
+PAGE_CANNOT_READ_MESSAGE = 'You have not rights to read/edit this page.'
+PAGE_CANNOT_EDIT_MESSAGE = 'You have not rights to edit this page.'
+
+NAMESPACE_SPLITTER = u':'
+INTERNAL_LINK_SPLITTER = u'|'
 
 
 def get_setting(key, default_value=None):
@@ -67,18 +71,18 @@ def get_default_setting(key, default_value=None):
     return settings.get(key, default_value)
 
 
-def set_syntax(page=None):
+def set_syntax(page_name=None, page_namespace=None):
     syntax = get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG.tmLanguage')
 
-    if page:
+    if page_name and page_namespace:
         syntax_ext = 'sublime-syntax' if int(sublime.version()) >= 3084 else 'tmLanguage'
 
         # Scribunto lua modules, except doc subpage
-        if page.namespace == SCRIBUNTO_NAMESPACE and not page.name.lower().endswith('/doc'):
+        if page_namespace == SCRIBUNTO_NAMESPACE and not page_name.lower().endswith('/doc'):
             syntax = 'Packages/Lua/Lua.%s' % syntax_ext
-        elif page.name.lower().endswith('.css'):
+        elif page_name.lower().endswith('.css'):
             syntax = 'Packages/CSS/CSS.%s' % syntax_ext
-        elif page.name.lower().endswith('.js'):
+        elif page_name.endswith('.js'):
             syntax = 'Packages/Javascript/Javascript.%s' % syntax_ext
 
     sublime.active_window().active_view().set_syntax_file(syntax)
@@ -166,38 +170,6 @@ def pagename_clear(pagename):
     return pagename
 
 
-# TODO: move functions like this to connection class?
-def get_connect():
-    sitecon = mwcon.get_site()
-    if not sitecon:
-        raise Exception("No valid connection available")
-    return sitecon
-
-
-# wiki related functions..
-
-def get_page(site, title):
-    return site.Pages[title]
-
-
-def get_page_text(page):
-    if page:
-        denied_message = 'You have not rights to edit this page. Click OK button to view its source.'
-
-        if page.can('edit'):
-            sublime.active_window().active_view().settings().set('page_revision', page.revision)
-            return True, page.text()
-        else:
-            if sublime.ok_cancel_dialog(denied_message):
-                if page.can('read'):
-                    return False, page.text()
-                else:
-                    return False, ''
-            else:
-                return False, ''
-    return False, ''
-
-
 def save_mypages(title, storage_name='mediawiker_pagelist'):
 
     title = title.replace('_', ' ')  # for wiki '_' and ' ' are equal in page name
@@ -262,367 +234,6 @@ def get_internal_links_regions(view):
     return [(get_header(r), r) for r in regions]
 
 
-# ###### Hover functions #######
-HOVER_IMG_SIZE = 300
-
-HOVER_HTML_HEADER = '''
-<html>
-    <style>
-        ul { margin-left: 0; padding-left: 0rem; }
-        li { margin-left: 0; display: block; }
-        a {text-decoration: none; }
-    </style>
-
-    <body id="mediawiker_html">
-'''
-
-HOVER_HTML_FOOTER = '''
-    </body>
-</html>
-'''
-
-
-def on_hover_selected(view, point):
-
-    def on_navigate_selected(link):
-        if link == 'bold':
-            sublime.active_window().run_command("insert_snippet", {"contents": "'''${0:$SELECTION}'''"})
-        elif link == 'italic':
-            sublime.active_window().run_command("insert_snippet", {"contents": "''${0:$SELECTION}''"})
-        elif link == 'code':
-            sublime.active_window().run_command("insert_snippet", {"contents": "<code>${0:$SELECTION}</code>"})
-        elif link == 'pre':
-            sublime.active_window().run_command("insert_snippet", {"contents": "<pre>${0:$SELECTION}</pre>"})
-        elif link == 'nowiki':
-            sublime.active_window().run_command("insert_snippet", {"contents": "<nowiki>${0:$SELECTION}</nowiki>"})
-        elif link == 'kbd':
-            sublime.active_window().run_command("insert_snippet", {"contents": "<kbd>${0:$SELECTION}</kbd>"})
-        elif link == 'strike':
-            sublime.active_window().run_command("insert_snippet", {"contents": "<s>${0:$SELECTION}</s>"})
-        elif link.startswith('comment'):
-            a, b = link.split(':')[-2:]
-            sublime.active_window().run_command("mediawiker_edit_comment", {"a": int(a), "b": int(b)})
-
-    selected = view.sel()
-    for r in selected:
-        if r and r.contains(point):
-            content = [
-                HOVER_HTML_HEADER,
-                'Format:',
-                '<ul>',
-                '<li><a href="bold">Bold</a></li>',
-                '<li><a href="italic">Italic</a></li>',
-                '<li><a href="code">Code</a></li>',
-                '<li><a href="pre">Predefined</a></li>',
-                '<li><a href="nowiki">Nowiki</a></li>',
-                '<li><a href="kbd">Keyboard</a></li>',
-                '<li><a href="strike">Strike</a></li>',
-                '<li><a href="comment:%s:%s">Comment</a></li>' % (r.a, r.b),
-                '</ul>',
-                HOVER_HTML_FOOTER
-            ]
-            content_html = ''.join(content)
-            view.show_popup(
-                content=content_html,
-                location=point,
-                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
-                on_navigate=on_navigate_selected
-            )
-            return True
-
-    return False
-
-
-def on_hover_internal_link(view, point):
-
-    def on_navigate(link):
-        page_name = link.split(':', 1)[-1].replace(' ', '_')
-        if link.startswith('open'):
-            view.window().run_command("mediawiker_page", {
-                'action': 'mediawiker_show_page',
-                'action_params': {'title': page_name}
-            })
-        elif link.startswith('browse'):
-            url = get_page_url(page_name)
-            webbrowser.open(url)
-
-    links = get_internal_links_regions(view)
-    for r in links:
-        if r[1].contains(point):
-
-            is_file = False
-            img_base64 = None
-            if get_setting('mediawiker_show_image_in_popup', True):
-                try:
-                    sitecon = get_connect()
-                    page = get_page(sitecon, r[0])
-                    if page.namespace == IMAGE_NAMESPACE:
-                        is_file = True
-                        extra_properties = {
-                            'imageinfo': (
-                                ('iiprop', 'timestamp|user|comment|url|size|sha1|metadata|archivename'),
-                                ('iiurlwidth', HOVER_IMG_SIZE)
-                            )
-                        }
-                        img = mwclient.Image(site=sitecon, name=r[0], extra_properties=extra_properties)
-                        img_remote_url = img.imageinfo['thumburl']
-                        response = requests.get(img_remote_url)
-                        # "http:" is not works: https://github.com/SublimeTextIssues/Core/issues/1378
-                        img_base64 = "data:" + response.headers['Content-Type'] + ";" + "base64," + str(base64.b64encode(response.content).decode("utf-8"))
-                except:
-                    pass
-
-            h = 'Page "%s"' % r[0] if not is_file else 'File "%s"' % r[0].split(':')[1]
-
-            content = [
-                HOVER_HTML_HEADER,
-                '<h4>%s</h4>' % h,
-                '<img src="%(uri)s">' % {'uri': img_base64} if img_base64 else '',
-                '<ul><li><a href="open:%(point)s">Open</a> | <a href="browse:%(point)s">View in browser</a></li></ul>' % {'point': r[0]},
-                HOVER_HTML_FOOTER
-            ]
-            content_html = ''.join(content)
-
-            view.show_popup(
-                content=content_html,
-                location=point,
-                max_width=500,
-                max_height=500,
-                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
-                on_navigate=on_navigate
-            )
-            # TODO: phantoms for images
-            # https://forum.sublimetext.com/t/dev-build-3118/21270
-            # view.add_phantom("test", view.sel()[0], "Hello, World!", sublime.LAYOUT_BLOCK)
-            # view.erase_phantoms("test")
-            # img_html = '<img src="%(uri)s">' % {'uri': img_base64} if img_base64 else ''
-            # view.add_phantom("image", sublime.Region(point, point), img_html, sublime.LAYOUT_BLOCK)
-            return True
-
-    return False
-
-
-def get_templates(view):
-
-    TPL_START = r'(?<![^\{]\{)\{{2}(?!\{[^\{])'
-    TPL_STOP = r'(?<![^\}]\})\}{2}(?!\}([^\}]|$))'
-    TYPE_START = 'start'
-    TYPE_STOP = 'stop'
-    text_region = sublime.Region(0, view.size())
-    line_regions = view.split_by_newlines(text_region)
-    # print(line_regions)
-    lines_data = []
-    templates = []
-    for region in line_regions:
-        line_text = view.substr(region)
-        starts = [region.a + m.start() for m in re.finditer(TPL_START, line_text)]
-        stops = [region.a + m.start() for m in re.finditer(TPL_STOP, line_text)]
-
-        line_index = {}
-        for i in starts:
-            line_index[i] = TYPE_START
-        for i in stops:
-            line_index[i] = TYPE_STOP
-
-        if starts or stops:
-            lines_data.append(line_index)
-
-    _templates = []
-    for d in lines_data:
-        line_indexes = list(d.keys())
-        line_indexes.sort()
-        for i in line_indexes:
-            if d[i] == TYPE_START:
-                t = sublime.Region(i + 2, i + 2)  # unknown end
-                _templates.append(t)
-            elif d[i] == TYPE_STOP:
-                # ST2 compat Region update
-                # _templates[-1].b = i
-                if _templates:  # if smth. wrong with parsing early, list can be empty, skipping
-                    _templates[-1] = sublime.Region(_templates[-1].a, i)
-                    templates.append((_templates[-1], len(_templates)))  # template region and includes level
-                    _templates = _templates[:-1]
-    return templates
-
-
-def on_hover_template(view, point):
-
-    def on_navigate(link):
-        if link.startswith('fold'):
-            point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_colapse", {"type": "fold", "point": point})
-        elif link.startswith('unfold'):
-            point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_colapse", {"type": "unfold", "point": point})
-        else:
-            sublime.active_window().run_command("mediawiker_page", {
-                'action': 'mediawiker_show_page',
-                'action_params': {'title': link.replace(' ', '_')}
-            })
-
-    SCRIBUNTO_PREFIX = '#invoke'
-    tpl_regions = []
-    _rs = get_templates(view)
-    for r in _rs:
-        tpl_regions.append(r[0])
-
-    for r in tpl_regions:
-        if r.contains(point):
-
-            template_name = view.substr(r).split('|')[0].strip()
-            if template_name.startswith(SCRIBUNTO_PREFIX):
-                # #invoke:ScribuntoTest
-                template_name = template_name.split(':')[-1]
-                template_link = 'Module:%s' % template_name
-                template_type = 'Scribunto module'
-            else:
-                template_link = 'Template:%s' % template_name
-                template_type = 'Template'
-
-            content = [
-                HOVER_HTML_HEADER,
-                '<h4>%s "%s"</h4>' % (template_type, template_name),
-                '<a href="%(link)s">Open</a> | <a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'link': template_link, 'point': point},
-                HOVER_HTML_FOOTER
-            ]
-            content_html = ''.join(content)
-
-            view.show_popup(
-                content=content_html,
-                location=point,
-                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
-                on_navigate=on_navigate
-            )
-            return True
-    return False
-
-
-def on_hover_heading(view, point):
-
-    def on_navigate(link):
-        if link.startswith('fold'):
-            point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_colapse", {"type": "fold", "point": point})
-        elif link.startswith('unfold'):
-            point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_colapse", {"type": "unfold", "point": point})
-
-    h_regions = []
-    for lvl in range(2, 6):
-        _rs = view.get_regions('h_%s' % lvl)
-        if _rs:
-            h_regions = h_regions + _rs
-
-    for r in h_regions:
-        _r = sublime.Region(view.line(r).a, r.a)
-        if _r.contains(point):
-
-            h_name = view.substr(_r).replace('=', '').strip()
-            content = [
-                HOVER_HTML_HEADER,
-                '<h4>Heading "%s"</h4>' % (h_name),
-                '<a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'point': point},
-                HOVER_HTML_FOOTER
-            ]
-            content_html = ''.join(content)
-
-            view.show_popup(
-                content=content_html,
-                location=point,
-                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
-                on_navigate=on_navigate
-            )
-            return True
-    return False
-
-
-def on_hover_tag(view, point):
-
-    def on_navigate(link):
-        if link.startswith('fold'):
-            point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_colapse", {"type": "fold", "point": point})
-        elif link.startswith('unfold'):
-            point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_colapse", {"type": "unfold", "point": point})
-
-    fold_tags = get_setting("mediawiker_fold_tags", ["source", "syntaxhighlight", "div", "pre"])
-    tag_regions = []
-
-    for tag in fold_tags:
-        regs = view.get_regions(tag)
-        for r in regs:
-            tag_regions.append((tag, r))
-
-    for r in tag_regions:
-        if r[1].contains(point):
-
-            content = [
-                HOVER_HTML_HEADER,
-                '<h4>%s</h4>' % r[0].title(),
-                '<a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a>' % {'point': point},
-                HOVER_HTML_FOOTER
-            ]
-            content_html = ''.join(content)
-
-            view.show_popup(
-                content=content_html,
-                location=point,
-                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
-                on_navigate=on_navigate
-            )
-            return True
-    return False
-
-
-def on_hover_comment(view, point):
-
-    def on_navigate(link):
-        if link.startswith('fold'):
-            point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_colapse", {"type": "fold", "point": point})
-        elif link.startswith('unfold'):
-            point = int(link.split(':')[-1])
-            sublime.active_window().run_command("mediawiker_colapse", {"type": "unfold", "point": point})
-
-    def get_text_pretty(r):
-        text = view.substr(r).strip().lstrip('<!--').rstrip('-->')
-        text = text.replace('TODO', '<strong style="color:#E08283;">TODO</strong>')
-        text = text.replace('NOTE', '<strong style="color:#26A65B;">NOTE</strong>')
-        text = text.replace('WARNING', '<strong style="color:#C0392B;">WARNING</strong>')
-        text = text.replace('\n', '<br>')
-        return text
-
-    comment_regions = view.get_regions('comment')
-
-    if not comment_regions:
-        return False
-
-    for r in comment_regions:
-        if r.contains(point):
-
-            comment_text = get_text_pretty(r)
-            content = [
-                HOVER_HTML_HEADER,
-                '<h4>Note</h4>',
-                '<ul>'
-                '<li>%s</li>' % comment_text,
-                '<li><a href="fold:%(point)s">Fold</a> | <a href="unfold:%(point)s">Unfold</a></li>' % {'point': point},
-                '</ul>',
-                HOVER_HTML_FOOTER
-            ]
-            content_html = ''.join(content)
-
-            view.show_popup(
-                content=content_html,
-                location=point,
-                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
-                on_navigate=on_navigate
-            )
-            return True
-    return False
-
-
 def status_message(message, replace=None, is_panel=None):
 
     def status_message_sublime(message, replace=None):
@@ -670,6 +281,138 @@ def set_timeout_async(callback, delay):
 
 
 # classes..
+class ConnectionFailed(Exception):
+    pass
+
+
+class PreAPI(object):
+
+    def __init__(self, conman):
+        self.conman = conman
+
+    def get_connect(self):
+        sitecon = self.conman.get_site()
+        if not sitecon:
+            raise ConnectionFailed("No valid connection available")
+        return sitecon
+
+    def call(self, func, **kwargs):
+
+        if not isinstance(func, str):
+            status_message('Error: PreAPI call arg must be a string.')
+            return
+
+        try:
+            funcobj = getattr(self, func)
+        except AttributeError as e:
+            status_message('PreAPI %s error: %s' % (type(e).__name__, e))
+            return
+
+        if funcobj:
+            while True:
+                try:
+                    return funcobj(**kwargs)
+                except mwclient.errors.APIError as e:
+                    status_message("%s exception: %s, trying to reconnect.." % (type(e).__name__, e))
+                    try:
+                        _ = self.get_connect(force=True)  # one time try to reconnect
+                        if _:
+                            return funcobj(**kwargs)
+                        else:
+                            status_message('Failed to call %s' % funcobj.__name__)  # TODO: check
+                            break
+                    except Exception as e:
+                        status_message("%s exception: %s" % (type(e).__name__, e))
+                        break
+                except Exception as e:
+                    status_message("%s exception: %s" % (type(e).__name__, e))
+                    break
+
+    def get_page(self, title):
+        sitecon = self.get_connect()
+        return sitecon.Pages.get(title, None)
+
+    def get_page_backlinks(self, page, limit):
+        return page.backlinks(limit=limit)
+
+    def get_page_embeddedin(self, page, limit):
+        return page.embeddedin(limit=limit)
+
+    def get_page_langlinks(self, page):
+        return page.langlinks()
+
+    def save_page(self, page, text, summary, mark_as_minor):
+        page.save(text, summary=summary.strip(), minor=mark_as_minor)
+
+    def page_attr(self, page, attr_name):
+        try:
+
+            if attr_name == 'namespace_name':
+                return getattr(page, 'name').split(':')[0]
+
+            return getattr(page, attr_name)
+
+        except AttributeError as e:
+            status_message('%s exception: %s' % (type(e).__name__, e))
+
+    def page_can_read(self, page):
+        return page.can('read')
+
+    def page_can_edit(self, page):
+        return page.can('edit')
+
+    def page_get_text(self, page):
+        try:
+            if self.page_can_read(page):
+                return page.text()
+        except:
+            pass
+        return ''
+
+    def get_subcategories(self, category_root):
+        sitecon = self.get_connect()
+        return sitecon.Categories.get(category_root, [])
+
+    def get_pages(self, prefix, namespace):
+        sitecon = self.get_connect()
+        return sitecon.allpages(prefix=prefix, namespace=namespace)
+
+    def get_notifications(self):
+        sitecon = self.get_connect()
+        return sitecon.notifications()
+
+    def get_parse_result(self, text, title):
+        sitecon = self.get_connect()
+        return sitecon.parse(text=text, title=title, disableeditsection=True).get('text', {}).get('*', '')
+
+    def get_search_result(self, search, limit, namespace):
+        sitecon = self.get_connect()
+        return sitecon.search(search=search, what='text', limit=limit, namespace=namespace)
+
+    def process_upload(self, file_handler, filename, description):
+        # TODO: retest
+        sitecon = self.get_connect()
+        return sitecon.upload(file_handler, filename, description)
+
+    def get_namespace_number(self, name):
+        sitecon = self.get_connect()
+        return sitecon.namespaces_canonical_invert.get(
+            name, sitecon.namespaces_invert.get(
+                name, sitecon.namespaces_aliases_invert.get(
+                    name, None)))
+
+    def image_init(self, name, extra_properties):
+        sitecon = self.get_connect()
+        return mwclient.Image(site=sitecon, name=name, extra_properties=extra_properties)
+
+    def is_equal_ns(self, ns_name1, ns_name2):
+        ns_name1_number = self.get_namespace_number(name=ns_name1)
+        ns_name2_number = self.get_namespace_number(name=ns_name2)
+        if ns_name1_number and ns_name2_number and int(ns_name1_number) == int(ns_name2_number):
+            return True
+        return False
+
+
 class WikiConnect(object):
 
     conns = {}
@@ -760,7 +503,7 @@ class WikiConnect(object):
     def url(self):
         return ''.join([self.host[0], '://', self.host[1]])
 
-    def get_site(self):
+    def get_site(self, force=False):
 
         self._site_preinit()
 
@@ -768,11 +511,14 @@ class WikiConnect(object):
 
         if self.auth_type == self.AUTH_TYPE_COOKIES and not self.is_eq_cookies(self.cj, cj):
             self.cj = cj
-        elif self.auth_type != self.AUTH_TYPE_LOGIN or not self.username or self.password:
+        elif not force and (self.auth_type != self.AUTH_TYPE_LOGIN or not self.username or self.password):
             sitecon = self.conns.get(self.site, None)
             if sitecon:
                 return sitecon
 
+        return self.get_new_connection()
+
+    def get_new_connection(self):
         self._site_init()
 
         if self.proxy_host:
@@ -811,11 +557,9 @@ class WikiConnect(object):
                     sitecon = self._http_auth(http_auth_header)
                 else:
                     sublime.message_dialog('HTTP connection failed: %s' % e[1])
-                    # raise Exception('HTTP connection failed.')
                     return
             except Exception as e:
                 sublime.message_dialog('Connection failed for %s: %s' % (self.host, e))
-                # raise Exception('HTTP connection failed: %s' % e)
                 return
 
         if sitecon:
@@ -1052,3 +796,4 @@ class WikiaInfoboxParser(HTMLParser):
 
 
 mwcon = WikiConnect()
+api = PreAPI(conman=mwcon)
