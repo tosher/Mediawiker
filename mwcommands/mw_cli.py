@@ -18,8 +18,8 @@ class MediawikerCliCommand(sublime_plugin.WindowCommand):
     def run(self, url):
         if url:
             url = mw.strunquote(url)
-            sublime.set_timeout(lambda: self.window.run_command('mediawiker_page', {
-                'action': 'mediawiker_show_page',
+            sublime.set_timeout(lambda: self.window.run_command(mw.cmd('page'), {
+                'action': mw.cmd('show_page'),
                 'action_params': {'title': self.proto_replacer(url)}
             }), 1)
 

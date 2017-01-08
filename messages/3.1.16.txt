@@ -1,6 +1,0 @@
-## Mediawiker 3.1.16
-
-* `ST3` Authorization on wiki sites using browser's cookies (Firefox, Chrome), based on **Browsercookie** packet [1](https://bitbucket.org/richardpenman/browsercookie), [2](https://github.com/borisbabic/browser_cookie3) with some modifications for compatibility.
-    - New option: **authotization_type** - `"oauth"` / `"cookies"` / `"login"`, default `"login"`;
-    - New option: **cookies_browser** - `"firefox"` / `"chrome"`, default `"chrome"`;
-* `ST3` Configurator was refactored, all external dependencies were removed.

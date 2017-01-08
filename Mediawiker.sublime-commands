@@ -2,6 +2,7 @@
     { "caption": "Mediawiker: Open page", "command": "mediawiker_open_page" },
     { "caption": "Mediawiker: Open page in browser", "command": "mediawiker_open_page_in_browser" },
     { "caption": "Mediawiker: Post page", "command": "mediawiker_post_page" },
+    { "caption": "Mediawiker: Move page", "command": "mediawiker_move_page" },
     { "caption": "Mediawiker: Pages history", "command": "mediawiker_page_list" },
     { "caption": "Mediawiker: Show TOC", "command": "mediawiker_show_toc" },
     { "caption": "Mediawiker: Select wiki", "command": "mediawiker_set_active_site" },
@@ -38,5 +39,6 @@
     { "caption": "Mediawiker: Unfold Level 5", "command": "mediawiker_colapse", "args": {"type": "unfold_5"}},
     { "caption": "Mediawiker: Fold text blocks", "command": "mediawiker_colapse", "args": {"type": "foldwiki"}},
     { "caption": "Mediawiker: Unfold text blocks", "command": "mediawiker_colapse", "args": {"type": "unfoldwiki"}},
-    { "caption": "Mediawiker: Configurator", "command": "mediawiker_configurator"}
+    { "caption": "Mediawiker: Configurator", "command": "mediawiker_configurator"},
+    { "caption": "Mediawiker: Changelog", "command": "mediawiker_changelog"}
 ]

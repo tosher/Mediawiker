@@ -15,29 +15,27 @@ else:
 
 class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
     site_keys = []
-    site_on = '> '
-    site_off = ' ' * 4
+    SITE_ON = '> '
+    SITE_OFF = ' ' * 4
     site_active = ''
 
     def run(self):
         self.site_active = mw.get_view_site()
-        sites = mw.get_setting('mediawiki_site')
+        sites = mw.get_setting('site')
         self.site_keys = [self.is_checked(x) for x in sorted(sites.keys(), key=str.lower)]
         sublime.set_timeout(lambda: self.window.show_quick_panel(self.site_keys, self.on_done), 1)
 
     def is_checked(self, site_key):
-        checked = self.site_on if site_key == self.site_active else self.site_off
+        checked = self.SITE_ON if site_key == self.site_active else self.SITE_OFF
         return '%s%s' % (checked, site_key)
 
     def on_done(self, index):
         # not escaped
         if index >= 0:
             site_active = self.site_keys[index].strip()
-            if site_active.startswith(self.site_on):
-                site_active = site_active[len(self.site_on):]
+            if site_active.startswith(self.SITE_ON):
+                site_active = site_active[len(self.SITE_ON):]
             # force to set site_active in global and in view settings
-            # current_syntax = self.window.active_view().settings().get('syntax')
-            # if current_syntax is not None and current_syntax.endswith('Mediawiker/Mediawiki.tmLanguage'):
-            if self.window.active_view().settings().get('mediawiker_is_here', False):
-                self.window.active_view().settings().set('mediawiker_site', site_active)
-            mw.set_setting("mediawiki_site_active", site_active)
+            if mw.props.get_view_setting(self.window.active_view(), 'is_here'):
+                mw.props.set_view_setting(self.window.active_view(), 'site', site_active)
+            mw.set_setting("site_active", site_active)

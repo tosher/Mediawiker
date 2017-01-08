@@ -24,7 +24,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
 
     def get_header_regions(self, level):
         _regions = []
-        pattern = r'={%(level)s}[^=]+={%(level)s}\s?\n((.|\n)*?)(?=(\n=|\Z))' % {'level': level}
+        pattern = r'={%(level)s}[^=]+={%(level)s}\s?\n((.|\n)*?)(?=(\n={1,%(level)s}[^=]|\Z))' % {'level': level}
         _regions = self.view.find_all(pattern)
         colapse_paragraphs = []
         if _regions:
@@ -33,7 +33,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                 _a, _b = r.a + len(header_line), r.b
                 colapse_paragraphs.append((r.a, sublime.Region(_a, _b)))
 
-            gutter_png = 'Packages/Mediawiker/img/gutter_h%s.png' % level if pythonver >= 3 else ''
+            gutter_png = mw.from_package('img', 'gutter_h%s.png' % level) if pythonver >= 3 else ''
             self.view.add_regions('h_%s' % level, [r[1] for r in colapse_paragraphs], 'comment', gutter_png, self.DRAW_TYPE)
 
         return colapse_paragraphs
@@ -50,7 +50,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                     colapse_templates[line_idx] = [_r[0]]
 
             # create gutter by first region in line..
-            gutter_png = 'Packages/Mediawiker/img/gutter_t.png' if pythonver >= 3 else ''
+            gutter_png = mw.from_package('img', 'gutter_t.png') if pythonver >= 3 else ''
             self.view.add_regions('templates_%s' % _r[1], [rl[0] for rl in list(colapse_templates.values())], 'comment', gutter_png, self.DRAW_TYPE)
         return colapse_templates
 
@@ -64,7 +64,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                 _a, _b = r.a + len(header_line) + 1, r.b - len('</%s>' % tag)
                 colapse_tag.append((r.a, sublime.Region(_a, _b)))
 
-            gutter_png = 'Packages/Mediawiker/img/gutter_tag.png' if pythonver >= 3 else ''
+            gutter_png = mw.from_package('img', 'gutter_tag.png') if pythonver >= 3 else ''
             self.view.add_regions(tag, [r[1] for r in colapse_tag], 'comment', gutter_png, self.DRAW_TYPE)
         return colapse_tag
 
@@ -77,7 +77,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                 _a, _b = r.a + 2, r.b - 2
                 colapse_tables.append(sublime.Region(_a, _b))
 
-            gutter_png = 'Packages/Mediawiker/img/gutter_t.png' if pythonver >= 3 else ''
+            gutter_png = mw.from_package('img', 'gutter_t.png') if pythonver >= 3 else ''
             self.view.add_regions('tables', colapse_tables, 'comment', gutter_png, self.DRAW_TYPE)
         return colapse_tables
 
@@ -92,7 +92,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
                 r_new = sublime.Region(r.a + len(C_START), r.b - len(C_STOP))
                 colapse_comment.append(r_new)
 
-            gutter_png = 'Packages/Mediawiker/img/gutter_tag.png' if pythonver >= 3 else ''
+            gutter_png = mw.from_package('img', 'gutter_tag.png') if pythonver >= 3 else ''
             self.view.add_regions('comment', colapse_comment, 'comment', gutter_png, self.DRAW_TYPE)
         return colapse_comment
 
@@ -129,7 +129,9 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
         return False
 
     def get_first_header_region_by_cursor(self, cursor, headers):
-        for level_tuple in headers.keys():
+        # colapse from max level to min
+        levels = reversed(list(headers.keys()))
+        for level_tuple in levels:
             if headers[level_tuple]:
                 for rt in headers[level_tuple]:
                     if self.is_cursor_inheader(cursor, rt):
@@ -137,12 +139,12 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, **kwargs):
 
-        if not self.view.settings().get('mediawiker_is_here', False):
+        if not mw.props.get_view_setting(self.view, 'is_here', False):
             return
 
         _fold_type = kwargs.get('type', None) if kwargs else None
         point = kwargs.get('point', None) if kwargs else None
-        fold_tags = mw.get_setting("mediawiker_fold_tags", ["source", "syntaxhighlight", "div", "pre"])
+        fold_tags = mw.get_setting("fold_tags")
 
         headers = {}
         for _h in range(2, 5):

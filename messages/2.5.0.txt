@@ -1,6 +1,0 @@
-Mediawiker 2.5.0:
-* Multi-site support - own wiki site per Sublime text's view (tab). Now, **mediawiki_site_active** setting is used as default site for new views. But, on opening a page from existing view it's own settings will be inherited.
-* New command to show other languages versions of the current page: **Show language links**. On opening page with selected language, active site will be automatically switched to the respective language version site. For example, from english page on en.wikipedia.org we want to open italian version of this page - active site will be switched to it.wikipedia.org for italian version view.
-
-Note 1: This version supports the possibility to switch between the language versions only for the sites using domain name scheme like *lang_prefix*.site.com, e.g. en.wikipedia.org. Other schemes can be added in future.
-Note 2: Selected language version site settings must be in preferences for work with it's pages.

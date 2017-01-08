@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import sys
+
+try:
+    import json
+except ImportError:
+    import simplejson as json
+
 import sublime
 import sublime_plugin
 
@@ -9,83 +15,10 @@ pythonver = sys.version_info[0]
 
 if pythonver >= 3:
     from . import mw_utils as mw
-    from distutils.util import strtobool
-    from collections import OrderedDict
+    from . import mw_html
 else:
     import mw_utils as mw
-
-
-class MWHTML(object):
-
-    HTML_HEADER = '''
-    <html>
-        <body id="mediawiker_html">
-            <style>
-                html { padding: 0; margin: 0; background-color: %(html_background_color)s; }
-
-                body { padding: 0; margin: 0; font-family: Tahoma; color: %(body_color)s;}
-
-                div { display: block; }
-
-                a {text-decoration: none; font-size: 1.2rem; color: %(a_color)s; }
-
-                ul { padding-right: 2rem; }
-
-                li {margin-left: 0; display: block; font-size: 1.2rem; }
-
-                code {color: %(code_color)s; }
-
-                h1, h2, h3, h4 {margin: 2rem; color: %(h_color)s; }
-
-                .error {padding: 5px; color: %(class_error_color)s; }
-
-                .success {padding: 5px; color: %(class_success_color)s; }
-
-            </style>
-            <div id="mediawiker_html">
-    '''
-    HTML_FOOTER = '''
-            </div>
-        </body>
-    </html>
-    '''
-    config = {}
-
-    def __init__(self, **kwargs):
-        self.config['html_background_color'] = kwargs.get('html_background_color', '#2c3e50') or '#2c3e50'
-        self.config['body_color'] = kwargs.get('body_color', 'white') or 'white'
-        self.config['a_color'] = kwargs.get('a_color', '#C5EFF7') or '#C5EFF7'
-        self.config['code_color'] = kwargs.get('code_color', '#c0c0c0') or '#c0c0c0'
-        self.config['h_color'] = kwargs.get('h_color', '#DADFE1') or '#DADFE1'
-        self.config['class_error_color'] = kwargs.get('class_error_color', '#c0392b') or '#c0392b'
-        self.config['class_success_color'] = kwargs.get('class_success_color', '#27ae60') or '#27ae60'
-
-    def h(self, lvl, title):
-        return '<h%(level)s>%(title)s</h%(level)s>' % {
-            'level': lvl,
-            'title': title
-        }
-
-    def h2(self, title):
-        return self.h(2, title)
-
-    def link(self, url, text):
-        return '<a href="%s">%s</a>' % (url, text)
-
-    def ul(self, close=False):
-        return '<ul>' if not close else '</ul>'
-
-    def li(self, data):
-        return '<li>%s</li>' % data
-
-    def strong(self, data, css_class='success'):
-        return '<strong class="%s">%s</strong>' % (css_class, data)
-
-    def code(self, data):
-        return '<code>%s</code>' % data
-
-    def build(self, lines):
-        return "%s\n%s\n%s" % (self.HTML_HEADER % self.config, '\n'.join(lines), self.HTML_FOOTER)
+    import mw_html
 
 
 class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
@@ -99,19 +32,21 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
     FORMAT_SECTION = '%(name)s'
     FORMAT_OPTION = '%(status)s %(name)s'
-    FORMAT_URL = '%(section)s:%(value)s:%(params)s:%(goto)s'
     MENU_OFFSET = 20
+    TYPE_PASSWORD = 'passwd'
+    PROPERTY_SITE_NAME = 'name'
 
     def run(self, edit):
-        self.MARKED = mw.get_setting('mediawiker_config_icon_checked', '✓')
-        self.UNMARKED = mw.get_setting('mediawiker_config_icon_unchecked', '✗')
-        self.RADIO_MARKED = mw.get_setting('mediawiker_config_icon_radio_checked', '✓')
-        self.RADIO_UNMARKED = mw.get_setting('mediawiker_config_icon_radio_unchecked', '⭕')
-        self.EDIT_ICON = mw.get_setting('mediawiker_config_icon_edit', '→')
-        self.BACK_ICON = mw.get_setting('mediawiker_config_icon_back', '←')
+        self.MARKED = mw.get_setting('config_icon_checked')
+        self.UNMARKED = mw.get_setting('config_icon_unchecked')
+        self.RADIO_MARKED = mw.get_setting('config_icon_radio_checked')
+        self.RADIO_UNMARKED = mw.get_setting('config_icon_radio_unchecked')
+        self.EDIT_ICON = mw.get_setting('config_icon_edit')
+        self.BACK_ICON = mw.get_setting('config_icon_back')
+        self.LIST_ICON = mw.get_setting('config_icon_unnumbered_list')
 
-        config_html = mw.get_setting('mediawiker_config_html', {})
-        self.html = MWHTML(**config_html)
+        self.html = mw_html.MwHtmlAdv(html_id='mediawiker_configurator')
+        self.set_css()
 
         if pythonver < 3:
             sublime.message_dialog('Only Sublime Text 3 supported')
@@ -119,205 +54,332 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
         self.show()
 
-    def post_prepare_menu(self, section, menu):
+    def set_css(self):
+        base_font_size = self.html.css_rules['body']['font-size']
+        self.html.css_rules['a']['color'] = '#C5EFF7'
+        self.html.css_rules['a']['text-decoration'] = 'none'
+        self.html.css_rules['a']['font-size'] = self.html.get_font_size(base_font_size, 0.1)
+        self.html.css_rules['ul']['padding-right'] = '2rem'
+        self.html.css_rules['ul']['margin-left'] = '1.5rem'
+        self.html.css_rules['li']['font-size'] = self.html.get_font_size(base_font_size, 0.1)
+        self.html.css_rules['h1,h2,h3,h4']['margin'] = '2rem'
+        self.html.css_rules['h1,h2,h3,h4']['color'] = 'white'
+        self.html.css_rules['.undefined'] = {'padding': '5px', 'color': '#c0c0c0'}
+
+    def post_prepare_popup(self, section, popup):
         if not section == 'Main':
 
             link = self.html.link(
-                url=self.FORMAT_URL % {'section': 'BACK', 'value': 'BACK', 'params': '', 'goto': 'Main'},
-                text=self.FORMAT_SECTION % {'name': '%s Back' % self.icon(self.BACK_ICON)}
+                url=self.to_s({'section': 'BACK', 'value': 'BACK', 'params': '', 'goto': 'Main'}),
+                # text=self.FORMAT_SECTION % {'name': '%s Back' % self.icon(self.BACK_ICON)}
+                text='Back'
             )
-            menu.append(self.html.li(link))
-        return menu
+            status = self.icon(self.BACK_ICON)
+            popup.append(self.html.li(link, icon=status['icon'], css_class=status['css_class']))
+        return popup
 
-    def append_toggle(self, menu, name, status, value, section, params, goto, adv=None):
+    def append_toggle(self, popup, name, status, value, section, params, goto, adv=None):
         if adv is None:
             adv = ''
 
         link = self.html.link(
-            url=self.FORMAT_URL % {'section': section, 'value': value, 'params': params, 'goto': goto},
-            text=self.FORMAT_OPTION % {'status': status, 'name': name}
+            url=self.to_s({'section': section, 'value': value, 'params': params, 'goto': goto}),
+            # text=self.FORMAT_OPTION % {'status': status, 'name': name}
+            text=name
         )
-        menu.append(self.html.li('%s%s' % (link, adv)))
-        return menu
+
+        popup.append(self.html.li('%s%s' % (link, adv), icon=status['icon'], css_class=status['css_class']))
+        return popup
 
     def icon(self, icon, css_class='success'):
-        return self.html.strong(icon, css_class)
+        # return self.html.strong(icon, css_class)
+        return {
+            'icon': icon,
+            'css_class': css_class
+        }
 
     def pretty(self, value):
         return ' '.join(value.replace('mediawiker_', '').replace('mediawiki_', '').split('_')).capitalize()
 
-    def prepare_menu_edit_panel(self, section, menu):
+    def prepare_popup_edit_panel(self, section, popup):
 
-        menu.append(self.html.ul())
-        menu = self.append_toggle(menu=menu, name='[All turn ON]', status=self.icon(self.MARKED, 'success'), value='all_on', section=section, params=0, goto=section)
-        menu = self.append_toggle(menu=menu, name='[All turn OFF]', status=self.icon(self.UNMARKED, 'error'), value='all_off', section=section, params=0, goto=section)
+        popup.append(self.html.ul())
 
-        self.options_default = mw.get_default_setting('mediawiker_panel', [])
-        self.options = mw.get_setting('mediawiker_panel', None)
-        snippet_char = mw.get_setting('mediawiker_snippet_char', 'Snippet:')
-        if self.options is None:
-            self.options = self.options_default
+        popup = self.append_toggle(
+            popup=popup,
+            name='[All turn ON]',
+            status=self.icon(self.MARKED, 'success'),
+            value='all_on',
+            section=section,
+            params=0,
+            goto=section
+        )
+
+        popup = self.append_toggle(
+            popup=popup,
+            name='[All turn OFF]',
+            status=self.icon(self.UNMARKED, 'error'),
+            value='all_off',
+            section=section,
+            params=0,
+            goto=section
+        )
+
+        self.options_default = mw.get_default_setting('panel')
+        self.options = mw.get_setting('panel')
+        snippet_char = mw.get_setting('snippet_char')
 
         for idx, option in enumerate(self.options_default):
             option_value = True if option in self.options else False
             option_text = '%s %s' % (snippet_char, option.get('caption')) if option.get('type') == 'snippet' else option.get('caption')
-            menu = self.append_toggle(menu=menu, name=option_text,
-                                      status=self.icon(self.MARKED if option_value else self.UNMARKED, 'success' if option_value else 'error'),
-                                      value=not option_value, section=section, params=idx, goto=section)
+            popup = self.append_toggle(
+                popup=popup,
+                name=option_text,
+                status=self.icon(
+                    self.MARKED if option_value else self.UNMARKED,
+                    'success' if option_value else 'error'
+                ),
+                value=not option_value,
+                section=section,
+                params=idx,
+                goto=section
+            )
         else:
-            menu = self.post_prepare_menu(section, menu)
-            menu.append(self.html.ul(close=True))
+            popup = self.post_prepare_popup(section, popup)
+            popup.append(self.html.ul(close=True))
 
-        return menu
+        return popup
+
+    def show_main(self, section, popup):
+        popup.append(self.html.h2('Mediawiker'))
+
+        popup.append(self.html.ul())
+        for option in self.MENU:
+            link = self.html.link(
+                url=self.to_s({'section': section, 'value': '', 'params': '', 'goto': option}),
+                # text=self.FORMAT_SECTION % {'name': option}
+                text=option
+            )
+            popup.append(self.html.li(link, icon='&nbsp;'))
+        else:
+            popup.append(self.html.ul(close=True))
+        return popup
+
+    def show_edit_panel(self, section, popup):
+        popup.append(self.html.h2('Edit panel'))
+        popup = self.prepare_popup_edit_panel(section=section, popup=popup)
+        return popup
+
+    def show_preferences(self, section, popup):
+        popup.append(self.html.h2('Preferences'))
+
+        popup.append(self.html.ul())
+        for option in sorted(mw.props.props, key=lambda k: mw.props.props[k]['text'].lower()):
+            value = mw.get_setting(option)
+            name = mw.props.props.get(option)['text']
+            option_default_value = mw.props.get_default_setting(option)
+            if isinstance(option_default_value, bool):
+
+                status = self.icon(
+                    self.MARKED if value else self.UNMARKED,
+                    'success' if value else 'error'
+                )
+                value = not value
+                params = (option, bool.__name__)
+
+            elif not isinstance(option_default_value, list) and not isinstance(option_default_value, dict):
+                if isinstance(option_default_value, int):
+                    value_pretty = '%s' % self.html.code(value)
+                    option_type = int.__name__
+                else:
+                    option_type = str.__name__
+                    value_pretty = '"%s"' % self.html.code(value) if value else '""'
+
+                name = '%s: %s' % (name, value_pretty)
+                status = self.icon(self.LIST_ICON)
+                params = (option, option_type)
+            else:
+                continue
+
+            popup = self.append_toggle(
+                popup=popup,
+                name=name,
+                status=status,
+                value=value,
+                section=section,
+                params=params,
+                goto=section
+            )
+
+        else:
+            popup = self.post_prepare_popup(section, popup)
+            popup.append(self.html.ul(close=True))
+        return popup
+
+    def show_select_wiki(self, section, popup):
+        popup.append(self.html.h2('Select wiki'))
+        sites = mw.get_setting('site')
+        site_active = mw.get_view_site()
+
+        popup.append(self.html.ul())
+
+        # new
+        popup = self.append_toggle(
+            popup=popup,
+            name='New',
+            status=self.icon(self.RADIO_UNMARKED),
+            value='edit',
+            section=section,
+            params='new',
+            goto='Edit site/new'
+        )
+
+        for site in sorted(sites.keys(), key=str.lower):
+            link = self.html.link(
+                url=self.to_s({
+                    'section': section,
+                    'value': 'edit',
+                    'params': site,
+                    'goto': 'Edit site/%s' % site
+                }),
+                text=self.html.span(self.icon(self.EDIT_ICON)['icon'], self.icon(self.EDIT_ICON)['css_class'])
+            )
+            adv = '&nbsp;&nbsp;%s' % (link)
+            popup = self.append_toggle(
+                popup=popup,
+                name=site,
+                status=self.icon(
+                    self.RADIO_MARKED if site == site_active else self.RADIO_UNMARKED,
+                    'success' if site == site_active else 'error'
+                ),
+                value='',
+                section=section,
+                params=site,
+                goto=section,
+                adv=adv)
+        else:
+            popup = self.post_prepare_popup(section, popup)
+            popup.append(self.html.ul(True))
+
+        return popup
+
+    def show_edit_site(self, section, popup):
+        section_clear, site = section.split('/')
+        popup.append(self.html.h2('Edit site: %s' % site))
+
+        if site == 'new':
+            site = ''
+            settings_default = {self.PROPERTY_SITE_NAME: mw.props.props_site[self.PROPERTY_SITE_NAME]}
+
+        else:
+            settings_default = mw.props.props_site
+
+        popup.append(self.html.ul())
+        for option in sorted(settings_default, key=lambda k: settings_default[k]['text'].lower()):
+            option_pretty = mw.props.props_site[option]['text']
+            value = mw.props.get_site_setting(site, option) if option != self.PROPERTY_SITE_NAME else site
+            if mw.props.props_site[option]['type'] is bool:
+
+                name = option_pretty
+                status = self.icon(
+                    self.MARKED if value else self.UNMARKED,
+                    'success' if value else 'error'
+                )
+                value = not value
+                params = (site, option, bool.__name__)
+
+            else:
+                if option.endswith(('password', 'secret', 'token')):
+                    option_type = self.TYPE_PASSWORD
+                    value_pretty = mw.get_setting('password_char') * 8 if value else '""'
+                else:
+                    option_type = str.__name__
+                    value_pretty = '"%s"' % self.html.code(value) if value else '""'
+
+                name = '%s: %s' % (option_pretty, value_pretty)
+                status = self.icon(
+                    self.LIST_ICON,
+                    'success' if value else 'undefined'
+                )
+                params = (site, option, option_type)
+
+            popup = self.append_toggle(
+                popup=popup,
+                name=name,
+                status=status,
+                value=value,
+                section=section_clear,
+                params=params,
+                goto=section
+            )
+
+        else:
+            popup = self.post_prepare_popup(section, popup)
+            popup.append(self.html.ul(close=True))
+        return popup
+
+    def show_tab_options(self, section, popup):
+        popup.append(self.html.h2('Tab options'))
+
+        settings_default = mw.props.props_view
+
+        popup.append(self.html.ul())
+
+        for option in settings_default.keys():
+            name = settings_default[option]['text']
+            option_type = settings_default[option]['type']
+            value = mw.props.get_view_setting(self.view, option)
+
+            if option_type is bool:
+                status = self.icon(self.MARKED if value else self.UNMARKED, 'success' if value else 'error')
+                value = not value
+            else:
+                value_pretty = self.html.code(value) if value is not None else ''
+                if option_type is str:
+                    value_pretty = '"%s"' % value_pretty
+                name = '%s: %s' % (name, value_pretty)
+                status = self.icon(self.LIST_ICON)
+
+            popup = self.append_toggle(
+                popup=popup,
+                name=name,
+                status=status,
+                value=value,
+                section=section,
+                params=(option, option_type.__name__),
+                goto=section
+            )
+
+        else:
+            popup = self.post_prepare_popup(section, popup)
+            popup.append(self.html.ul(close=True))
+
+        return popup
 
     def show(self, section='Main'):
 
         popup = []
         if section == 'Main':
-
-            popup.append(self.html.h2('Mediawiker'))
-
-            popup.append(self.html.ul())
-            for option in self.MENU:
-                link = self.html.link(
-                    url=self.FORMAT_URL % {'section': section, 'value': '', 'params': '', 'goto': option},
-                    text=self.FORMAT_SECTION % {'name': option}
-                )
-                popup.append(self.html.li(link))
-            else:
-                popup.append(self.html.ul(False))
+            popup = self.show_main(section, popup)
 
         elif section == 'Edit panel':
-            popup.append(self.html.h2('Edit panel'))
-            popup = self.prepare_menu_edit_panel(section=section, menu=popup)
+            popup = self.show_edit_panel(section, popup)
 
         elif section == 'Preferences':
-            popup.append(self.html.h2('Preferences'))
-            settings_default = sublime.decode_value(sublime.load_resource('Packages/Mediawiker/Mediawiker.sublime-settings'))
-
-            popup.append(self.html.ul())
-            for idx, option in enumerate(settings_default):
-                value = mw.get_setting(option)
-                option_pretty = self.pretty(option)
-                if isinstance(settings_default.get(option, None), bool):
-                    popup = self.append_toggle(menu=popup, name=option_pretty,
-                                               status=self.icon(self.MARKED if value else self.UNMARKED, 'success' if value else 'error'),
-                                               value=not value, section=section, params='%s/bool' % (option), goto=section)
-                elif not isinstance(settings_default.get(option, None), list) and not isinstance(settings_default.get(option, None), dict):
-                    option_pretty = self.pretty(option)
-                    if isinstance(settings_default.get(option, None), int):
-                        value_pretty = '"%s"' % self.html.code(value)
-                        option_type = 'int'
-                    else:
-                        option_type = 'text'
-                        value_pretty = '"%s"' % self.html.code(value) if value else '""'
-                        value = self.escaped(value)
-                    popup = self.append_toggle(menu=popup, name='%s: %s' % (option_pretty, value_pretty), status=self.icon('•'),
-                                               value=value, section=section, params='%s/%s' % (option, option_type),
-                                               goto=self.escaped(section))
-            else:
-                popup = self.post_prepare_menu(section, popup)
-                popup.append(self.html.ul(False))
+            popup = self.show_preferences(section, popup)
 
         elif section == 'Select wiki':
-            popup.append(self.html.h2('Select wiki'))
-            sites = mw.get_setting('mediawiki_site')
-            site_active = mw.get_view_site()
-
-            popup.append(self.html.ul())
-            for site in sorted(sites.keys(), key=str.lower):
-                link = self.html.link(
-                    url=self.FORMAT_URL % {'section': section, 'value': 'edit', 'params': self.escaped(site), 'goto': 'Edit site/%s' % self.escaped(site)},
-                    text=self.icon(self.EDIT_ICON)
-                )
-                adv = '&nbsp;&nbsp;%s' % (link)
-                popup = self.append_toggle(menu=popup, name=site,
-                                           status=self.icon(self.RADIO_MARKED if site == site_active else self.RADIO_UNMARKED, 'success' if site == site_active else 'error'),
-                                           value='', section=section, params=self.escaped(site), goto=section, adv=adv)
-            else:
-                popup = self.post_prepare_menu(section, popup)
-                popup.append(self.html.ul(False))
+            popup = self.show_select_wiki(section, popup)
 
         elif section.startswith('Edit site'):
-            popup.append(self.html.h2('Edit site'))
-            section_clear, site = section.split('/')
-            settings = mw.get_setting('mediawiki_site').get(site)
-            settings_default = OrderedDict([
-                ('host', (False, '')),
-                ('https', (True, True)),
-                ('is_ssl_cert_verify', (True, True)),
-                ('path', (False, '')),
-                ('pagepath', (False, '')),
-                ('domain', (False, '')),
-                ('username', (False, '')),
-                ('password', (False, '')),
-                ('use_http_auth', (True, False)),
-                ('http_auth_login', (False, '')),
-                ('http_auth_password', (False, '')),
-                ('proxy_host', (False, '')),
-                ('oauth_access_secret', (False, '')),
-                ('oauth_access_token', (False, '')),
-                ('oauth_consumer_secret', (False, '')),
-                ('oauth_consumer_token', (False, '')),
-                ('authorization_type', (False, 'login')),
-                ('cookies_browser', (False, 'chrome')),
-                ('is_wikia', (True, False))
-            ])
-
-            popup.append(self.html.ul())
-            for option in settings_default.keys():
-                option_pretty = self.pretty(option)
-                value = settings.get(option, settings_default.get(option)[1])
-                if settings_default.get(option)[0]:
-                    # boolean type
-                    popup = self.append_toggle(menu=popup, name=option_pretty,
-                                               status=self.icon(self.MARKED if value else self.UNMARKED, 'success' if value else 'error'),
-                                               value=not value, section=section_clear, params='%s/%s/bool' % (self.escaped(site), option), goto=section)
-                else:
-                    if option.endswith(('password', 'secret', 'token')):
-                        option_type = 'passwd'
-                        value_pretty = mw.get_setting('mediawiker_password_char', '*') * 8 if value else '""'
-                    else:
-                        option_type = 'text'
-                        value_pretty = '"%s"' % self.html.code(value) if value else '""'
-
-                    popup = self.append_toggle(menu=popup, name='%s: %s' % (option_pretty, value_pretty), status=self.icon('•'),
-                                               value=self.escaped(value), section=section_clear, params='%s/%s/%s' % (self.escaped(site), option, option_type),
-                                               goto=self.escaped(section))
-            else:
-                popup = self.post_prepare_menu(section, popup)
-                popup.append(self.html.ul(False))
+            popup = self.show_edit_site(section, popup)
 
         elif section == 'Tab options':
-            popup.append(self.html.h2('Tab options'))
-            settings = self.view.settings()
+            popup = self.show_tab_options(section, popup)
 
-            settings_default = OrderedDict([
-                ('mediawiker_is_here', (True, False)),
-                ('mediawiker_wiki_instead_editor', (True, False)),
-                ('mediawiker_site', (False, '')),
-                ('page_revision', (False, ''))
-            ])
+        self.show_popup(popup)
 
-            popup.append(self.html.ul())
-            for option in settings_default.keys():
-                option_pretty = self.pretty(option)
-                if settings_default.get(option)[0]:
-                    value = settings.get(option, settings_default.get(option)[1])
-                    popup = self.append_toggle(menu=popup, name=option_pretty,
-                                               status=self.icon(self.MARKED if value else self.UNMARKED, 'success' if value else 'error'),
-                                               value=not value, section=section, params=option, goto=section)
-                else:
-                    value = settings.get(option, '')
-                    line = self.html.li('%s %s: %s' % (self.icon('•'), option_pretty, '"%s"' % self.html.code(value) if value else '""'))
-                    popup.append(line)
-            else:
-                popup = self.post_prepare_menu(section, popup)
-                popup.append(self.html.ul(False))
-
-        self.show_menu(popup)
-
-    def show_menu(self, popup):
+    def show_popup(self, popup):
         if not popup:
             return
 
@@ -330,62 +392,118 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
             on_navigate=self.on_navigate,
             on_hide=None)
 
-    def escaped(self, value):
-        return value.replace(':', '>>')
+    def to_s(self, d):
+        return json.dumps(d).replace('"', '&quot;')
 
-    def unescaped(self, value):
-        return value.replace('&gt;&gt;', ':')
+    def to_d(self, s):
+        return json.loads(s.replace('&quot;', '"'))
 
     def toggle_edit_panel(self, value, idx):
         elem = self.options_default[idx]
         if value == 'all_on':
-            mw.del_setting('mediawiker_panel')
+            mw.del_setting('panel')
         else:
             if value == 'all_off':
                 self.options = []
-            elif strtobool(value) and elem not in self.options:
+            elif value and elem not in self.options:
                 self.options.append(elem)
             elif elem in self.options:
                 self.options.remove(elem)
-            mw.set_setting('mediawiker_panel', self.options)
+            mw.set_setting('panel', self.options)
+
+    def on_navigate_edit_panel(self, section, value, params, goto):
+        idx = int(params)
+        self.toggle_edit_panel(value, idx)
+        return False
+
+    def on_navigate_preferences(self, section, value, params, goto):
+        is_async = False
+        option, option_type = params
+        if option_type == bool.__name__:
+            mw.set_setting(option, value)
+        elif option_type in (str.__name__, int.__name__):
+            is_async = True
+            option_pretty = self.pretty(option)
+            panel = InputValue(callback=self.show, option=option, goto=goto, option_type=option_type)
+            panel.show_input(panel_title=option_pretty, value_pre=value)
+
+        return is_async
+
+    def on_navigate_select_wiki(self, section, value, params, goto):
+        if value != 'edit':
+            if mw.props.get_view_setting(self.view, 'is_here', False):
+                mw.props.set_view_setting(self.view, 'site', params)
+            mw.set_setting("site_active", params)
+
+        return False
+
+    def on_navigate_edit_site(self, section, value, params, goto):
+        is_async = False
+        site, option, option_type = params
+        if option == self.PROPERTY_SITE_NAME:
+            option_pretty = self.pretty(option)
+            panel = InputSiteValue(callback=self.show, site=site, option=option, goto=goto)
+            panel.show_input(panel_title=option_pretty, value_pre=value)
+        elif option_type == bool.__name__:
+            mw.props.set_site_setting(site, option, value)
+        elif option_type in (str.__name__, self.TYPE_PASSWORD):
+            is_async = True
+            option_pretty = self.pretty(option)
+            panel = InputSiteValue(callback=self.show, site=site, option=option, goto=goto)
+            if option_type == str.__name__:
+                panel.show_input(panel_title=option_pretty, value_pre=value)
+            elif option_type == self.TYPE_PASSWORD:
+                panel.show_input_passwd(value_pre=value)
+
+        return is_async
+
+    def on_navigate_tab_options(self, section, value, params, goto):
+        is_async = False
+        option, option_type = params
+        if option_type == bool.__name__:
+            mw.props.set_view_setting(self.view, option, value)
+        elif option_type in (int.__name__, str.__name__):
+            is_async = True
+            option_pretty = self.pretty(option)
+            panel = InputTabValue(callback=self.show, option=option, goto=goto, option_type=option_type)
+            panel.show_input(panel_title=option_pretty, value_pre=value)
+
+        return is_async
 
     def on_navigate(self, url):
 
-        section, value, params, goto = [self.unescaped(val) for val in url.split(':')]
+        _ = self.to_d(url)
+        section = _['section']
+        value = _['value']
+        params = _['params']
+        goto = _['goto']
+
         is_async = False
+
+        # Edit panel commands
         if section == 'Edit panel':
-            idx = int(params)
-            self.toggle_edit_panel(value, idx)
+
+            is_async = self.on_navigate_edit_panel(section, value, params, goto)
+
+        # Edit preferences
         elif section == 'Preferences':
-            option, option_type = params.split('/')
-            if option_type == 'bool':
-                mw.set_setting(option, True if strtobool(value) else False)
-            elif option_type in ('text', 'int'):
-                is_async = True
-                option_pretty = self.pretty(option)
-                panel = InputValue(callback=self.show, option=option, goto=goto, option_type=option_type)
-                panel.show_input(panel_title=option_pretty, value_pre=value)
+
+            is_async = self.on_navigate_preferences(section, value, params, goto)
+
+        # Select active site
         elif section == 'Select wiki':
-            if value != 'edit':
-                if self.view.settings().get('mediawiker_is_here', False):
-                    self.view.settings().set('mediawiker_site', params)
-                mw.set_setting("mediawiki_site_active", params)
+
+            is_async = self.on_navigate_select_wiki(section, value, params, goto)
+
+        # Edit site configuration
         elif section == 'Edit site':
-            site, option, option_type = params.split('/')
-            if option_type == 'bool':
-                settings = mw.get_setting('mediawiki_site')
-                settings[site][option] = True if strtobool(value) else False
-                mw.set_setting('mediawiki_site', settings)
-            elif option_type in ('text', 'passwd'):
-                is_async = True
-                option_pretty = self.pretty(option)
-                panel = InputSiteValue(callback=self.show, site=site, option=option, goto=goto)
-                if option_type == 'text':
-                    panel.show_input(panel_title=option_pretty, value_pre=value)
-                elif option_type == 'passwd':
-                    panel.show_input_passwd(value_pre=value)
+
+            is_async = self.on_navigate_edit_site(section, value, params, goto)
+
+        # Edit view options
         elif section == 'Tab options':
-            self.view.settings().set(params, True if strtobool(value) else False)
+
+            is_async = self.on_navigate_tab_options(section, value, params, goto)
 
         if not is_async:
             self.show(goto)
@@ -393,7 +511,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
 class InputValue(mw.InputPanel):
 
-    def __init__(self, callback, option, goto, option_type='text'):
+    def __init__(self, callback, option, goto, option_type=str.__name__):
         super(InputValue, self).__init__(callback=callback)
         self.option = option
         self.goto = goto
@@ -401,7 +519,7 @@ class InputValue(mw.InputPanel):
         self.option_type = option_type
 
     def on_done(self, value):
-        self.value = int(value) if self.option_type == 'int' else value
+        self.value = int(value) if self.option_type == int.__name__ else value
         self.set_setting()
 
     def on_cancel(self):
@@ -409,6 +527,13 @@ class InputValue(mw.InputPanel):
 
     def set_setting(self):
         mw.set_setting(self.option, self.value)
+        mw.set_timeout_async(self.callback(self.goto), 0)
+
+
+class InputTabValue(InputValue):
+
+    def set_setting(self):
+        mw.props.set_view_setting(sublime.active_window().active_view(), self.option, self.value)
         mw.set_timeout_async(self.callback(self.goto), 0)
 
 
@@ -421,6 +546,10 @@ class InputSiteValue(mw.InputPanel):
         self.goto = goto
         self.callback = callback
         self.ph = None
+
+    def show_input(self, panel_title='Input', value_pre=''):
+        self.value_pre = value_pre
+        self.window.show_input_panel(panel_title, value_pre, self.on_done, self.on_change, self.on_cancel)
 
     def show_input_passwd(self, value_pre):
         self.ph = mw.PasswordHider()
@@ -441,7 +570,17 @@ class InputSiteValue(mw.InputPanel):
         mw.set_timeout_async(self.callback(self.goto), 0)
 
     def set_setting(self):
-        settings = mw.get_setting('mediawiki_site')
-        settings[self.site][self.option] = self.value if self.value is not None else ''
-        mw.set_setting('mediawiki_site', settings)
+        if self.option == 'name':
+            settings = mw.get_setting('site')
+            if not self.value_pre or self.value_pre not in settings:
+                settings[self.value] = {}
+            else:
+                settings[self.value] = dict(settings[self.value_pre])
+                del settings[self.value_pre]
+            section = self.goto.split('/')[0]
+            self.goto = '/'.join([section, self.value])
+            mw.set_setting('site', settings)
+        else:
+            mw.props.set_site_setting(self.site, self.option, self.value if self.value is not None else '')
+
         mw.set_timeout_async(self.callback(self.goto), 0)

@@ -18,7 +18,7 @@ class MediawikerSearchStringCommand(sublime_plugin.WindowCommand):
     ''' alias to Search string list command '''
 
     def run(self):
-        self.window.run_command("mediawiker_page", {"action": "mediawiker_search_string_list"})
+        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('search_string_list')})
 
 
 class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
@@ -30,8 +30,8 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
         sublime.active_window().show_input_panel('Wiki search:', search_pre, self.show_results, None, None)
 
     def do_search(self, string_value):
-        namespace = mw.get_setting('mediawiker_search_namespaces')
-        search_limit = mw.get_setting('mediawiker_search_results_count', 20)
+        namespace = mw.get_setting('search_namespaces')
+        search_limit = mw.get_setting('search_results_count', 20)
         return mw.api.call('get_search_result', search=string_value, limit=search_limit, namespace=namespace)
 
     def show_results(self, search_value=''):
@@ -53,10 +53,10 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
             if text:
                 self.view = sublime.active_window().new_file()
                 # TODO: view set attrs in utils..
-                syntax_file = mw.get_setting('mediawiki_syntax')
+                syntax_file = mw.get_setting('syntax')
                 self.view.set_syntax_file(syntax_file)
                 self.view.set_name('Wiki search results: %s' % search_value)
-                self.view.run_command('mediawiker_insert_text', {'position': 0, 'text': text})
+                self.view.run_command(mw.cmd('insert_text'), {'position': 0, 'text': text})
             elif search_value:
                 sublime.message_dialog('No results for: %s' % search_value)
 

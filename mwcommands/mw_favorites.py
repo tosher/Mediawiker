@@ -17,10 +17,10 @@ class MediawikerFavoritesAddCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         title = mw.get_title()
-        mw.save_mypages(title=title, storage_name='mediawiker_favorites')
+        mw.save_mypages(title=title, storage_name='favorites')
 
 
 class MediawikerFavoritesOpenCommand(sublime_plugin.WindowCommand):
 
     def run(self):
-        self.window.run_command('mediawiker_page_list', {'storage_name': 'mediawiker_favorites'})
+        self.window.run_command(mw.cmd('page_list'), {'storage_name': 'favorites'})

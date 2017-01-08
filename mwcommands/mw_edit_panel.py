@@ -15,11 +15,10 @@ else:
 
 class MediawikerEditPanelCommand(sublime_plugin.WindowCommand):
     options = []
-    SNIPPET_CHAR = u'\u24C8'
 
     def run(self):
-        self.SNIPPET_CHAR = mw.get_setting('mediawiker_snippet_char')
-        self.options = mw.get_setting('mediawiker_panel', {})
+        self.SNIPPET_CHAR = mw.get_setting('snippet_char')
+        self.options = mw.get_setting('panel', {})
         if self.options:
             office_panel_list = ['\t%s' % val['caption'] if val['type'] != 'snippet' else '\t%s %s' % (
                 self.SNIPPET_CHAR, val['caption']) for val in self.options]
@@ -35,10 +34,10 @@ class MediawikerEditPanelCommand(sublime_plugin.WindowCommand):
                     # run snippet
                     self.window.active_view().run_command("insert_snippet", {"name": action_value})
                 elif action_type == 'window_command':
-                    # run command
+                    # run window command
                     self.window.run_command(action_value)
                 elif action_type == 'text_command':
-                    # run command
+                    # run text command
                     self.window.active_view().run_command(action_value)
             except ValueError as e:
                 mw.status_message(e)

@@ -17,7 +17,7 @@ class MediawikerShowPageLanglinksCommand(sublime_plugin.WindowCommand):
     ''' alias to Get page command '''
 
     def run(self):
-        self.window.run_command("mediawiker_page", {"action": "mediawiker_page_langlinks"})
+        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('page_langlinks')})
 
 
 class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
@@ -62,7 +62,7 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
         if index == 0:
             site_active_new = None
             site_active = mw.get_view_site()
-            sites = mw.get_setting('mediawiki_site')
+            sites = mw.get_setting('site')
             host = sites[site_active]['host']
             domain_first = '.'.join(host.split('.')[-2:])
             # NOTE: only links like lang_prefix.site.com supported.. (like en.wikipedia.org)
@@ -74,11 +74,11 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
                     break
             if site_active_new:
                 # open page with force site_active_new
-                sublime.active_window().run_command("mediawiker_page", {
-                    'action': 'mediawiker_show_page',
+                sublime.active_window().run_command(mw.cmd('page'), {
+                    'action': mw.cmd('show_page'),
                     'action_params': {'title': self.page_name, 'site_active': site_active_new}
                 })
             else:
                 mw.status_message('Settings not found for host %s.' % (host_new))
         elif index == 1:
-            self.view.run_command('mediawiker_replace_text', {'text': self.page_name})
+            self.view.run_command(mw.cmd('replace_text'), {'text': self.page_name})

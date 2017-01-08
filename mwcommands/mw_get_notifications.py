@@ -18,7 +18,7 @@ class MediawikerNotificationsCommand(sublime_plugin.WindowCommand):
     ''' alias to GetNotifications command '''
 
     def run(self):
-        self.window.run_command("mediawiker_page", {"action": "mediawiker_get_notifications"})
+        self.window.run_command(mw.cmd('page'), {'action': mw.cmd('get_notifications')})
 
 
 class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
@@ -29,8 +29,8 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
     '''
 
     def run(self, edit):
-        notifications_type = mw.get_setting('mediawiki_notifications_show_all', True)
-        self.read_sign = mw.get_setting('mediawiki_notifications_read_sign', ' [+]')
+        notifications_type = mw.get_setting('notifications_show_all', True)
+        self.read_sign = mw.get_setting('notifications_read_sign', ' [+]')
         ns = mw.api.call('get_notifications')
         self.msgs = []
         if ns:
@@ -68,8 +68,8 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
             else:
                 title = self.msgs[idx - 1].get('title', None)
                 if title:
-                    sublime.active_window().run_command("mediawiker_page", {
-                        "action": "mediawiker_show_page",
+                    sublime.active_window().run_command(mw.cmd('page'), {
+                        "action": mw.cmd('show_page'),
                         'action_params': {"title": title},
                         "check_notifications": False
                     })

@@ -17,7 +17,7 @@ class MediawikerShowPageBacklinksCommand(sublime_plugin.WindowCommand):
     ''' alias to PageBacklinks command '''
 
     def run(self):
-        self.window.run_command("mediawiker_page", {"action": "mediawiker_page_backlinks"})
+        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('page_backlinks')})
 
 
 class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):
@@ -33,7 +33,7 @@ class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):
 
     def mw_get_page_backlinks(self, title):
         self.links = []
-        links_limit = mw.get_setting('mediawiki_linkstopage_limit', 5)
+        links_limit = mw.get_setting('linkstopage_limit')
         page = mw.api.get_page(title)
 
         # backlinks to page
@@ -60,4 +60,4 @@ class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):
         if index >= 0:
             self.page_name = self.links[index]
 
-            sublime.active_window().run_command('mediawiker_page', {'action': 'mediawiker_show_page', 'action_params': {'title': self.page_name}})
+            sublime.active_window().run_command(mw.cmd('page'), {'action': mw.cmd('show_page'), 'action_params': {'title': self.page_name}})

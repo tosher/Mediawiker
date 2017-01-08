@@ -15,10 +15,10 @@ else:
 
 class MediawikerPageListCommand(sublime_plugin.WindowCommand):
 
-    def run(self, storage_name='mediawiker_pagelist'):
+    def run(self, storage_name='pagelist'):
         site_name_active = mw.get_view_site()
-        mediawiker_pagelist = mw.get_setting(storage_name, {})
-        self.my_pages = mediawiker_pagelist.get(site_name_active, [])
+        pagelist = mw.get_setting(storage_name, {})
+        self.my_pages = pagelist.get(site_name_active, [])
         if self.my_pages:
             self.my_pages.reverse()
             sublime.set_timeout(lambda: self.window.show_quick_panel(self.my_pages, self.on_done), 1)
@@ -29,8 +29,8 @@ class MediawikerPageListCommand(sublime_plugin.WindowCommand):
         if index >= 0:
             title = self.my_pages[index]
             try:
-                self.window.run_command('mediawiker_page', {
-                    'action': 'mediawiker_show_page',
+                self.window.run_command(mw.cmd('page'), {
+                    'action': mw.cmd('show_page'),
                     'action_params': {'title': title}
                 })
             except ValueError as e:

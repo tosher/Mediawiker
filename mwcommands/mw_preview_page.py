@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import os
 import re
 import webbrowser
-import tempfile
 from jinja2 import Template
 
 import sublime
@@ -22,7 +20,7 @@ class MediawikerPreviewCommand(sublime_plugin.WindowCommand):
     ''' alias to Preview page command '''
 
     def run(self):
-        self.window.run_command("mediawiker_page", {"action": "mediawiker_preview_page"})
+        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('preview_page')})
 
 
 class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
@@ -32,22 +30,34 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         text = self.view.substr(sublime.Region(0, self.view.size()))
+        # site = mw.get_setting('site').get(mw.get_view_site())
+        site = mw.conman.get_site()
 
-        site_active = mw.get_view_site()
-        site_list = mw.get_setting('mediawiki_site')
-        host = site_list[site_active]['host']
-        path = site_list[site_active]['path']
-        head_default = mw.get_setting('mediawiki_preview_head')
-        head = '\n'.join(site_list[site_active].get('preview_custom_head', head_default))
-        lang = mw.get_setting('mediawiki_preview_lang', 'en')
-        preview_file = mw.get_setting('mediawiki_preview_file', 'Wiki_page_preview_')
-        site_http = 'https' if site_list[site_active].get('https', False) else 'http'
+        page_css = mw.api.call('get_page', title='MediaWiki:Common.css')
+        text_css = mw.api.page_get_text(page_css)
+        if text_css:
+            common_css = '''
+            <style type="text/css">
+            %s
+            </style>
+            ''' % text_css
+        else:
+            common_css = ''
+
+        host = site['host']
+        path = site['path']
+        head = '\n'.join(site['preview_custom_head'] or mw.get_setting('preview_head'))
+        lang = mw.get_setting('preview_lang')
+        self.page_id = '%s: %s' % (host, mw.get_title())
+        self.preview_file = mw.from_package('%s_preview_file.html' % mw.PML, name='User', posix=False, is_abs=True)
+        site_http = 'https' if site['https'] else 'http'
 
         html_header_lines = [
             '<!DOCTYPE html>',
             '<html>',
             '<head>',
             '%(head)s',
+            '%(common_css)s'
             '</head>',
             '<body style="margin:20px;">'
         ]
@@ -55,47 +65,36 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         geshi_css = self.get_geshi_langs()
         head_tpl = Template(head)
         head_str = head_tpl.render(http=site_http, host=host, path=path, lang=lang, geshi_css=geshi_css)
-        html_header = '\n'.join(html_header_lines) % {'head': head_str}
+        html_header = '\n'.join(html_header_lines) % {'head': head_str, 'common_css': common_css}
         html_footer = '</body></html>'
 
         html = mw.api.call('get_parse_result', text=text, title=mw.get_title())
         html = html.replace('"//', '"%s://' % site_http)  # internal links: images,..
         html = html.replace('"/', '"%s://%s/' % (site_http, host))  # internal local links: images,..
 
-        if preview_file.endswith('.html'):
-            preview_file = os.path.join(sublime.packages_path(), 'User', preview_file)
-            # fixed file in User folder
-            if pythonver >= 3:
-                with open(preview_file, 'w', encoding='utf-8') as tf:
-                    tf.write(html_header)
-                    tf.write(html)
-                    tf.write(html_footer)
-            else:
-                with open(preview_file, 'w') as tf:
-                    tf.write(html_header)
-                    tf.write(html.encode('utf-8'))
-                    tf.write(html_footer)
-            html_view = sublime.active_window().find_open_file(preview_file)
-            if html_view:
-                sublime.active_window().focus_view(html_view)
-            else:
-                sublime.active_window().open_file(preview_file)
-                webbrowser.open(tf.name)
-        else:
-            # temporary file
-            if pythonver >= 3:
-                with tempfile.NamedTemporaryFile(mode='w+t', suffix='.html', prefix=preview_file, dir=None, delete=False, encoding='utf-8') as tf:
-                    tf.write(html_header)
-                    tf.write(html)
-                    tf.write(html_footer)
-            else:
-                with tempfile.NamedTemporaryFile(mode='w+t', suffix='.html', prefix=preview_file, dir=None, delete=False) as tf:
-                    tf.write(html_header)
-                    tf.write(html.encode('utf-8'))
-                    tf.write(html_footer)
-            webbrowser.open(tf.name)
+        page_id_old = self.get_page_id()
+        page = self.generate_preview(html_header, html, html_footer)
+        if self.page_id != page_id_old or mw.props.get_view_setting(self.view, 'autoreload') == 0:
+            # print('[%s] vs [%s]' % (self.page_id, page_id_old))
+            webbrowser.open(page)
+
+    def get_page_id(self):
+        with open(self.preview_file, 'r', encoding='utf-8') as tf:
+            first_line = tf.readline()
+        return first_line.replace('<!--', '').replace('-->', '').replace('\n', '')
+
+    def generate_preview(self, header, data, footer):
+        html = data if pythonver >= 3 else data.encode('utf-8')
+        with open(self.preview_file, 'w', encoding='utf-8') as tf:
+            tf.write('<!--%s-->\n' % self.page_id)
+            tf.write(header)
+            tf.write(html)
+            tf.write(footer)
+        return tf.name
 
     def get_geshi_langs(self):
+        # NOTE: in last mediawiki versions module "pygments" is using, not need to generate langs list
+        # just use css string with pygments and remove geshi string
         langs = []
         pattern = r'<(source|syntaxhighlight) lang="(.*?)"(.*?)>'
         self.regions = self.view.find_all(pattern)

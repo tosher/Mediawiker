@@ -1,4 +1,0 @@
-## Mediawiker 3.1.15
-
-* `ST3` Syntax highlighting fixes.
-* `ST3` Lost dependency fix: pygments.

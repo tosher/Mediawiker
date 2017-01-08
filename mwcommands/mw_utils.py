@@ -3,9 +3,10 @@
 
 import sys
 
-from os.path import splitext, basename
+import os
 import re
 import urllib.parse
+import traceback
 
 try:
     # Python 2.7+
@@ -27,73 +28,94 @@ if pythonver >= 3:
     #     import mwclient
     # else:
     #     from . import mwclient
+    from . import mw_properties as mwprops
     from html.parser import HTMLParser
     from ..lib import mwclient
     from ..lib import browser_cookie3
 else:
+    import mw_properties as mwprops
     from HTMLParser import HTMLParser
     from lib import mwclient
 
 
-CATEGORY_NAMESPACE = 14  # category namespace number
-IMAGE_NAMESPACE = 6  # file/image namespace number
-TEMPLATE_NAMESPACE = 10  # template namespace number
-SCRIBUNTO_NAMESPACE = 828  # scribunto module namespace number
-
-COMMENT_REGIONS_KEY = 'comment'
-
-PAGE_CANNOT_READ_MESSAGE = 'You have not rights to read/edit this page.'
-PAGE_CANNOT_EDIT_MESSAGE = 'You have not rights to edit this page.'
-
-NAMESPACE_SPLITTER = u':'
-INTERNAL_LINK_SPLITTER = u'|'
-
+# linting skips
+# all must be ovverrided in plugin_loaded
 
 def get_setting(key, default_value=None):
-    settings = sublime.load_settings('Mediawiker.sublime-settings')
-    return settings.get(key, default_value)
+    pass
 
 
 def set_setting(key, value):
-    settings = sublime.load_settings('Mediawiker.sublime-settings')
-    settings.set(key, value)
-    sublime.save_settings('Mediawiker.sublime-settings')
+    pass
 
 
 def del_setting(key):
-    settings = sublime.load_settings('Mediawiker.sublime-settings')
-    settings.erase(key)
-    sublime.save_settings('Mediawiker.sublime-settings')
+    pass
 
 
 def get_default_setting(key, default_value=None):
-    settings = sublime.decode_value(sublime.load_resource('Packages/Mediawiker/Mediawiker.sublime-settings'))
-    return settings.get(key, default_value)
+    pass
+
+
+def from_package(*path):
+    pass
+
+
+conman = None
+# api = None
+props = None
+
+
+def plugin_loaded():
+    mw = sys.modules[__name__]
+    props = mwprops.MediawikerProperties()
+    setattr(mw, 'props', props)
+
+    for attr in dir(mwprops):
+        if isinstance(getattr(mwprops, attr), (str, int)) and not attr.startswith('_'):
+            setattr(mw, attr, getattr(mwprops, attr))
+
+    setattr(mw, 'from_package', mwprops.from_package)
+    setattr(mw, 'get_setting', props.get_setting)
+    setattr(mw, 'set_setting', props.set_setting)
+    setattr(mw, 'del_setting', props.del_setting)
+    setattr(mw, 'get_default_setting', props.get_default_setting)
+
+    conman = MediawikerConnectionManager()
+    setattr(mw, 'conman', conman)
+    setattr(mw, 'api', PreAPI(conman=conman))
 
 
 def set_syntax(page_name=None, page_namespace=None):
-    syntax = get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG.tmLanguage')
+    syntax = get_setting('syntax')
 
     if page_name and page_namespace:
         syntax_ext = 'sublime-syntax' if int(sublime.version()) >= 3084 else 'tmLanguage'
 
         # Scribunto lua modules, except doc subpage
-        if page_namespace == SCRIBUNTO_NAMESPACE and not page_name.lower().endswith('/doc'):
-            syntax = 'Packages/Lua/Lua.%s' % syntax_ext
+        if page_namespace == mwprops.SCRIBUNTO_NAMESPACE and not page_name.lower().endswith('/doc'):
+            syntax = from_package('Lua.%s' % syntax_ext, name='Lua')
         elif page_name.lower().endswith('.css'):
-            syntax = 'Packages/CSS/CSS.%s' % syntax_ext
+            syntax = from_package('CSS.%s' % syntax_ext, name='CSS')
         elif page_name.endswith('.js'):
-            syntax = 'Packages/Javascript/Javascript.%s' % syntax_ext
+            syntax = from_package('Javascript.%s' % syntax_ext, name='Javascript')
 
     sublime.active_window().active_view().set_syntax_file(syntax)
 
 
+def cmd(cmd):
+    if cmd.startswith(mwprops.PML):
+        return cmd
+    else:
+        return '_'.join([mwprops.PML, cmd])
+
+
 def get_view_site():
     try:
-        return sublime.active_window().active_view().settings().get('mediawiker_site', get_setting('mediawiki_site_active'))
+        return props.get_view_setting(sublime.active_window().active_view(), 'site', get_setting('site_active'))
     except:
         # st2 exception on start.. sublime not available on activated..
-        return get_setting('mediawiki_site_active')
+        return get_setting('site_active')
 
 
 def enco(value):
@@ -134,8 +156,8 @@ def get_title():
         # haven't view.name, try to get from view.file_name (without extension)
         file_name = sublime.active_window().active_view().file_name()
         if file_name:
-            wiki_extensions = get_setting('mediawiker_files_extension')
-            title, ext = splitext(basename(file_name))
+            wiki_extensions = get_setting('files_extension')
+            title, ext = os.path.splitext(os.path.basename(file_name))
             if ext[1:] in wiki_extensions and title:
                 return title
             else:
@@ -146,15 +168,11 @@ def get_title():
 
 def pagename_clear(pagename):
     """ Return clear pagename if page-url was set instead of.."""
-    site_active = get_view_site()
-    site_list = get_setting('mediawiki_site')
-    site = site_list.get(site_active, {}).get('host', None)
+    site = get_setting('site').get(get_view_site())
+    host = site.get('host', None)
+    pagepath = site.get('pagepath', None)
 
-    if not site:
-        return pagename
-
-    pagepath = site_list.get(site_active, {}).get('pagepath', None)
-    if not pagepath:
+    if not host or not pagepath:
         return pagename
 
     try:
@@ -164,23 +182,23 @@ def pagename_clear(pagename):
     except Exception:
         pass
 
-    if site in pagename:
-        pagename = re.sub(r'(https?://)?%s%s' % (site, pagepath), '', pagename)
+    if host in pagename:
+        pagename = re.sub(r'(https?://)?%s%s' % (host, pagepath), '', pagename)
 
     return pagename
 
 
-def save_mypages(title, storage_name='mediawiker_pagelist'):
+def save_mypages(title, storage_name='pagelist'):
 
     title = title.replace('_', ' ')  # for wiki '_' and ' ' are equal in page name
-    pagelist_maxsize = get_setting('mediawiker_pagelist_maxsize')
+    pagelist_maxsize = get_setting('pagelist_maxsize')
     site_active = get_view_site()
-    mediawiker_pagelist = get_setting(storage_name, {})
+    pagelist = get_setting(storage_name, {})
 
-    if site_active not in mediawiker_pagelist:
-        mediawiker_pagelist[site_active] = []
+    if site_active not in pagelist:
+        pagelist[site_active] = []
 
-    my_pages = mediawiker_pagelist[site_active]
+    my_pages = pagelist[site_active]
 
     if my_pages:
         while len(my_pages) >= pagelist_maxsize:
@@ -190,7 +208,7 @@ def save_mypages(title, storage_name='mediawiker_pagelist'):
             # for sorting
             my_pages.remove(title)
     my_pages.append(title)
-    set_setting(storage_name, mediawiker_pagelist)
+    set_setting(storage_name, pagelist)
 
 
 def get_hlevel(header_string, substring):
@@ -205,23 +223,20 @@ def get_category(category_full_name):
         return 'Category', category_full_name
 
 
-def get_page_url(page_name=''):
-    site_active = get_view_site()
-    site_list = get_setting('mediawiki_site')
-    site = site_list[site_active]["host"]
+def get_page_url(page_name=None):
 
-    is_https = False
-    if 'https' in site_list[site_active]:
-        is_https = site_list[site_active]["https"]
-
-    proto = 'https' if is_https else 'http'
-    pagepath = site_list[site_active]["pagepath"]
-    if not page_name:
+    if page_name is None:
         page_name = strquote(get_title())
+
+    site = get_setting('site').get(get_view_site())
+    host = site['host']
+    proto = 'https' if site.get('https', True) else 'http'
+    pagepath = site.get("pagepath", '/wiki/')
+
     if page_name:
-        return '%s://%s%s%s' % (proto, site, pagepath, page_name)
-    else:
-        return ''
+        return '%s://%s%s%s' % (proto, host, pagepath, page_name)
+
+    return ''
 
 
 def get_internal_links_regions(view):
@@ -234,7 +249,7 @@ def get_internal_links_regions(view):
     return [(get_header(r), r) for r in regions]
 
 
-def status_message(message, replace=None, is_panel=None):
+def status_message(message, replace=None, is_panel=None, new_line=True):
 
     def status_message_sublime(message, replace=None):
         if replace:
@@ -245,25 +260,28 @@ def status_message(message, replace=None, is_panel=None):
     is_use_message_panel = is_panel if is_panel is not None else get_setting('use_status_messages_panel', True)
 
     if is_use_message_panel:
-        panel_name = 'mediawiker_panel'
+        panel_name = '%s_panel' % mwprops.PML
         if int(sublime.version()) >= 3000:
             panel = sublime.active_window().find_output_panel(panel_name)
 
             if panel is None:
                 panel = sublime.active_window().create_output_panel(panel_name)
 
-            if panel is not None:
-                # https://forum.sublimetext.com/t/style-the-output-panel/10316/6
-                panel.set_syntax_file(get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiPanel.sublime-syntax'))
+                if panel is not None:
+                    # https://forum.sublimetext.com/t/style-the-output-panel/10316/6
+                    # panel.set_syntax_file(get_setting('syntax', from_package('MediawikerPanel.sublime-syntax')))
+                    panel.set_syntax_file(from_package('MediawikerPanel.sublime-syntax'))
         else:
             panel = sublime.active_window().get_output_panel(panel_name)
             if panel is not None:
-                panel.set_syntax_file(get_setting('mediawiki_syntax', 'Packages/Mediawiker/MediawikiNG_ST2.tmLanguage'))
+                # panel.set_syntax_file(get_setting('mediawiki_syntax', from_package('MediawikiNG_ST2.tmLanguage')))
+                panel.set_syntax_file(from_package('MediawikiNG_ST2.tmLanguage'))
 
         if panel is not None:
             sublime.active_window().run_command("show_panel", {"panel": "output.%s" % panel_name})
+            props.set_view_setting(panel, 'is_here', True)
             panel.set_read_only(False)
-            panel.run_command('mediawiker_insert_text', {'position': panel.size(), 'text': '%s\n' % message})
+            panel.run_command(cmd('insert_text'), {'position': panel.size(), 'text': '%s%s' % (message, '\n' if new_line else '')})
             panel.set_read_only(True)
             panel.show(panel.size())
 
@@ -290,8 +308,13 @@ class PreAPI(object):
     def __init__(self, conman):
         self.conman = conman
 
-    def get_connect(self):
-        sitecon = self.conman.get_site()
+    def get_connect(self, force=False):
+        sitecon = self.conman.get_connect(force=force)
+
+        if not hasattr(sitecon, 'logged_in') or not sitecon.logged_in:
+            status_message('Forcing new connection, not logged in..')
+            sitecon = self.conman.get_connect(force=True)
+
         if not sitecon:
             raise ConnectionFailed("No valid connection available")
         return sitecon
@@ -315,6 +338,7 @@ class PreAPI(object):
                 except mwclient.errors.APIError as e:
                     status_message("%s exception: %s, trying to reconnect.." % (type(e).__name__, e))
                     try:
+                        status_message('Forcing new connection..')
                         _ = self.get_connect(force=True)  # one time try to reconnect
                         if _:
                             return funcobj(**kwargs)
@@ -329,8 +353,11 @@ class PreAPI(object):
                     break
 
     def get_page(self, title):
-        sitecon = self.get_connect()
-        return sitecon.Pages.get(title, None)
+        return self.get_connect().Pages.get(title, None)
+
+    def page_move(self, page, new_title, reason='', no_redirect=False):
+        result = page.move(new_title=new_title, reason=reason, move_talk=True, no_redirect=no_redirect)
+        return result
 
     def get_page_backlinks(self, page, limit):
         return page.backlinks(limit=limit)
@@ -370,29 +397,22 @@ class PreAPI(object):
         return ''
 
     def get_subcategories(self, category_root):
-        sitecon = self.get_connect()
-        return sitecon.Categories.get(category_root, [])
+        return self.get_connect().Categories.get(category_root, [])
 
     def get_pages(self, prefix, namespace):
-        sitecon = self.get_connect()
-        return sitecon.allpages(prefix=prefix, namespace=namespace)
+        return self.get_connect().allpages(prefix=prefix, namespace=namespace)
 
     def get_notifications(self):
-        sitecon = self.get_connect()
-        return sitecon.notifications()
+        return self.get_connect().notifications()
 
     def get_parse_result(self, text, title):
-        sitecon = self.get_connect()
-        return sitecon.parse(text=text, title=title, disableeditsection=True).get('text', {}).get('*', '')
+        return self.get_connect().parse(text=text, title=title, disableeditsection=True).get('text', {}).get('*', '')
 
     def get_search_result(self, search, limit, namespace):
-        sitecon = self.get_connect()
-        return sitecon.search(search=search, what='text', limit=limit, namespace=namespace)
+        return self.get_connect().search(search=search, what='text', limit=limit, namespace=namespace)
 
     def process_upload(self, file_handler, filename, description):
-        # TODO: retest
-        sitecon = self.get_connect()
-        return sitecon.upload(file_handler, filename, description)
+        return self.get_connect().upload(file_handler, filename, description)
 
     def get_namespace_number(self, name):
         sitecon = self.get_connect()
@@ -413,40 +433,220 @@ class PreAPI(object):
         return False
 
 
-class WikiConnect(object):
+class MediawikerConnectionManager(object):
 
-    conns = {}
-    cj = None  # cookies
-    username = ''
-    password = ''
+    sites = {}
     AUTH_TYPE_LOGIN = 'login'
     AUTH_TYPE_OAUTH = 'oauth'
     AUTH_TYPE_COOKIES = 'cookies'
 
-    def _site_preinit(self):
-        site_active = get_view_site()
-        site_list = get_setting('mediawiki_site')
-        self.site_params = site_list.get(site_active, {})
-        self.site = self.site_params.get('host', None)
-        if not self.site:
-            sublime.message_dialog('Host is not defined for site %s' % site_active)
-        self.auth_type = self.site_params.get('authorization_type', self.AUTH_TYPE_LOGIN)
-        self.cookies_browser = self.site_params.get('cookies_browser', 'chrome') if self.auth_type == self.AUTH_TYPE_COOKIES else None
+    def get_site_config(self, name):
+        ''' get site settings '''
+        site_config = get_setting('site').get(name)
+        self.validate_site(name, site_config)
 
-    def try_cookie(self):
-        if self.auth_type != self.AUTH_TYPE_COOKIES:
+    def is_site_changed(self, oldsite, newsite):
+        if not oldsite and newsite:
+            return True
+
+        return oldsite != newsite
+
+    def validate_site(self, name, site_config):
+        ''' validate and update site configuration
+            drops connection if site configuration was changed
+        '''
+
+        def get_proto():
+            return 'https' if site['https'] else 'http'
+
+        assert 'host' in site_config, 'Host is not defined for site %s' % name
+
+        site = self.sites.get(name, {})
+        site_config_old = site.get('config', {})
+
+        if self.is_site_changed(site_config_old, site_config):
+            if not site_config_old:
+                status_message("'''Setup new connection to \"%s\".'''" % name)
+            else:
+                status_message("'''Site configuration is changed, setup new connection to \"%s\"..'''" % name)
+            if 'connection' in site:
+                site['connection'] = None
+
+            site['config'] = site_config
+            site['host'] = site_config['host']
+            site['username'] = site_config.get('username', None)
+            site['password'] = site_config.get('password', None) or site.get('password', None)
+            site['domain'] = site_config.get('domain', None)
+            site['path'] = site_config.get('path', '/w/')
+            site['pagepath'] = site_config.get('pagepath', '/wiki/')
+            site['authorization_type'] = site_config.get('authorization_type', self.AUTH_TYPE_LOGIN)
+            site['cookies_browser'] = site_config.get('cookies_browser', 'chrome') if site['authorization_type'] == self.AUTH_TYPE_COOKIES else None
+            site['https'] = site_config.get('https', True)
+            site['hosturl'] = (get_proto(), site['host'])
+            site['is_ssl_cert_verify'] = site_config.get('is_ssl_cert_verify', True)
+            site['retry_timeout'] = site_config.get('retry_timeout', 30)
+            site['proxy_host'] = site_config.get('proxy_host', None)
+            site['proxies'] = {get_proto(): site['proxy_host']} if site['proxy_host'] else None
+            site['cookies'] = None
+            site['use_http_auth'] = site_config.get('use_http_auth', False)
+            site['http_auth_login'] = site_config.get('http_auth_login', None)
+            site['http_auth_password'] = site_config.get('http_auth_password', None)
+            site['oauth_consumer_token'] = site_config.get('oauth_consumer_token', None)
+            site['oauth_consumer_secret'] = site_config.get('oauth_consumer_secret', None)
+            site['oauth_access_token'] = site_config.get('oauth_access_token', None)
+            site['oauth_access_secret'] = site_config.get('oauth_access_secret', None)
+            site['preview_custom_head'] = site_config.get('preview_custom_head', None)
+
+            self.sites[name] = site
+
+    def get_site(self, name=None):
+        ''' returns actual site options, includes connection '''
+
+        if name is None:
+            name = get_view_site()
+
+        self.get_site_config(name=name)
+
+        return self.sites.get(name, None)
+
+    def update_site(self, name=None, **options):
+        ''' update site settings
+            * add/update connection
+            * add/update password
+        '''
+        site = self.get_site(name)
+        for key in options.keys():
+            site[key] = options[key]
+
+    def get_requests_config(self, name=None):
+        site = self.get_site(name)
+
+        # proxies:
+        #   proxy host like: http(s)://user:pass@10.10.1.10:3128
+        #   Note: PC uses requests ver. 2.7.0. Per-host proxies supported from 2.8.0 version only.
+        #   http://docs.python-requests.org/en/latest/community/updates/#id4
+        #   host_key = '%s://%s' % ('https' if self.is_https else 'http', self.site)
+        #   using proto only..
+
+        return {
+            'verify': site['is_ssl_cert_verify'],
+            'proxies': site['proxies'],
+            'timeout': (site['retry_timeout'], None)
+        }
+
+    def get_connect(self, name=None, force=False):
+        ''' setup new connection (call connect()) or returns exists '''
+        try:
+            site = self.get_site(name)
+
+            cj = self.get_cookies(name=name) if site['authorization_type'] == self.AUTH_TYPE_COOKIES else None
+
+            if site['authorization_type'] == self.AUTH_TYPE_COOKIES and not self.is_eq_cookies(site['cookies'], cj):
+                site['cookies'] = cj
+            elif not force and (site['authorization_type'] != self.AUTH_TYPE_LOGIN or not site['username'] or site['password']):
+                connection = site.get('connection', None)
+                if connection:
+                    return connection
+
+        except Exception as e:
+            formatted_lines = traceback.format_exc().splitlines()
+            for line in formatted_lines:
+                status_message(line)
+
+        return self.connect(name=name)
+
+    def connect(self, name=None):
+        ''' new connection '''
+
+        site = self.get_site(name)
+
+        status_message('Connecting to %s..' % self.url(name), new_line=False)
+
+        if site['authorization_type'] == self.AUTH_TYPE_OAUTH:
+            # oauth authorization
+            connection = self._oauth()
+        else:
+            # Site connection
+            try:
+                connection = mwclient.Site(
+                    host=site['hosturl'],
+                    path=site['path'],
+                    retry_timeout=None,
+                    max_retries=None,
+                    requests=self.get_requests_config(name)
+                )
+            except requests.exceptions.HTTPError as e:
+                # additional http auth (basic, digest)
+                if e.response.status_code == 401 and site['use_http_auth']:
+                    http_auth_header = e.response.headers.get('www-authenticate', '')
+                    connection = self._http_auth(http_auth_header=http_auth_header, name=name)
+                else:
+                    sublime.message_dialog('HTTP connection failed: %s' % e[1])
+                    return
+            except Exception as e:
+                sublime.message_dialog('Connection failed for %s: %s' % (site['hosturl'], e))
+                return
+
+        if connection:
+            status_message(' done.')
+            status_message('Login in with type %s..' % site['authorization_type'], new_line=False)
+            success_message = ' done'
+            # Cookie auth
+            if site['authorization_type'] == self.AUTH_TYPE_COOKIES and site['cookies']:
+                try:
+                    connection.login(cookies=site['cookies'])
+                except mwclient.LoginError as exc:
+                    e = exc.args if pythonver >= 3 else exc
+                    status_message(' failed: %s' % e[1]['result'])
+                    return
+            # Login/Password auth
+            elif site['authorization_type'] == self.AUTH_TYPE_LOGIN and site['username'] and site['password']:
+                try:
+                    connection.login(username=site['username'], password=site['password'], domain=site['domain'])
+                except mwclient.LoginError as exc:
+                    e = exc.args if pythonver >= 3 else exc
+                    status_message(' failed: %s' % e[1]['result'])
+                    return
+            # elif self.auth_type == self.AUTH_TYPE_OAUTH:
+            else:
+                success_message = ' done, without authorization.'  # TODO: recheck AUTH messages
+
+            status_message(success_message)
+
+            site['connection'] = connection
+            return connection
+        else:
+            status_message(' failed.')
+
+        return None
+
+    def require_password(self, name=None):
+
+        site = self.get_site(name)
+        if site['authorization_type'] == self.AUTH_TYPE_LOGIN and not site.get('password', None):
+            return True
+        return False
+
+    def url(self, name=None):
+        site = self.get_site(name)
+        return ''.join([site['hosturl'][0], '://', site['hosturl'][1]])
+
+    def get_cookies(self, name):
+        site = self.get_site(name)
+
+        if site['authorization_type'] != self.AUTH_TYPE_COOKIES:
             return None
 
-        cookie_files = get_setting('mediawiker_%s_cookie_files' % self.cookies_browser, [])
+        cookie_files = get_setting('%s_cookie_files' % site['cookies_browser'], [])
         if not cookie_files:
             cookie_files = None
 
-        if self.cookies_browser == "firefox":
-            return browser_cookie3.firefox(cookie_files=cookie_files, domain_name=self.site)
-        elif self.cookies_browser == 'chrome':
-            return browser_cookie3.chrome(cookie_files=cookie_files, domain_name=self.site)
+        if site['cookies_browser'] == "firefox":
+            return browser_cookie3.firefox(cookie_files=cookie_files, domain_name=site['host'])
+        elif site['cookies_browser'] == 'chrome':
+            return browser_cookie3.chrome(cookie_files=cookie_files, domain_name=site['host'])
         else:
-            sublime.message_dialog("Incompatible browser for cookie: %s" % (self.cookies_browser or "Not defined"))
+            sublime.message_dialog("Incompatible browser for cookie: %s" % (site['cookies_browser'] or "Not defined"))
 
         return None
 
@@ -455,151 +655,17 @@ class WikiConnect(object):
         cj2_set = set((c.domain, c.path, c.name, c.value) for c in cj2) if cj2 else set()
         return not bool(cj1_set - cj2_set or cj2_set - cj1_set)
 
-    def _site_init(self):
-        self.path = self.site_params.get('path', '/w/')
-        self.username = self.site_params.get('username', '')
-        self.password = self.site_params.get('password', '') if not self.password else self.password
-        self.domain = self.site_params.get('domain', '')
-        self.proxy_host = self.site_params.get('proxy_host', '')
-        self.http_auth_login = self.site_params.get('http_auth_login', '')
-        self.http_auth_password = self.site_params.get('http_auth_password', '')
-        self.is_https = self.site_params.get('https', True)
-        self.is_ssl_cert_verify = self.site_params.get('is_ssl_cert_verify', True)
-        http_proto = 'https' if self.is_https else 'http'
-        self.host = (http_proto, self.site)
-        self.proxies = None
-        # oauth params
-        self.oauth_consumer_token = self.site_params.get('oauth_consumer_token', None)
-        self.oauth_consumer_secret = self.site_params.get('oauth_consumer_secret', None)
-        self.oauth_access_token = self.site_params.get('oauth_access_token', None)
-        self.oauth_access_secret = self.site_params.get('oauth_access_secret', None)
-        self.retry_timeout = self.site_params.get('retry_timeout', 30)
-
-        if self.proxy_host:
-            # proxy host like: http(s)://user:pass@10.10.1.10:3128
-            # NOTE: PC uses requests ver. 2.7.0. Per-host proxies supported from 2.8.0 version only.
-            # http://docs.python-requests.org/en/latest/community/updates/#id4
-            # host_key = '%s://%s' % ('https' if self.is_https else 'http', self.site)
-            # using proto only..
-            self.proxies = {
-                http_proto: self.proxy_host
-            }
-
-        self.requests_config = {
-            'verify': self.is_ssl_cert_verify,
-            'proxies': self.proxies,
-            'timeout': (self.retry_timeout, None)
-        }
-
-    def set_password(self, password):
-        if password:
-            self.password = password
-
-    def require_password(self):
-        if self.AUTH_TYPE_LOGIN and not self.password:
-            return True
-        return False
-
-    def url(self):
-        return ''.join([self.host[0], '://', self.host[1]])
-
-    def get_site(self, force=False):
-
-        self._site_preinit()
-
-        cj = self.try_cookie() if self.auth_type == self.AUTH_TYPE_COOKIES else None
-
-        if self.auth_type == self.AUTH_TYPE_COOKIES and not self.is_eq_cookies(self.cj, cj):
-            self.cj = cj
-        elif not force and (self.auth_type != self.AUTH_TYPE_LOGIN or not self.username or self.password):
-            sitecon = self.conns.get(self.site, None)
-            if sitecon:
-                return sitecon
-
-        return self.get_new_connection()
-
-    def get_new_connection(self):
-        self._site_init()
-
-        if self.proxy_host:
-            status_message('Connection with proxy %s to %s..' % (self.proxy_host, self.url()))
-        else:
-            status_message('Connecting to %s..' % self.url())
-
-        # oauth authorization
-        if self.auth_type == self.AUTH_TYPE_OAUTH and all([self.oauth_consumer_token, self.oauth_consumer_secret, self.oauth_access_token, self.oauth_access_secret]):
-            try:
-                sitecon = mwclient.Site(host=self.host, path=self.path,
-                                        retry_timeout=None,
-                                        max_retries=None,
-                                        consumer_token=self.oauth_consumer_token,
-                                        consumer_secret=self.oauth_consumer_secret,
-                                        access_token=self.oauth_access_token,
-                                        access_secret=self.oauth_access_secret,
-                                        requests=self.requests_config)
-            except mwclient.OAuthAuthorizationError as exc:
-                e = exc.args if pythonver >= 3 else exc
-                status_message('Login failed: %s' % e[1])
-                return
-        else:
-
-            # Site connection
-            try:
-                sitecon = mwclient.Site(host=self.host, path=self.path,
-                                        retry_timeout=None,
-                                        max_retries=None,
-                                        requests=self.requests_config)
-            except requests.exceptions.HTTPError as e:
-                is_use_http_auth = self.site_params.get('use_http_auth', False)
-                # additional http auth (basic, digest)
-                if e.response.status_code == 401 and is_use_http_auth:
-                    http_auth_header = e.response.headers.get('www-authenticate', '')
-                    sitecon = self._http_auth(http_auth_header)
-                else:
-                    sublime.message_dialog('HTTP connection failed: %s' % e[1])
-                    return
-            except Exception as e:
-                sublime.message_dialog('Connection failed for %s: %s' % (self.host, e))
-                return
-
-        if sitecon:
-            status_message('Connection done.')
-            status_message('Login in with type %s..' % self.auth_type)
-            success_message = 'Login successfully.'
-            # Cookie auth
-            if self.auth_type == self.AUTH_TYPE_COOKIES and self.cj:
-                try:
-                    sitecon.login(cookies=self.cj, domain=self.domain)
-                except mwclient.LoginError as exc:
-                    e = exc.args if pythonver >= 3 else exc
-                    status_message('Login failed: %s' % e[1]['result'])
-                    return
-            # Login/Password auth
-            elif self.auth_type == self.AUTH_TYPE_LOGIN and self.username and self.password:
-                try:
-                    sitecon.login(username=self.username, password=self.password, domain=self.domain)
-                except mwclient.LoginError as exc:
-                    e = exc.args if pythonver >= 3 else exc
-                    status_message('Login failed: %s' % e[1]['result'])
-                    return
-            # elif self.auth_type == self.AUTH_TYPE_OAUTH:
-            else:
-                success_message = 'Connection was made without authorization.'
-
-            status_message(success_message)
-
-            self.conns[self.site] = sitecon
-            return sitecon
-
-        return None
-
-    def _http_auth(self, http_auth_header):
-        sitecon = None
+    def _http_auth(self, http_auth_header, name=None):
         DIGEST_REALM = 'Digest realm'
         BASIC_REALM = 'Basic realm'
 
-        if not self.http_auth_login or not self.http_auth_password:
-            raise Exception('HTTP connection failed: Empty authorization data.')
+        site = self.get_site(name)
+
+        http_auth_login = site['http_auth_login']
+        http_auth_password = site['http_auth_password']
+
+        if not http_auth_login or not http_auth_password:
+            return None
 
         httpauth = None
         realm = None
@@ -610,20 +676,52 @@ class WikiConnect(object):
 
         if realm is not None:
             if realm == BASIC_REALM:
-                httpauth = requests.auth.HTTPBasicAuth(self.http_auth_login, self.http_auth_password)
+                httpauth = requests.auth.HTTPBasicAuth(http_auth_login, http_auth_password)
             elif realm == DIGEST_REALM:
-                httpauth = requests.auth.HTTPDigestAuth(self.http_auth_login, self.http_auth_password)
+                httpauth = requests.auth.HTTPDigestAuth(http_auth_login, http_auth_password)
 
             if httpauth:
-                sitecon = mwclient.Site(
-                    host=self.host, path=self.path,
+                connection = mwclient.Site(
+                    host=site['hosturl'],
+                    path=site['path'],
                     httpauth=httpauth,
-                    requests=self.requests_config)
+                    requests=self.get_requests_config(name))
+                return connection
         else:
-            error_message = 'HTTP connection failed: Unknown realm.'
-            status_message(error_message)
-            raise Exception(error_message)
-        return sitecon
+            status_message('HTTP connection failed: Unknown realm.')
+
+        return None
+
+    def _oauth(self, name=None):
+
+        site = self.get_site(name)
+
+        if site['authorization_type'] != self.AUTH_TYPE_OAUTH:
+            return None
+
+        if all([
+            site['oauth_consumer_token'],
+            site['oauth_consumer_secret'],
+            site['oauth_access_token'],
+            site['oauth_access_secret']
+        ]):
+            try:
+                connection = mwclient.Site(
+                    host=self.hosturl,
+                    path=self.path,
+                    retry_timeout=None,
+                    max_retries=None,
+                    consumer_token=site['oauth_consumer_token'],
+                    consumer_secret=site['oauth_consumer_secret'],
+                    access_token=site['oauth_access_token'],
+                    access_secret=site['oauth_access_secret'],
+                    requests=self.get_requests_config(name)
+                )
+                return connection
+            except mwclient.OAuthAuthorizationError as exc:
+                e = exc.args if pythonver >= 3 else exc
+                status_message('OAuth login failed: %s' % e[1])
+        return None
 
 
 class InputPanel(object):
@@ -651,7 +749,7 @@ class InputPanelPageTitle(InputPanel):
         if not title:
             title_pre = ''
             # use clipboard or selected text for page name
-            if bool(get_setting('mediawiker_clipboard_as_defaultpagename')):
+            if bool(get_setting('clipboard_as_defaultpagename')):
                 title_pre = sublime.get_clipboard().strip()
             if not title_pre:
                 selection = self.window.active_view().sel()
@@ -676,18 +774,17 @@ class InputPanelPassword(InputPanel):
     is_hide_password = False
 
     def get_password(self):
-        site_active = get_view_site()
-        site_list = get_setting('mediawiki_site')
+        site = conman.get_site()
 
-        if site_list.get(site_active, {}).get('authorization_type', 'login') != 'login':
+        if site['authorization_type'] != conman.AUTH_TYPE_LOGIN:
             self.on_done(password=None)
             return
 
-        password = site_list.get(site_active, {}).get('password', '') or mwcon.password
-        if site_list.get(site_active, {}).get("username", ''):
+        password = site['password']
+        if site['username']:
             # auth required if username exists in settings
             if not password:
-                self.is_hide_password = get_setting('mediawiker_password_input_hide')
+                self.is_hide_password = get_setting('password_input_hide')
                 if self.is_hide_password:
                     self.ph = PasswordHider()
                 self.show_input('Password:', '')
@@ -708,7 +805,7 @@ class InputPanelPassword(InputPanel):
         if password and self.is_hide_password and self.ph:
             password = self.ph.done()
         if password:
-            mwcon.set_password(password)
+            conman.update_site(password=password)
         set_timeout_async(self.callback, 0)
 
 
@@ -717,7 +814,7 @@ class PasswordHider(object):
     password = ''
 
     def hide(self, password):
-        password_char = get_setting('mediawiker_password_char', '*')
+        password_char = get_setting('password_char', '*')
         if len(password) < len(self.password):
             self.password = self.password[:len(password)]
         else:
@@ -793,7 +890,3 @@ class WikiaInfoboxParser(HTMLParser):
                 param = '%s=%s' % (par, self.params[par])
                 params_list.append(param)
         return params_list
-
-
-mwcon = WikiConnect()
-api = PreAPI(conman=mwcon)

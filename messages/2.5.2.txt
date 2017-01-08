@@ -1,2 +1,0 @@
-Mediawiker 2.5.2:
-* Scratch property for opened/reopened/published page.

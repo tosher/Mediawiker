@@ -17,7 +17,7 @@ class MediawikerInsertImageCommand(sublime_plugin.WindowCommand):
     ''' alias to Add image command '''
 
     def run(self):
-        self.window.run_command("mediawiker_page", {"action": "mediawiker_add_image"})
+        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('add_image')})
 
 
 class MediawikerAddImageCommand(sublime_plugin.TextCommand):
@@ -25,7 +25,7 @@ class MediawikerAddImageCommand(sublime_plugin.TextCommand):
     images_names = []
 
     def run(self, edit):
-        self.image_prefix_min_lenght = mw.get_setting('mediawiker_image_prefix_min_length', 4)
+        self.image_prefix_min_lenght = mw.get_setting('image_prefix_min_length', 4)
         sublime.active_window().show_input_panel('Wiki image prefix (min %s):' % self.image_prefix_min_lenght, '', self.show_list, None, None)
 
     def show_list(self, image_prefix):
@@ -39,4 +39,4 @@ class MediawikerAddImageCommand(sublime_plugin.TextCommand):
     def on_done(self, idx):
         if idx >= 0:
             index_of_cursor = self.view.sel()[0].begin()
-            self.view.run_command('mediawiker_insert_text', {'position': index_of_cursor, 'text': '[[Image:%s]]' % self.images_names[idx]})
+            self.view.run_command(mw.cmd('insert_text'), {'position': index_of_cursor, 'text': '[[Image:%s]]' % self.images_names[idx]})

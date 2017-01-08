@@ -1,2 +1,0 @@
-Mediawiker 2.4.5:
-* Password hiding in setup wizard.

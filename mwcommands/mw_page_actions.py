@@ -23,7 +23,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
         self.action_params = action_params
         self.check_notifications = kwargs.get('check_notifications', self.check_notifications)
 
-        if not mw.mwcon.require_password():
+        if not mw.conman.require_password():
             panel_passwd = mw.InputPanelPassword(callback=self.command_run)
             panel_passwd.get_password()
         else:
@@ -39,7 +39,7 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
 
     def get_notifications(self):
         # check notifications on page open command
-        if self.action == 'mediawiker_show_page' and self.check_notifications:
+        if self.action == mw.cmd('show_page') and self.check_notifications:
             ns = mw.api.call('get_notifications')
             is_notify_exists = False
             if ns:
@@ -57,7 +57,5 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
                         if not msg_read:
                             is_notify_exists = True
                             break
-            if is_notify_exists:
-                show_notify = sublime.ok_cancel_dialog('You have new notifications.')
-                if show_notify:
-                    self.window.run_command("mediawiker_get_notifications")
+            if is_notify_exists and sublime.ok_cancel_dialog('You have new notifications.'):
+                self.window.run_command(mw.cmd('get_notifications'))

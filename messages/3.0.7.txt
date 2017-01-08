@@ -1,5 +1,0 @@
-Mediawiker 3.0.7:
-
-* H5 headings snippet
-* List ends improvements
-* Headings conversion improvements

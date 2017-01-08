@@ -18,7 +18,7 @@ class MediawikerFileUploadCommand(sublime_plugin.WindowCommand):
     ''' alias to Add template command '''
 
     def run(self):
-        self.window.run_command("mediawiker_page", {"action": "mediawiker_upload"})
+        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('upload')})
 
 
 class MediawikerUploadCommand(sublime_plugin.TextCommand):
@@ -35,6 +35,23 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
             self.file_path = file_path
             file_destname = os.path.basename(file_path)
             sublime.active_window().show_input_panel('Destination file name [%s]:' % (file_destname), file_destname, self.get_filedescr, None, None)
+        # else:
+        #     # try to get clipboard and upload
+        #     try:
+        #         # data = sublime.get_clipboard()
+        #         import win32clipboard
+        #         win32clipboard.OpenClipboard()
+        #         if win32clipboard.IsClipboardFormatAvailable(win32clipboard.CF_DIB):
+        #             data = win32clipboard.GetClipboardData(win32clipboard.CF_DIB)
+        #         win32clipboard.CloseClipboard()
+        #     except Exception as e:
+        #         print('Exception from clipboard %s' % e)
+        #         return
+        #     upload_file = mw.from_package('%s_upload_data.png' % mw.PML, name='User', posix=False, is_abs=True)
+        #     print(upload_file)
+        #     with open(upload_file, 'w+b') as tf:
+        #         tf.write(data)
+        #     self.get_filedescr(upload_file)
 
     def get_filedescr(self, file_destname):
         if not file_destname:

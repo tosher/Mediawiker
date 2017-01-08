@@ -26,8 +26,9 @@ from .mw_show_toc import MediawikerShowTocCommand
 from .mw_table import MediawikerCsvTableCommand, MediawikerTableSimpleToWikiCommand, MediawikerTableWikiToSimpleCommand
 from .mw_text_commands import MediawikerInsertTextCommand, MediawikerReplaceTextCommand
 from .mw_upload import MediawikerUploadCommand, MediawikerFileUploadCommand
-from .mw_setup import MediawikerProcessSiteCommand
 from .mw_configurator import MediawikerConfiguratorCommand
+from .mw_events import MediawikerViewEvents, MediawikerEvents
+from .mw_changelog import MediawikerChangelogCommand
 
 __all__ = [
     'MediawikerAddCategoryCommand',
@@ -69,6 +70,8 @@ __all__ = [
     'MediawikerReplaceTextCommand',
     'MediawikerUploadCommand',
     'MediawikerFileUploadCommand',
-    'MediawikerProcessSiteCommand',
-    'MediawikerConfiguratorCommand'
+    'MediawikerConfiguratorCommand',
+    'MediawikerViewEvents',
+    'MediawikerEvents',
+    'MediawikerChangelogCommand'
 ]

@@ -1,3 +1,0 @@
-Mediawiker 2.3.8:
-
-* Favorite pages

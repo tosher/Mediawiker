@@ -17,7 +17,7 @@ class MediawikerCategoryTreeCommand(sublime_plugin.WindowCommand):
     ''' alias to Category list command '''
 
     def run(self):
-        self.window.run_command("mediawiker_page", {"action": "mediawiker_category_list"})
+        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('category_list')})
 
 
 class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
@@ -32,7 +32,7 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
         if self.category_path:
             category_root = mw.get_category(self.get_category_current())[1]
         else:
-            category_root = mw.get_category(mw.get_setting('mediawiker_category_root'))[1]
+            category_root = mw.get_category(mw.get_setting('category_root'))[1]
         sublime.active_window().show_input_panel('Wiki root category:', category_root, self.show_list, None, None)
 
     def show_list(self, category_root):
@@ -110,7 +110,12 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
                 self.show_list(page_name)
             else:
                 try:
-                    sublime.active_window().run_command("mediawiker_page", {"action": "mediawiker_show_page", 'action_params': {"title": page_name}})
+                    sublime.active_window().run_command(mw.cmd('page'), {
+                        'action': mw.cmd('show_page'),
+                        'action_params': {
+                            'title': page_name
+                        }
+                    })
                 except ValueError as e:
                     sublime.message_dialog(e)
 

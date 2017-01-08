@@ -1,4 +1,0 @@
-Mediawiker 2.3.1 Changelog:
-
-* Password input hiding hack ("mediawiker_password_input_hide" option in settings, default: false). When turned on (value is true) password characters will be replaced with * in input panel.
-

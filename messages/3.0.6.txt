@@ -1,3 +1,0 @@
-Mediawiker 3.0.6:
-
-* Fix: Language independent syntax setup for opened page

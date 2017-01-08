@@ -42,8 +42,8 @@ class MediawikerShowInternalLinksCommand(sublime_plugin.TextCommand):
             self.view.sel().clear()
             self.view.sel().add(self.regions[self.selected][1])
         elif index == 1:
-            sublime.set_timeout(lambda: self.view.window().run_command("mediawiker_page", {
-                'action': 'mediawiker_show_page',
+            sublime.set_timeout(lambda: self.view.window().run_command(mw.cmd('page'), {
+                'action': mw.cmd('show_page'),
                 'action_params': {'title': self.items[self.selected]}
             }), 1)
         elif index == 2:

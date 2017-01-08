@@ -1,7 +1,0 @@
-## Mediawiker 3.1.17
-
-* Fixed: removed prints html data in ST's console when using Configurator;
-* Fixed: requirement of the site parameters "username", "password" when using cookies autorization type;
-* New: plugin messages will be shown in plugin's output panel by default, intead of status string. It can be turned off by new **use_status_messages_panel** option;
-* New: optional global parameters **mediawiker_firefox_cookie_files**, **mediawiker_chrome_cookie_files** for manual setup pathes to browser's cookies - value can be a string or a list of strings.
-* New: Optional site configuration option **retry_timeout** to define http connection timeout (in seconds).

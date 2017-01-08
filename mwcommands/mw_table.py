@@ -21,11 +21,11 @@ class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
 
     # TODO: rewrite as simple to wiki command
     def run(self, edit):
-        self.delimiter = mw.get_setting('mediawiker_csvtable_delimiter', '|')
+        self.delimiter = mw.get_setting('csvtable_delimiter', '|')
         table_header = '{|'
         table_footer = '|}'
-        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw.get_setting('mediawiker_wikitable_properties', {}).items()])
-        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw.get_setting('mediawiker_wikitable_cell_properties', {}).items()])
+        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw.get_setting('wikitable_properties', {}).items()])
+        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw.get_setting('wikitable_cell_properties', {}).items()])
         if cell_properties:
             cell_properties = ' %s | ' % cell_properties
 
@@ -208,7 +208,7 @@ class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
         REPLACE_STR = ':::'
 
         text_wikitable = ''
-        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw.get_setting('mediawiker_wikitable_properties', {}).items()])
+        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw.get_setting('wikitable_properties', {}).items()])
 
         need_header = table_list[0][0]['is_header']
         is_first_line = True
@@ -228,7 +228,7 @@ class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
     def getrow(self, delimiter, rowlist=None):
         if rowlist is None:
             rowlist = []
-        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw.get_setting('mediawiker_wikitable_cell_properties', {}).items()])
+        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw.get_setting('wikitable_cell_properties', {}).items()])
         cell_properties = '%s | ' % cell_properties if cell_properties else ''
         try:
             return delimiter.join(' %s%s ' % (cell_properties, cell['cell_data'].strip()) for cell in rowlist)

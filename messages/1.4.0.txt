@@ -1,3 +1,0 @@
-﻿Mediawiker 1.4.0 Changelog:
-
- - Enumerate TOC option

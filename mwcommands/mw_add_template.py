@@ -18,7 +18,7 @@ class MediawikerInsertTemplateCommand(sublime_plugin.WindowCommand):
     ''' alias to Add template command '''
 
     def run(self):
-        self.window.run_command("mediawiker_page", {"action": "mediawiker_add_template"})
+        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('add_template')})
 
 
 class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
@@ -37,8 +37,8 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
 
     def get_template_params(self, text):
         site_active = mw.get_view_site()
-        site_list = mw.get_setting('mediawiki_site')
-        is_wikia = site_list.get(site_active, {}).get('is_wikia', False)
+        site = mw.get_setting('site').get(site_active)
+        is_wikia = site.get('is_wikia', False)
         if is_wikia:
             infobox = mw.WikiaInfoboxParser()
             infobox.feed(text)
@@ -74,6 +74,6 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
                 params_text = self.get_template_params(text)
                 index_of_cursor = self.view.sel()[0].begin()
                 template_text = '{{%s%s}}' % (self.templates_names[idx], params_text)
-                self.view.run_command('mediawiker_insert_text', {'position': index_of_cursor, 'text': template_text})
+                self.view.run_command(mw.cmd('insert_text'), {'position': index_of_cursor, 'text': template_text})
             else:
                 mw.status_message('')
