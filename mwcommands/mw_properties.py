@@ -1,19 +1,37 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
+
+import sys
+pythonver = sys.version_info[0]
 import os
 import sublime
 
 PM = 'Mediawiker'
 PML = 'mediawiker'
 
+# if pythonver < 3:
+#     import json
 
-def from_package(*path, name=PM, posix=True, is_abs=False):
+# python 3
+# def from_package(*path, name=PM, posix=True, is_abs=False):
 
-    def posix(line):
+#     def posixer(line):
+#         return line.replace('\\', '/') if posix else line
+
+#     root = sublime.packages_path() if is_abs else 'Packages'
+#     return posixer(os.path.join(root, name, *path))
+
+
+def from_package(*path, **kwargs):
+
+    def posixer(line):
         return line.replace('\\', '/') if posix else line
 
+    name = kwargs.get('name', PM)
+    posix = kwargs.get('posix', True)
+    is_abs = kwargs.get('is_abs', False)
     root = sublime.packages_path() if is_abs else 'Packages'
-    return posix(os.path.join(root, name, *path))
+    return posixer(os.path.join(root, name, *path))
 
 
 class MediawikerProperties(object):
@@ -67,7 +85,8 @@ class MediawikerProperties(object):
         'pagelist': {'text': 'Pages history'},
         'favorites': {'text': 'Favorite pages'},
         'popup_image_size': {'text': 'Max image size in preview popups'},
-        'red_link_icon': {'text': 'Red links mark icon'}
+        'red_link_icon': {'text': 'Red links mark icon'},
+        'debug': {'text': 'Advanced logging mode'}
     }
 
     props_autoremove = [
@@ -114,7 +133,15 @@ class MediawikerProperties(object):
     def __init__(self):
         self.reload_settings()
         self.deprecated = self.get_deprecated()
-        self.settings_default = sublime.decode_value(sublime.load_resource(from_package('Mediawiker.sublime-settings')))
+        if pythonver >= 3:
+            self.settings_default = sublime.decode_value(sublime.load_resource(from_package('Mediawiker.sublime-settings')))
+        else:
+            # TODO: strip commments
+            # with open(from_package('Mediawiker.sublime-settings', posix=True, is_abs=True)) as setdef:
+            #     self.settings_default = json.load(setdef)
+            # not used in ST2
+            self.settings_default = {}
+
         self.autoremove_deprecated()
 
         # settings for plugin's panel
@@ -126,7 +153,13 @@ class MediawikerProperties(object):
 
     def reload_settings(self):
         self.settings = sublime.load_settings('Mediawiker.sublime-settings')
-        self.settings_user = sublime.decode_value(sublime.load_resource(from_package('Mediawiker.sublime-settings', name='User')))
+        if pythonver >= 3:
+            self.settings_user = sublime.decode_value(sublime.load_resource(from_package('Mediawiker.sublime-settings', name='User')))
+        else:
+            # with open(from_package('Mediawiker.sublime-settings', name='User', posix=True, is_abs=True)) as setu:
+            #     self.settings_user = json.load(setu)
+            # not used in ST2
+            self.settings_user = {}
 
     def autoremove_deprecated(self):
         for key in self.settings_user:
@@ -151,7 +184,9 @@ class MediawikerProperties(object):
         return name[len(PML) + 1:]
 
     def get_deprecated(self):
-        return {self.props[k].get('deprecated'): self.get_name(k) for k in self.props.keys() if self.props[k].get('deprecated', None)}
+        # python 3
+        # return {self.props[k].get('deprecated'): self.get_name(k) for k in self.props.keys() if self.props[k].get('deprecated', None)}
+        return dict((self.props[k].get('deprecated'), self.get_name(k)) for k in self.props.keys() if self.props[k].get('deprecated', None))
 
     def is_deprecated(self, key):
         if key in self.deprecated:

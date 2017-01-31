@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+pythonver = sys.version_info[0]
 
 import sublime
 
@@ -351,7 +352,12 @@ class HeaderOne(Element):
 
     def get_next(self):
         v = self.view
-        next_h = v.find(r'%s[^\%s]' % (self.open_tag, self.RESERVED_CHAR), self.region.b + 1).b
+        next_h_region = v.find(r'%s[^\%s]' % (self.open_tag, self.RESERVED_CHAR), self.region.b + 1)
+        # ST2 compat
+        if next_h_region:
+            next_h = next_h_region.b
+        else:
+            next_h = v.size()
         return next_h if next_h > 0 else v.size()
 
 
@@ -436,7 +442,12 @@ class Parser(object):
     def register_dynamic(self, name, base=SimpleHtml, **kwargs):
         if name in self.owned_tags:
             return
-        class_name = name.title()
+
+        if pythonver >= 3:
+            class_name = name.title()
+        else:
+            class_name = name.title().encode('utf-8')
+
         this = sys.modules[__name__]
 
         attrs = {

@@ -100,6 +100,7 @@
     "mediawiker_linkstopage_limit": 50,
     "mediawiker_preview_lang": "en",
     "mediawiker_fold_tags": ["div"],
+    "mediawiker_debug": false,
     "mediawiker_preview_head": [
         "<meta charset=\"UTF-8\"/>",
         "<link rel=\"stylesheet\" href=\"{{ http }}://{{ host }}{{ path }}load.php?debug=false&amp;lang={{ lang }}&amp;modules=site&amp;only=styles&amp;skin=vector\"/>",

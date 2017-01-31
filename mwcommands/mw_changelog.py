@@ -20,7 +20,13 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
 
     DRAW_TYPE = sublime.HIDDEN + sublime.PERSISTENT
 
-    def run(self, edit):
+    def run(self, edit, version='sublime'):
+
+        if pythonver < 3 and version == 'sublime':
+            if sublime.ok_cancel_dialog('For Sublime Text 2 version, changelog will be opened in browser'):
+                version = 'browser'
+            else:
+                return
 
         self.MARKED = mw.get_setting('config_icon_checked')
         self.UNMARKED = mw.get_setting('config_icon_unchecked')
@@ -34,9 +40,14 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
         self.set_css()
         # self.html.debug = True
 
-        with open(mw.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r', encoding='utf-8') as cl:
-            log = cl.read()
-        self.process_h2_regions(log, 2)
+        if pythonver >= 3:
+            with open(mw.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r', encoding='utf-8') as cl:
+                log = cl.read()
+        else:
+            with open(mw.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r') as cl:
+                log = cl.read().decode('utf-8')
+
+        self.process_h2_regions(log, 2, version)
 
     def set_css(self):
         base_font_size = self.html.css_rules['body']['font-size']
@@ -74,7 +85,7 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
             'display': 'block'
         }
 
-    def process_h2_regions(self, data, level):
+    def process_h2_regions(self, data, level, version):
         # group 1: header name
         # group 2: header data
 
@@ -97,17 +108,25 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
                 blocks.append(r[1])
         html = self.html.build(blocks)
 
-        view = sublime.active_window().new_file()
-        view.set_name('%s changelog' % mw.PM)
-        view.settings().set('gutter', False)
-        view.settings().set('word_wrap', True)
-        view.settings().set('wrap_width', 120)
-        # phantom = sublime.Phantom(sublime.Region(0, 0), html, sublime.LAYOUT_BELOW, None)
-        # ps = sublime.PhantomSet(view, 'changelog')
-        # ps.update([phantom])
-        # view.erase_phantoms("exec")
-        view.add_phantom('changelog', view.sel()[0], html, sublime.LAYOUT_INLINE, on_navigate=self.on_navigate)
-        view.set_scratch(True)
+        if version == 'sublime':
+            view = sublime.active_window().new_file()
+            view.set_name('%s changelog' % mw.PM)
+            view.settings().set('gutter', False)
+            view.settings().set('word_wrap', True)
+            view.settings().set('wrap_width', 120)
+            view.add_phantom('changelog', view.sel()[0], html, sublime.LAYOUT_INLINE, on_navigate=self.on_navigate)
+            view.set_scratch(True)
+        elif version == 'browser':
+            preview_file = mw.from_package('%s_changelog.html' % mw.PML, name='User', posix=False, is_abs=True)
+            html = html.replace('<html>', '<html><head><meta charset="UTF-8"/></head>')
+            if pythonver >= 3:
+                with open(preview_file, 'w', encoding='utf-8') as tf:
+                    tf.write(html)
+            else:
+                with open(preview_file, 'w') as tf:
+                    tf.write(html.encode('utf-8'))
+
+            webbrowser.open(tf.name)
 
     def on_navigate(self, url):
         webbrowser.open(url)

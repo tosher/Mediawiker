@@ -252,8 +252,13 @@ class Site(object):
         """
         kwargs.update(args)
 
+        # tosher TODO: on edit 'continue' not needed
+        # if 'continue' not in kwargs:
+        #     kwargs['continue'] = ''
         if 'continue' not in kwargs:
-            kwargs['continue'] = ''
+            if action != 'edit':
+                kwargs['continue'] = ''
+
         if action == 'query':
             if 'meta' in kwargs:
                 kwargs['meta'] += '|userinfo'
@@ -281,6 +286,7 @@ class Site(object):
             userinfo = info['query']['userinfo']
         except KeyError:
             userinfo = ()
+
         if 'blockedby' in userinfo:
             self.blocked = (userinfo['blockedby'], userinfo.get('blockreason', u''))
         else:

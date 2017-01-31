@@ -445,8 +445,11 @@ Support folding/unfolding for:
 
 {{Note|In browser autoreloading can be processed by extensions like [https://addons.mozilla.org/ru/firefox/addon/auto-reload/?src=api Auto Reload (Firefox)] - just point changes trigger to preview file.}}
 
+{{Note|Commands {{Command|Show red links}}, {{Command|Hide red links}} and option {{Property|Autoreload}} for command {{Command|Page preview}} are available in Sublime Text 3 only.}}
+
 === Connection ===
 * Site connections manager was rewritten;
+* Connection to wiki site with Firefox cookies was improved with realtime update on cookies changes (<code>browser_cookie3</code> library was changed).
 
 === Settings ===
 * All settings in configuration have the same prefix <code>mediawiker_</code>, old settings without this prefix or with prefix <code>mediawiki_</code> will be replaced automatically.

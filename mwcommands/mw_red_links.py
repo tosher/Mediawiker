@@ -24,5 +24,9 @@ class MediawikerShowRedLinksCommand(sublime_plugin.TextCommand):
 class MediawikerHideRedLinksCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
+        if pythonver < 3:
+            mw.status_message('Commands "Show red links/Hide red links" supported in Sublime text 3 only.')
+            return
+
         self.view.erase_phantoms('redlink')
 

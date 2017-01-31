@@ -6,8 +6,8 @@ file_extensions: [mediawiki, wikipedia, wiki]
 scope: text.html.mediawiki
 
 variables:
-  src_tag_before_lang: '(<)(source|syntaxhighlight)[ \t]+(lang)(=)(")'
-  src_tag_after_lang: '(")(>)'
+  src_tag_before_lang: '((<)(source|syntaxhighlight)[ \t]+(lang)(=)("))'
+  src_tag_after_lang: '((")((\s+[^\"]+="[^\"]+")*)(>))'
 
 contexts:
   main:
@@ -20,379 +20,498 @@ contexts:
     - match: '{{src_tag_before_lang}}'
       captures:
         1: meta.tag.validhtml.mediawiki
-        2: entity.name.tag.source.mediawiki
-        3: entity.other.attribute-name.mediawiki
-        4: entity.other.attributes.validhtml.mediawiki
-        5: entity.other.quote.validhtml.mediawiki
+        2: punctuation.definition.tag.begin.html
+        3: entity.name.tag.validhtml.source.mediawiki
+        4: entity.other.attribute-name.mediawiki
+        5: entity.other.attributes.validhtml.mediawiki
+        6: entity.other.quote.validhtml.mediawiki
       push:
         - match: '(python){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.python
-          with_prototype:
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.python.mediawiki source.python.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.python
         - match: '(ini){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.ini
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.ini.mediawiki source.ini.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.ini
         - match: '(javascript){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.js
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.js.mediawiki source.js.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.js
         - match: '(c){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.c
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.c.mediawiki source.c.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.c
         - match: '(actionscript){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.actionscript
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.actionscript.2.mediawiki source.actionscript.2.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.actionscript.2
         - match: '(applescript){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.applescript
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.applescript.mediawiki source.applescript.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
-        # - match: '(asp){{src_tag_after_lang}}'
-        #   # conflicts with text.html.basic
-        #   captures:
-        #     1: string.quoted.mediawiki
-        #     2: entity.other.quote.validhtml.mediawiki
-        #     3: meta.tag.validhtml.mediawiki
-        #   push: scope:source.asp
-        #   with_prototype:
-        #     - match: (?=</(source|syntaxhighlight)>)
-        #       pop: true
+            - include: scope:source.applescript
+        - match: '(asp){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.asp.mediawiki source.asp.embedded
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+            - include: scope:source.asp
         - match: '(dos){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.dosbatch
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.dosbatch.mediawiki source.dosbatch.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.dosbatch
         - match: '(csharp){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.cs
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.cs.mediawiki source.cs.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.cs
         - match: '(cpp){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.c++
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.c++.mediawiki source.c++.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.c++
         - match: '(clojure){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.clojure
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.clojure.mediawiki source.clojure.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.clojure
         - match: '(css){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.css
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.css.mediawiki source.css.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.css
         - match: '(d){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.d
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.d.mediawiki source.d.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.d
         - match: '(erlang){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.erlang
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.erlang.mediawiki source.erlang.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.erlang
         - match: '(go){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.go
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.go.mediawiki source.go.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.go
         - match: '(haskell){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.haskell
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.haskell.mediawiki source.haskell.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.haskell
         - match: '(java){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.java
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.java.mediawiki source.java.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.java
         - match: '(groovy){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.groovy
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.groovy.mediawiki source.groovy.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.groovy
         - match: '(latex){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.latex
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.text.tex.latex.mediawiki source.text.tex.latex.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:text.tex.latex
         - match: '(lisp){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.lisp
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.lisp.mediawiki source.lisp.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.lisp
         - match: '(lua){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.lua
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.lua.mediawiki source.lua.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.lua
         - match: '(make){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.makefile
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.makefile.mediawiki source.makefile.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.makefile
         - match: '(matlab){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.matlab
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.matlab.mediawiki source.matlab.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.matlab
         - match: '(objc){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.objc
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.objc.mediawiki source.objc.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.objc
         - match: '(ocaml){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.ocaml
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.ocaml.mediawiki source.ocaml.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.ocaml
         - match: '(pascal){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.pascal
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.pascal.mediawiki source.pascal.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.pascal
         - match: '(perl){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.perl
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.perl.mediawiki source.perl.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
-        # - match: '(php){{src_tag_after_lang}}'
-        #   # conflicts with text.html.basic
-        #   captures:
-        #     1: string.quoted.mediawiki
-        #     2: entity.other.quote.validhtml.mediawiki
-        #     3: meta.tag.validhtml.mediawiki
-        #   push: scope:source.php
-        #   with_prototype:
-        #     - match: (?=</(source|syntaxhighlight)>)
-        #       pop: true
+            - include: scope:source.perl
+        - match: '(php){{src_tag_after_lang}}'
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.php.mediawiki source.php.embedded
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+            - include: scope:source.php
         - match: '(r){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.r
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.r.mediawiki source.r.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.r
         - match: '(rails){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.ruby.rails
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.ruby.rails.mediawiki source.ruby.rails.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.ruby.rails
         - match: '(ruby){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.ruby
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.ruby.mediawiki source.ruby.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.ruby
         - match: '(scala){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.scala
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.scala.mediawiki source.scala.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.scala
         - match: '(bash){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.shell
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.shell.mediawiki source.shell.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.shell
         - match: '(sql){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.sql
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.sql.mediawiki source.sql.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.sql
         - match: '(tsql){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.tsql
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.tsql.mediawiki source.tsql.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.tsql
         - match: '(tcl){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.tcl
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.tcl.mediawiki source.tcl.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:source.tcl
         - match: '(xml){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.xml
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.text.xml.mediawiki source.text.xml.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
+            - include: scope:text.xml
         - match: '(yaml){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
-          push: scope:source.yaml
-          with_prototype:
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.yaml.mediawiki source.yaml.embedded
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
-        # - match: '(html5){{src_tag_after_lang}}'
-        #   # conflicts with php and asp
-        #   captures:
-        #     1: string.quoted.mediawiki
-        #     2: entity.other.quote.validhtml.mediawiki
-        #     3: meta.tag.validhtml.mediawiki
-        #   push: scope:text.html.basic
-        #   with_prototype:
-        #     - match: (?=</(source|syntaxhighlight)>)
-        #       pop: true
+            - include: scope:source.yaml
+        - match: '(html5){{src_tag_after_lang}}'
+          # conflicts with php and asp
+          captures:
+            1: string.quoted.mediawiki
+            2: entity.other.quote.validhtml.mediawiki
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
+          push:
+            - meta_include_prototype: false
+            - meta_content_scope: meta.environment.embedded.text.html.basic.mediawiki source.text.html.basic.embedded
+            - match: (?=</(source|syntaxhighlight)>)
+              pop: true
+            - include: scope:text.html.basic
         - match: '([^"]+){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
             2: entity.other.quote.validhtml.mediawiki
-            3: meta.tag.validhtml.mediawiki
+            3: entity.other.attributes.validhtml.mediawiki
+            5: meta.tag.validhtml.mediawiki
           push:
             - meta_content_scope: meta.tag.source.unknown.validhtml.mediawiki
             - match: (?=</(source|syntaxhighlight)>)
               pop: true
-        - match: (</)(source|syntaxhighlight)(>)
+        - match: ((</)(source|syntaxhighlight)(>))
           captures:
             1: meta.tag.validhtml.mediawiki
-            2: entity.name.tag.source.mediawiki
-            3: meta.tag.validhtml.mediawiki
+            2: punctuation.definition.tag.begin.html
+            3: entity.name.tag.source.mediawiki
+            4: punctuation.definition.tag.end.html
           pop: true
   block:
     - match: ^\s*(?i)(#redirect)
@@ -482,7 +601,7 @@ contexts:
 
   block_item_definition_list:
     # comment: "definition lists"
-    - meta_scope: markup.list.definition.mediawiki
+    #- meta_scope: markup.list.definition.mediawiki
     - match: '^(([*#]*)|([:]*))(;)(?!=;:#*)'  # starts from ; with not next lists chars
       captures:
         2: markup.other.special.mediawiki
@@ -517,110 +636,133 @@ contexts:
     #           * headers: h1, h2, h3, h4, h5, h6
     #           * br"
 
-    - match: (<math>)
+    - match: "((<)(math)(>))"
       captures:
-        0: punctuation.section.embedded.tex.math
-        1: meta.tag.inline.math.mediawiki
-        2: source.tex.math
+        1: meta.tag.validhtml.math.tex.mediawiki
+        2: meta.tag.validhtml.math.tex.mediawiki
+        3: entity.name.tag.math.tex.mediawiki
+        4: meta.tag.validhtml.math.tex.mediawiki
       push:
-        - meta_scope: meta.embedded.tex.math
-        - meta_content_scope: source.tex.math
-        - match: ((<)/math>)
+        - meta_include_prototype: false
+        - meta_content_scope: meta.environment.embedded.tex.mediawiki source.tex.embedded
+        - match: "((</)(math)(>))"
           captures:
-            0: punctuation.section.embedded.tex.math
-            1: meta.tag.inline.math.mediawiki
-            2: source.tex.math
+            1: meta.tag.validhtml.math.tex.mediawiki
+            2: meta.tag.validhtml.math.tex.mediawiki
+            3: entity.name.tag.math.tex.mediawiki
+            4: meta.tag.validhtml.math.tex.mediawiki
           pop: true
-        - include: scope:text.tex.math
-    - match: "<table[^>]*>"
+        - include: scope:text.tex
+    - match: "((<)(table)[^>]*(>))"
+      captures:
+        1: meta.tag.validhtml.table.mediawiki
+        2: meta.tag.validhtml.table.mediawiki
+        3: entity.name.tag.table.mediawiki
+        4: meta.tag.validhtml.table.mediawiki
       push:
-        - meta_scope: meta.embedded.html.table
-        - meta_content_scope: source.html
-        - match: </table>
+        - meta_include_prototype: false
+        - meta_content_scope: meta.environment.embedded.text.html.basic.mediawiki source.text.html.basic.embedded
+        - match: "((</)(math)(>))"
+          captures:
+            1: meta.tag.validhtml.math.tex.mediawiki
+            2: meta.tag.validhtml.math.tex.mediawiki
+            3: entity.name.tag.math.tex.mediawiki
+            4: meta.tag.validhtml.math.tex.mediawiki
           pop: true
         - include: scope:text.html.basic
-    - match: (<)(ref)(>)
+    - match: ((<)(ref)(>))
       captures:
-        1: meta.tag.inline.ref.mediawiki
-        2: entity.name.tag.ref.mediawiki
-        3: meta.tag.inline.ref.mediawiki
+        1: meta.tag.validhtml.ref.mediawiki
+        2: meta.tag.validhtml.ref.mediawiki
+        3: entity.name.tag.ref.mediawiki
+        4: meta.tag.validhtml.ref.mediawiki
       push:
         - meta_content_scope: meta.reference.content.mediawiki
-        - match: (</)(ref)(>)
+        - match: ((</)(ref)(>))
           captures:
-            1: meta.tag.inline.ref.mediawiki
-            2: entity.name.tag.ref.mediawiki
-            3: meta.tag.inline.ref.mediawiki
+            1: meta.tag.validhtml.ref.mediawiki
+            2: meta.tag.validhtml.ref.mediawiki
+            3: entity.name.tag.ref.mediawiki
+            4: meta.tag.validhtml.ref.mediawiki
           pop: true
         - include: inline
-    - match: (<)(blockquote)(>)
+    - match: ((<)(blockquote)(>))
       captures:
-        1: meta.tag.inline.ref.mediawiki
-        2: entity.name.tag.ref.mediawiki
-        3: meta.tag.inline.ref.mediawiki
+        1: meta.tag.validhtml.ref.mediawiki
+        2: meta.tag.validhtml.ref.mediawiki
+        3: entity.name.tag.ref.mediawiki
+        4: meta.tag.validhtml.ref.mediawiki
       push:
         - meta_content_scope: meta.reference.blockquote.content.mediawiki
-        - match: (</)(blockquote)(>)
+        - match: ((</)(blockquote)(>))
           captures:
-            1: meta.tag.inline.ref.mediawiki
-            2: entity.name.tag.ref.mediawiki
-            3: meta.tag.inline.ref.mediawiki
+            1: meta.tag.validhtml.ref.mediawiki
+            2: meta.tag.validhtml.ref.mediawiki
+            3: entity.name.tag.ref.mediawiki
+            4: meta.tag.validhtml.ref.mediawiki
           pop: true
         - include: inline
-    - match: (<)(center)(>)
+    - match: ((<)(center)(>))
       captures:
-        1: meta.tag.inline.ref.mediawiki
-        2: entity.name.tag.ref.mediawiki
-        3: meta.tag.inline.ref.mediawiki
+        1: meta.tag.validhtml.ref.mediawiki
+        2: meta.tag.validhtml.ref.mediawiki
+        3: entity.name.tag.ref.mediawiki
+        4: meta.tag.validhtml.ref.mediawiki
       push:
         - meta_content_scope: meta.reference.center.content.mediawiki
-        - match: (</)(center)(>)
+        - match: ((</)(center)(>))
           captures:
-            1: meta.tag.inline.ref.mediawiki
-            2: entity.name.tag.ref.mediawiki
-            3: meta.tag.inline.ref.mediawiki
+            1: meta.tag.validhtml.ref.mediawiki
+            2: meta.tag.validhtml.ref.mediawiki
+            3: entity.name.tag.ref.mediawiki
+            4: meta.tag.validhtml.ref.mediawiki
           pop: true
         - include: inline
-    - match: '(<)(ref)\s*((name)\s*(=)\s*([^>]*))(/>)'
+    - match: '((<)(ref)\s*((name)\s*(=)\s*([^>]*))(/>))'
       # comment: <ref name="label"/>
       scope: meta.reference.named.cite.mediawiki
       captures:
-        1: meta.tag.inline.ref.mediawiki
-        2: entity.name.tag.ref.mediawiki
-        4: entity.name.tag.name.mediawiki
-        5: meta.tag.inline.ref.mediawiki
-        6: string.quoted.ref.name.mediawiki
-        7: meta.tag.inline.ref.mediawiki
-    - match: '(<)(ref)\s*((name)\s*(=)\s*([^>]*))(>)'
+        1: meta.tag.validhtml.ref.mediawiki
+        2: meta.tag.validhtml.ref.mediawiki
+        3: entity.name.tag.ref.mediawiki
+        5: entity.name.tag.name.mediawiki
+        6: meta.tag.validhtml.ref.mediawiki
+        7: string.quoted.ref.name.mediawiki
+        8: meta.tag.validhtml.ref.mediawiki
+    - match: '((<)(ref)\s*((name)\s*(=)\s*([^>]*))(>))'
       captures:
-        1: meta.tag.inline.ref.mediawiki
-        2: entity.name.tag.ref.mediawiki
-        4: entity.name.tag.name.mediawiki
-        5: meta.tag.inline.ref.mediawiki
-        6: string.quoted.ref.name.mediawiki
-        7: meta.tag.inline.ref.mediawiki
+        1: meta.tag.validhtml.ref.mediawiki
+        2: meta.tag.validhtml.ref.mediawiki
+        3: entity.name.tag.ref.mediawiki
+        5: entity.name.tag.name.mediawiki
+        6: meta.tag.validhtml.ref.mediawiki
+        7: string.quoted.ref.name.mediawiki
+        8: meta.tag.validhtml.ref.mediawiki
       push:
         - meta_content_scope: meta.reference.content.labelled.mediawiki
         # comment: <ref name="label">content</ref>
-        - match: (</)(ref)(>)
+        - match: ((</)(ref)(>))
           captures:
-            1: meta.tag.inline.ref.mediawiki
-            2: entity.name.tag.ref.mediawiki
-            3: meta.tag.inline.ref.mediawiki
+            1: meta.tag.validhtml.ref.mediawiki
+            2: meta.tag.validhtml.ref.mediawiki
+            3: entity.name.tag.ref.mediawiki
+            4: meta.tag.validhtml.ref.mediawiki
           pop: true
         - include: inline
-    - match: "(<)(gallery[^>]*)(>)"
+    - match: "((<)(gallery[^>]*)(>))"
       captures:
-        1: meta.tag.inline.ref.mediawiki
-        2: entity.name.tag.ref.mediawiki
-        3: meta.tag.inline.ref.mediawiki
+        1: meta.tag.validhtml.ref.mediawiki
+        2: meta.tag.validhtml.ref.mediawiki
+        3: entity.name.tag.ref.mediawiki
+        4: meta.tag.validhtml.ref.mediawiki
       push:
         - meta_content_scope: meta.gallery.mediawiki
-        - match: (</)(gallery)(>)
+        - match: ((</)(gallery)(>))
           captures:
-            1: meta.tag.inline.ref.mediawiki
-            2: entity.name.tag.ref.mediawiki
-            3: meta.tag.inline.ref.mediawiki
+            1: meta.tag.validhtml.ref.mediawiki
+            2: meta.tag.validhtml.ref.mediawiki
+            3: entity.name.tag.ref.mediawiki
+            4: meta.tag.validhtml.ref.mediawiki
           pop: true
         - match: '^\s*(([Ff]ile|[Ii]mage)(:))?([^\[\]\|\n]+)'
           captures:
@@ -948,6 +1090,7 @@ contexts:
           pop: true
         - include: inline
         - include: block
+        - include: block_highlight
         - include: block_pre_spaced
     - match: '(?i:(<(pre)(\b[^>]*)>))'
       captures:
@@ -1174,7 +1317,8 @@ contexts:
         - include: template_parameters
         - match: '\s*([^\{\}\|]+)'
           scope: entity.name.function.template.mediawiki
-        - match: '(\|)\s*(([^\{\}\|=]+)(=))?'
+        # - match: '(\|)\s*(([^\{\}\|=]+)(=))?'
+        - match: '(\|)\s*(([\w\-]+)(=))?'
           captures:
             1: meta.tag.param-delimiter.template.mediawiki
             3: variable.parameter.template.mediawiki

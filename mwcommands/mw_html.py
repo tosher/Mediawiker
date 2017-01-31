@@ -161,7 +161,12 @@ class MwHtml(object):
     def br(self, cnt=1):
         return '<br>' * cnt
 
-    def join(self, *args, char=' '):
+    # python 3
+    # def join(self, *args, char=' '):
+    #     return char.join([a for a in args if a])
+
+    def join(self, *args, **kwargs):
+        char = kwargs.get('char', ' ')
         return char.join([a for a in args if a])
 
     def build(self, lines):
@@ -177,7 +182,18 @@ class MwHtmlAdv(MwHtml):
     def __init__(self, html_id, user_css=True):
         super(MwHtmlAdv, self).__init__(html_id=html_id, user_css=user_css)
 
-    def unnumbered_list(self, *items, icon='•', css_class=None):
+    # python 3
+    # def unnumbered_list(self, *items, icon='•', css_class=None):
+    #     li_list = []
+    #     li_list.append(self.ul())
+    #     for li in items:
+    #         li_list.append(self.li(li, icon=icon, css_class=css_class))
+    #     li_list.append(self.ul(close=True))
+    #     return '\n'.join(li_list)
+
+    def unnumbered_list(self, *items, **kwargs):
+        icon = kwargs.get('icon', '•')
+        css_class = kwargs.get('css_class', None)
         li_list = []
         li_list.append(self.ul())
         for li in items:

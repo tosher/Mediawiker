@@ -5,7 +5,7 @@ import sys
 
 import os
 import re
-import urllib.parse
+import urllib
 import traceback
 
 try:
@@ -173,7 +173,14 @@ def show_red_links(view, page):
 
 
 def process_red_links(view, page):
+
+    # ST2 hasn't phantoms
+    if pythonver < 3:
+        status_message('Commands "Show red links/Hide red links" supported in Sublime text 3 only.')
+        return
+
     status_message('Processing red_links for page [[%s]].. ' % api.page_attr(page, 'name'), new_line=False)
+
     view.erase_phantoms('redlink')
     red_link_icon = get_setting('red_link_icon')
     linksgen = api.get_page_links(page, generator=True)
@@ -318,7 +325,7 @@ def status_message(message, replace=None, is_panel=None, new_line=True):
             panel.set_read_only(False)
             last_position = panel.size()
             panel.run_command(cmd('insert_text'), {'position': panel.size(), 'text': '%s%s' % (message, '\n' if new_line else '')})
-            panel.show(last_position)
+            panel.show_at_center(last_position)
             panel.set_read_only(True)
 
         else:
@@ -358,7 +365,7 @@ class PreAPI(object):
         sitecon = self.conman.get_connect(force=force)
 
         if sitecon and (not hasattr(sitecon, 'logged_in') or not sitecon.logged_in):
-            status_message('Not logged in, forcing new connection.. ')
+            status_message('Anonymous connection detected, forcing new connection.. ')
             sitecon = self.conman.get_connect(force=True)
 
         if not sitecon:
@@ -467,6 +474,12 @@ class PreAPI(object):
         return page.langlinks()
 
     def save_page(self, page, text, summary, mark_as_minor):
+        try:
+            # verify connection
+            self.get_connect()
+        except Exception as e:
+            status_message('%s exception: %s' % (type(e).__name__, e))
+
         page.save(text, summary=summary.strip(), minor=mark_as_minor)
 
     def page_attr(self, page, attr_name):
@@ -575,10 +588,13 @@ class PreAPI(object):
 
 class MediawikerConnectionManager(object):
 
-    sites = {}
     AUTH_TYPE_LOGIN = 'login'
     AUTH_TYPE_OAUTH = 'oauth'
     AUTH_TYPE_COOKIES = 'cookies'
+
+    def __init__(self):
+        self.sites = {}
+        self.debug_msgs = []
 
     def get_site_config(self, name):
         ''' get site settings '''
@@ -674,18 +690,29 @@ class MediawikerConnectionManager(object):
             'timeout': (site['retry_timeout'], None)
         }
 
+    def debug_flush(self):
+        if get_setting('debug'):
+            for msg in self.debug_msgs:
+                status_message("'''DEBUG''' %s" % msg)
+        self.debug_msgs = []
+
     def get_connect(self, name=None, force=False):
         ''' setup new connection (call connect()) or returns exists '''
+        self.debug_msgs.append('Get connection from connection manager.')
         try:
             site = self.get_site(name)
 
             cj = self.get_cookies(name=name) if site['authorization_type'] == self.AUTH_TYPE_COOKIES else None
 
             if site['authorization_type'] == self.AUTH_TYPE_COOKIES and not self.is_eq_cookies(site['cookies'], cj):
+                self.debug_msgs.append('New cookies: %s' % cj)
                 site['cookies'] = cj
             elif not force and (site['authorization_type'] != self.AUTH_TYPE_LOGIN or not site['username'] or site['password']):
                 connection = site.get('connection', None)
+
                 if connection:
+                    self.debug_msgs.append('Cached connection: True')
+                    self.debug_flush()
                     return connection
 
         except Exception as e:
@@ -693,7 +720,11 @@ class MediawikerConnectionManager(object):
             for line in formatted_lines:
                 status_message(line)
 
-        return self.connect(name=name)
+        connection = self.connect(name=name)
+
+        self.debug_flush()
+
+        return connection
 
     def connect(self, name=None):
         ''' new connection '''
@@ -737,6 +768,17 @@ class MediawikerConnectionManager(object):
             if site['authorization_type'] == self.AUTH_TYPE_COOKIES and site['cookies']:
                 try:
                     connection.login(cookies=site['cookies'])
+
+                    if get_setting('debug'):
+                        self.debug_msgs.append('Username: %s' % connection.username.strip())
+                        # not connection.logged_in and self.debug_msgs.append('* Anonymous connection: True')
+                        self.debug_msgs.append('Anonymous connection: True') if not connection.logged_in else None
+                        self.debug_msgs.append('Connection rights: %s' % (', '.join(connection.rights)))
+                        self.debug_msgs.append('Connection tokens: %s' % (', '.join(['%s: %s' % (
+                            t,
+                            connection.tokens[t]
+                        ) for t in connection.tokens.keys()]) if connection.tokens else '<empty>'))
+
                 except mwclient.LoginError as exc:
                     e = exc.args if pythonver >= 3 else exc
                     status_message(' failed: %s' % e[1]['result'])
@@ -784,7 +826,7 @@ class MediawikerConnectionManager(object):
             cookie_files = None
 
         if site['cookies_browser'] == "firefox":
-            return browser_cookie3.firefox(cookie_files=cookie_files, domain_name=site['host'])
+            return browser_cookie3.firefox(cookie_files=cookie_files, domain_name=site['host'], copy_path=from_package(name='User', posix=True, is_abs=True))
         elif site['cookies_browser'] == 'chrome':
             return browser_cookie3.chrome(cookie_files=cookie_files, domain_name=site['host'])
         else:
@@ -1032,3 +1074,8 @@ class WikiaInfoboxParser(HTMLParser):
                 param = '%s=%s' % (p, self.params[p])
                 params_list.append(param)
         return params_list
+
+
+if pythonver < 3:
+    plugin_loaded()
+

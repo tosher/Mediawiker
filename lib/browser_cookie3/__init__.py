@@ -41,6 +41,7 @@ from pbkdf2 import PBKDF2
 # from Crypto.Cipher import AES
 # https://pypi.python.org/pypi/pyaes/1.6.0
 from pyaes import AES
+import shutil
 
 
 class TLDLazy(object):
@@ -163,33 +164,75 @@ class TLDLazy(object):
 class BrowserCookieError(Exception):
     pass
 
+# @contextmanager
+# def create_local_copy(cookie_file):
+#     """Make a local copy of the sqlite cookie database and return the new filename.
+#     This is necessary in case this database is still being written to while the user browses
+#     to avoid sqlite locking errors.
+#     """
+#     # check if cookie file exists
+#     if os.path.exists(cookie_file):
+#         # copy to random name in tmp folder
+#         tmp_cookie_file = tempfile.NamedTemporaryFile(suffix='.sqlite').name
+#         open(tmp_cookie_file, 'wb').write(open(cookie_file, 'rb').read())
+#         yield tmp_cookie_file
+#     else:
+#         raise BrowserCookieError('Can not find cookie file at: ' + cookie_file)
+
+#     os.remove(tmp_cookie_file)
+
 
 @contextmanager
-def create_local_copy(cookie_file):
+def create_local_copy(cookie_file, copy_path=None):
     """Make a local copy of the sqlite cookie database and return the new filename.
     This is necessary in case this database is still being written to while the user browses
     to avoid sqlite locking errors.
     """
-    # check if cookie file exists
-    if os.path.exists(cookie_file):
-        # copy to random name in tmp folder
-        tmp_cookie_file = tempfile.NamedTemporaryFile(suffix='.sqlite').name
-        open(tmp_cookie_file, 'wb').write(open(cookie_file, 'rb').read())
-        yield tmp_cookie_file
-    else:
-        raise BrowserCookieError('Can not find cookie file at: ' + cookie_file)
 
-    os.remove(tmp_cookie_file)
+    if copy_path is not None and os.path.exists(copy_path):
+        cookie_tmp = os.path.join(copy_path, '__mediawiker_tmp.sqlite')
+        if os.path.exists(cookie_file):
+            shutil.copy2(cookie_file, cookie_tmp)
+        else:
+            raise BrowserCookieError('Can not find cookie file at: ' + cookie_file)
+
+        # .sqlite-shm not needed
+        # cookie_file_shm = cookie_file.replace('.sqlite', '.sqlite-shm')
+        # cookie_tmp_shm = os.path.join(copy_path, '__mediawiker_tmp.sqlite-shm')
+        # if os.path.exists(cookie_file_shm):
+        #     shutil.copy2(cookie_file_shm, cookie_tmp_shm)
+        cookie_file_wal = cookie_file.replace('.sqlite', '.sqlite-wal')
+        cookie_tmp_wal = os.path.join(copy_path, '__mediawiker_tmp.sqlite-wal')
+        if os.path.exists(cookie_file_wal):
+            shutil.copy2(cookie_file_wal, cookie_tmp_wal)
+
+        yield cookie_tmp
+
+        # wal and shm will be deleted automatically after db disconnect
+        os.remove(cookie_tmp)
+
+    else:
+        # check if cookie file exists
+        if os.path.exists(cookie_file):
+            # copy to random name in tmp folder
+            tmp_cookie_file = tempfile.NamedTemporaryFile(suffix='.sqlite').name
+            open(tmp_cookie_file, 'wb').write(open(cookie_file, 'rb').read())
+            yield tmp_cookie_file
+        else:
+            raise BrowserCookieError('Can not find cookie file at: ' + cookie_file)
+
+        os.remove(tmp_cookie_file)
 
 
 class BrowserCookieLoader(object):
-    def __init__(self, cookie_files=None, domain_name=None):
+    def __init__(self, cookie_files=None, domain_name=None, copy_path=None):
         cookie_files = cookie_files or self.find_cookie_files()
         if isinstance(cookie_files, list):
             self.cookie_files = cookie_files
         else:
             self.cookie_files = [cookie_files]
         self.domain_name_tld = TLDLazy().get_tld_domain(domain_name) if domain_name else None
+        self.copy_path = copy_path
 
     def find_cookie_files(self):
         '''Return a list of cookie file locations valid for this loader'''
@@ -328,7 +371,7 @@ class Firefox(BrowserCookieLoader):
 
     def get_cookies(self):
         for cookie_file in self.cookie_files:
-            with create_local_copy(cookie_file) as tmp_cookie_file:
+            with create_local_copy(cookie_file, copy_path=self.copy_path) as tmp_cookie_file:
                 con = sqlite3.connect(tmp_cookie_file)
                 cur = con.cursor()
 
@@ -342,7 +385,7 @@ class Firefox(BrowserCookieLoader):
                     yield create_cookie(*item)
                 con.close()
 
-                # current sessions are saved in sessionstore.js
+                # current sessions are saved in sessionstore.js (after firefox closing)
                 session_file = os.path.join(os.path.dirname(cookie_file), 'sessionstore.js')
                 if os.path.exists(session_file):
                     try:
@@ -372,10 +415,10 @@ def chrome(cookie_files=None, domain_name=None):
     return Chrome(cookie_files, domain_name).load()
 
 
-def firefox(cookie_files=None, domain_name=None):
+def firefox(cookie_files=None, domain_name=None, copy_path=None):
     """Returns a cookiejar of the cookies and sessions used by Firefox
     """
-    return Firefox(cookie_files, domain_name).load()
+    return Firefox(cookie_files, domain_name, copy_path).load()
 
 
 def _get_cookies():

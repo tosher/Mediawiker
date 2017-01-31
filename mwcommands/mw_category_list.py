@@ -105,7 +105,7 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
         if index >= 0:
             # escape from quick panel return -1
             page_name = self.category_strip_special_prefix(self.pages_names[index])
-            if self.pages[page_name] == mw.CATEGORY_NAMESPACE:
+            if self.pages[page_name] == mw.api.CATEGORY_NAMESPACE:
                 self.update_category_path(page_name)
                 self.show_list(page_name)
             else:

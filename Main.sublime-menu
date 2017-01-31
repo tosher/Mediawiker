@@ -56,6 +56,11 @@
                                 "caption": "Changelog"
                             },
                             {
+                                "command": "mediawiker_changelog",
+                                "args": {"version": "browser"},
+                                "caption": "Changelog in browser"
+                            },
+                            {
                                 "command": "open_file",
                                 "args": {"file": "${packages}/Mediawiker/README.md"},
                                 "caption": "README"

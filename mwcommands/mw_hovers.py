@@ -172,6 +172,9 @@ def on_hover_template(view, point):
     for r in p.templates:
         if r.region.contains(point):
 
+            page = mw.api.get_page(r.page_name)
+            css_class = None if page.exists else 'redlink'
+
             template_type = 'Template'
             if r.mode == r.MODE_SCRIBUNTO:
                 template_type = 'Scribunto module'
@@ -183,7 +186,7 @@ def on_hover_template(view, point):
             content = [
                 html.h(4, '%s "%s"' % (template_type, r.page_name) if r.page_name else template_type),
                 html.join(
-                    html.link(r.page_name, 'Open') if r.page_name else '',
+                    html.link(r.page_name, 'Open' if page.exists else 'Create', css_class=css_class) if r.page_name else '',
                     html.link('fold', 'Fold'),
                     html.link('unfold', 'Unfold'),
                     char=html.span('|', css_class='wide')

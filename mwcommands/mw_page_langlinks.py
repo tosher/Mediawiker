@@ -37,7 +37,7 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
         else:
             mw.status_message('Unable to find laguage links for "%s"' % title)
 
-    def mw_get_page_langlinks(self, site, title):
+    def mw_get_page_langlinks(self, title):
         self.links = {}
         page = mw.api.get_page(title)
 

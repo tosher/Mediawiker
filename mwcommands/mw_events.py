@@ -14,27 +14,36 @@ else:
     import mw_utils as mw
     import mw_hovers as hovers
 
+if pythonver >= 3:
 
-class MediawikerViewEvents(sublime_plugin.ViewEventListener):
+    class MediawikerViewEvents(sublime_plugin.ViewEventListener):
 
-    cnt = None
+        cnt = None
 
-    def on_modified(self):
-        try:
-            ch_cnt = mw.props.get_view_setting(self.view, 'autoreload')
-            if ch_cnt:
-                if not self.cnt:
-                    self.cnt = self.view.change_count()
+        def on_modified(self):
+            try:
+                ch_cnt = mw.props.get_view_setting(self.view, 'autoreload')
+                if ch_cnt:
+                    if not self.cnt:
+                        self.cnt = self.view.change_count()
 
-                cnt_delta = self.view.change_count() - self.cnt
-                if cnt_delta > ch_cnt:
-                    sublime.status_message('Autoreload: Generating preview..')
-                    sublime.active_window().run_command(mw.cmd('preview'))
-                    self.cnt = None
-                else:
-                    sublime.status_message('\nAutoreload: change %s of %s..' % (cnt_delta, ch_cnt))
-        except Exception as e:
-            mw.status_message('Preview exception: %s' % e)
+                    cnt_delta = self.view.change_count() - self.cnt
+                    if cnt_delta > ch_cnt:
+                        sublime.status_message('Autoreload: Generating preview..')
+                        sublime.active_window().run_command(mw.cmd('preview'))
+                        self.cnt = None
+                    else:
+                        sublime.status_message('\nAutoreload: change %s of %s..' % (cnt_delta, ch_cnt))
+            except Exception as e:
+                mw.status_message('Preview exception: %s' % e)
+else:
+
+    class MediawikerViewEvents(object):
+
+        cnt = None
+
+        def on_modified(self):
+            pass
 
 
 class MediawikerEvents(sublime_plugin.EventListener):

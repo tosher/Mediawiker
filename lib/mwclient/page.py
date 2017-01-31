@@ -176,6 +176,7 @@ class Page(object):
         """
         Update the text of a section or the whole page by performing an edit operation.
         """
+
         if not self.site.logged_in and self.site.force_login:
             # Should we really check for this?
             raise errors.LoginError(
@@ -321,8 +322,8 @@ class Page(object):
 
     def categories(self, generator=True):
         """
-        List categories used on the current page.
-
+        List categories used on the current page
+.
         API doc: https://www.mediawiki.org/wiki/API:Categories
 
         """
@@ -371,9 +372,13 @@ class Page(object):
 
         """
         if generator:
-            return listing.PagePropertyGenerator(self, 'images', '')
+            # tosher
+            # return listing.PagePropertyGenerator(self, 'images', '')
+            return listing.PagePropertyGenerator(self, 'images', 'im')
         else:
-            return listing.PageProperty(self, 'images', '', return_values='title')
+            # tosher
+            # return listing.PageProperty(self, 'images', '', return_values='title')
+            return listing.PageProperty(self, 'images', 'im', return_values='title')
 
     def iwlinks(self):
         """
@@ -456,6 +461,6 @@ class Page(object):
         prefix = listing.List.get_prefix('tl', generator)
         kwargs = dict(listing.List.generate_kwargs(prefix, namespace=namespace))
         if generator:
-            return listing.PagePropertyGenerator(self, 'templates', prefix, **kwargs)
+            return listing.PagePropertyGenerator(self, 'templates', 'tl', **kwargs)
         else:
-            return listing.PageProperty(self, 'templates', prefix, return_values='title', **kwargs)
+            return listing.PageProperty(self, 'templates', 'tl', return_values='title', **kwargs)

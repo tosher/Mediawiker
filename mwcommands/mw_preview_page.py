@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 import re
 import webbrowser
 from jinja2 import Template
@@ -75,21 +76,28 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         page_id_old = self.get_page_id()
         page = self.generate_preview(html_header, html, html_footer)
         if self.page_id != page_id_old or mw.props.get_view_setting(self.view, 'autoreload') == 0:
-            # print('[%s] vs [%s]' % (self.page_id, page_id_old))
             webbrowser.open(page)
 
     def get_page_id(self):
-        with open(self.preview_file, 'r', encoding='utf-8') as tf:
+        if not os.path.exists(self.preview_file):
+            return None
+        with open(self.preview_file, 'r') as tf:
             first_line = tf.readline()
         return first_line.replace('<!--', '').replace('-->', '').replace('\n', '')
 
     def generate_preview(self, header, data, footer):
-        html = data if pythonver >= 3 else data.encode('utf-8')
-        with open(self.preview_file, 'w', encoding='utf-8') as tf:
-            tf.write('<!--%s-->\n' % self.page_id)
-            tf.write(header)
-            tf.write(html)
-            tf.write(footer)
+        if pythonver >= 3:
+            with open(self.preview_file, 'w', encoding='utf-8') as tf:
+                tf.write('<!--%s-->\n' % self.page_id)
+                tf.write(header)
+                tf.write(data)
+                tf.write(footer)
+        else:
+            with open(self.preview_file, 'w') as tf:
+                tf.write('<!--%s-->\n' % self.page_id)
+                tf.write(header.encode('utf-8'))
+                tf.write(data.encode('utf-8'))
+                tf.write(footer.encode('utf-8'))
         return tf.name
 
     def get_geshi_langs(self):

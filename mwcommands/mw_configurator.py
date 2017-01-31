@@ -32,7 +32,6 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
     FORMAT_SECTION = '%(name)s'
     FORMAT_OPTION = '%(status)s %(name)s'
-    MENU_OFFSET = 20
     TYPE_PASSWORD = 'passwd'
     PROPERTY_SITE_NAME = 'name'
 
@@ -60,7 +59,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
         self.html.css_rules['a']['text-decoration'] = 'none'
         self.html.css_rules['a']['font-size'] = self.html.get_font_size(base_font_size, 0.1)
         self.html.css_rules['ul']['padding-right'] = '2rem'
-        self.html.css_rules['ul']['margin-left'] = '1.5rem'
+        self.html.css_rules['ul']['margin-left'] = '0.2rem'
         self.html.css_rules['li']['font-size'] = self.html.get_font_size(base_font_size, 0.1)
         self.html.css_rules['h1,h2,h3,h4']['margin'] = '2rem'
         self.html.css_rules['h1,h2,h3,h4']['color'] = 'white'
@@ -383,10 +382,14 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
         if not popup:
             return
 
+        # TODO: refact
+        sh_line = self.view.lines(self.view.visible_region())[0]
+        sh_point = sh_line.a + 20
+
         self.view.show_popup(
             content=self.html.build(popup),
             flags=0,
-            location=self.view.visible_region().a + self.MENU_OFFSET,
+            location=sh_point,
             max_width=800,
             max_height=600,
             on_navigate=self.on_navigate,
@@ -466,7 +469,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
             is_async = True
             option_pretty = self.pretty(option)
             panel = InputTabValue(callback=self.show, option=option, goto=goto, option_type=option_type)
-            panel.show_input(panel_title=option_pretty, value_pre=value)
+            panel.show_input(panel_title=option_pretty, value_pre=str(value))
 
         return is_async
 
