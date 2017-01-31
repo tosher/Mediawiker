@@ -5,7 +5,7 @@
 * Possibility to use files as wiki pages: [https://github.com/tosher/Mediawiker/pull/3 pull-request].
 
 == Mediawiker 1.3.0 ==
-* New command: {{Command|Add category}} (experimental).
+* New command: {{Command|Add category}}.
 
 == Mediawiker 1.4.0 ==
 * New command: {{Command|Enumerate TOC}}.
@@ -95,7 +95,7 @@ New commands for links management for opened page:
 * Mediawiker specific shortcuts:
 ** <kbd>ctrl+b</kbd> - bold;
 ** <kbd>ctrl+i</kbd> - italic;
-** <kbd>ctrl+alt+[2, 3, 4]</kbd> - heading of 2, 3 and 4 levels;
+** <kbd>ctrl+alt+(2, 3, 4)</kbd> - heading of 2, 3 and 4 levels;
 ** <kbd>f5</kbd> - reopen page (refresh);
 ** <kbd>ctrl+s</kbd> - post page (optional, check new option {{Property|mediawiker_wiki_instead_editor}}.
 * Possibility to create new shortcuts in mediawiker context ({{Property|mediawiker_is_here}}) - for examples, check sublime-keymap files.
@@ -408,3 +408,61 @@ Support folding/unfolding for:
 
 === Other ===
 * Fixed: Correct display of the content of headers containing html tags.
+
+== Mediawiker 3.3.0 ==
+
+* New mediawiki markup parser, used for all commands.
+
+=== Changelog ===
+* Plugin's changelog was moved to <code>Preferences / Package Settings / Mediawiker / Changelog</code>;
+* Changelog will be shown in human readable format;
+* It can be called by new command {{Command|Changelog}} too.
+
+{{Note|Original data for changelog saved in <code>Changelog.mediawiki</code> in mediawiki format inside the plugin's folder.}}
+
+=== Commands changes ===
+* New command {{Command|Move page}} for moving/renaming pages;
+* New commands {{Command|Show red links}}, {{Command|Hide red links}}. Also, possibility to show red links in automatic mode, based on site parameter {{Property|show_red_links}}, default: <code>false</code> (maybe slow on some pages with many links);
+* {{Command|Search}} command results will be shown in mediawiki format instead of markdown;
+* {{Command|Cli}} - fixed opening pages with national characters in title;
+* {{Command|Fold}} - fixed headings folding - for example, folding of heading with level 2 - will folds all headings with 3, 4, 5 levels inside;
+* {{Command|Add/edit wiki site}} was removed;
+* {{Command|Configurator}}:
+** New option to add new wiki site;
+** Human readable option names instead of parameters based names;
+** Many fixes and improvements.
+* {{Command|Page preview}}:
+** Used static file <code>mediawiker_preview_file.html</code> in <code>User</code> folder for preview html generation;
+** Tab (view) option {{Property|Autoreload}} ('''Generate a preview after each Nth change''') - calls automatic generation of preview on every Nth change, without opening page in browser. By default, this parameter has value <code>0</code> - autogeneration not processed and page will be opened on every {{Command|Page preview}} command call;
+** When option {{Property|Autoreload}} is set to value more than <code>0</code> - in the status bar will display the number of changes that were made;
+** <code>Mediawiki:Common.css</code> - included in the preview result to support custom css rules from wiki site.
+* {{Command|Post page}} - fixed double entry of postfix in the summary message (defined by {{Property|mediawiker_summary_postfix}});
+* Commands {{Command|Show internal links}}, {{Command|Show external links}} now based on native Mediawiki API.
+
+'''Live preview scenario''':
+* With <code>autoreload</code> as <code>0</code> call {{Command|Page preview}} - page will be opened in browser.
+* With {{Command|Configurator}} change <code>Generate a preview after each Nth change</code> option in '''Tab options''' - preview will be regenerated after each Nth change.
+
+{{Note|In browser autoreloading can be processed by extensions like [https://addons.mozilla.org/ru/firefox/addon/auto-reload/?src=api Auto Reload (Firefox)] - just point changes trigger to preview file.}}
+
+=== Connection ===
+* Site connections manager was rewritten;
+
+=== Settings ===
+* All settings in configuration have the same prefix <code>mediawiker_</code>, old settings without this prefix or with prefix <code>mediawiki_</code> will be replaced automatically.
+* Some setting will be removed:
+** {{Property|mediawiki_search_syntax}} - now, mediawiki format will be always used;
+** {{Property|mediawiker_preview_file}} - static file <code>mediawiker_preview_file.html</code> will be used always;
+** {{Property|mediawiker_config_html}} - use {{Property|mediawiker_css_html}} instead. All css properties can be replaced with custom values.
+
+{{Note|{{Property|mediawiker_config_html}} used only in {{Command|Configurator}} currently.}}
+
+=== Syntax Highlighting ===
+* Fixed incorrect matching of the inline markup tags in template without parameter's names;
+* Fixed many errors with embedded source scopes.
+
+=== Popups ===
+* Image size in popups can be changed with {{Property|mediawiker_popup_image_size}}, default <code>300px</code>;
+* Popups for tables;
+* Red links support in popups;
+* Fixes of links, templates popups.

@@ -6,19 +6,6 @@ import sublime
 PM = 'Mediawiker'
 PML = 'mediawiker'
 
-CATEGORY_NAMESPACE = 14  # category namespace number
-IMAGE_NAMESPACE = 6  # file/image namespace number
-TEMPLATE_NAMESPACE = 10  # template namespace number
-SCRIBUNTO_NAMESPACE = 828  # scribunto module namespace number
-
-COMMENT_REGIONS_KEY = 'comment'
-
-PAGE_CANNOT_READ_MESSAGE = 'You have not rights to read/edit this page.'
-PAGE_CANNOT_EDIT_MESSAGE = 'You have not rights to edit this page.'
-
-NAMESPACE_SPLITTER = u':'
-INTERNAL_LINK_SPLITTER = u'|'
-
 
 def from_package(*path, name=PM, posix=True, is_abs=False):
 
@@ -78,7 +65,9 @@ class MediawikerProperties(object):
         'css_html': {'text': 'Custom html css'},
         'panel': {'text': 'Edit panel items list'},
         'pagelist': {'text': 'Pages history'},
-        'favorites': {'text': 'Favorite pages'}
+        'favorites': {'text': 'Favorite pages'},
+        'popup_image_size': {'text': 'Max image size in preview popups'},
+        'red_link_icon': {'text': 'Red links mark icon'}
     }
 
     props_autoremove = [
@@ -118,7 +107,8 @@ class MediawikerProperties(object):
         'cookies_browser': {'text': 'Browser for cookies', 'type': str, 'default': 'chrome'},
         'is_wikia': {'text': 'Is a Wikia site', 'type': bool, 'default': False},
         'retry_timeout': {'text': 'Requests timeout', 'type': int, 'default': 30},
-        'preview_custom_head': {'text': 'Custom html head tags for preview', 'type': list, 'default': []}
+        'preview_custom_head': {'text': 'Custom html head tags for preview', 'type': list, 'default': []},
+        'show_red_links': {'text': 'Mark red links in page text', 'type': bool, 'default': False}
     }
 
     def __init__(self):
@@ -126,6 +116,13 @@ class MediawikerProperties(object):
         self.deprecated = self.get_deprecated()
         self.settings_default = sublime.decode_value(sublime.load_resource(from_package('Mediawiker.sublime-settings')))
         self.autoremove_deprecated()
+
+        # settings for plugin's panel
+        panel_settings_file_name = '%sPanel.sublime-settings' % PM
+        if not os.path.exists(from_package(panel_settings_file_name, name='User', posix=False, is_abs=True)):
+            panel_settings = sublime.load_settings(panel_settings_file_name)
+            panel_settings.set('font_size', 10)
+            sublime.save_settings(panel_settings_file_name)
 
     def reload_settings(self):
         self.settings = sublime.load_settings('Mediawiker.sublime-settings')
@@ -222,7 +219,6 @@ class MediawikerProperties(object):
 
         default_value = self.props_site[key]['default'] if default_value is None else default_value
         key_type = self.props_site[key]['type']
-
         return key_type(self.get_setting('site').get(site).get(key, default_value))
 
     def set_site_setting(self, site, key, value):

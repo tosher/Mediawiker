@@ -72,7 +72,8 @@ class MediawikerEvents(sublime_plugin.EventListener):
                 mw.props.set_view_setting(view, 'is_changed', True)
 
             # folding gutters update
-            sublime.active_window().run_command(mw.cmd('colapse'))
+            # removed: skip parsing while editing
+            # mw.set_timeout_async(sublime.active_window().run_command(mw.cmd('colapse')), 5)
 
     def on_post_save(self, view):
         mw.props.set_view_setting(view, 'wiki_instead_editor', False)
@@ -91,16 +92,19 @@ class MediawikerEvents(sublime_plugin.EventListener):
             if hovers.on_hover_selected(view, point):
                 return
 
-            if hovers.on_hover_tag(view, point):
+            if hovers.on_hover_internal_link(view, point):
                 return
 
-            if hovers.on_hover_internal_link(view, point):
+            if hovers.on_hover_tag(view, point):
                 return
 
             if hovers.on_hover_template(view, point):
                 return
 
             if hovers.on_hover_heading(view, point):
+                return
+
+            if hovers.on_hover_table(view, point):
                 return
 
             # TODO: external links..?
@@ -117,7 +121,7 @@ class MediawikerEvents(sublime_plugin.EventListener):
             if line_before_position.rfind('[[') > line_before_position.rfind(']]'):
                 internal_link = line_before_position[line_before_position.rfind('[[') + 2:]
 
-            if mw.INTERNAL_LINK_SPLITTER in internal_link:
+            if mw.api.INTERNAL_LINK_SPLITTER in internal_link:
                 # cursor at custom url text zone..
                 return []
 
@@ -127,8 +131,8 @@ class MediawikerEvents(sublime_plugin.EventListener):
                 ns_text = None
                 ns_text_number = None
 
-                if mw.NAMESPACE_SPLITTER in internal_link:
-                    ns_text, internal_link = internal_link.split(mw.NAMESPACE_SPLITTER)
+                if mw.api.NAMESPACE_SPLITTER in internal_link:
+                    ns_text, internal_link = internal_link.split(mw.api.NAMESPACE_SPLITTER)
 
                 if len(internal_link) >= word_cursor_min_len:
                     namespaces_search = [ns.strip() for ns in mw.get_setting('search_namespaces').split(',')]
@@ -150,7 +154,7 @@ class MediawikerEvents(sublime_plugin.EventListener):
                                 if int(ns):
                                     ns_name = mw.api.page_attr(p, 'namespace_name')
                                     page_name = mw.api.page_attr(p, 'name') if not mw.api.is_equal_ns(ns_text, ns_name) else mw.api.page_attr(p, 'page_title')
-                                    if int(ns) in (mw.CATEGORY_NAMESPACE, mw.IMAGE_NAMESPACE):
+                                    if int(ns) in (mw.api.CATEGORY_NAMESPACE, mw.api.IMAGE_NAMESPACE):
                                         page_insert = page_name
                                     else:
                                         page_insert = '%s|%s' % (page_name, mw.api.page_attr(p, 'page_title'))

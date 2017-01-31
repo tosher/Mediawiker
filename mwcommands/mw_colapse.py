@@ -10,10 +10,10 @@ import sublime_plugin
 pythonver = sys.version_info[0]
 if pythonver >= 3:
     from . import mw_utils as mw
-    from . import mw_hovers as hovers
+    from . import mw_parser as par
 else:
     import mw_utils as mw
-    import mw_hovers as hovers
+    import mw_parser as par
 
 
 class MediawikerColapseCommand(sublime_plugin.TextCommand):
@@ -22,120 +22,31 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
     DRAW_TYPE = sublime.HIDDEN + sublime.PERSISTENT
     point = None
 
-    def get_header_regions(self, level):
-        _regions = []
-        pattern = r'={%(level)s}[^=]+={%(level)s}\s?\n((.|\n)*?)(?=(\n={1,%(level)s}[^=]|\Z))' % {'level': level}
-        _regions = self.view.find_all(pattern)
-        colapse_paragraphs = []
-        if _regions:
-            for r in _regions:
-                header_line = self.view.substr(r).split('\n')[0]
-                _a, _b = r.a + len(header_line), r.b
-                colapse_paragraphs.append((r.a, sublime.Region(_a, _b)))
-
+    def get_colapse_headers(self, headers):
+        if headers:
+            level = headers[0].level
             gutter_png = mw.from_package('img', 'gutter_h%s.png' % level) if pythonver >= 3 else ''
-            self.view.add_regions('h_%s' % level, [r[1] for r in colapse_paragraphs], 'comment', gutter_png, self.DRAW_TYPE)
+            self.view.add_regions('h_%s' % level, [r.region for r in headers], 'comment', gutter_png, self.DRAW_TYPE)
 
-        return colapse_paragraphs
-
-    def get_templates_regions(self):
-        _regions = hovers.get_templates(self.view)
-        colapse_templates = {}
-        if _regions:
-            for _r in _regions:
-                line_idx = self.view.line(_r[0]).a
-                if line_idx in colapse_templates:
-                    colapse_templates[line_idx].append(_r[0])
-                else:
-                    colapse_templates[line_idx] = [_r[0]]
-
-            # create gutter by first region in line..
+    def get_colapse_templates(self, templates):
+        if templates:
             gutter_png = mw.from_package('img', 'gutter_t.png') if pythonver >= 3 else ''
-            self.view.add_regions('templates_%s' % _r[1], [rl[0] for rl in list(colapse_templates.values())], 'comment', gutter_png, self.DRAW_TYPE)
-        return colapse_templates
+            self.view.add_regions('templates', [r.region for r in templates], 'comment', gutter_png, self.DRAW_TYPE)
 
-    def get_tag_regions(self, tag):
-        pattern_tag = r'<%(tag)s((.|\n)*?)</%(tag)s>' % {'tag': tag}
-        _regions = self.view.find_all(pattern_tag)
-        colapse_tag = []
-        if _regions:
-            for r in _regions:
-                header_line = self.view.substr(r).split('>')[0]
-                _a, _b = r.a + len(header_line) + 1, r.b - len('</%s>' % tag)
-                colapse_tag.append((r.a, sublime.Region(_a, _b)))
-
+    def get_colapse_tags(self, tag, tags):
+        if tags:
             gutter_png = mw.from_package('img', 'gutter_tag.png') if pythonver >= 3 else ''
-            self.view.add_regions(tag, [r[1] for r in colapse_tag], 'comment', gutter_png, self.DRAW_TYPE)
-        return colapse_tag
+            self.view.add_regions(tag, [r.region for r in tags], 'comment', gutter_png, self.DRAW_TYPE)
 
-    def get_tables_regions(self):
-        pattern_tables = r'\{\|((.|\n)*?)\|\}'
-        _regions = self.view.find_all(pattern_tables)
-        colapse_tables = []
-        if _regions:
-            for r in _regions:
-                _a, _b = r.a + 2, r.b - 2
-                colapse_tables.append(sublime.Region(_a, _b))
-
+    def get_colapse_tables(self, tables):
+        if tables:
             gutter_png = mw.from_package('img', 'gutter_t.png') if pythonver >= 3 else ''
-            self.view.add_regions('tables', colapse_tables, 'comment', gutter_png, self.DRAW_TYPE)
-        return colapse_tables
+            self.view.add_regions('tables', [r.region for r in tables], 'comment', gutter_png, self.DRAW_TYPE)
 
-    def get_comment_regions(self):
-        C_START = r'<!--'
-        C_STOP = r'-->'
-        pattern_comment = r'%s((.|\n)*?)%s' % (C_START, C_STOP)
-        _regions = self.view.find_all(pattern_comment)
-        colapse_comment = []
-        if _regions:
-            for r in _regions:
-                r_new = sublime.Region(r.a + len(C_START), r.b - len(C_STOP))
-                colapse_comment.append(r_new)
-
+    def get_colapse_comments(self, comments):
+        if comments:
             gutter_png = mw.from_package('img', 'gutter_tag.png') if pythonver >= 3 else ''
-            self.view.add_regions('comment', colapse_comment, 'comment', gutter_png, self.DRAW_TYPE)
-        return colapse_comment
-
-    def is_cursor_inheader(self, cursor, rt):
-        '''
-        cursor: current cursor position
-        rt: tuple (h_start, h_region)
-        '''
-        region = rt[1]
-        r_full = sublime.Region(rt[0], region.b)
-        if r_full.contains(cursor):
-            return True
-        return False
-
-    def is_cursor_intemplate(self, cursor, region):
-        r_full = sublime.Region(region.a - 2, region.b + 2)
-        if r_full.contains(cursor):
-            return True
-        return False
-
-    def is_cursor_intag(self, cursor, rt, tag):
-        r_full = sublime.Region(rt[0], rt[1].b + len('</%s>' % tag))
-        if r_full.contains(cursor):
-            return True
-        return False
-
-    def is_cursor_incomment(self, cursor, r):
-        C_START = '<!--'
-        C_STOP = '-->'
-
-        r_full = sublime.Region(r.a - len(C_START), r.b + len(C_STOP))
-        if r_full.contains(cursor):
-            return True
-        return False
-
-    def get_first_header_region_by_cursor(self, cursor, headers):
-        # colapse from max level to min
-        levels = reversed(list(headers.keys()))
-        for level_tuple in levels:
-            if headers[level_tuple]:
-                for rt in headers[level_tuple]:
-                    if self.is_cursor_inheader(cursor, rt):
-                        return rt[1]
+            self.view.add_regions('comment', [r.region for r in comments], 'comment', gutter_png, self.DRAW_TYPE)
 
     def run(self, edit, **kwargs):
 
@@ -146,98 +57,111 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
         point = kwargs.get('point', None) if kwargs else None
         fold_tags = mw.get_setting("fold_tags")
 
-        headers = {}
-        for _h in range(2, 5):
-            headers[_h] = self.get_header_regions(level=_h)
+        p = par.Parser(self.view)
+        p.register_all(
+            par.Comment, par.TemplateAttribute, par.Template, par.Link, par.Pre,
+            par.Source, par.WikiTable,
+            par.HeaderOne, par.HeaderTwo, par.HeaderThree,
+            par.HeaderFour, par.HeaderFive
+        )
 
-        t = self.get_templates_regions()
-        tbl = self.get_tables_regions()
-        tags = {}
-        for _t in fold_tags:
-            tags[_t] = self.get_tag_regions(_t)
-        comments = self.get_comment_regions()
+        for tag in fold_tags:
+            p.register_dynamic(tag)
 
-        self.is_cursor_intable = self.is_cursor_intemplate
+        if not p.parse():
+            return
+
+        # headers
+        self.get_colapse_headers(p.headerones)
+        self.get_colapse_headers(p.headertwos)
+        self.get_colapse_headers(p.headerthrees)
+        self.get_colapse_headers(p.headerfours)
+        self.get_colapse_headers(p.headerfives)
+        headers = p.headerfives + p.headerfours + p.headerthrees + p.headertwos + p.headerones
+
+        # templates
+        self.get_colapse_templates(p.templates)
+
+        # tables
+        self.get_colapse_tables(p.wikitables)
+
+        # html tags
+        tags = p.pres + p.sources
+        for tag in fold_tags:
+            tags_list = p.elist_by_name(tag)
+            if tags_list:
+                tags += tags_list
+
+        self.get_colapse_tags(tag, tags)
+
+        # comments
+        comments_regions = p.comments
+        self.get_colapse_comments(comments_regions)
 
         cursor = point if point is not None else self.view.sel()[0].begin()
+
+        tags.sort(key=lambda x: x.region.a, reverse=True)
+        p.wikitables.reverse()
+        p.templates.reverse()
 
         if _fold_type is None:
             return
 
         elif _fold_type == 'fold':
 
-            # TODO: get regions from all type, get min of them, then fold! But it's slowly..
-
-            for r in comments:
-                if self.is_cursor_incomment(cursor, r):
-                    self.view.fold(r)
+            for r in p.comments:
+                if r.region.contains(cursor):
+                    r.fold()
                     return
 
-            for tag in tags.keys():
-                for r in tags[tag]:
-                    if self.is_cursor_intag(cursor, r, tag):
-                        self.view.fold(r[1])
-                        return
-
-            for r in tbl:
-                if self.is_cursor_intable(cursor, r):
-                    self.view.fold(r)
+            for r in tags:
+                if r.region.contains(cursor):
+                    r.fold()
                     return
 
-            # if fires from on_hover, check region, started in point line
-            if point is not None:
-                for r in t.keys():
-                    if point == r:
-                        for _r in t[r]:
-                            self.view.fold(_r)
-                        return
+            for tbl in p.wikitables:
+                if tbl.region.contains(cursor):
+                    tbl.fold()
+                    return
 
-            t_lines = list(t.keys())
-            t_lines.sort()
-            for r in reversed(t_lines):
-                for _r in t[r]:
-                    if self.is_cursor_intemplate(cursor, _r):
-                        self.view.fold(_r)
-                        return
+            for r in p.templates:
+                if r.region.contains(cursor):
+                    r.fold()
+                    return
 
-            r = self.get_first_header_region_by_cursor(cursor, headers)
-            if r:
-                self.view.fold(r)
-                return
+            for r in headers:
+                if r.region.contains(cursor):
+                    r.fold()
+                    return
 
         elif _fold_type == 'unfold':
 
-            for r in comments:
-                if self.is_cursor_incomment(cursor, r):
-                    self.view.unfold(r)
+            for r in p.comments:
+                if r.region.contains(cursor):
+                    r.unfold()
                     return
 
-            for tag in tags.keys():
-                for r in tags[tag]:
-                    if self.is_cursor_intag(cursor, r, tag):
-                        self.view.unfold(r[1])
-                        return
+            for tag in tags:
+                if tag.region.contains(cursor):
+                    r.unfold()
+                    return
 
-            for r in tbl:
-                if self.is_cursor_intable(cursor, r):
-                    self.view.unfold(r)
+            for tbl in p.wikitables:
+                if tbl.region.contains(cursor):
+                    tbl.unfold()
                     self.view.show_at_center(cursor)
                     return
 
-            t_lines = list(t.keys())
-            t_lines.sort()
-            for r in reversed(t_lines):
-                for _r in t[r]:
-                    if self.is_cursor_intemplate(cursor, _r):
-                        self.view.unfold(t[r])
-                        self.view.show_at_center(cursor)
-                        return
+            for r in p.templates:
+                if r.region.contains(cursor):
+                    r.unfold()
+                    self.view.show_at_center(cursor)
+                    return
 
-            r = self.get_first_header_region_by_cursor(cursor, headers)
-            if r:
-                self.view.unfold(r)
-                self.view.show_at_center(cursor)
-                return
+            for r in headers:
+                if r.region.contains(cursor):
+                    r.unfold()
+                    return
 
         elif _fold_type.startswith('fold_'):
             try:
@@ -245,10 +169,9 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
             except:
                 level = 2
 
-            for _l in range(level, 5):
-                for r in headers[_l]:
-                    if r:
-                        self.view.fold(r[1])
+            hdrs = [h for h in headers if h.level == level]
+            for h in hdrs:
+                h.fold()
 
         elif _fold_type.startswith('unfold_'):
             try:
@@ -256,34 +179,29 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
             except:
                 level = 2
 
-            for _l in reversed(range(level, 5)):
-                for r in headers[_l]:
-                    if r:
-                        self.view.unfold(r[1])
+            hdrs = [h for h in headers if h.level == level]
+
+            for h in hdrs:
+                h.unfold()
 
         elif _fold_type.startswith('foldwiki'):
 
-            for tag in tags.keys():
-                for r in tags[tag]:
-                    self.view.fold(r[1])
+            for r in tags:
+                r.fold()
 
-            for r in tbl:
-                self.view.fold(r)
+            for tbl in p.wikitables:
+                tbl.fold()
 
-            for r in t.keys():
-                for _r in t[r]:
-                    self.view.fold(_r)
+            for r in p.templates:
+                r.fold()
 
         elif _fold_type.startswith('unfoldwiki'):
 
-            for tag in tags.keys():
-                for r in tags[tag]:
-                    self.view.unfold(r[1])
+            for r in tags:
+                r.unfold()
 
-            for r in tbl:
-                self.view.unfold(r)
+            for tbl in p.wikitables:
+                tbl.unfold()
 
-            for r in t.keys():
-                for _r in t[r]:
-                    self.view.unfold(_r)
-
+            for r in p.templates:
+                r.unfold()

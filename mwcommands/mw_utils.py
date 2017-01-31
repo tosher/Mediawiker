@@ -28,7 +28,9 @@ if pythonver >= 3:
     #     import mwclient
     # else:
     #     from . import mwclient
+    import base64
     from . import mw_properties as mwprops
+    from . import mw_parser as par
     from html.parser import HTMLParser
     from ..lib import mwclient
     from ..lib import browser_cookie3
@@ -62,7 +64,7 @@ def from_package(*path):
 
 
 conman = None
-# api = None
+api = None
 props = None
 
 
@@ -93,7 +95,7 @@ def set_syntax(page_name=None, page_namespace=None):
         syntax_ext = 'sublime-syntax' if int(sublime.version()) >= 3084 else 'tmLanguage'
 
         # Scribunto lua modules, except doc subpage
-        if page_namespace == mwprops.SCRIBUNTO_NAMESPACE and not page_name.lower().endswith('/doc'):
+        if page_namespace == api.SCRIBUNTO_NAMESPACE and not page_name.lower().endswith('/doc'):
             syntax = from_package('Lua.%s' % syntax_ext, name='Lua')
         elif page_name.lower().endswith('.css'):
             syntax = from_package('CSS.%s' % syntax_ext, name='CSS')
@@ -164,6 +166,48 @@ def get_title():
                 status_message('Unauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
                 return ''
     return ''
+
+
+def show_red_links(view, page):
+    set_timeout_async(process_red_links(view, page), 0)
+
+
+def process_red_links(view, page):
+    status_message('Processing red_links for page [[%s]].. ' % api.page_attr(page, 'name'), new_line=False)
+    view.erase_phantoms('redlink')
+    red_link_icon = get_setting('red_link_icon')
+    linksgen = api.get_page_links(page, generator=True)
+
+    links_d = {}
+    for link in linksgen:
+        if link.namespace not in links_d:
+            links_d[link.namespace] = {}
+            links_d[link.namespace]['names'] = []
+            links_d[link.namespace]['data'] = []
+        links_d[link.namespace]['names'].append(link.page_title)
+        links_d[link.namespace]['data'].append(link)
+
+    p = par.Parser(view)
+    p.register_all(par.Comment, par.Link, par.Pre, par.Source)
+    if not p.parse():
+        return
+
+    links = p.links
+
+    for l in links:
+        l_ns_number = api.get_namespace_number(l.namespace)
+        l_name = l.get_titled(l.get_spaced(l.title))
+        if l_ns_number in links_d and l_name in links_d[l_ns_number]['names']:
+            idx = links_d[l_ns_number]['names'].index(l_name)
+            link = links_d[l_ns_number]['data'][idx]
+            if not link.exists:
+                view.add_phantom(
+                    'redlink',
+                    sublime.Region(l.region.a + 2, l.region.a + 2),
+                    '<strong style="padding: 0px; color: #c0392b;">%s</strong>' % red_link_icon,
+                    sublime.LAYOUT_INLINE
+                )
+    status_message('done.')
 
 
 def pagename_clear(pagename):
@@ -239,16 +283,6 @@ def get_page_url(page_name=None):
     return ''
 
 
-def get_internal_links_regions(view):
-
-    def get_header(region):
-        return strunquote(re.sub(pattern, r'\1', view.substr(region)))
-
-    pattern = r'\[{2}(.*?)(\|.*?)?\]{2}'
-    regions = view.find_all(pattern)
-    return [(get_header(r), r) for r in regions]
-
-
 def status_message(message, replace=None, is_panel=None, new_line=True):
 
     def status_message_sublime(message, replace=None):
@@ -271,6 +305,7 @@ def status_message(message, replace=None, is_panel=None, new_line=True):
                     # https://forum.sublimetext.com/t/style-the-output-panel/10316/6
                     # panel.set_syntax_file(get_setting('syntax', from_package('MediawikerPanel.sublime-syntax')))
                     panel.set_syntax_file(from_package('MediawikerPanel.sublime-syntax'))
+
         else:
             panel = sublime.active_window().get_output_panel(panel_name)
             if panel is not None:
@@ -281,9 +316,10 @@ def status_message(message, replace=None, is_panel=None, new_line=True):
             sublime.active_window().run_command("show_panel", {"panel": "output.%s" % panel_name})
             props.set_view_setting(panel, 'is_here', True)
             panel.set_read_only(False)
+            last_position = panel.size()
             panel.run_command(cmd('insert_text'), {'position': panel.size(), 'text': '%s%s' % (message, '\n' if new_line else '')})
+            panel.show(last_position)
             panel.set_read_only(True)
-            panel.show(panel.size())
 
         else:
             status_message_sublime(message, replace)
@@ -305,14 +341,24 @@ class ConnectionFailed(Exception):
 
 class PreAPI(object):
 
+    CATEGORY_NAMESPACE = 14
+    IMAGE_NAMESPACE = 6
+    TEMPLATE_NAMESPACE = 10
+    SCRIBUNTO_NAMESPACE = 828
+    SCRIBUNTO_PREFIX = '#invoke'
+    NAMESPACE_SPLITTER = u':'
+    INTERNAL_LINK_SPLITTER = u'|'
+    PAGE_CANNOT_READ_MESSAGE = 'You have not rights to read/edit this page.'
+    PAGE_CANNOT_EDIT_MESSAGE = 'You have not rights to edit this page.'
+
     def __init__(self, conman):
         self.conman = conman
 
     def get_connect(self, force=False):
         sitecon = self.conman.get_connect(force=force)
 
-        if not hasattr(sitecon, 'logged_in') or not sitecon.logged_in:
-            status_message('Forcing new connection, not logged in..')
+        if sitecon and (not hasattr(sitecon, 'logged_in') or not sitecon.logged_in):
+            status_message('Not logged in, forcing new connection.. ')
             sitecon = self.conman.get_connect(force=True)
 
         if not sitecon:
@@ -322,13 +368,13 @@ class PreAPI(object):
     def call(self, func, **kwargs):
 
         if not isinstance(func, str):
-            status_message('Error: PreAPI call arg must be a string.')
+            status_message('Error: PreAPI call arg must be a string, not %s.' % type(func))
             return
 
         try:
             funcobj = getattr(self, func)
         except AttributeError as e:
-            status_message('PreAPI %s error: %s' % (type(e).__name__, e))
+            status_message('PreAPI %s error in %s: %s' % (type(e).__name__, func, e))
             return
 
         if funcobj:
@@ -336,9 +382,9 @@ class PreAPI(object):
                 try:
                     return funcobj(**kwargs)
                 except mwclient.errors.APIError as e:
-                    status_message("%s exception: %s, trying to reconnect.." % (type(e).__name__, e))
+                    status_message("%s exception for %s: %s, trying to reconnect.. " % (type(e).__name__, func, e))
                     try:
-                        status_message('Forcing new connection..')
+                        status_message('Forcing new connection.. ')
                         _ = self.get_connect(force=True)  # one time try to reconnect
                         if _:
                             return funcobj(**kwargs)
@@ -346,10 +392,10 @@ class PreAPI(object):
                             status_message('Failed to call %s' % funcobj.__name__)  # TODO: check
                             break
                     except Exception as e:
-                        status_message("%s exception: %s" % (type(e).__name__, e))
+                        status_message("%s exception for %s: %s" % (type(e).__name__, func, e))
                         break
                 except Exception as e:
-                    status_message("%s exception: %s" % (type(e).__name__, e))
+                    status_message("%s exception for %s: %s" % (type(e).__name__, func, e))
                     break
 
     def get_page(self, title):
@@ -359,11 +405,63 @@ class PreAPI(object):
         result = page.move(new_title=new_title, reason=reason, move_talk=True, no_redirect=no_redirect)
         return result
 
+    def image_init(self, name, extra_properties):
+        return mwclient.Image(site=self.get_connect(), name=name, extra_properties=extra_properties)
+
+    def get_image(self, title, thumb=True, thumb_size=100, url=False):
+        '''
+        thumb: return thumb or full-size image (False not implemeted now)
+        thumb_size: max thumb size to return
+        url: return image url or base64 data ("http:" is not works: https://github.com/SublimeTextIssues/Core/issues/1378)
+        '''
+
+        page = self.get_page(title)  # use image?
+        if self.page_attr(page, 'namespace') == self.IMAGE_NAMESPACE:
+            img_width = page.imageinfo.get('width', thumb_size)
+            img_url = page.imageinfo.get('url', thumb_size)
+            img_size_request = min(img_width, thumb_size)
+            extra_properties = {
+                'imageinfo': (
+                    ('iiprop', 'timestamp|user|comment|url|size|sha1|metadata|archivename'),
+                    ('iiurlwidth', img_size_request)
+                )
+            }
+            img = self.call('image_init', name=title, extra_properties=extra_properties)
+            img_thumb_url = img.imageinfo.get('thumburl', None)
+            if img_thumb_url is not None:
+                response = requests.get(img_thumb_url)
+                img_base64 = "data:" + response.headers['Content-Type'] + ";" + "base64," + str(base64.b64encode(response.content).decode("utf-8"))
+                return (img_base64, img_size_request, img_url)
+        return None
+
     def get_page_backlinks(self, page, limit):
         return page.backlinks(limit=limit)
 
     def get_page_embeddedin(self, page, limit):
         return page.embeddedin(limit=limit)
+
+    def get_page_links(self, page, generator=True, namespace=None):
+
+        def add(arr, gen):
+            for g in gen:
+                arr.append(g)
+            return arr
+
+        links = page.links(generator=generator)
+        images = page.images(generator=generator)
+        categories = page.categories(generator=generator)
+        templates = page.templates(generator=generator)
+
+        links_all = []
+        add(links_all, links)
+        add(links_all, images)
+        add(links_all, categories)
+        add(links_all, templates)
+
+        return links_all
+
+    def get_page_extlinks(self, page):
+        return [l for l in page.extlinks()]
 
     def get_page_langlinks(self, page):
         return page.langlinks()
@@ -405,6 +503,49 @@ class PreAPI(object):
     def get_notifications(self):
         return self.get_connect().notifications()
 
+    def get_notifications_list(self, ignore_read=False):
+
+        def msg_data(msg):
+            m = {}
+            m['title'] = msg.get('title', {}).get('full')
+            m['type'] = msg.get('type', None)
+            m['timestamp'] = msg.get('timestamp', {}).get('date', None)
+            m['agent'] = msg.get('agent', {}).get('name', None)
+            m['read'] = True if msg.get('read', False) else False
+            return m
+
+        ns = self.call('get_notifications')
+        msgs = []
+        if ns:
+            if isinstance(ns, dict):
+                for n in ns.keys():
+                    msg = ns.get(n, {})
+                    msg_read = msg.get('read', False)
+                    if not msg_read or not ignore_read:
+                        msgs.append(msg_data(msg))
+            elif isinstance(ns, list):
+                for msg in ns:
+                    msg_read = msg.get('read', False)
+                    if not msg_read or not ignore_read:
+                        msgs.append(msg_data(msg))
+        return msgs
+
+    def exists_unread_notifications(self):
+        ns = self.call('get_notifications')
+        if ns:
+            if isinstance(ns, dict):
+                for n in ns.keys():
+                    msg = ns.get(n, {})
+                    msg_read = msg.get('read', None)
+                    if not msg_read:
+                        return True
+            elif isinstance(ns, list):
+                for msg in ns:
+                    msg_read = msg.get('read', None)
+                    if not msg_read:
+                        return True
+        return False
+
     def get_parse_result(self, text, title):
         return self.get_connect().parse(text=text, title=title, disableeditsection=True).get('text', {}).get('*', '')
 
@@ -415,15 +556,14 @@ class PreAPI(object):
         return self.get_connect().upload(file_handler, filename, description)
 
     def get_namespace_number(self, name):
+        if name is None:
+            return 0
+
         sitecon = self.get_connect()
         return sitecon.namespaces_canonical_invert.get(
             name, sitecon.namespaces_invert.get(
                 name, sitecon.namespaces_aliases_invert.get(
                     name, None)))
-
-    def image_init(self, name, extra_properties):
-        sitecon = self.get_connect()
-        return mwclient.Image(site=sitecon, name=name, extra_properties=extra_properties)
 
     def is_equal_ns(self, ns_name1, ns_name2):
         ns_name1_number = self.get_namespace_number(name=ns_name1)
@@ -468,7 +608,7 @@ class MediawikerConnectionManager(object):
             if not site_config_old:
                 status_message("'''Setup new connection to \"%s\".'''" % name)
             else:
-                status_message("'''Site configuration is changed, setup new connection to \"%s\"..'''" % name)
+                status_message("'''Site configuration is changed, setup new connection to \"%s\".. '''" % name)
             if 'connection' in site:
                 site['connection'] = None
 
@@ -560,7 +700,7 @@ class MediawikerConnectionManager(object):
 
         site = self.get_site(name)
 
-        status_message('Connecting to %s..' % self.url(name), new_line=False)
+        status_message('Connecting to %s .. ' % self.url(name), new_line=False)
 
         if site['authorization_type'] == self.AUTH_TYPE_OAUTH:
             # oauth authorization
@@ -581,15 +721,17 @@ class MediawikerConnectionManager(object):
                     http_auth_header = e.response.headers.get('www-authenticate', '')
                     connection = self._http_auth(http_auth_header=http_auth_header, name=name)
                 else:
-                    sublime.message_dialog('HTTP connection failed: %s' % e[1])
+                    # sublime.message_dialog('HTTP connection failed: %s' % e[1])
+                    status_message(' failed: %s' % e[1])
                     return
             except Exception as e:
-                sublime.message_dialog('Connection failed for %s: %s' % (site['hosturl'], e))
+                # sublime.message_dialog('Connection failed for %s: %s' % (site['hosturl'], e))
+                status_message(' failed: %s' % e)
                 return
 
         if connection:
             status_message(' done.')
-            status_message('Login in with type %s..' % site['authorization_type'], new_line=False)
+            status_message('Login in with authorization type %s.. ' % site['authorization_type'], new_line=False)
             success_message = ' done'
             # Cookie auth
             if site['authorization_type'] == self.AUTH_TYPE_COOKIES and site['cookies']:
@@ -886,7 +1028,7 @@ class WikiaInfoboxParser(HTMLParser):
     def get_params_list(self):
         params_list = []
         if self.params:
-            for par in self.params.keys():
-                param = '%s=%s' % (par, self.params[par])
+            for p in self.params.keys():
+                param = '%s=%s' % (p, self.params[p])
                 params_list.append(param)
         return params_list

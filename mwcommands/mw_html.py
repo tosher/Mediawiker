@@ -21,7 +21,7 @@ except ImportError:
 
 class MwHtml(object):
 
-    HTML_HEADER = '''
+    HTML_HEADER = ''' \
     <html>
         <body id="%(html_id)s">
             <style>
@@ -29,7 +29,7 @@ class MwHtml(object):
             </style>
             <div>
     '''
-    HTML_FOOTER = '''
+    HTML_FOOTER = ''' \
             </div>
         </body>
     </html>
@@ -44,7 +44,6 @@ class MwHtml(object):
             ('html', {'padding': '0', 'margin': '0', 'background-color': '#19232D'}),
             ('body', {'padding': '0', 'margin': '0', 'font-family': 'Helvetica, Arial, Tahoma', 'color': 'white', 'font-size': '1rem'}),
             ('div', {'display': 'block'}),
-            ('img', {'display': 'block'}),
             ('a', {'text-decoration': 'underline', 'color': '#8FC1FF', 'font-size': '1rem'}),
             ('ul', {'padding-left': '1rem'}),
             ('li', {'margin-left': '1rem', 'display': 'block', 'font-size': '1rem'}),
@@ -89,21 +88,31 @@ class MwHtml(object):
         font_size = float(size.replace('rem', ''))
         return '%srem' % round(font_size + delta, 1)
 
-    def h(self, lvl, title):
-        return '<h%(level)s>%(title)s</h%(level)s>' % {
-            'level': lvl,
-            'title': title
-        }
+    def h(self, lvl, title, css_class=None):
+        if css_class is None:
+            return '<h%(level)s>%(title)s</h%(level)s>' % {
+                'level': lvl,
+                'title': title
+            }
+        else:
+            return '<h%(level)s class="%(css_class)s">%(title)s</h%(level)s>' % {
+                'level': lvl,
+                'title': title,
+                'css_class': css_class
+            }
 
-    def h2(self, title):
-        return self.h(2, title)
+    def h2(self, title, css_class=None):
+        return self.h(2, title, css_class)
 
-    def link(self, url, text):
-        return '<a href="%s">%s</a>' % (url, text)
+    def link(self, url, text, css_class=None):
+        if not css_class:
+            return '<a href="%s">%s</a>' % (url, text)
+        else:
+            return '<a href="%s" class="%s">%s</a>' % (url, css_class, text)
 
-    def a(self, url, text):
+    def a(self, url, text, css_class=None):
         ''' just alias to link '''
-        return self.link(url, text)
+        return self.link(url, text, css_class)
 
     def simple_tag(self, tag, text, css_class=None, close=True):
         if close:
@@ -127,7 +136,7 @@ class MwHtml(object):
         return self.simple_tag('i', data, close=close)
 
     def strong(self, data, css_class=None, close=True):
-        return self.simple_tag('i', data, css_class=css_class, close=close)
+        return self.simple_tag('strong', data, css_class=css_class, close=close)
 
     def var(self, data, css_class=None, close=True):
         return self.simple_tag('var', data, css_class=css_class, close=close)
@@ -153,7 +162,7 @@ class MwHtml(object):
         return '<br>' * cnt
 
     def join(self, *args, char=' '):
-        return char.join(args)
+        return char.join([a for a in args if a])
 
     def build(self, lines):
 

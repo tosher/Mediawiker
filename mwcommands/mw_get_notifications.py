@@ -29,36 +29,22 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
     '''
 
     def run(self, edit):
-        notifications_type = mw.get_setting('notifications_show_all', True)
-        self.read_sign = mw.get_setting('notifications_read_sign', ' [+]')
-        ns = mw.api.call('get_notifications')
-        self.msgs = []
-        if ns:
-            if isinstance(ns, dict):
-                for n in ns.keys():
-                    # TODO: move to PreAPI
-                    msg = ns.get(n, {})
-                    msg_read = msg.get('read', '')
-                    if notifications_type or not msg_read:
-                        self.msgs.append(self._get_data(msg))
-            elif isinstance(ns, list):
-                for msg in ns:
-                    msg_read = msg.get('read', '')
-                    if notifications_type or not msg_read:
-                        self.msgs.append(self._get_data(msg))
-
+        ignore_read = not mw.get_setting('notifications_show_all')
+        read_sign = mw.get_setting('notifications_read_sign')
+        self.msgs = mw.api.get_notifications_list(ignore_read=ignore_read)
         self.msgs = sorted(self.msgs, key=lambda k: k['read'])
-        n_list = ['All in browser'] + ['%s, %s: %s (%s)%s' % (m['title'], m['agent'], m['timestamp'], m['type'], m['read']) for m in self.msgs]
-        sublime.active_window().show_quick_panel(n_list, self.on_done)
+        n_list = ['All in browser']
+        for m in self.msgs:
+            line = '%s, %s: %s (%s)%s' % (
+                m['title'],
+                m['agent'],
+                m['timestamp'],
+                m['type'],
+                ' %s' % read_sign if m['read'] else ''
+            )
+            n_list.append(line)
 
-    def _get_data(self, msg):
-        _ = {}
-        _['title'] = msg.get('title', {}).get('full')
-        _['type'] = msg.get('type', None)
-        _['timestamp'] = msg.get('timestamp', {}).get('date', None)
-        _['agent'] = msg.get('agent', {}).get('name', None)
-        _['read'] = self.read_sign if msg.get('read', None) else ''
-        return _
+        sublime.active_window().show_quick_panel(n_list, self.on_done)
 
     def on_done(self, idx):
         if idx > -1:

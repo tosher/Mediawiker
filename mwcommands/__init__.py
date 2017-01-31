@@ -29,6 +29,7 @@ from .mw_upload import MediawikerUploadCommand, MediawikerFileUploadCommand
 from .mw_configurator import MediawikerConfiguratorCommand
 from .mw_events import MediawikerViewEvents, MediawikerEvents
 from .mw_changelog import MediawikerChangelogCommand
+from .mw_red_links import MediawikerShowRedLinksCommand, MediawikerHideRedLinksCommand
 
 __all__ = [
     'MediawikerAddCategoryCommand',
@@ -73,5 +74,7 @@ __all__ = [
     'MediawikerConfiguratorCommand',
     'MediawikerViewEvents',
     'MediawikerEvents',
-    'MediawikerChangelogCommand'
+    'MediawikerChangelogCommand',
+    'MediawikerShowRedLinksCommand',
+    'MediawikerHideRedLinksCommand'
 ]

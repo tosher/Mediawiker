@@ -41,7 +41,7 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
         self.categories_list_names.append(mw.api.page_attr(categories, 'page_title'))
 
         for category in categories:
-            if mw.api.page_attr(category, 'namespace') == mw.CATEGORY_NAMESPACE:
+            if mw.api.page_attr(category, 'namespace') == mw.api.CATEGORY_NAMESPACE:
                 self.categories_list_values.append(mw.api.page_attr(category, 'name'))
                 self.categories_list_names.append(mw.api.page_attr(category, 'page_title'))
 

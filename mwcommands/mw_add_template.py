@@ -30,7 +30,7 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
 
     def show_list(self, tpl_prefix):
         self.templates_names = []
-        templates = mw.api.call('get_pages', prefix=tpl_prefix, namespace=mw.TEMPLATE_NAMESPACE)
+        templates = mw.api.call('get_pages', prefix=tpl_prefix, namespace=mw.api.TEMPLATE_NAMESPACE)
         for template in templates:
             self.templates_names.append(mw.api.page_attr(template, 'page_title'))
         sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.templates_names, self.on_done), 1)

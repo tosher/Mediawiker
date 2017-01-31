@@ -47,12 +47,12 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
             self.update_category_path('%s:%s' % (self.get_category_prefix(), category_root))
 
         if len(self.category_path) > 1:
-            self.add_page(self.get_category_prev(), mw.CATEGORY_NAMESPACE, False)
+            self.add_page(self.get_category_prev(), mw.api.CATEGORY_NAMESPACE, False)
 
         for page in self.get_list_data(category_root):
             page_name = mw.api.page_attr(page, 'name')
             page_namespace = mw.api.page_attr(page, 'namespace')
-            if page_namespace == mw.CATEGORY_NAMESPACE and not self.category_prefix:
+            if page_namespace == mw.api.CATEGORY_NAMESPACE and not self.category_prefix:
                 self.category_prefix = mw.get_category(page_name)[0]
             self.add_page(page_name, page_namespace, True)
         if self.pages:
@@ -63,7 +63,7 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
 
     def add_page(self, page_name, page_namespace, as_next=True):
         page_name_menu = page_name
-        if page_namespace == mw.CATEGORY_NAMESPACE:
+        if page_namespace == mw.api.CATEGORY_NAMESPACE:
             page_name_menu = self.get_category_as_next(page_name) if as_next else self.get_category_as_prev(page_name)
         self.pages[page_name] = page_namespace
         self.pages_names.append(page_name_menu)

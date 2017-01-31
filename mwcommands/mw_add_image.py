@@ -30,7 +30,7 @@ class MediawikerAddImageCommand(sublime_plugin.TextCommand):
 
     def show_list(self, image_prefix):
         if len(image_prefix) >= self.image_prefix_min_lenght:
-            images = mw.api.call('get_pages', prefix=image_prefix, namespace=mw.IMAGE_NAMESPACE)  # images list by prefix
+            images = mw.api.call('get_pages', prefix=image_prefix, namespace=mw.api.IMAGE_NAMESPACE)  # images list by prefix
             self.images_names = [mw.api.page_attr(x, 'page_title') for x in images]
             sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.images_names, self.on_done), 1)
         else:

@@ -81,10 +81,10 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
             mw.props.set_view_setting(view, 'page_revision', mw.api.page_attr(page, 'revision'))
         elif not mw.api.page_can_read(page):
             # can not read and edit
-            sublime.message_dialog(mw.PAGE_CANNOT_READ_MESSAGE)
+            sublime.message_dialog(mw.api.PAGE_CANNOT_READ_MESSAGE)
             view.close()
             return
-        elif not sublime.ok_cancel_dialog('%s Click OK button to view its source.' % mw.PAGE_CANNOT_EDIT_MESSAGE):
+        elif not sublime.ok_cancel_dialog('%s Click OK button to view its source.' % mw.api.PAGE_CANNOT_EDIT_MESSAGE):
             # can not edit, but can read, but not want
             view.close()
             return
@@ -98,6 +98,8 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
 
         view.run_command(mw.cmd('insert_text'), {'position': 0, 'text': text, 'with_erase': True})
 
+        if mw.props.get_site_setting(self.site_active, 'show_red_links'):
+            mw.show_red_links(view, page)
         mw.status_message('Page [[%s]] was opened successfully from "%s".' % (title, mw.get_view_site()), replace=['[', ']'])
         mw.set_syntax(title, page_namespace)
         mw.props.set_view_setting(view, 'is_here', True)
@@ -107,6 +109,16 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         view.set_scratch(True)
         # own is_changed flag instead of is_dirty for possib. to reset..
         mw.props.set_view_setting(view, 'is_changed', False)
+
+        try:
+            self.get_notifications()
+        except Exception as e:
+            mw.status_message('%s notifications exception: %s' % (mw.PM, e))
+
+    def get_notifications(self):
+        is_unread_notify_exists = mw.api.exists_unread_notifications()
+        if is_unread_notify_exists and sublime.ok_cancel_dialog('You have new notifications.'):
+            self.window.run_command(mw.cmd('get_notifications'))
 
 
 class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
@@ -158,6 +170,9 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
         self.page = mw.api.get_page(self.title)
         mw.props.set_view_setting(self.view, 'page_revision', mw.api.page_attr(self.page, 'revision'))
 
+        if mw.props.get_site_setting(mw.get_view_site(), 'show_red_links'):
+            mw.show_red_links(self.view, self.page)
+
         self.view.set_scratch(True)
         mw.props.set_view_setting(self.view, 'is_changed', False)  # reset is_changed flag
         mw.status_message('Page [[%s]] was successfully published to wiki "%s".' % (self.title, mw.get_view_site()), replace=['[', ']'])
@@ -170,7 +185,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             if mw.api.page_can_edit(self.page):
                 self.post_page(summary=summary)
             else:
-                mw.status_message(mw.PAGE_CANNOT_EDIT_MESSAGE)
+                mw.status_message(mw.api.PAGE_CANNOT_EDIT_MESSAGE)
         except mw.mwclient.EditError as e:
             mw.status_message('Can\'t publish page [[%s]] (%s)' % (self.title, e), replace=['[', ']'])
 

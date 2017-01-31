@@ -20,6 +20,8 @@
     { "caption": "Mediawiker: File Upload", "command": "mediawiker_file_upload"},
     { "caption": "Mediawiker: Show internal links", "command": "mediawiker_show_internal_links"},
     { "caption": "Mediawiker: Show external links", "command": "mediawiker_show_external_links"},
+    { "caption": "Mediawiker: Show red links", "command": "mediawiker_show_red_links"},
+    { "caption": "Mediawiker: Hide red links", "command": "mediawiker_hide_red_links"},
     { "caption": "Mediawiker: Add to Favorites", "command": "mediawiker_favorites_add"},
     { "caption": "Mediawiker: Favorite pages", "command": "mediawiker_favorites_open"},
     { "caption": "Mediawiker: Add/Edit wiki server", "command": "mediawiker_process_site"},

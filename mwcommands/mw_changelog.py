@@ -34,7 +34,7 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
         self.set_css()
         # self.html.debug = True
 
-        with open(mw.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r') as cl:
+        with open(mw.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r', encoding='utf-8') as cl:
             log = cl.read()
         self.process_h2_regions(log, 2)
 

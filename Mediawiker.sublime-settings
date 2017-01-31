@@ -22,7 +22,8 @@
             "cookies_browser": "chrome",  // Cookies authorization type: "chrome" or "firefox"
             "preview_custom_head": [],  // List of custom html head tags for preview generation
             "retry_timeout": 30, // Timeout in seconds for http requests
-            "is_wikia": false  // is wikia site
+            "is_wikia": false,  // is wikia site
+            "show_red_links": false  // validate red links on open/post page (not recommended, use command instead)
         },
         "Russian wikipedia": {
             "authorization_type": "login",
@@ -45,7 +46,8 @@
             "cookies_browser": "chrome",
             "preview_custom_head": [],
             "retry_timeout": 30,
-            "is_wikia": false
+            "is_wikia": false,
+            "show_red_links": false
 
         },
         "Mediawiki": {
@@ -69,7 +71,8 @@
             "cookies_browser": "chrome",
             "preview_custom_head": [],
             "retry_timeout": 30,
-            "is_wikia": false
+            "is_wikia": false,
+            "show_red_links": false
         }
     },
     "mediawiker_syntax": "Packages/Mediawiker/MediawikiNG.sublime-syntax",
@@ -92,10 +95,11 @@
     "mediawiker_image_prefix_min_length": 0,
     "mediawiker_wiki_instead_editor": true,
     "mediawiker_show_image_in_popup": true,
+    "mediawiker_popup_image_size": 300,  // px
     "mediawiker_validate_revision_on_post": true,
     "mediawiker_linkstopage_limit": 50,
     "mediawiker_preview_lang": "en",
-    "mediawiker_fold_tags": ["source", "syntaxhighlight", "div", "pre"],
+    "mediawiker_fold_tags": ["div"],
     "mediawiker_preview_head": [
         "<meta charset=\"UTF-8\"/>",
         "<link rel=\"stylesheet\" href=\"{{ http }}://{{ host }}{{ path }}load.php?debug=false&amp;lang={{ lang }}&amp;modules=site&amp;only=styles&amp;skin=vector\"/>",
@@ -118,10 +122,10 @@
     "mediawiker_config_icon_edit": "→",
     "mediawiker_config_icon_back": "←",
     "mediawiker_config_icon_unnumbered_list": "•",
+    "mediawiker_red_link_icon": "✘",
     "mediawiker_css_html": {},
     "mediawiker_panel":
     [
-        {"caption": "Changelog", "type": "window_command", "value": "mediawiker_changelog"},
         {"caption": "Open page", "type": "window_command", "value": "mediawiker_open_page"},
         {"caption": "Post page", "type": "window_command", "value": "mediawiker_post_page"},
         {"caption": "Move page", "type": "window_command", "value": "mediawiker_move_page"},
@@ -141,6 +145,8 @@
         {"caption": "Show TOC", "type": "text_command", "value": "mediawiker_show_toc"},
         {"caption": "Show internal links", "type": "text_command", "value": "mediawiker_show_internal_links"},
         {"caption": "Show external links", "type": "text_command", "value": "mediawiker_show_external_links"},
+        {"caption": "Show red links", "type": "text_command", "value": "mediawiker_show_red_links"},
+        {"caption": "Hide red links", "type": "text_command", "value": "mediawiker_hide_red_links"},
         {"caption": "Show language links", "type": "window_command", "value": "mediawiker_show_page_langlinks"},
         {"caption": "Show links to page", "type": "window_command", "value": "mediawiker_show_page_backlinks"},
         {"caption": "Numbered TOC", "type": "text_command", "value": "mediawiker_enumerate_toc"},
@@ -164,7 +170,8 @@
         {"caption": "Predefined text", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_pre.sublime-snippet"},
         {"caption": "Keyboard", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_kbd.sublime-snippet"},
         {"caption": "Nowiki", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_nowiki.sublime-snippet"},
-        {"caption": "Code", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_code.sublime-snippet"}
+        {"caption": "Code", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_code.sublime-snippet"},
+        {"caption": "Changelog", "type": "window_command", "value": "mediawiker_changelog"}
     ],
     "mediawiker_favorites": {},
     "mediawiker_pagelist": {}
