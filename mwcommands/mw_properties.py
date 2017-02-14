@@ -154,7 +154,10 @@ class MediawikerProperties(object):
     def reload_settings(self):
         self.settings = sublime.load_settings('Mediawiker.sublime-settings')
         if pythonver >= 3:
-            self.settings_user = sublime.decode_value(sublime.load_resource(from_package('Mediawiker.sublime-settings', name='User')))
+            try:
+                self.settings_user = sublime.decode_value(sublime.load_resource(from_package('Mediawiker.sublime-settings', name='User')))
+            except IOError as e:
+                self.settings_user = {}
         else:
             # with open(from_package('Mediawiker.sublime-settings', name='User', posix=True, is_abs=True)) as setu:
             #     self.settings_user = json.load(setu)

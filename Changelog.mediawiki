@@ -469,3 +469,6 @@ Support folding/unfolding for:
 * Popups for tables;
 * Red links support in popups;
 * Fixes of links, templates popups.
+
+== Mediawiker 3.3.1 ==
+* Fixed error with empty User settings.
