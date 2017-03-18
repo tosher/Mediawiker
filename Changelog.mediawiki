@@ -475,3 +475,8 @@ Support folding/unfolding for:
 
 == Mediawiker 3.3.2 ==
 * Fixed: Templates and other non-headings staff showing in <code>Symbol list</code>.
+
+== Mediawiker 3.3.3 ==
+* New global option {{Property|mediawiker_popup_type}} with possible values of <code>auto</code> (default value - to show popups with autohide), <code>manual</code> (to show popups without autohiding), <code>off</code> (do not show popups globally);
+* New tab option {{Property|Turn off popups}} - not show popups in current tab. This option can be set with {{Command|Configurator}};
+* Now, popup will hide on typing.
