@@ -86,7 +86,8 @@ class MediawikerProperties(object):
         'favorites': {'text': 'Favorite pages'},
         'popup_image_size': {'text': 'Max image size in preview popups'},
         'red_link_icon': {'text': 'Red links mark icon'},
-        'debug': {'text': 'Advanced logging mode'}
+        'debug': {'text': 'Advanced logging mode'},
+        'popup_type': {'text': 'Popup type (manual/auto/off)'}
     }
 
     props_autoremove = [
@@ -101,7 +102,8 @@ class MediawikerProperties(object):
         'autoreload': {'text': 'Generate a preview after each Nth change', 'default': 0, 'type': int},
         'site': {'text': 'Mediawiki site in view', 'default': '', 'type': str},
         'page_revision': {'text': 'Page revision number', 'default': 0, 'type': int},
-        'is_changed': {'text': 'Page has changes', 'default': False, 'type': bool}
+        'is_changed': {'text': 'Page has changes', 'default': False, 'type': bool},
+        'popups_off': {'text': 'Turn off popups', 'default': False, 'type': bool}
     }
 
     props_site = {

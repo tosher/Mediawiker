@@ -29,6 +29,19 @@ html.css_rules['.wide'] = {'padding-left': '0.5rem', 'padding-right': '0.5rem'}
 html.css_rules['.redlink'] = {'padding': '0px', 'color': '#c0392b'}
 
 
+def get_popup_flags(view):
+    if mw.props.get_view_setting(view, 'popups_off'):
+        return None
+    popup_type = mw.get_setting('popup_type')
+    if popup_type == 'manual':
+        return 0
+    elif popup_type == 'auto':
+        return sublime.HIDE_ON_MOUSE_MOVE_AWAY
+    elif popup_type == 'off':
+        return None
+    return sublime.HIDE_ON_MOUSE_MOVE_AWAY
+
+
 def on_hover_selected(view, point):
 
     def on_navigate_selected(link):
@@ -49,6 +62,10 @@ def on_hover_selected(view, point):
         elif link.startswith('comment'):
             sublime.active_window().run_command("insert_snippet", {"contents": "<!-- ${0:$SELECTION} -->"})
 
+    popup_flags = get_popup_flags(view)
+    if popup_flags is None:
+        return
+    
     selected = view.sel()
     for r in selected:
         if r and r.contains(point):
@@ -72,7 +89,7 @@ def on_hover_selected(view, point):
             view.show_popup(
                 content=content_html,
                 location=point,
-                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                flags=popup_flags,
                 on_navigate=on_navigate_selected
             )
             return True
@@ -94,6 +111,10 @@ def on_hover_internal_link(view, point):
             webbrowser.open(url)
         elif link.startswith('get_image'):
             webbrowser.open(page_name)
+
+    popup_flags = get_popup_flags(view)
+    if popup_flags is None:
+        return
 
     p = par.Parser(view)
     p.register_all(par.Comment, par.Link, par.Pre, par.Source)
@@ -136,7 +157,7 @@ def on_hover_internal_link(view, point):
                     location=point,
                     max_width=img_size + 150 if img_data else 800,
                     max_height=img_size + 150 if img_data else 600,
-                    flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                    flags=popup_flags,
                     on_navigate=on_navigate
                 )
                 return True
@@ -162,6 +183,10 @@ def on_hover_template(view, point):
                 'action': mw.cmd('show_page'),
                 'action_params': {'title': link.replace(' ', '_')}
             })
+
+    popup_flags = get_popup_flags(view)
+    if popup_flags is None:
+        return
 
     p = par.Parser(view)
     p.register_all(par.Comment, par.TemplateAttribute, par.Template, par.Pre, par.Source)
@@ -197,7 +222,7 @@ def on_hover_template(view, point):
             view.show_popup(
                 content=content_html,
                 location=point,
-                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                flags=popup_flags,
                 on_navigate=on_navigate,
                 max_width=800
             )
@@ -218,6 +243,10 @@ def on_hover_table(view, point):
                 if t.region.contains(point):
                     r.unfold()
                     return
+
+    popup_flags = get_popup_flags(view)
+    if popup_flags is None:
+        return
 
     p = par.Parser(view)
     p.register_all(par.Comment, par.TemplateAttribute, par.Template, par.Pre, par.Source, par.WikiTable)
@@ -242,7 +271,7 @@ def on_hover_table(view, point):
             view.show_popup(
                 content=content_html,
                 location=point,
-                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                flags=popup_flags,
                 on_navigate=on_navigate,
                 max_width=800
             )
@@ -263,6 +292,10 @@ def on_hover_heading(view, point):
                 if h.region.contains(point):
                     h.unfold()
                     return
+
+    popup_flags = get_popup_flags(view)
+    if popup_flags is None:
+        return
 
     p = par.Parser(view)
     p.register_all(
@@ -291,7 +324,7 @@ def on_hover_heading(view, point):
             view.show_popup(
                 content=content_html,
                 location=point,
-                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                flags=popup_flags,
                 on_navigate=on_navigate,
                 max_width=800
             )
@@ -312,6 +345,10 @@ def on_hover_tag(view, point):
                 if tag.region.contains(point):
                     tag.unfold()
                     return
+
+    popup_flags = get_popup_flags(view)
+    if popup_flags is None:
+        return
 
     fold_tags = mw.get_setting("fold_tags")
 
@@ -350,7 +387,7 @@ def on_hover_tag(view, point):
             view.show_popup(
                 content=content_html,
                 location=point,
-                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                flags=popup_flags,
                 on_navigate=on_navigate
             )
             return True
@@ -379,6 +416,10 @@ def on_hover_comment(view, point):
         text = text.replace('\n', html.br())
         return text
 
+    popup_flags = get_popup_flags(view)
+    if popup_flags is None:
+        return
+
     p = par.Parser(view)
     p.register_all(
         par.Comment, par.Pre, par.Source
@@ -404,7 +445,7 @@ def on_hover_comment(view, point):
             view.show_popup(
                 content=content_html,
                 location=point,
-                flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
+                flags=popup_flags,
                 on_navigate=on_navigate,
                 max_width=800,
                 max_height=600

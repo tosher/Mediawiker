@@ -96,6 +96,7 @@
     "mediawiker_wiki_instead_editor": true,
     "mediawiker_show_image_in_popup": true,
     "mediawiker_popup_image_size": 300,  // px
+    "mediawiker_popup_type": "auto",  // "manual", "auto", "off"
     "mediawiker_validate_revision_on_post": true,
     "mediawiker_linkstopage_limit": 50,
     "mediawiker_preview_lang": "en",

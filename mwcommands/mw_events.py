@@ -21,6 +21,9 @@ if pythonver >= 3:
         cnt = None
 
         def on_modified(self):
+            
+            self.view.hide_popup()
+            
             try:
                 ch_cnt = mw.props.get_view_setting(self.view, 'autoreload')
                 if ch_cnt:
