@@ -424,6 +424,9 @@ class PreAPI(object):
 
         page = self.get_page(title)  # use image?
         if self.page_attr(page, 'namespace') == self.IMAGE_NAMESPACE:
+            # Link like [[File:Filename]] has not imageinfo, only [[Image:Imagename]]
+            if not hasattr(page, 'imageinfo'):
+                page = self.get_page('Image:%s' % self.page_attr(page, 'page_title'))
             img_width = page.imageinfo.get('width', thumb_size)
             img_url = page.imageinfo.get('url', thumb_size)
             img_size_request = min(img_width, thumb_size)
@@ -466,6 +469,18 @@ class PreAPI(object):
         add(links_all, templates)
 
         return links_all
+
+    def get_page_talk_page(self, page):
+        ns = self.page_attr(page, 'namespace')
+        if ns == self.CATEGORY_NAMESPACE:
+            return self.get_page('Category_talk:%s' % self.page_attr(page, 'page_title'))
+        elif ns == self.IMAGE_NAMESPACE:
+            return self.get_page('File_talk:%s' % self.page_attr(page, 'page_title'))
+        elif ns == self.TEMPLATE_NAMESPACE:
+            return self.get_page('Template_talk:%s' % self.page_attr(page, 'page_title'))
+        elif ns == self.SCRIBUNTO_NAMESPACE:
+            return self.get_page('Module_talk:%s' % self.page_attr(page, 'page_title'))
+        return self.get_page('Talk:%s' % self.page_attr(page, 'page_title'))
 
     def get_page_extlinks(self, page):
         return [l for l in page.extlinks()]

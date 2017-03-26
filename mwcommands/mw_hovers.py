@@ -129,6 +129,8 @@ def on_hover_internal_link(view, point):
             if l.name:
                 page = mw.api.get_page(l.name)
                 css_class = None if page.exists else 'redlink'
+                page_talk = mw.api.get_page_talk_page(page)
+                css_class_talk = None if page_talk.exists else 'redlink'
 
                 img_data = None
                 if mw.get_setting('show_image_in_popup'):
@@ -137,8 +139,7 @@ def on_hover_internal_link(view, point):
                     except:
                         pass
 
-                h = 'Page "%s"' % html.span(l.name, css_class=css_class) if not img_data else 'File "%s"' % l.name.split(':')[1]
-
+                h = 'Page "%s"' % html.span(l.name, css_class=css_class) if not img_data else 'File "%s"' % mw.api.page_attr(page, 'page_title')
                 content = [
                     html.h(lvl=4, title=h),
                     html.img(uri=img_data) if img_data else '',
@@ -147,6 +148,12 @@ def on_hover_internal_link(view, point):
                         html.link('open:%s' % l.name, 'Open' if page.exists else 'Create', css_class=css_class),
                         html.link('browse:%s' % l.name, 'View in browser', css_class=css_class),
                         html.link('get_image:%s' % img_url, 'View image in browser') if img_data else '',
+                        char=html.span('|', css_class='wide')
+                    ),
+                    html.br(cnt=1),
+                    html.join(
+                        html.link('open:%s' % mw.api.page_attr(page_talk, 'name'), 'Open talk page' if page_talk.exists else 'Create talk page', css_class=css_class_talk),
+                        html.link('browse:%s' % mw.api.page_attr(page_talk, 'name'), 'View talk page in browser', css_class=css_class_talk),
                         char=html.span('|', css_class='wide')
                     )
                 ]

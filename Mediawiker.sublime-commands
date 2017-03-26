@@ -42,5 +42,6 @@
     { "caption": "Mediawiker: Fold text blocks", "command": "mediawiker_colapse", "args": {"type": "foldwiki"}},
     { "caption": "Mediawiker: Unfold text blocks", "command": "mediawiker_colapse", "args": {"type": "unfoldwiki"}},
     { "caption": "Mediawiker: Configurator", "command": "mediawiker_configurator"},
-    { "caption": "Mediawiker: Changelog", "command": "mediawiker_changelog"}
+    { "caption": "Mediawiker: Changelog", "command": "mediawiker_changelog"},
+    { "caption": "Mediawiker: Open talk page", "command": "mediawiker_open_talk_page" }
 ]
