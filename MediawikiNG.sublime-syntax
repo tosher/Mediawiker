@@ -7,7 +7,7 @@ scope: text.html.mediawiki
 
 variables:
   src_tag_before_lang: '((<)(source|syntaxhighlight)[ \t]+(lang)(=)("))'
-  src_tag_after_lang: '((")((\s+[^\"]+="[^\"]+")*)(>))'
+  src_tag_after_lang: '((")((\s+[^\"]+(="[^\"]+")?)*)(>))'
 
 contexts:
   main:
