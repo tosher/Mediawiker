@@ -290,7 +290,7 @@ def get_page_url(page_name=None):
     return ''
 
 
-def status_message(message, replace=None, is_panel=None, new_line=True):
+def status_message(message, replace=None, is_panel=None, new_line=True, panel_name=None, syntax=None, new=False):
 
     def status_message_sublime(message, replace=None):
         if replace:
@@ -301,25 +301,28 @@ def status_message(message, replace=None, is_panel=None, new_line=True):
     is_use_message_panel = is_panel if is_panel is not None else get_setting('use_status_messages_panel', True)
 
     if is_use_message_panel:
-        panel_name = '%s_panel' % mwprops.PML
+        panel = None
+        if panel_name is None:
+            panel_name = '%s_panel' % mwprops.PML
+
+        if syntax is None:
+            if int(sublime.version()) >= 3000:
+                syntax = from_package('MediawikerPanel.sublime-syntax')
+            else:
+                syntax = from_package('MediawikiNG_ST2.tmLanguage')
+
         if int(sublime.version()) >= 3000:
-            panel = sublime.active_window().find_output_panel(panel_name)
+            if not new:
+                panel = sublime.active_window().find_output_panel(panel_name)
 
             if panel is None:
                 panel = sublime.active_window().create_output_panel(panel_name)
 
-                if panel is not None:
-                    # https://forum.sublimetext.com/t/style-the-output-panel/10316/6
-                    # panel.set_syntax_file(get_setting('syntax', from_package('MediawikerPanel.sublime-syntax')))
-                    panel.set_syntax_file(from_package('MediawikerPanel.sublime-syntax'))
-
         else:
             panel = sublime.active_window().get_output_panel(panel_name)
-            if panel is not None:
-                # panel.set_syntax_file(get_setting('mediawiki_syntax', from_package('MediawikiNG_ST2.tmLanguage')))
-                panel.set_syntax_file(from_package('MediawikiNG_ST2.tmLanguage'))
 
         if panel is not None:
+            panel.set_syntax_file(syntax)
             sublime.active_window().run_command("show_panel", {"panel": "output.%s" % panel_name})
             props.set_view_setting(panel, 'is_here', True)
             panel.set_read_only(False)

@@ -43,5 +43,6 @@
     { "caption": "Mediawiker: Unfold text blocks", "command": "mediawiker_colapse", "args": {"type": "unfoldwiki"}},
     { "caption": "Mediawiker: Configurator", "command": "mediawiker_configurator"},
     { "caption": "Mediawiker: Changelog", "command": "mediawiker_changelog"},
-    { "caption": "Mediawiker: Open talk page", "command": "mediawiker_open_talk_page" }
+    { "caption": "Mediawiker: Open talk page", "command": "mediawiker_open_talk_page" },
+    { "caption": "Mediawiker: Show unsaved changes", "command": "mediawiker_show_diff" }
 ]

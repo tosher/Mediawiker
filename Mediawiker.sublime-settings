@@ -156,6 +156,7 @@
         {"caption": "Wiki table to Simple (for plugin TableEdit)", "type": "text_command", "value": "mediawiker_table_wiki_to_simple"},
         {"caption": "Simple table to wiki (for plugin TableEdit)", "type": "text_command", "value": "mediawiker_table_simple_to_wiki"},
         {"caption": "Page preview", "type": "window_command", "value": "mediawiker_preview"},
+        {"caption": "Show unsaved changes", "type": "window_command", "value": "mediawiker_show_diff"},
         {"caption": "Get Notifications", "type": "window_command", "value": "mediawiker_notifications"},
         {"caption": "Open talk page", "type": "window_command", "value": "mediawiker_open_talk_page"},
         {"caption": "Create/edit an issue", "type": "window_command", "value": "mediawiker_open_issue"},

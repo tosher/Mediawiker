@@ -219,7 +219,7 @@ continued
 
 <source lang="python">
 // <- meta.tag.validhtml.mediawiki
- // <- entity.name.tag.source.mediawiki
+ // <- entity.name.tag.validhtml.source.mediawiki
 //      ^ entity.other.attribute-name.mediawiki
 //            ^ string.quoted.mediawiki
 //                   ^meta.tag.validhtml.mediawiki
@@ -242,5 +242,5 @@ from __future__ import with_statement
 *: <source lang="python">
  // <- markup.other.special.mediawiki
 // ^ meta.tag.validhtml.mediawiki
-//  ^ entity.name.tag.source.mediawiki
+//  ^ entity.name.tag.validhtml.source.mediawiki
 </source>

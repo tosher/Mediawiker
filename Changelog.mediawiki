@@ -484,3 +484,7 @@ Support folding/unfolding for:
 == Mediawiker 3.3.4 ==
 * New command: {{Command|Open talk page}} - for fast way to open talk pages;
 * Possibility to open talk page from popups.
+
+== Mediawiker 3.3.5 ==
+* New command: {{Command|Show unsaved changes}} - shows differencies between local and server versions. Thanks to [https://github.com/scholer scholer] for command {{Command|Page diff vs. server version}} from his [https://github.com/scholer/Mediawiker/blob/master/mediawiker.py#L595 fork], the new command is based on it;
+* Allowing unvalued attributes in <code>Syntaxhighlight</code> tags. Thanks to [https://github.com/smanolloff smanolloff] for pull-request.
