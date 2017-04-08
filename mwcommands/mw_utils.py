@@ -498,7 +498,10 @@ class PreAPI(object):
         except Exception as e:
             status_message('%s exception: %s' % (type(e).__name__, e))
 
-        page.save(text, summary=summary.strip(), minor=mark_as_minor)
+        try:
+            page.save(text, summary=summary.strip(), minor=mark_as_minor)
+        except Exception as e:
+            status_message('%s exception: %s' % (type(e).__name__, e))
 
     def page_attr(self, page, attr_name):
         try:

@@ -65,7 +65,7 @@ def on_hover_selected(view, point):
     popup_flags = get_popup_flags(view)
     if popup_flags is None:
         return
-    
+
     selected = view.sel()
     for r in selected:
         if r and r.contains(point):
@@ -204,8 +204,9 @@ def on_hover_template(view, point):
     for r in p.templates:
         if r.region.contains(point):
 
-            page = mw.api.get_page(r.page_name)
-            css_class = None if page.exists else 'redlink'
+            page = None
+            css_class = None
+            page_exists = None
 
             template_type = 'Template'
             if r.mode == r.MODE_SCRIBUNTO:
@@ -215,10 +216,15 @@ def on_hover_template(view, point):
             elif r.mode == r.MODE_VAR:
                 template_type = 'Variable'
 
+            if r.mode != r.MODE_VAR:
+                page = mw.api.get_page(r.page_name)
+                css_class = None if page.exists else 'redlink'
+                page_exists = page.exists
+
             content = [
                 html.h(4, '%s "%s"' % (template_type, r.page_name) if r.page_name else template_type),
                 html.join(
-                    html.link(r.page_name, 'Open' if page.exists else 'Create', css_class=css_class) if r.page_name else '',
+                    html.link(r.page_name, 'Open' if page_exists else 'Create', css_class=css_class) if r.page_name else '',
                     html.link('fold', 'Fold'),
                     html.link('unfold', 'Unfold'),
                     char=html.span('|', css_class='wide')

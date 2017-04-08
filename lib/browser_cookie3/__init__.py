@@ -229,8 +229,10 @@ class BrowserCookieLoader(object):
         cookie_files = cookie_files or self.find_cookie_files()
         if isinstance(cookie_files, list):
             self.cookie_files = cookie_files
-        else:
+        elif isinstance(cookie_files, str):
             self.cookie_files = [cookie_files]
+        else:
+            self.cookie_files = cookie_files
         self.domain_name_tld = TLDLazy().get_tld_domain(domain_name) if domain_name else None
         self.copy_path = copy_path
 

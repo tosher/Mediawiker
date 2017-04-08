@@ -488,3 +488,9 @@ Support folding/unfolding for:
 == Mediawiker 3.3.5 ==
 * New command: {{Command|Show unsaved changes}} - shows differencies between local and server versions. Thanks to [https://github.com/scholer scholer] for command {{Command|Page diff vs. server version}} from his [https://github.com/scholer/Mediawiker/blob/master/mediawiker.py#L595 fork], the new command is based on it;
 * Allowing unvalued attributes in <code>Syntaxhighlight</code> tags. Thanks to [https://github.com/smanolloff smanolloff] for pull-request.
+
+== Mediawiker 3.3.6 ==
+* Fixed: variables popup;
+* Fixed: error <code>Unable to decode Packages/Mediawiker/img/gutter_h1.png</code>;
+* Fixed: authorization with Chrome's cookies;
+* Fixed: save page messages in plugin's panel.
