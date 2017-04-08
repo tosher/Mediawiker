@@ -494,3 +494,6 @@ Support folding/unfolding for:
 * Fixed: error <code>Unable to decode Packages/Mediawiker/img/gutter_h1.png</code>;
 * Fixed: authorization with Chrome's cookies;
 * Fixed: save page messages in plugin's panel.
+
+== Mediawiker 3.3.7 ==
+* Fixed: notifications check while page opening.

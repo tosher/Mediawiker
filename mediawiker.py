@@ -118,7 +118,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
     def get_notifications(self):
         is_unread_notify_exists = mw.api.exists_unread_notifications()
         if is_unread_notify_exists and sublime.ok_cancel_dialog('You have new notifications.'):
-            self.window.run_command(mw.cmd('get_notifications'))
+            self.view.window().run_command(mw.cmd('notifications'))
 
 
 class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
@@ -237,6 +237,7 @@ class MediawikerMovePageCommand(sublime_plugin.TextCommand):
                     'action_params': {'title': self.new_title, 'new_tab': True}
                 }), 2)
 
+
 class MediawikerOpenTalkPageCommand(sublime_plugin.WindowCommand):
     ''' Open talk page for current page '''
 
@@ -248,8 +249,9 @@ class MediawikerOpenTalkPageCommand(sublime_plugin.WindowCommand):
             sublime.message_dialog('There is a talk page already.')
 
         sublime.set_timeout(
-            lambda: sublime.active_window().run_command(mw.cmd('page'), {
-                'action': mw.cmd('show_page'),
-                'action_params': {'title': mw.api.page_attr(page_talk, 'name'), 'new_tab': True}
-        }), 2)
-
+            lambda: sublime.active_window().run_command(
+                mw.cmd('page'), {
+                    'action': mw.cmd('show_page'),
+                    'action_params': {'title': mw.api.page_attr(page_talk, 'name'), 'new_tab': True}
+                }
+            ), 2)

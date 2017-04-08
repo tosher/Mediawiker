@@ -15,20 +15,12 @@ else:
 
 
 class MediawikerNotificationsCommand(sublime_plugin.WindowCommand):
-    ''' alias to GetNotifications command '''
-
-    def run(self):
-        self.window.run_command(mw.cmd('page'), {'action': mw.cmd('get_notifications')})
-
-
-class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
     '''
     https://www.mediawiki.org/wiki/Notifications
     https://www.mediawiki.org/wiki/Extension:Echo
-    NOTE: Beta
     '''
 
-    def run(self, edit):
+    def run(self):
         ignore_read = not mw.get_setting('notifications_show_all')
         read_sign = mw.get_setting('notifications_read_sign')
         self.msgs = mw.api.get_notifications_list(ignore_read=ignore_read)
@@ -44,7 +36,7 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
             )
             n_list.append(line)
 
-        sublime.active_window().show_quick_panel(n_list, self.on_done)
+        self.window.show_quick_panel(n_list, self.on_done)
 
     def on_done(self, idx):
         if idx > -1:
@@ -54,7 +46,7 @@ class MediawikerGetNotificationsCommand(sublime_plugin.TextCommand):
             else:
                 title = self.msgs[idx - 1].get('title', None)
                 if title:
-                    sublime.active_window().run_command(mw.cmd('page'), {
+                    self.window.run_command(mw.cmd('page'), {
                         "action": mw.cmd('show_page'),
                         'action_params': {"title": title},
                         "check_notifications": False
