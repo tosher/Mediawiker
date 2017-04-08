@@ -497,3 +497,6 @@ Support folding/unfolding for:
 
 == Mediawiker 3.3.7 ==
 * Fixed: notifications check while page opening.
+
+== Mediawiker 3.3.8 ==
+* Fixed: incorrect notification command import.

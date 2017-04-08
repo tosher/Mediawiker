@@ -10,7 +10,7 @@ from .mw_colapse import MediawikerColapseCommand
 from .mw_edit_panel import MediawikerEditPanelCommand
 from .mw_enumerate_toc import MediawikerEnumerateTocCommand
 from .mw_favorites import MediawikerFavoritesAddCommand, MediawikerFavoritesOpenCommand
-from .mw_get_notifications import MediawikerNotificationsCommand, MediawikerGetNotificationsCommand
+from .mw_get_notifications import MediawikerNotificationsCommand
 from .mw_open_issue import MediawikerOpenIssueCommand
 from .mw_open_page_in_browser import MediawikerOpenPageInBrowserCommand
 from .mw_page_actions import MediawikerPageCommand
@@ -48,7 +48,6 @@ __all__ = [
     'MediawikerFavoritesAddCommand',
     'MediawikerFavoritesOpenCommand',
     'MediawikerNotificationsCommand',
-    'MediawikerGetNotificationsCommand',
     'MediawikerOpenIssueCommand',
     'MediawikerOpenPageInBrowserCommand',
     'MediawikerPageCommand',
