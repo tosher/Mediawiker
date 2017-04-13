@@ -122,7 +122,7 @@ class MediawikerEvents(sublime_plugin.EventListener):
             # TODO: external links..?
 
     def on_query_completions(self, view, prefix, locations):
-        if mw.props.get_view_setting(view, 'is_here'):
+        if mw.props.get_view_setting(view, 'is_here') and not mw.props.get_setting(view, 'offline_mode'):
             view = sublime.active_window().active_view()
 
             # internal links completions

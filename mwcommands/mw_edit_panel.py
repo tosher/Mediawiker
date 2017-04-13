@@ -18,9 +18,9 @@ class MediawikerEditPanelCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         self.SNIPPET_CHAR = mw.get_setting('snippet_char')
-        self.options = mw.get_setting('panel', {})
+        self.options = [el for el in mw.get_setting('panel', []) if (not el.get('online', False) or el.get('online', False) != mw.get_setting('offline_mode'))]
         if self.options:
-            office_panel_list = ['\t%s' % val['caption'] if val['type'] != 'snippet' else '\t%s %s' % (
+            office_panel_list = ['%s' % val['caption'] if val['type'] != 'snippet' else '%s %s' % (
                 self.SNIPPET_CHAR, val['caption']) for val in self.options]
             self.window.show_quick_panel(office_panel_list, self.on_done)
 

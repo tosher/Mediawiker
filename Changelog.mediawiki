@@ -505,3 +505,7 @@ Support folding/unfolding for:
 * New option {{Property|mediawiker_show_gutters}} - possibility to turn of gutters showing;
 * Fixed: plugin's events run without checking view;
 * Fixed: {{Command|Page preview}} not works on OSX.
+
+== Mediawiker 3.4.0 ==
+* New option {{Property|mediawiker_offline_mode}} - possibility to work offline with files in mediawiki markup. For correct showing of <code>Edit panel</code> in offline mode, please, readd edit panel components if you use customized list;
+* Fixed: opening talk pages in namespaces: <code>User</code>, <code>Mediawiki</code>, <code>Project</code>.

@@ -88,7 +88,16 @@ class MediawikerProperties(object):
         'red_link_icon': {'text': 'Red links mark icon'},
         'debug': {'text': 'Advanced logging mode'},
         'popup_type': {'text': 'Popup type (manual/auto/off)'},
-        'show_gutters': {'text': 'Show gutters'}
+        'show_gutters': {'text': 'Show gutters'},
+        'offline_mode': {'text': 'Offline mode'}
+    }
+
+    props_dependencies = {
+        'popup_type': {
+            'dep_property': 'offline_mode',
+            'dep_value': True,
+            'value': 'off'
+        }
     }
 
     props_autoremove = [
@@ -199,6 +208,24 @@ class MediawikerProperties(object):
             return True
         return False
 
+
+    # props_dependencies = {
+    #     'popup_type': {
+    #         'dep_property': 'offline_mode',
+    #         'dep_value': True,
+    #         'value': 'off'
+    #     }
+    # }
+    def get_dependency_value(self, key):
+        ''' Dependencies between settings - overrides real value '''
+        try:
+            dep_property = self.props_dependencies.get(key, {}).get('dep_property', None)
+            if dep_property is not None and self.get_setting(dep_property) == self.props_dependencies[key]['dep_value']:
+                return self.props_dependencies.get(key, {}).get('value')
+        except:
+            pass
+        return None
+
     def get_setting(self, key, default_value=None):
         '''
         supports:
@@ -206,6 +233,11 @@ class MediawikerProperties(object):
         * key as "option_name"
         '''
         self.reload_settings()
+
+        dep_value = self.get_dependency_value(key)
+        if dep_value is not None:
+            return dep_value
+
         key = self.prop(key)
         return self.settings.get(key, default_value)
 
