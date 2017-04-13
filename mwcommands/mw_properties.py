@@ -87,7 +87,8 @@ class MediawikerProperties(object):
         'popup_image_size': {'text': 'Max image size in preview popups'},
         'red_link_icon': {'text': 'Red links mark icon'},
         'debug': {'text': 'Advanced logging mode'},
-        'popup_type': {'text': 'Popup type (manual/auto/off)'}
+        'popup_type': {'text': 'Popup type (manual/auto/off)'},
+        'show_gutters': {'text': 'Show gutters'}
     }
 
     props_autoremove = [

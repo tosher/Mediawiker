@@ -255,3 +255,10 @@ class MediawikerOpenTalkPageCommand(sublime_plugin.WindowCommand):
                     'action_params': {'title': mw.api.page_attr(page_talk, 'name'), 'new_tab': True}
                 }
             ), 2)
+
+
+class MediawikerPopupCommand(sublime_plugin.WindowCommand):
+
+    def run(self):
+        view = self.window.active_view()
+        MediawikerEvents.on_hover(self, view, view.sel()[0].a, sublime.HOVER_TEXT)

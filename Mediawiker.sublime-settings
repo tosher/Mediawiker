@@ -126,6 +126,7 @@
     "mediawiker_config_icon_unnumbered_list": "•",
     "mediawiker_red_link_icon": "✘",
     "mediawiker_css_html": {},
+    "mediawiker_show_gutters": true,
     "mediawiker_panel":
     [
         {"caption": "Open page", "type": "window_command", "value": "mediawiker_open_page"},

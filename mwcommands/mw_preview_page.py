@@ -76,7 +76,7 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         page_id_old = self.get_page_id()
         page = self.generate_preview(html_header, html, html_footer)
         if self.page_id != page_id_old or mw.props.get_view_setting(self.view, 'autoreload') == 0:
-            webbrowser.open(page)
+            webbrowser.open('file:///%s' % page)
 
     def get_page_id(self):
         if not os.path.exists(self.preview_file):

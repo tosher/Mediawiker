@@ -44,5 +44,6 @@
     { "caption": "Mediawiker: Configurator", "command": "mediawiker_configurator"},
     { "caption": "Mediawiker: Changelog", "command": "mediawiker_changelog"},
     { "caption": "Mediawiker: Open talk page", "command": "mediawiker_open_talk_page" },
-    { "caption": "Mediawiker: Show unsaved changes", "command": "mediawiker_show_diff" }
+    { "caption": "Mediawiker: Show unsaved changes", "command": "mediawiker_show_diff" },
+    { "caption": "Mediawiker: Fire popup", "command": "mediawiker_popup" }
 ]

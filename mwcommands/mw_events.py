@@ -21,28 +21,26 @@ if pythonver >= 3:
         cnt = None
 
         def on_modified(self):
-            
-            self.view.hide_popup()
-            
-            try:
-                ch_cnt = mw.props.get_view_setting(self.view, 'autoreload')
-                if ch_cnt:
-                    if not self.cnt:
-                        self.cnt = self.view.change_count()
+            if mw.props.get_view_setting(self.view, 'is_here'):
+                self.view.hide_popup()
+                try:
+                    ch_cnt = mw.props.get_view_setting(self.view, 'autoreload')
+                    if ch_cnt:
+                        if not self.cnt:
+                            self.cnt = self.view.change_count()
 
-                    cnt_delta = self.view.change_count() - self.cnt
-                    if cnt_delta > ch_cnt:
-                        sublime.status_message('Autoreload: Generating preview..')
-                        sublime.active_window().run_command(mw.cmd('preview'))
-                        self.cnt = None
-                    else:
-                        sublime.status_message('\nAutoreload: change %s of %s..' % (cnt_delta, ch_cnt))
-            except Exception as e:
-                mw.status_message('Preview exception: %s' % e)
+                        cnt_delta = self.view.change_count() - self.cnt
+                        if cnt_delta > ch_cnt:
+                            sublime.status_message('Autoreload: Generating preview..')
+                            sublime.active_window().run_command(mw.cmd('preview'))
+                            self.cnt = None
+                        else:
+                            sublime.status_message('\nAutoreload: change %s of %s..' % (cnt_delta, ch_cnt))
+                except Exception as e:
+                    mw.status_message('Preview exception: %s' % e)
 else:
 
     class MediawikerViewEvents(object):
-
         cnt = None
 
         def on_modified(self):
@@ -88,10 +86,12 @@ class MediawikerEvents(sublime_plugin.EventListener):
             # mw.set_timeout_async(sublime.active_window().run_command(mw.cmd('colapse')), 5)
 
     def on_post_save(self, view):
-        mw.props.set_view_setting(view, 'wiki_instead_editor', False)
+        if mw.props.get_view_setting(view, 'is_here'):
+            mw.props.set_view_setting(view, 'wiki_instead_editor', False)
 
     def on_post_save_async(self, view):
-        mw.props.set_view_setting(view, 'wiki_instead_editor', False)
+        if mw.props.get_view_setting(view, 'is_here'):
+            mw.props.set_view_setting(view, 'wiki_instead_editor', False)
 
     def on_hover(self, view, point, hover_zone):
         # not fires in ST2

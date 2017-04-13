@@ -500,3 +500,8 @@ Support folding/unfolding for:
 
 == Mediawiker 3.3.8 ==
 * Fixed: incorrect notification command import.
+
+== Mediawiker 3.3.9 ==
+* New option {{Property|mediawiker_show_gutters}} - possibility to turn of gutters showing;
+* Fixed: plugin's events run without checking view;
+* Fixed: {{Command|Page preview}} not works on OSX.
