@@ -61,6 +61,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
         self.html.css_rules['ul']['padding-right'] = '2rem'
         self.html.css_rules['ul']['margin-left'] = '0.2rem'
         self.html.css_rules['li']['font-size'] = self.html.get_font_size(base_font_size, 0.1)
+        self.html.css_rules['li']['margin-top'] = '0.2rem'
         self.html.css_rules['h1,h2,h3,h4']['margin'] = '2rem'
         self.html.css_rules['h1,h2,h3,h4']['color'] = 'white'
         self.html.css_rules['.undefined'] = {'padding': '5px', 'color': '#c0c0c0'}
