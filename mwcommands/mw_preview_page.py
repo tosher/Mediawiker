@@ -81,8 +81,12 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
     def get_page_id(self):
         if not os.path.exists(self.preview_file):
             return None
-        with open(self.preview_file, 'r') as tf:
-            first_line = tf.readline()
+        if pythonver >= 3:
+            with open(self.preview_file, 'r', encoding='utf-8') as tf:
+                first_line = tf.readline()
+        else:
+            with open(self.preview_file, 'r') as tf:
+                first_line = tf.readline()
         return first_line.replace('<!--', '').replace('-->', '').replace('\n', '')
 
     def generate_preview(self, header, data, footer):
