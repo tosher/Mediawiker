@@ -355,6 +355,9 @@ class PreAPI(object):
     IMAGE_NAMESPACE = 6
     TEMPLATE_NAMESPACE = 10
     SCRIBUNTO_NAMESPACE = 828
+    USER_NAMESPACE = 2
+    MEDIAWIKI_NAMESPACE = 8
+    PROJECT_NAMESPACE = 4
     SCRIBUNTO_PREFIX = '#invoke'
     NAMESPACE_SPLITTER = u':'
     INTERNAL_LINK_SPLITTER = u'|'
@@ -475,15 +478,23 @@ class PreAPI(object):
 
     def get_page_talk_page(self, page):
         ns = self.page_attr(page, 'namespace')
+        title = self.page_attr(page, 'page_title')
+
         if ns == self.CATEGORY_NAMESPACE:
-            return self.get_page('Category_talk:%s' % self.page_attr(page, 'page_title'))
+            return self.get_page('Category_talk:%s' % title)
         elif ns == self.IMAGE_NAMESPACE:
-            return self.get_page('File_talk:%s' % self.page_attr(page, 'page_title'))
+            return self.get_page('File_talk:%s' % title)
         elif ns == self.TEMPLATE_NAMESPACE:
-            return self.get_page('Template_talk:%s' % self.page_attr(page, 'page_title'))
+            return self.get_page('Template_talk:%s' % title)
         elif ns == self.SCRIBUNTO_NAMESPACE:
-            return self.get_page('Module_talk:%s' % self.page_attr(page, 'page_title'))
-        return self.get_page('Talk:%s' % self.page_attr(page, 'page_title'))
+            return self.get_page('Module_talk:%s' % title)
+        elif ns == self.USER_NAMESPACE:
+            return self.get_page('User_talk:%s' % title)
+        elif ns == self.MEDIAWIKI_NAMESPACE:
+            return self.get_page('Mediawiki_talk:%s' % title)
+        elif ns == self.PROJECT_NAMESPACE:
+            return self.get_page('Project_talk:%s' % title)
+        return self.get_page('Talk:%s' % title)
 
     def get_page_extlinks(self, page):
         return [l for l in page.extlinks()]
@@ -741,7 +752,10 @@ class MediawikerConnectionManager(object):
             for line in formatted_lines:
                 status_message(line)
 
-        connection = self.connect(name=name)
+        try:
+            connection = self.connect(name=name)
+        except Exception as e:
+            self.debug_msgs.append('Connection exception: %s' % e)
 
         self.debug_flush()
 
@@ -768,6 +782,9 @@ class MediawikerConnectionManager(object):
                     requests=self.get_requests_config(name)
                 )
             except requests.exceptions.HTTPError as e:
+                if get_setting('debug'):
+                    self.debug_msgs.append('HTTP response: %s' % e)
+
                 # additional http auth (basic, digest)
                 if e.response.status_code == 401 and site['use_http_auth']:
                     http_auth_header = e.response.headers.get('www-authenticate', '')
@@ -783,6 +800,9 @@ class MediawikerConnectionManager(object):
 
         if connection:
             status_message(' done.')
+            if get_setting('debug'):
+                self.debug_msgs.append('Connection: %s' % connection.connection)
+
             status_message('Login in with authorization type %s.. ' % site['authorization_type'], new_line=False)
             success_message = ' done'
             # Cookie auth
