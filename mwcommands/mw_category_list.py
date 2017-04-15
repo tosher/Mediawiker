@@ -17,6 +17,9 @@ class MediawikerCategoryTreeCommand(sublime_plugin.WindowCommand):
     ''' alias to Category list command '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.window.run_command(mw.cmd('page'), {"action": mw.cmd('category_list')})
 
 
@@ -29,6 +32,9 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
     category_prefix = ''  # "Category" namespace name as returned language..
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         if self.category_path:
             category_root = mw.get_category(self.get_category_current())[1]
         else:

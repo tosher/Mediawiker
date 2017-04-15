@@ -17,12 +17,18 @@ class MediawikerShowPageLanglinksCommand(sublime_plugin.WindowCommand):
     ''' alias to Get page command '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.window.run_command(mw.cmd('page'), {"action": mw.cmd('page_langlinks')})
 
 
 class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         selected_text = self.view.substr(self.view.sel()[0]).strip()
         title = selected_text if selected_text else mw.get_title()
         self.mw_get_page_langlinks(title)

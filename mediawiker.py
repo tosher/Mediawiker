@@ -31,12 +31,18 @@ class MediawikerOpenPageCommand(sublime_plugin.WindowCommand):
     ''' alias to Get page command '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.window.run_command(mw.cmd('page'), {"action": mw.cmd('show_page')})
 
 
 class MediawikerReopenPageCommand(sublime_plugin.WindowCommand):
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         title = mw.get_title()
         self.window.run_command(mw.cmd('page'), {
             'action': mw.cmd('show_page'),
@@ -48,12 +54,17 @@ class MediawikerPostPageCommand(sublime_plugin.WindowCommand):
     ''' alias to Publish page command '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.window.run_command(mw.cmd('page'), {"action": mw.cmd('publish_page')})
 
 
 class MediawikerShowPageCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, title=None, new_tab=None, site_active=None):
+        if mw.get_setting('offline_mode'):
+            return
 
         self.new_tab = new_tab if new_tab is not None else mw.get_setting('newtab_ongetpage')
 
@@ -128,6 +139,9 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
     current_text = ''
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         is_process_post = True
         is_skip_summary = mw.get_setting('skip_summary', False)
         self.title = mw.get_title()
@@ -193,6 +207,9 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 class MediawikerMovePageCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.title = mw.get_title()
         if self.title:
             self.page = mw.api.get_page(self.title)
@@ -242,6 +259,9 @@ class MediawikerOpenTalkPageCommand(sublime_plugin.WindowCommand):
     ''' Open talk page for current page '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         page = mw.api.get_page(mw.get_title())
         page_talk = mw.api.get_page_talk_page(page)
 

@@ -21,6 +21,9 @@ class MediawikerNotificationsCommand(sublime_plugin.WindowCommand):
     '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         ignore_read = not mw.get_setting('notifications_show_all')
         read_sign = mw.get_setting('notifications_read_sign')
         self.msgs = mw.api.get_notifications_list(ignore_read=ignore_read)

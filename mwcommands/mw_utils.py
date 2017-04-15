@@ -9,10 +9,8 @@ import urllib
 import traceback
 
 try:
-    # Python 2.7+
     from collections import OrderedDict
 except ImportError:
-    # Python 2.6
     from ordereddict import OrderedDict
 
 import sublime
@@ -83,9 +81,10 @@ def plugin_loaded():
     setattr(mw, 'del_setting', props.del_setting)
     setattr(mw, 'get_default_setting', props.get_default_setting)
 
-    conman = MediawikerConnectionManager()
-    setattr(mw, 'conman', conman)
-    setattr(mw, 'api', PreAPI(conman=conman))
+    if not mw.props.get_setting('offline_mode'):
+        conman = MediawikerConnectionManager()
+        setattr(mw, 'conman', conman)
+        setattr(mw, 'api', PreAPI(conman=conman))
 
 
 def set_syntax(page_name=None, page_namespace=None):
@@ -374,6 +373,8 @@ class PreAPI(object):
             status_message('Anonymous connection detected, forcing new connection.. ')
             sitecon = self.conman.get_connect(force=True)
 
+        if not sitecon and get_setting('offline_mode'):
+            raise ConnectionFailed("Connection not available in offline mode")
         if not sitecon:
             raise ConnectionFailed("No valid connection available")
         return sitecon
@@ -730,6 +731,10 @@ class MediawikerConnectionManager(object):
 
     def get_connect(self, name=None, force=False):
         ''' setup new connection (call connect()) or returns exists '''
+
+        if get_setting('offline_mode'):
+            return None
+
         self.debug_msgs.append('Get connection from connection manager.')
         try:
             site = self.get_site(name)

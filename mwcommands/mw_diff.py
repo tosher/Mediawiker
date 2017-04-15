@@ -19,6 +19,9 @@ class MediawikerShowDiffCommand(sublime_plugin.WindowCommand):
     ''' alias to MediawikerPageDiffVsServerCommand '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.window.run_command(mw.cmd('page'), {"action": mw.cmd('page_diff_vs_server')})
 
 
@@ -31,6 +34,9 @@ class MediawikerPageDiffVsServerCommand(sublime_plugin.TextCommand):
     '''
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         title = mw.get_title()
         view_text = self.view.substr(sublime.Region(0, self.view.size()))
 

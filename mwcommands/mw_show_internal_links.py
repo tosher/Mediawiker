@@ -21,6 +21,9 @@ class MediawikerShowInternalLinksCommand(sublime_plugin.TextCommand):
     actions = ['Find', 'Open page in editor', 'Open page in browser']
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.item = None
 
         red_link_icon = mw.get_setting('red_link_icon')

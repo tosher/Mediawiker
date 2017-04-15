@@ -18,12 +18,18 @@ class MediawikerSearchStringCommand(sublime_plugin.WindowCommand):
     ''' alias to Search string list command '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.window.run_command(mw.cmd('page'), {"action": mw.cmd('search_string_list')})
 
 
 class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         search_pre = ''
         selection = self.view.sel()
         search_pre = self.view.substr(selection[0]).strip() if selection and selection[0] else ''

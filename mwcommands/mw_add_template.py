@@ -18,6 +18,9 @@ class MediawikerInsertTemplateCommand(sublime_plugin.WindowCommand):
     ''' alias to Add template command '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.window.run_command(mw.cmd('page'), {"action": mw.cmd('add_template')})
 
 
@@ -26,6 +29,9 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
     templates_names = []
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         sublime.active_window().show_input_panel('Wiki template prefix:', '', self.show_list, None, None)
 
     def show_list(self, tpl_prefix):

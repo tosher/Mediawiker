@@ -16,6 +16,8 @@ else:
 class MediawikerShowRedLinksCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
 
         page = mw.api.get_page(mw.get_title())
         mw.process_red_links(self.view, page)

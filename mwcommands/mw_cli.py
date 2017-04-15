@@ -16,6 +16,9 @@ else:
 class MediawikerCliCommand(sublime_plugin.WindowCommand):
 
     def run(self, url):
+        if mw.get_setting('offline_mode'):
+            return
+
         if url:
             url = mw.strunquote(url)
             sublime.set_timeout(lambda: self.window.run_command(mw.cmd('page'), {

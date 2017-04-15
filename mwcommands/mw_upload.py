@@ -18,6 +18,9 @@ class MediawikerFileUploadCommand(sublime_plugin.WindowCommand):
     ''' alias to Add template command '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.window.run_command(mw.cmd('page'), {"action": mw.cmd('upload')})
 
 
@@ -28,6 +31,9 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
     file_descr = None
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         sublime.active_window().show_input_panel('File path:', '', self.get_destfilename, None, None)
 
     def get_destfilename(self, file_path):

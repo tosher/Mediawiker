@@ -20,6 +20,9 @@ class MediawikerShowExternalLinksCommand(sublime_plugin.TextCommand):
     actions = ['Goto external link', 'Open link in browser']
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.item = None
         page = mw.api.get_page(mw.get_title())
         linksgen = mw.api.get_page_extlinks(page)

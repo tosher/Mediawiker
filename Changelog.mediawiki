@@ -507,5 +507,6 @@ Support folding/unfolding for:
 * Fixed: {{Command|Page preview}} not works on OSX.
 
 == Mediawiker 3.4.0 ==
-* New option {{Property|mediawiker_offline_mode}} - possibility to work offline with files in mediawiki markup. For correct showing of <code>Edit panel</code> in offline mode, please, readd edit panel components if you use customized list;
+* New option {{Property|mediawiker_offline_mode}} - possibility to work offline with files in mediawiki markup. For correct showing of <code>Edit panel</code> in offline mode, please, readd edit panel components if you use customized list (<code>false</code>/<code>true</code>, default: <code>false</code>);
 * Fixed: opening talk pages in namespaces: <code>User</code>, <code>Mediawiki</code>, <code>Project</code>.
+* Fixed: {{Command|Page preview}} not works on OSX (lost in 3.3.9).

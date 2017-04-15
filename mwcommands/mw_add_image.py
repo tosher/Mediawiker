@@ -17,6 +17,9 @@ class MediawikerInsertImageCommand(sublime_plugin.WindowCommand):
     ''' alias to Add image command '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.window.run_command(mw.cmd('page'), {"action": mw.cmd('add_image')})
 
 
@@ -25,6 +28,9 @@ class MediawikerAddImageCommand(sublime_plugin.TextCommand):
     images_names = []
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.image_prefix_min_lenght = mw.get_setting('image_prefix_min_length', 4)
         sublime.active_window().show_input_panel('Wiki image prefix (min %s):' % self.image_prefix_min_lenght, '', self.show_list, None, None)
 

@@ -16,6 +16,9 @@ else:
 
 class MediawikerOpenPageInBrowserCommand(sublime_plugin.WindowCommand):
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         url = mw.get_page_url()
         if url:
             webbrowser.open(url)

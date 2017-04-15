@@ -17,6 +17,9 @@ class MediawikerSetCategoryCommand(sublime_plugin.WindowCommand):
     ''' alias to Add category command '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.window.run_command(mw.cmd('page'), {"action": mw.cmd('add_category')})
 
 
@@ -29,6 +32,9 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
     # TODO: back in category tree..
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.category_root = mw.get_category(mw.get_setting('category_root'))[1]
         sublime.active_window().show_input_panel('Category:', self.category_root, self.get_category_menu, None, None)
 

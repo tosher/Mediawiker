@@ -21,6 +21,9 @@ class MediawikerPreviewCommand(sublime_plugin.WindowCommand):
     ''' alias to Preview page command '''
 
     def run(self):
+        if mw.get_setting('offline_mode'):
+            return
+
         self.window.run_command(mw.cmd('page'), {"action": mw.cmd('preview_page')})
 
 
@@ -30,6 +33,9 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
     '''
 
     def run(self, edit):
+        if mw.get_setting('offline_mode'):
+            return
+
         text = self.view.substr(sublime.Region(0, self.view.size()))
         # site = mw.get_setting('site').get(mw.get_view_site())
         site = mw.conman.get_site()
