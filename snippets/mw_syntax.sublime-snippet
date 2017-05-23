@@ -1,0 +1,11 @@
+<snippet>
+	<content><![CDATA[
+<syntaxhighlight lang="text" highlight="" start="1" line>
+${1:$TM_SELECTED_TEXT}
+</syntaxhighlight>
+]]></content>
+<tabTrigger>wss</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+<scope>text.html.mediawiki</scope>
+<description>Mediawiker: Code</description>
+</snippet>
