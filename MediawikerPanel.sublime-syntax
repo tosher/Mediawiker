@@ -1,0 +1,236 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: MediawikerPanel
+scope: text.html.mediawiki
+hidden: true
+
+contexts:
+  main:
+    - include: inline
+
+  inline:
+    - include: link
+    - include: style
+
+  link:
+    # files, images
+    - match: |-
+        (?x:(\[\[)                    (?# opening brackets)
+        ( [ ]*(([Ff]ile|[Ii]mage)(:)) (?# spaces, image, colon)
+        ([^\[\]|]+)                   (?# anything)
+        ))
+      captures:
+        1: meta.tag.inline.any.mediawiki
+        4: constant.other.namespace.image.mediawiki
+        5: punctuation.definition.tag.colon.mediawiki
+        6: constant.other.wiki-link.image.mediawiki
+      push:
+        - meta_scope: meta.image.wiki.mediawiki
+        - match: |-
+            (?x)
+            (\|)[ ]*
+            ( (thumbnail|thumb|frameless|frame|border)
+             |(right|left|center|none)
+             |(baseline|sub|super|top|text-top|middle|bottom|text-bottom)
+             |([0-9]+)?(x?)([0-9]+)?(px)
+             |(link=)([^|]+)?
+             |(alt=)([^|]+)?
+             |(class=)([^|]+)?
+             |([^|\]]+)
+            )[ ]*
+          captures:
+            1: punctuation.definition.tag.pipe.mediawiki
+            2: keyword.control.image.formatting.mediawiki
+            3: keyword.control.image.frame.mediawiki
+            4: keyword.control.image.alignment.mediawiki
+            5: keyword.control.image.alignment-vertical.mediawiki
+            6: constant.numeric.image.width.mediawiki
+            7: punctuation.other.unit.image.size.mediawiki
+            8: constant.numeric.image.height.mediawiki
+            9: keyword.control.image.size.mediawiki
+            10: keyword.control.image.link.mediawiki
+            11: constant.other.wiki-link.mediawiki
+            12: keyword.control.image.alt.mediawiki
+            13: constant.other.image.alt.mediawiki
+            14: keyword.control.image.css-class.mediawiki
+            15: constant.other.image.css-class.mediawiki
+            16: string.other.image.caption.mediawiki
+        - match: \|
+          scope: punctuation.definition.tag.pipe.mediawiki
+        - include: style_in_link
+        - match: |-
+            (?x:
+            ((\|)[ ]*( [^\[\]|]+ )[ ]*)?  (?# pipe, spaces, anything, spaces)
+            (\]\])                        (?# closing brackets)
+            )
+          captures:
+            2: punctuation.definition.tag.pipe.mediawiki
+            3: string.other.title.link.wiki-link.mediawiki
+            4: meta.tag.inline.any.mediawiki
+          pop: true
+    - match: |-
+        (?x:
+        ({{)                        (?# opening brackets)
+        ([Rr]edirect|subst:.*)      (?# redirect?)
+        [ ]*                        (?# spaces)
+        (\\
+        |)                          (?# pipe)
+        )
+      captures:
+        1: meta.tag.inline.redirect.mediawiki
+        2: keyword.operator.wiki-link.redirect.mediawiki
+        3: constant.other.pipe.mediawiki
+      push:
+        - meta_scope: meta.link.wiki.redirect.mediawiki
+        - match: |-
+            (?x:
+            (([\\|}]+)(\\|)([\\|}]+))?    (?#  from | to)
+            ([^}]*)                       (?# anything)
+            (}})                          (?# closing brackets)
+            )
+          captures:
+            2: meta.tag.inline.any.mediawiki
+            3: markup.underline.link.internal.mediawiki
+            4: constant.other.pipe.mediawiki
+            6: meta.tag.inline.redirect.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: |-
+        (?x:
+        (\[\[)                      (?# opening brackets)
+        (:)?                        (?# colon to suppress image or category?)
+        ((\s+):[^\[\]]*(?=\]\]))?   (?# a colon after spaces is invalid)
+        \s*                         (?# spaces)
+        ( (([^\[\]|]+)(:))?         (?# namespace)
+        ([^\[\]|]+)\s*              (?# link name)
+        )?
+        )
+      captures:
+        1: meta.tag.inline.link.mediawiki
+        2: keyword.operator.suppress-image-or-category.link.internal.mediawiki
+        4: invalid.illegal.whitespace.mediawiki
+        7: markup.underline.link.internal.namespace.mediawiki
+        8: punctuation.definition.tag.colon.mediawiki
+        9: markup.underline.link.internal.mediawiki
+      push:
+        - meta_scope: meta.tag.link.wiki.mediawiki
+        - match: (\]\])
+          captures:
+            1: meta.tag.inline.link.mediawiki
+          pop: true
+        - match: \|
+          scope: punctuation.definition.tag.pipe.mediawiki
+          push:
+            - meta_content_scope: string.other.title.link.internal.mediawiki
+            - match: (?=\]\])
+              pop: true
+            - include: style_in_link
+
+    - match: '(\[)((\w[\w\d+-\.]+://|mailto:)[-:@\w.~%+/?=&#]+)\s*(?=[^\]]*\])'
+      # comment: external link like [http://example.com/example.html Example]
+      captures:
+        1: meta.tag.inline.link.mediawiki
+        2: markup.underline.link.external.mediawiki
+      push:
+        - meta_scope: meta.link.inline.external.mediawiki
+        - meta_content_scope: string.other.title.link.external.mediawiki
+        - match: '(\])'
+          captures:
+            1: meta.tag.inline.link.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: '(\w[\w\d+-\.]+://|mailto:)[-:@\w.~%+/?=&#]+'
+      scope: markup.underline.link.external.mediawiki
+
+  style:
+    - match: (''')
+      captures:
+        1: markup.other.special.mediawiki
+      push:
+        - meta_content_scope: markup.bold.html.mediawiki
+        - match: (''')
+          captures:
+            1: markup.other.special.mediawiki
+          pop: true
+        - include: inline
+    - match: ('')
+      captures:
+        1: markup.other.special.mediawiki
+      push:
+        - meta_content_scope: markup.italic.html.mediawiki
+        - match: "(''(?!'[^']))"
+          captures:
+            1: markup.other.special.mediawiki
+          pop: true
+        - include: inline
+    - match: (?i:(<(s|strike)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.other.strikethrough.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: inline
+    - match: (?i:(<(tt|code|kbd)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.raw.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: inline
+
+  style_in_link:
+    - match: (''')
+      captures:
+        1: markup.other.special.mediawiki
+      push:
+        - meta_content_scope: markup.bold.mediawiki
+        - match: (''')
+          captures:
+            1: markup.other.special.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: ('')
+      captures:
+        1: markup.other.special.mediawiki
+      push:
+        - meta_content_scope: markup.italic.mediawiki
+        - match: ('')
+          captures:
+            1: markup.other.special.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: (?i:(<(s|strike)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.other.strikethrough.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: style_in_link
+    - match: (?i:(<(tt|code|kbd)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.raw.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: style_in_link

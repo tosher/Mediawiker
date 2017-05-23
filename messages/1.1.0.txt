@@ -1,3 +1,0 @@
-Mediawiker 1.1.0 Changelog:
-
- - Function 'Open in browser'

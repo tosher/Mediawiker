@@ -1,6 +1,0 @@
-Mediawiker 2.3.5 Changelog:
-
-* **mediawiker_cli_command** for possibility to create protocol handler like **mediawiker://**. Check [wiki](https://github.com/tosher/Mediawiker/wiki/Mediawiker%20protocol%20handler) for instructions.
-* Small changes on syntax highlighting: highlighting in templates value blocks, bold and italic scopes was backed up to original, correct scopes.
-* Improved for mediawiki syntax color schemes was added: Eiffel (Mediawiki), Twilight (Mediawiki): bold as bold, italic as italic, different background for templates value blocks. 
-* Shortuts under the linux commented by default, only **Edit Panel** enabled. All shortcuts moved to Ctrl+Shift+Fn scheme.

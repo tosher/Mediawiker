@@ -4,7 +4,7 @@
 
 ## Main features
 * [MWClient](https://github.com/mwclient/mwclient) library based.
-* Syntax highlighting - based on [Textmate Mediawiki bundle](https://github.com/textmate/mediawiki.tmbundle).
+* Syntax highlighting - improved version of the [Textmate Mediawiki bundle](https://github.com/textmate/mediawiki.tmbundle).
 * Editor - create new pages, edit existing and post it to wiki.
 * Completions - auto completions for internal wiki links
 * History - list of edited pages
@@ -17,17 +17,40 @@
 * Snippets - basic wiki marking tags - bold, italic, headings, etc.
 * Edit panel - all commands and snippets available through one panel. 
 * Shortcuts - possibility to create plugin specific shortcuts to all commands and snippets to create word-like editor.
-* Connectivity - http/https, direct/proxy connection with basic/digest web-server authorization.
+* Connectivity - http/https, direct/proxy connection with basic/digest web-server authorization. Types of authorization: 
+    - Login/Password;
+    - OAuth;
+    - Browser's cookie based - Firefox or Chrome.
 * Connection manager - add new wiki sites, and switch between them.
+* Page preview - possibility to preview page before posting with some preview customization options.
+* Text folding - folding/unfolding page blocks by headers, tags, templates, html comments.
+* Notifications - show [notifications](https://www.mediawiki.org/wiki/Notifications) as menu.
+* Context opening - possibility to open included page, template, function by inline context.
+* Configurator - visual configuration of important settings.
 
 ![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/Mediawiker_Dark.png)
 *Screenshot using the Mediawiker_Dark color scheme*
+
+## External dependencies (with modifications or not)
+* [Mwclient](https://github.com/mwclient/mwclient) - the Corrrre!
+* [Browsercookie](https://bitbucket.org/richardpenman/browsercookie), [Browser_cookie3](https://github.com/borisbabic/browser_cookie3)
+    - [Keyring](https://pypi.python.org/pypi/keyring)
+    - [Pbkdf2](https://pypi.python.org/pypi/pbkdf2)
+    - [Pyaes](https://pypi.python.org/pypi/pyaes)
+
+### Dependencies, supported by Package control
+* [Requests](https://github.com/packagecontrol/requests)
+* [Requests-oauthlib](https://github.com/packagecontrol/requests-oauthlib)
+* [OAuthlib](https://github.com/packagecontrol/oauthlib)
+* [python-jinja2](https://bitbucket.org/teddy_beer_maniac/sublime-text-dependency-jinja2)
+* [markupsafe](https://bitbucket.org/teddy_beer_maniac/sublime-text-dependency-markupsafe)
+* [python-pywin32](https://github.com/randy3k/sublime-pywin32)
 
 ## Install
 
 ### Package Control
 
-    Package Control 3.0 now required for work on Linux.
+    Package Control 3.0 now required for work.
 
 The easiest way to install this is with [Package Control](http://wbond.net/sublime\_packages/package\_control).
 
@@ -59,6 +82,11 @@ Download this repo using the "ZIP" button above, unzip and place the files in "/
  * If user-name is empty, then authorization will not be used.
  * If user-name is not empty, but user-password is empty, you will be prompted for password on action.
 * All settings are available under the Main menu / Preferences / Package Settings / Mediawiker.
+
+### Configurator
+GUI configurator for important settings.
+
+![Mediawiker configurator](https://github.com/tosher/Mediawiker/wiki/Mediawiker_Configurator.png)
 
 ### Commands
 * **Edit panel** with all commands and snippets in ordered list (can be customized in the settings).

@@ -10,7 +10,29 @@
                 [
                     {"command": "mediawiker_edit_panel", "caption": "Edit panel"},
                     {"command": "mediawiker_open_page", "caption": "Open page"},
-                    {"command": "mediawiker_post_page", "caption": "Post page"}
+                    {"command": "mediawiker_post_page", "caption": "Post page"},
+                    {"command": "mediawiker_configurator", "caption": "Configurator"},
+                    {
+                        "id": "text_folding",
+                        "mnemonic": "f",
+                        "caption": "Text folding",
+                        "children":
+                        [
+                            { "caption": "Mediawiker: Fold", "command": "mediawiker_colapse", "args": {"type": "fold"}},
+                            { "caption": "Mediawiker: Fold Level 2", "command": "mediawiker_colapse", "args": {"type": "fold_2"}},
+                            { "caption": "Mediawiker: Fold Level 3", "command": "mediawiker_colapse", "args": {"type": "fold_3"}},
+                            { "caption": "Mediawiker: Fold Level 4", "command": "mediawiker_colapse", "args": {"type": "fold_4"}},
+                            { "caption": "Mediawiker: Fold Level 5", "command": "mediawiker_colapse", "args": {"type": "fold_5"}},
+                            { "caption": "Mediawiker: Fold text blocks", "command": "mediawiker_colapse", "args": {"type": "foldwiki"}},
+                            { "caption": "Mediawiker: Unfold", "command": "mediawiker_colapse", "args": {"type": "unfold"}},
+                            { "caption": "Mediawiker: Unfold Level 2", "command": "mediawiker_colapse", "args": {"type": "unfold_2"}},
+                            { "caption": "Mediawiker: Unfold Level 3", "command": "mediawiker_colapse", "args": {"type": "unfold_3"}},
+                            { "caption": "Mediawiker: Unfold Level 4", "command": "mediawiker_colapse", "args": {"type": "unfold_4"}},
+                            { "caption": "Mediawiker: Unfold Level 5", "command": "mediawiker_colapse", "args": {"type": "unfold_5"}},
+                            { "caption": "Mediawiker: Unfold text blocks", "command": "mediawiker_colapse", "args": {"type": "unfoldwiki"}}
+                        ]
+                    }
+
                 ]
             }
         ]
@@ -29,6 +51,15 @@
                         "caption": "Mediawiker",
                         "children":
                         [
+                            {
+                                "command": "mediawiker_changelog",
+                                "caption": "Changelog"
+                            },
+                            {
+                                "command": "mediawiker_changelog",
+                                "args": {"version": "browser"},
+                                "caption": "Changelog in browser"
+                            },
                             {
                                 "command": "open_file",
                                 "args": {"file": "${packages}/Mediawiker/README.md"},

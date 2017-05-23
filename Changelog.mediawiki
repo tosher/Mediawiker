@@ -1,0 +1,512 @@
+== Mediawiker 1.1.0 ==
+* New command: {{Command|Open in browser}}.
+
+== Mediawiker 1.2.0 ==
+* Possibility to use files as wiki pages: [https://github.com/tosher/Mediawiker/pull/3 pull-request].
+
+== Mediawiker 1.3.0 ==
+* New command: {{Command|Add category}}.
+
+== Mediawiker 1.4.0 ==
+* New command: {{Command|Enumerate TOC}}.
+
+== Mediawiker 1.5.0 ==
+* Mark changes as minor.
+
+== Mediawiker 1.6.0 ==
+* Snippets:
+** {{Snippet|Heading level 2}}
+** {{Snippet|Heading level 3}}
+** {{Snippet|Heading level 4}}
+** {{Snippet|Internal link}}
+** {{Snippet|Numbered list}}
+** {{Snippet|Unnumbered list}}
+** {{Snippet|External link}}
+** {{Snippet|Source tag}}
+* Some changes for future st3 compatibility.
+
+== Mediawiker 1.7.0 ==
+* Shortcut for {{Command|Enumerate TOC}} was removed;
+* Shortcut for Mediawiker Command Palette was added;
+* New command: {{Command|CSV to wiki table}} for wiki tables generation from selected csv-text. Check settings for table properties.
+
+== Mediawiker 1.8.0 ==
+* New command: {{Command|Reopen page}};
+* Sublime Text3 compatibility changes.
+
+== Mediawiker 2.0.0 ==
+* Support for Sublime Text 3;
+* {{Command|Edit panel}} is used instead of sub-Context menu for easy using with keyboard. Also {{Command|Edit panel}} can be called with <kbd>Alt-F1</kbd> shortcut;
+* Some shortcuts was changed or removed:
+** <kbd>Alt-F10</kbd> instead of <kbd>Alt-F1</kbd> for {{Command|Pages history}} command (select from history of posted pages);
+** Shortcut for {{Command|Set category}} command was removed.
+* Some of the commands was changed in this version for easy using in configuration. Please, recreate your key bindings configuration if you changed the original values;
+* Possibility to connect to wiki sites with HTTPS protocol was added as experimental option. Add {{Property|https}} parameter with <code>true</code> value to site options for using it.
+
+== Mediawiker 2.1.0 ==
+* New options:
+** New command: {{Command|Insert image}} from wiki list (by predefined prefix - minimal prefix length can be changed in configuration: {{Property|mediawiker_image_prefix_min_length}});
+** New command: {{Command|Insert Template}} from wiki list;
+** New command: {{Command|Search}} - results will be shown in new tab in markdown format, result count limited by {{Property|mediawiker_search_results_count}}option in configuration;
+** New command: {{Command|Category tree}};
+* Proxy connection - use {{Property|proxy_host}} parameter: <code>"proxy_host": "ip.address:port"</code> in site configuration.
+
+== Mediawiker 2.2.0 ==
+* Command {{Command|Wiki table to Simple}} was rewritten.
+
+== Mediawiker 2.3.0 ==
+* Mediawiker sub-menu was moved from "File" to "Tools" menu;
+* Context menu was removed;
+* {{Command|Set category}} command was changed - possibility to change root category on request, possibility to move by category tree to sub-categories.
+
+== Mediawiker 2.3.1 ==
+* Password input hiding ({{Property|mediawiker_password_input_hide}} option in settings, default: <code>false</code>). When turned on (<code>true</code>) password characters will be replaced with <code>*</code> in input panel.
+
+== Mediawiker 2.3.2 ==
+* Unicode symbol <code>•</code> as default password character (in hidden mode);
+* Password and snippets characters in configuration for easy customizing: {{Property|mediawiker_password_char}}, {{Property|mediawiker_snippet_char}}.
+
+== Mediawiker 2.3.3 ==
+* HTTP Basic, Digest Authorization support (experimental);
+* Snippets: {{Snippet|Strike}}, {{Snippet|Pre}}.
+
+== Mediawiker 2.3.4 ==
+* SSL and HTTPS under linux (Thanx to Will Bond's solution from SFTP plugin);
+* <code>.no-sublime-package</code> was added.
+
+== Mediawiker 2.3.5 ==
+* New command: {{Command|mediawiker_cli_command}} for possibility to create protocol handler like <code>mediawiker://</code>. Check [https://github.com/tosher/Mediawiker/wiki/Mediawiker%20protocol%20handler wiki] for instructions;
+* Small changes in syntax highlighting: highlighting in templates value blocks, bold and italic scopes was backed up to original, correct scopes;
+* Improved for mediawiki syntax color schemes was added: Eiffel (Mediawiki), Twilight (Mediawiki): bold as bold, italic as italic, different background for templates value blocks;
+* Shortuts under the linux commented by default, only {{Command|Edit Panel}} enabled. All shortcuts moved to <kbd>Ctrl+Shift+Fn</kbd> scheme.
+
+== Mediawiker 2.3.6 ==
+New commands for links management for opened page:
+* {{Command|Show internal links}}
+* {{Command|Show external links}} - external wiki links like <code>[link..]</code>.
+
+== Mediawiker 2.3.7 ==
+* Scope <code>text.html.mediawiki</code> for snippets.
+
+== Mediawiker 2.3.8 ==
+* New command: {{Command|Favorite pages}}, {{Command|Add to favorites}}.
+
+== Mediawiker 2.3.9 ==
+* Mediawiker specific shortcuts:
+** <kbd>ctrl+b</kbd> - bold;
+** <kbd>ctrl+i</kbd> - italic;
+** <kbd>ctrl+alt+(2, 3, 4)</kbd> - heading of 2, 3 and 4 levels;
+** <kbd>f5</kbd> - reopen page (refresh);
+** <kbd>ctrl+s</kbd> - post page (optional, check new option {{Property|mediawiker_wiki_instead_editor}}.
+* Possibility to create new shortcuts in mediawiker context ({{Property|mediawiker_is_here}}) - for examples, check sublime-keymap files.
+
+== Mediawiker 2.4.0 ==
+* {{Command|Add/edit wiki site}} setup wizard;
+* Mediawiker environment shortcuts fix;
+* {{Snippet|kbd}} tag snippet (mw_kbd, <kbd>Ctrl+Alt+K</kbd>).
+
+== Mediawiker 2.4.1 ==
+* Auto completions for internal links;
+** Configuration option {{Property|mediawiker_search_namespaces}} is used to define namespaces for search pages (default: <code>0</code>). Example: <code>"0,500"</code>;
+** Configuration option {{Property|mediawiker_page_prefix_min_length}} defines minimal page prefix length for auto complete.
+
+== Mediawiker 2.4.2 ==
+* Fixed lost command in command palette: {{Command|Open page in browser}}.
+
+== Mediawiker 2.4.3 ==
+* Show headings in Symbol list by <kbd>Ctrl+R</kbd> (https://github.com/tosher/Mediawiker/issues/28).
+
+== Mediawiker 2.4.4 ==
+* Custom ssl loader was removed. Package control 3.0 now required for work on linux.
+
+== Mediawiker 2.4.5 ==
+* Password hiding in setup wizard.
+
+== Mediawiker 2.4.6 ==
+* Option {{Property|mediawiker_skip_summary}} to skip page summary on posting (default: <code>false</code>).
+
+== Mediawiker 2.5.0 ==
+* Multi-site support - own wiki site per Sublime text's view (tab). Now, {{Property|mediawiker_site_active}} setting is used as default site for new views. But, on opening a page from existing view it's own settings will be inherited;
+* New command to show other languages versions of the current page: {{Command|Show language links}}. On opening page with selected language, active site will be automatically switched to the respective language version site. For example, from english page on <code>en.wikipedia.org</code> we want to open italian version of this page - active site will be switched to <code>it.wikipedia.org</code> for italian version view.
+
+{{Note|This version supports the possibility to switch between the language versions only for the sites using domain name scheme like <code>*lang_prefix*.site.com</code>, e.g. <code>en.wikipedia.org</code>. Other schemes can be added in future.}}
+
+{{Note|Selected language version site settings must be in preferences for work with it's pages.}}
+
+== Mediawiker 2.5.1 ==
+* With selected text, {{Command|Show language links}} tries to show language links for it;
+* Selected language link can be opened as page or it's name can be used as replacement for currently selected text (first region only in multiselect mode).
+
+== Mediawiker 2.5.2 ==
+* <code>Scratch</code> property for opened/reopened/published page.
+
+== Mediawiker 2.5.3 ==
+* Syntax highlighting for {{Tag|source}} tag;
+* {{Tag|uml}} tag highlighting.
+
+== Mediawiker 2.5.4 ==
+* Showing source of the read only pages was fixed.
+
+== Mediawiker 2.5.5 ==
+* <kbd>Ctrl+s</kbd> saves the file when the opened page has a link to a file on disk.
+
+== Mediawiker 2.5.6 ==
+* New improved <code>MediawikiNG.tmLanguage</code> is used by default and defined in settings with {{Property|mediawiker_syntax}} option. Old version is available too;
+* Updated <code>Mediawiker_Dark.tmTheme</code> and new <code>Mediawiker_Light.tmTheme</code> color schemes with improved highlighting.
+
+== Mediawiker 2.5.7 ==
+* Comparing page revision with server on post. Can be switched off by {{Property|mediawiker_validate_revision_on_post}} option in settings.
+
+== Mediawiker 3.0.0 ==
+* '''MWClient''' library was updated to version [https://github.com/mwclient/mwclient 0.8.0];
+* Autocompletion optimizations.
+
+== Mediawiker 3.0.1 ==
+* New command: {{Command|Show links to page}} - pages with backlinks and pages transcludes current.
+
+== Mediawiker 3.0.2 ==
+* Site option {{Property|is_ssl_cert_verify}} for possibility to switch SSL certificate validation on site (for self-signed certificates on corporate wikies). Default value: <code>true</code>;
+* Caching site connection.
+
+== Mediawiker 3.0.3 ==
+* Proxy connection fix (support in '''mwclient''' library);
+* Lists auto-continuation by <kbd>Enter</kbd> key.
+
+== Mediawiker 3.0.4 ==
+* Configurable markdown syntax for search results page: {{Property|mediawiker_search_syntax}} option in the settings. Default value: <code>"Packages/Markdown/Markdown.tmLanguage"</code>;
+* Small changes in search results page: search words highlighting, etc.
+
+== Mediawiker 3.0.5 ==
+* New experimental command: {{Command|Open inline}} - context menu item for opening pages under cursor;
+* Automatic activation of Lua language syntax for Scribunto module pages (thnx. to [https://github.com/Adadov @Adadov] for idea and [https://github.com/tosher/Mediawiker/pull/59 pull-request]).
+
+== Mediawiker 3.0.6 ==
+* Fix: Language independent syntax setup for opened page.
+
+== Mediawiker 3.0.7 ==
+* {{Snippet|h5}} headings snippet;
+* List ends improvements;
+* Headings conversion improvements.
+
+== Mediawiker 3.0.8 ==
+* New command: <code>Page preview</code>.
+
+== Mediawiker 3.0.9 ==
+
+=== Page preview ===
+* Option {{Property|mediawiki_preview_lang}} (default: <code>en</code>) - language value, used in preview;
+* Option {{Property|mediawiki_preview_file}} (default: <code>Wiki_page_preview_</code>):
+** If defined as prefix (default) - preview will be generated as temporary file - new on each try;
+** If defined as filename (like <code>Wiki_page_preview.html</code>) - html preview-file will be generated in <code>User</code> folder, opened in new tab and first time in browser. But if preview-tab is already exists - html file will be regenerated only, without opening in browser - for possibility to just use '''Reload''' in browser or some auto-reloading plugins.
+
+=== Open inline ===
+As command or from Context menu.
+* Selected text opening as page;
+* Internal link opening by cursor position on it (links with spaces are not supported);
+* Templates in '''Template''' and '''Main''' (starts with <code>:</code> prefix) namespaces;
+* [https://www.mediawiki.org/wiki/Extension:Scribunto Scribunto] functions.
+
+=== Get notifications ===
+* Show [https://www.mediawiki.org/wiki/Notifications notifications] as menu;
+* Option {{Property|mediawiki_notifications_show_all}} (default: <code>true</code>) - show all or only unread notifications;
+* On opening any page from site - plugin runs the check for new unread notifications.
+
+{{Note|Must be supported by wiki-site (extension installed or with in-core support).}}
+
+== Mediawiker 3.1.0 ==
+* Fixes, improvements.
+
+== Mediawiker 3.1.1 ==
+=== Get notifications command ===
+* Notifications sorting by <code>read</code> property;
+* Notifications <code>read</code> sign character in the settings. Parameter {{Property|mediawiki_notifications_read_sign}}, default value: <code>" \u2713"</code>.
+
+== Mediawiker 3.1.2 ==
+=== Page preview command ===
+* Dynamic generation of geshi highlighting css;
+* Possibility to add custom lines to <code>head</code> part of preview html page for advanced css or javascript using:
+
+: Parameter {{Property|preview_custom_head}} with list of lines, for example:
+
+<source lang="javascript">
+"English wikipedia":
+{
+    "domain": "",
+    "host": "en.wikipedia.org",
+    "https": true,
+    "pagepath": "/wiki/",
+    "password": "",
+    "path": "/w/",
+    "username": "",
+    "preview_custom_head": [
+        "<link rel=\"stylesheet\" href=\"%(http)s://%(host)s%(path)sload.php?...;lang=%(lang)s...\"/>",
+        "<link rel=\"stylesheet\" href=\"%(http)s://%(host)s%(path)sload.php?debug=false&amp;lang=%(lang)...\"/>",
+        "<script async=\"\" src=\"%(http)s://%(host)s%(path)sload.php?debug=false&amp;lang=%(lang)s...\"></script>"
+    ]
+}
+</source>
+
+=== Variables in strings ===
+Wiki site based variables available in strings:
+
+* <code>%(http)s</code> - site protocol value (<code>http</code>/<code>https</code>), based on {{Property|https}} parameter;
+* <code>%(host)s</code> - site address value, based on {{Property|host}} parameter;
+* <code>%(path)s</code> - api path value, based on {{Property|path}} parameter;
+* <code>%(lang)s</code> - lang value, based on global {{Property|mediawiki_preview_lang}} parameter.
+
+== Mediawiker 3.1.3 ==
+
+=== Page preview command ===
+* Parameter {{Property|preview_custom_head}} is a [http://jinja.pocoo.org/docs/dev/ Jinja2] template (splitted by lines).
+
+=== Variables changes ===
+Variables are Jinja2 template [http://jinja.pocoo.org/docs/dev/templates/#variables variables]:
+* <code>http</code> - site protocol value (<code>http</code>/<code>https</code>), based on {{Property|https}} parameter;
+* <code>host</code> - site address value, based on {{Property|host}} parameter;
+* <code>path</code> - api path value, based on {{Property|path}} parameter;
+* <code>lang</code> - lang value, based on global {{Property|mediawiki_preview_lang}} parameter.
+
+== Mediawiker 3.1.4 ==
+
+=== Page preview command ===
+
+* Default <code>head</code> part of preview html was moved to settings parameter {{Property|mediawiki_preview_head}} as [http://jinja.pocoo.org/docs/dev/ Jinja2] template.
+
+{{Note|Data, defined by {{Property|preview_custom_head}} parameter (in wiki site's parameters) will be used instead of data, defined by {{Property|mediawiki_preview_head}}. If both values are required, needs to define all lines in {{Property|preview_custom_head}}.}}
+
+=== New variable ===
+* <code>geshi_css</code> - dynamic [https://www.mediawiki.org/wiki/Extension:SyntaxHighlight GeSHi Source Highlighting] css rules, based on page's source (both tags {{Tag|source}} and {{Tag|syntaxhighlight}} are supported).
+
+== Mediawiker 3.1.5 ==
+
+=== Text blocks folding possibilities ===
+Support folding/unfolding for:
+* Headings - by target header, by header level (2, 3, 4, 5);
+* Templates;
+* Tags (customizable list of tags, check {{Property|mediawiker_fold_tags}} option). Default: <code>source, syntaxhighlight, div, pre</code>;
+* All text blocks - all templates, tags.
+
+=== Standard shortcuts ===
+* Fold block: <kbd>Ctrl+Shift+[</kbd>;
+* Unfold block: <kbd>Ctrl+Shift+]</kbd>.
+
+=== Gutters folding ===
+* {{Property|mediawiker_use_gutters_folding}} option for switching on/off gutters for text blocks. Default: <code>true</code>;
+* Fold text block by moving mouse over the gutter.
+
+=== New commands ===
+* {{Command|Fold}}
+* {{Command|Fold Level 2}}
+* {{Command|Fold Level 3}}
+* {{Command|Fold Level 4}}
+* {{Command|Fold Level 5}}
+* {{Command|Fold text blocks}}
+* {{Command|Unfold}}
+* {{Command|Unfold Level 2}}
+* {{Command|Unfold Level 3}}
+* {{Command|Unfold Level 4}}
+* {{Command|Unfold Level 5}}
+* {{Command|Unfold text blocks}}
+
+{{Note|Also available in '''Tools''' menu.}}
+
+== Mediawiker 3.1.6 ==
+
+* Fixed bug for page opening with folding gutters;
+* Improved logic for templates folding.
+
+== Mediawiker 3.1.7 ==
+
+=== Source refactoring ===
+* All commands was moved to its own modules.
+
+=== Syntax highlighting fixes, improvements ===
+* Fix: Table highlighting with first row tag omitted (<code>|-</code>);
+* Fix: Highlighting of template parameters lines started from new line with space char before <code>|</code> delimiter - the conflict with space-predefined text;
+* Fix: {{Tag|gallery}} tag with <code>File:</code>\<code>Image:</code> prefix omitted;
+* Fix: {{Tag|ref}} tag highlighting;
+* New: {{Tag|blockquote}}, {{Tag|center}} tags support.
+
+=== Popup menu ===
+* Popup menu for selected text;
+* Popup menu for text markup blocks.
+
+=== Folding ===
+* Mouse over the gutters folding was replaced with popup menu options;
+* {{Command|Open inline}} command was replaced with popup menu options.
+
+=== Snippets ===
+* New {{Snippet|Code}} snippet
+
+=== Known bugs ===
+* Sublime crash on opening some templates from popup menu without write-permissions.
+
+{{Note|Restart required after update.}}
+
+== Mediawiker 3.1.9 ==
+
+=== Mwclient library update ===
+* Mwclient internal library was partly synced with latest original [http://mwclient.readthedocs.io/en/latest/index.html version].
+
+=== Syntax highlighting ===
+* New highlighting scheme in new '''sublime-syntax''' engine (for ST3) as a default scheme.
+** Improvements in highlighting;
+** Tests for validation (<code>syntax_test_mediawikerng.mediawiki</code>);
+** Old tmLanguage versions for ST2 compatibility only - needs to set correct value in configuration (<code>Mediawiki_ST2.tmLanguage</code> or <code>MediawikiNG_ST2.tmLanguage</code>).
+
+=== Comments (pre-beta, unfinished) ===
+* Possibility to create/edit internal notes for selected text blocks - notes will be stored in Sublime text only.
+** Some magic words are supported in notes: '''TODO''', '''NOTE''', '''WARNING'''.
+
+=== OAuth authorization ===
+* [http://mwclient.readthedocs.io/en/latest/user/connecting.html#oauth OAuth authorization] support.
+
+=== HTTPS as default proto ===
+* For sites without https support, option {{Property|https}} with <code>false</code> is required.
+
+== Mediawiker 3.1.10 ==
+* Page preview fix.
+
+== Mediawiker 3.1.14 ==
+* Deprecation warnings from mwclient were suppressed;
+* New popup configurator for most important settings ({{Command|Configurator}} command);
+* Asynchronous page publishing.
+
+== Mediawiker 3.1.15 ==
+* '''ST3''': Syntax highlighting fixes;
+* '''ST3''': Lost dependency fix: pygments.
+
+
+== Mediawiker 3.1.16 ==
+* '''ST3''': Authorization on wiki sites using browser's cookies (Firefox, Chrome), based on '''Browsercookie''' packet [https://bitbucket.org/richardpenman/browsercookie browsercookie], [https://github.com/borisbabic/browser_cookie3 browser_cookie3] with some modifications for compatibility;
+** New option: {{Property|authorization_type}} - <code>"oauth"</code> / <code>"cookies"</code> / <code>"login"</code>, default <code>"login"</code>;
+** New option: {{Property|cookies_browser}} - <code>"firefox"</code> / <code>"chrome"</code>, default <code>"chrome"</code>;
+* '''ST3''': Configurator was refactored, all external dependencies were removed.
+
+== Mediawiker 3.1.17 ==
+* Fixed: removed prints html data in ST's console when using {{Command|Configurator}};
+* Fixed: requirement of the site parameters {{Property|username}}, {{Property|password}} when using cookies autorization type;
+* New: plugin messages will be shown in plugin's output panel by default, intead of status string. It can be turned off by new {{Property|use_status_messages_panel}} option;
+* New: optional global parameters {{Property|mediawiker_firefox_cookie_files}}, {{Property|mediawiker_chrome_cookie_files}} for manual setup pathes to browser's cookies - value can be a string or a list of strings;
+* New: Optional site configuration option {{Property|retry_timeout}} to define http connection timeout (in seconds).
+
+== Mediawiker 3.2.0 ==
+
+=== Connection ===
+* Refactoring, fixes;
+* Fixed: connection timeout, retry operations;
+* More asynchronous non-blocking operations.
+
+=== Syntax highlighting (ST3) ===
+* Fixed: heading with attributed html tags inside;
+* Fixed: file links with internal links or formatting styles inside;
+* More syntax tests.
+
+=== Popups ===
+* Images preview inside popups (can be switched off by {{Property|mediawiker_show_image_in_popup}} option in settings);
+* Fixed: popups for multi templates in line.
+
+=== Other ===
+* Fixed: Correct display of the content of headers containing html tags.
+
+== Mediawiker 3.3.0 ==
+
+* New mediawiki markup parser, used for all commands.
+
+=== Changelog ===
+* Plugin's changelog was moved to <code>Preferences / Package Settings / Mediawiker / Changelog</code>;
+* Changelog will be shown in human readable format;
+* It can be called by new command {{Command|Changelog}} too.
+
+{{Note|Original data for changelog saved in <code>Changelog.mediawiki</code> in mediawiki format inside the plugin's folder.}}
+
+=== Commands changes ===
+* New command {{Command|Move page}} for moving/renaming pages;
+* New commands {{Command|Show red links}}, {{Command|Hide red links}}. Also, possibility to show red links in automatic mode, based on site parameter {{Property|show_red_links}}, default: <code>false</code> (maybe slow on some pages with many links);
+* {{Command|Search}} command results will be shown in mediawiki format instead of markdown;
+* {{Command|Cli}} - fixed opening pages with national characters in title;
+* {{Command|Fold}} - fixed headings folding - for example, folding of heading with level 2 - will folds all headings with 3, 4, 5 levels inside;
+* {{Command|Add/edit wiki site}} was removed;
+* {{Command|Configurator}}:
+** New option to add new wiki site;
+** Human readable option names instead of parameters based names;
+** Many fixes and improvements.
+* {{Command|Page preview}}:
+** Used static file <code>mediawiker_preview_file.html</code> in <code>User</code> folder for preview html generation;
+** Tab (view) option {{Property|Autoreload}} ('''Generate a preview after each Nth change''') - calls automatic generation of preview on every Nth change, without opening page in browser. By default, this parameter has value <code>0</code> - autogeneration not processed and page will be opened on every {{Command|Page preview}} command call;
+** When option {{Property|Autoreload}} is set to value more than <code>0</code> - in the status bar will display the number of changes that were made;
+** <code>Mediawiki:Common.css</code> - included in the preview result to support custom css rules from wiki site.
+* {{Command|Post page}} - fixed double entry of postfix in the summary message (defined by {{Property|mediawiker_summary_postfix}});
+* Commands {{Command|Show internal links}}, {{Command|Show external links}} now based on native Mediawiki API.
+
+'''Live preview scenario''':
+* With <code>autoreload</code> as <code>0</code> call {{Command|Page preview}} - page will be opened in browser.
+* With {{Command|Configurator}} change <code>Generate a preview after each Nth change</code> option in '''Tab options''' - preview will be regenerated after each Nth change.
+
+{{Note|In browser autoreloading can be processed by extensions like [https://addons.mozilla.org/ru/firefox/addon/auto-reload/?src=api Auto Reload (Firefox)] - just point changes trigger to preview file.}}
+
+{{Note|Commands {{Command|Show red links}}, {{Command|Hide red links}} and option {{Property|Autoreload}} for command {{Command|Page preview}} are available in Sublime Text 3 only.}}
+
+=== Connection ===
+* Site connections manager was rewritten;
+* Connection to wiki site with Firefox cookies was improved with realtime update on cookies changes (<code>browser_cookie3</code> library was changed).
+
+=== Settings ===
+* All settings in configuration have the same prefix <code>mediawiker_</code>, old settings without this prefix or with prefix <code>mediawiki_</code> will be replaced automatically.
+* Some setting will be removed:
+** {{Property|mediawiki_search_syntax}} - now, mediawiki format will be always used;
+** {{Property|mediawiker_preview_file}} - static file <code>mediawiker_preview_file.html</code> will be used always;
+** {{Property|mediawiker_config_html}} - use {{Property|mediawiker_css_html}} instead. All css properties can be replaced with custom values.
+
+{{Note|{{Property|mediawiker_config_html}} used only in {{Command|Configurator}} currently.}}
+
+=== Syntax Highlighting ===
+* Fixed incorrect matching of the inline markup tags in template without parameter's names;
+* Fixed many errors with embedded source scopes.
+
+=== Popups ===
+* Image size in popups can be changed with {{Property|mediawiker_popup_image_size}}, default <code>300px</code>;
+* Popups for tables;
+* Red links support in popups;
+* Fixes of links, templates popups.
+
+== Mediawiker 3.3.1 ==
+* Fixed error with empty User settings.
+
+== Mediawiker 3.3.2 ==
+* Fixed: Templates and other non-headings staff showing in <code>Symbol list</code>.
+
+== Mediawiker 3.3.3 ==
+* New global option {{Property|mediawiker_popup_type}} with possible values of <code>auto</code> (default value - to show popups with autohide), <code>manual</code> (to show popups without autohiding), <code>off</code> (do not show popups globally);
+* New tab option {{Property|Turn off popups}} - not show popups in current tab. This option can be set with {{Command|Configurator}};
+* Now, popup will hide on typing.
+
+== Mediawiker 3.3.4 ==
+* New command: {{Command|Open talk page}} - for fast way to open talk pages;
+* Possibility to open talk page from popups.
+
+== Mediawiker 3.3.5 ==
+* New command: {{Command|Show unsaved changes}} - shows differencies between local and server versions. Thanks to [https://github.com/scholer scholer] for command {{Command|Page diff vs. server version}} from his [https://github.com/scholer/Mediawiker/blob/master/mediawiker.py#L595 fork], the new command is based on it;
+* Allowing unvalued attributes in <code>Syntaxhighlight</code> tags. Thanks to [https://github.com/smanolloff smanolloff] for pull-request.
+
+== Mediawiker 3.3.6 ==
+* Fixed: variables popup;
+* Fixed: error <code>Unable to decode Packages/Mediawiker/img/gutter_h1.png</code>;
+* Fixed: authorization with Chrome's cookies;
+* Fixed: save page messages in plugin's panel.
+
+== Mediawiker 3.3.7 ==
+* Fixed: notifications check while page opening.
+
+== Mediawiker 3.3.8 ==
+* Fixed: incorrect notification command import.
+
+== Mediawiker 3.3.9 ==
+* New option {{Property|mediawiker_show_gutters}} - possibility to turn of gutters showing;
+* Fixed: plugin's events run without checking view;
+* Fixed: {{Command|Page preview}} not works on OSX.
+
+== Mediawiker 3.4.0 ==
+* New option {{Property|mediawiker_offline_mode}} - possibility to work offline with files in mediawiki markup. For correct showing of <code>Edit panel</code> in offline mode, please, readd edit panel components if you use customized list (<code>false</code>/<code>true</code>, default: <code>false</code>);
+* Fixed: opening talk pages in namespaces: <code>User</code>, <code>Mediawiki</code>, <code>Project</code>.
+* Fixed: {{Command|Page preview}} not works on OSX (lost in 3.3.9).

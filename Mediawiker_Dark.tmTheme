@@ -165,7 +165,7 @@
 			<key>settings</key>
 			<dict>
 				<key>background</key>
-				<string>#B0B3BA14</string>
+				<string>#181818</string>
 			</dict>
 		</dict>
 		<dict>
@@ -480,17 +480,6 @@
 			<dict>
 				<key>foreground</key>
 				<string>#CA7840</string>
-			</dict>
-		</dict>
-		<dict>
-			<key>name</key>
-			<string>Meta: Value</string>
-			<key>scope</key>
-			<string>meta.value</string>
-			<key>settings</key>
-			<dict>
-				<key>background</key>
-				<string>#181818</string>
 			</dict>
 		</dict>
 		<dict>

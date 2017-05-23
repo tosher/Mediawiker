@@ -60,5 +60,10 @@
             { "key": "preceding_text", "operator": "regex_contains", "operand": "^[*#]+\\s*$", "match_all": true },
             { "key": "auto_complete_visible", "operator": "equal", "operand": false }
         ]
+    },
+    {
+        "keys": ["ctrl+shift+["], "command": "mediawiker_page", "args": {"action": "mediawiker_colapse", "action_params": {"type": "fold"}}, "context": [
+            {"key": "setting.mediawiker_is_here", "operand": true}
+        ]
     }
 ]
