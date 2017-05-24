@@ -1,7 +1,7 @@
 <snippet>
 	<content><![CDATA[
-<syntaxhighlight lang="text" highlight="" start="1" line>
-${1:$TM_SELECTED_TEXT}
+<syntaxhighlight lang="${1}" highlight="" start="1" line>
+${2:$TM_SELECTED_TEXT}
 </syntaxhighlight>
 ]]></content>
 <tabTrigger>wss</tabTrigger>
