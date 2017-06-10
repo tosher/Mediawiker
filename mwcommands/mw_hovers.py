@@ -127,7 +127,12 @@ def on_hover_internal_link(view, point):
         if l.region.contains(point):
 
             if l.name:
-                page = mw.api.get_page(l.name)
+                page_name = l.name
+                if l.name.startswith('/'):
+                    # subpage
+                    page_name = '%s%s' % (mw.get_title(), l.name)
+
+                page = mw.api.get_page(page_name)
                 css_class = None if page.exists else 'redlink'
                 page_talk = mw.api.get_page_talk_page(page)
                 css_class_talk = None if page_talk.exists else 'redlink'
@@ -135,18 +140,18 @@ def on_hover_internal_link(view, point):
                 img_data = None
                 if mw.get_setting('show_image_in_popup'):
                     try:
-                        img_data, img_size, img_url = mw.api.call('get_image', title=l.name, thumb_size=mw.get_setting('popup_image_size'))
+                        img_data, img_size, img_url = mw.api.call('get_image', title=page_name, thumb_size=mw.get_setting('popup_image_size'))
                     except:
                         pass
 
-                h = 'Page "%s"' % html.span(l.name, css_class=css_class) if not img_data else 'File "%s"' % mw.api.page_attr(page, 'page_title')
+                h = 'Page "%s"' % html.span(page_name, css_class=css_class) if not img_data else 'File "%s"' % mw.api.page_attr(page, 'page_title')
                 content = [
                     html.h(lvl=4, title=h),
                     html.img(uri=img_data) if img_data else '',
                     html.br(cnt=2) if img_data else '',
                     html.join(
-                        html.link('open:%s' % l.name, 'Open' if page.exists else 'Create', css_class=css_class),
-                        html.link('browse:%s' % l.name, 'View in browser', css_class=css_class),
+                        html.link('open:%s' % page_name, 'Open' if page.exists else 'Create', css_class=css_class),
+                        html.link('browse:%s' % page_name, 'View in browser', css_class=css_class),
                         html.link('get_image:%s' % img_url, 'View image in browser') if img_data else '',
                         char=html.span('|', css_class='wide')
                     ),

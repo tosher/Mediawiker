@@ -486,8 +486,8 @@ Support folding/unfolding for:
 * Possibility to open talk page from popups.
 
 == Mediawiker 3.3.5 ==
-* New command: {{Command|Show unsaved changes}} - shows differencies between local and server versions. Thanks to [https://github.com/scholer scholer] for command {{Command|Page diff vs. server version}} from his [https://github.com/scholer/Mediawiker/blob/master/mediawiker.py#L595 fork], the new command is based on it;
-* Allowing unvalued attributes in <code>Syntaxhighlight</code> tags. Thanks to [https://github.com/smanolloff smanolloff] for pull-request.
+* New command: {{Command|Show unsaved changes}} - shows differencies between local and server versions. Thanks to [https://github.com/scholer @scholer] for command {{Command|Page diff vs. server version}} from his [https://github.com/scholer/Mediawiker/blob/master/mediawiker.py#L595 fork], the new command is based on it;
+* Allowing unvalued attributes in <code>Syntaxhighlight</code> tags. Thanks to [https://github.com/smanolloff @smanolloff] for pull-request.
 
 == Mediawiker 3.3.6 ==
 * Fixed: variables popup;
@@ -510,3 +510,7 @@ Support folding/unfolding for:
 * New option {{Property|mediawiker_offline_mode}} - possibility to work offline with files in mediawiki markup. For correct showing of <code>Edit panel</code> in offline mode, please, readd edit panel components if you use customized list (<code>false</code>/<code>true</code>, default: <code>false</code>);
 * Fixed: opening talk pages in namespaces: <code>User</code>, <code>Mediawiki</code>, <code>Project</code>.
 * Fixed: {{Command|Page preview}} not works on OSX (lost in 3.3.9).
+
+== Mediawiker 3.4.1 ==
+* Subpages support (beta)
+* New snippet: {{Snippet|syntaxhighlight}}, with trigger <code>wss</code>. Thanks to [https://github.com/rabin-io @rabin-io].

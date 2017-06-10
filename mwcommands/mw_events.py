@@ -151,6 +151,9 @@ class MediawikerEvents(sublime_plugin.EventListener):
                     if ns_text:
                         ns_text_number = mw.api.call('get_namespace_number', name=ns_text)
 
+                    if internal_link.startswith('/'):
+                        internal_link = '%s%s' % (mw.get_title(), internal_link)
+
                     # TODO: recheck completions
 
                     pages = []
