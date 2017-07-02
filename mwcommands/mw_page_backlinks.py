@@ -8,57 +8,57 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerShowPageBacklinksCommand(sublime_plugin.WindowCommand):
     ''' alias to PageBacklinks command '''
 
     def run(self):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
-        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('page_backlinks')})
+        self.window.run_command(utils.cmd('page'), {"action": utils.cmd('page_backlinks')})
 
 
 class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
-        title = mw.get_title()
+        title = utils.get_title()
         self.mw_get_page_backlinks(title)
 
         if self.links:
             sublime.active_window().show_quick_panel(self.links, self.on_done)
         else:
-            mw.status_message('Unable to find links to this page')
+            utils.status_message('Unable to find links to this page')
 
     def mw_get_page_backlinks(self, title):
         self.links = []
-        links_limit = mw.get_setting('linkstopage_limit')
-        page = mw.api.get_page(title)
+        links_limit = utils.props.get_setting('linkstopage_limit')
+        page = utils.api.get_page(title)
 
         # backlinks to page
-        linksgen = mw.api.get_page_backlinks(page, links_limit)
+        linksgen = utils.api.get_page_backlinks(page, links_limit)
         if linksgen:
             while True:
                 try:
                     prop = linksgen.next()
-                    self.links.append(mw.api.page_attr(prop, 'name'))
+                    self.links.append(utils.api.page_attr(prop, 'name'))
                 except StopIteration:
                     break
 
         # pages, transcludes this
-        linksgen = mw.api.get_page_embeddedin(page, links_limit)
+        linksgen = utils.api.get_page_embeddedin(page, links_limit)
         if linksgen:
             while True:
                 try:
                     prop = linksgen.next()
-                    self.links.append(mw.api.page_attr(prop, 'name'))
+                    self.links.append(utils.api.page_attr(prop, 'name'))
                 except StopIteration:
                     break
 
@@ -66,4 +66,4 @@ class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):
         if index >= 0:
             self.page_name = self.links[index]
 
-            sublime.active_window().run_command(mw.cmd('page'), {'action': mw.cmd('show_page'), 'action_params': {'title': self.page_name}})
+            sublime.active_window().run_command(utils.cmd('page'), {'action': utils.cmd('show_page'), 'action_params': {'title': self.page_name}})

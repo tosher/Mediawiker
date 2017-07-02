@@ -4,24 +4,24 @@
 import sys
 import webbrowser
 
-import sublime
+# import sublime
 import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerOpenPageInBrowserCommand(sublime_plugin.WindowCommand):
     def run(self):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
-        url = mw.get_page_url()
+        url = utils.get_page_url()
         if url:
             webbrowser.open(url)
         else:
-            mw.status_message('Can\'t open page with empty title')
+            utils.status_message('Can\'t open page with empty title')
             return

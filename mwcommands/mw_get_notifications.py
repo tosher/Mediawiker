@@ -9,9 +9,9 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerNotificationsCommand(sublime_plugin.WindowCommand):
@@ -21,12 +21,12 @@ class MediawikerNotificationsCommand(sublime_plugin.WindowCommand):
     '''
 
     def run(self):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
-        ignore_read = not mw.get_setting('notifications_show_all')
-        read_sign = mw.get_setting('notifications_read_sign')
-        self.msgs = mw.api.get_notifications_list(ignore_read=ignore_read)
+        ignore_read = not utils.props.get_setting('notifications_show_all')
+        read_sign = utils.props.get_setting('notifications_read_sign')
+        self.msgs = utils.api.get_notifications_list(ignore_read=ignore_read)
         self.msgs = sorted(self.msgs, key=lambda k: k['read'])
         n_list = ['All in browser']
         for m in self.msgs:
@@ -44,13 +44,13 @@ class MediawikerNotificationsCommand(sublime_plugin.WindowCommand):
     def on_done(self, idx):
         if idx > -1:
             if idx == 0:
-                url = mw.get_page_url(page_name='Special:Notifications')
+                url = utils.get_page_url(page_name='Special:Notifications')
                 webbrowser.open(url)
             else:
                 title = self.msgs[idx - 1].get('title', None)
                 if title:
-                    self.window.run_command(mw.cmd('page'), {
-                        "action": mw.cmd('show_page'),
+                    self.window.run_command(utils.cmd('page'), {
+                        "action": utils.cmd('show_page'),
                         'action_params': {"title": title},
                         "check_notifications": False
                     })

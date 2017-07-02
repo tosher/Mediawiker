@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import sys
-pythonver = sys.version_info[0]
 import sublime
 # import sublime_plugin
+pythonver = sys.version_info[0]
 
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 try:
     # Python 2.7+
@@ -56,8 +56,8 @@ class MwHtml(object):
     def debug_html(self, html):
         view = sublime.active_window().new_file()
         view.set_name('debug.html')
-        view.set_syntax_file(mw.from_package('HTML.sublime-syntax', name='HTML'))
-        view.run_command(mw.cmd('insert_text'), {'position': 0, 'text': html, 'with_erase': True})
+        view.set_syntax_file(utils.p.from_package('HTML.sublime-syntax', name='HTML'))
+        view.run_command(utils.cmd('insert_text'), {'position': 0, 'text': html, 'with_erase': True})
         view.set_scratch(True)
 
     # def set_css(self, rule, value, attr=None):
@@ -67,7 +67,7 @@ class MwHtml(object):
     #         self.css_rules[rule][attr] = value
 
     def get_user_css(self):
-        css_user = mw.get_setting('css_html', {})
+        css_user = utils.props.get_setting('css_html', {})
         if css_user:
             for key in css_user.keys():
                 for tag in css_user[key].keys():

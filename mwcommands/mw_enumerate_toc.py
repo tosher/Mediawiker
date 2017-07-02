@@ -9,9 +9,9 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerEnumerateTocCommand(sublime_plugin.TextCommand):
@@ -33,7 +33,7 @@ class MediawikerEnumerateTocCommand(sublime_plugin.TextCommand):
                 r_new = r
             region_len = r_new.b - r_new.a
             header_text = self.view.substr(r_new)
-            level = mw.get_hlevel(header_text, "=")
+            level = utils.get_hlevel(header_text, "=")
             current_number_str = ''
             i = 1
             # generate number value, start from 1

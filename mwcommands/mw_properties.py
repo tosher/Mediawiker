@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import sys
-pythonver = sys.version_info[0]
 import os
 import sublime
 
+pythonver = sys.version_info[0]
 PM = 'Mediawiker'
 PML = 'mediawiker'
 
@@ -207,7 +207,6 @@ class MediawikerProperties(object):
         if key in self.deprecated:
             return True
         return False
-
 
     # props_dependencies = {
     #     'popup_type': {

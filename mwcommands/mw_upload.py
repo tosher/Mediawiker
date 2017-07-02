@@ -9,19 +9,19 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerFileUploadCommand(sublime_plugin.WindowCommand):
     ''' alias to Add template command '''
 
     def run(self):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
-        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('upload')})
+        self.window.run_command(utils.cmd('page'), {"action": utils.cmd('upload')})
 
 
 class MediawikerUploadCommand(sublime_plugin.TextCommand):
@@ -31,7 +31,7 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
     file_descr = None
 
     def run(self, edit):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
         sublime.active_window().show_input_panel('File path:', '', self.get_destfilename, None, None)
@@ -53,7 +53,7 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
         #     except Exception as e:
         #         print('Exception from clipboard %s' % e)
         #         return
-        #     upload_file = mw.from_package('%s_upload_data.png' % mw.PML, name='User', posix=False, is_abs=True)
+        #     upload_file = p.from_package('%s_upload_data.png' % p.PML, name='User', posix=False, is_abs=True)
         #     print(upload_file)
         #     with open(upload_file, 'w+b') as tf:
         #         tf.write(data)
@@ -71,10 +71,17 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
         else:
             self.file_descr = '%s as %s' % (os.path.basename(self.file_path), self.file_destname)
         try:
-            with open(self.file_path, 'rb') as f:
-                mw.api.call('process_upload', file_handler=f, filename=self.file_destname, description=self.file_descr)
-            mw.status_message('File %s successfully uploaded to wiki as %s' % (self.file_path, self.file_destname))
+            self.upload()
+            utils.status_message('File %s successfully uploaded to wiki as %s' % (self.file_path, self.file_destname))
         except IOError as e:
             sublime.message_dialog('Upload io error: %s' % e)
         except Exception as e:
             sublime.message_dialog('Upload error: %s' % e)
+
+    def upload(self):
+        if self.file_path.startswith('http'):
+            # require `$wgAllowCopyUploads = true` in LocalSettings.php
+            utils.api.call('process_upload', url=self.file_path, filename=self.file_destname, description=self.file_descr)
+            return
+        with open(self.file_path, 'rb') as f:
+            utils.api.call('process_upload', file_handler=f, filename=self.file_destname, description=self.file_descr)

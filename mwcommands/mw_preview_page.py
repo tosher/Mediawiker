@@ -12,19 +12,19 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerPreviewCommand(sublime_plugin.WindowCommand):
     ''' alias to Preview page command '''
 
     def run(self):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
-        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('preview_page')})
+        self.window.run_command(utils.cmd('page'), {"action": utils.cmd('preview_page')})
 
 
 class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
@@ -33,15 +33,15 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
     '''
 
     def run(self, edit):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
         text = self.view.substr(sublime.Region(0, self.view.size()))
-        # site = mw.get_setting('site').get(mw.get_view_site())
-        site = mw.conman.get_site()
+        # site = utils.props.get_setting('site').get(utils.get_view_site())
+        site = utils.conman.get_site()
 
-        page_css = mw.api.call('get_page', title='MediaWiki:Common.css')
-        text_css = mw.api.page_get_text(page_css)
+        page_css = utils.api.call('get_page', title='MediaWiki:Common.css')
+        text_css = utils.api.page_get_text(page_css)
         if text_css:
             common_css = '''
             <style type="text/css">
@@ -53,10 +53,10 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
 
         host = site['host']
         path = site['path']
-        head = '\n'.join(site['preview_custom_head'] or mw.get_setting('preview_head'))
-        lang = mw.get_setting('preview_lang')
-        self.page_id = '%s: %s' % (host, mw.get_title())
-        self.preview_file = mw.from_package('%s_preview_file.html' % mw.PML, name='User', posix=False, is_abs=True)
+        head = '\n'.join(site['preview_custom_head'] or utils.props.get_setting('preview_head'))
+        lang = utils.props.get_setting('preview_lang')
+        self.page_id = '%s: %s' % (host, utils.get_title())
+        self.preview_file = utils.p.from_package('%s_preview_file.html' % utils.p.PML, name='User', posix=False, is_abs=True)
         site_http = 'https' if site['https'] else 'http'
 
         html_header_lines = [
@@ -75,13 +75,13 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         html_header = '\n'.join(html_header_lines) % {'head': head_str, 'common_css': common_css}
         html_footer = '</body></html>'
 
-        html = mw.api.call('get_parse_result', text=text, title=mw.get_title())
+        html = utils.api.call('get_parse_result', text=text, title=utils.get_title())
         html = html.replace('"//', '"%s://' % site_http)  # internal links: images,..
         html = html.replace('"/', '"%s://%s/' % (site_http, host))  # internal local links: images,..
 
         page_id_old = self.get_page_id()
         page = self.generate_preview(html_header, html, html_footer)
-        if self.page_id != page_id_old or mw.props.get_view_setting(self.view, 'autoreload') == 0:
+        if self.page_id != page_id_old or utils.props.get_view_setting(self.view, 'autoreload') == 0:
             webbrowser.open('file:///%s' % page)
 
     def get_page_id(self):

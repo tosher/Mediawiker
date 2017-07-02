@@ -8,19 +8,19 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerCategoryTreeCommand(sublime_plugin.WindowCommand):
     ''' alias to Category list command '''
 
     def run(self):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
-        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('category_list')})
+        self.window.run_command(utils.cmd('page'), {"action": utils.cmd('category_list')})
 
 
 class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
@@ -32,13 +32,13 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
     category_prefix = ''  # "Category" namespace name as returned language..
 
     def run(self, edit):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
         if self.category_path:
-            category_root = mw.get_category(self.get_category_current())[1]
+            category_root = utils.get_category(self.get_category_current())[1]
         else:
-            category_root = mw.get_category(mw.get_setting('category_root'))[1]
+            category_root = utils.get_category(utils.props.get_setting('category_root'))[1]
         sublime.active_window().show_input_panel('Wiki root category:', category_root, self.show_list, None, None)
 
     def show_list(self, category_root):
@@ -47,19 +47,19 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
         self.pages = {}
         self.pages_names = []
 
-        category_root = mw.get_category(category_root)[1]
+        category_root = utils.get_category(category_root)[1]
 
         if not self.category_path:
             self.update_category_path('%s:%s' % (self.get_category_prefix(), category_root))
 
         if len(self.category_path) > 1:
-            self.add_page(self.get_category_prev(), mw.api.CATEGORY_NAMESPACE, False)
+            self.add_page(self.get_category_prev(), utils.api.CATEGORY_NAMESPACE, False)
 
         for page in self.get_list_data(category_root):
-            page_name = mw.api.page_attr(page, 'name')
-            page_namespace = mw.api.page_attr(page, 'namespace')
-            if page_namespace == mw.api.CATEGORY_NAMESPACE and not self.category_prefix:
-                self.category_prefix = mw.get_category(page_name)[0]
+            page_name = utils.api.page_attr(page, 'name')
+            page_namespace = utils.api.page_attr(page, 'namespace')
+            if page_namespace == utils.api.CATEGORY_NAMESPACE and not self.category_prefix:
+                self.category_prefix = utils.get_category(page_name)[0]
             self.add_page(page_name, page_namespace, True)
         if self.pages:
             self.pages_names.sort()
@@ -69,14 +69,14 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
 
     def add_page(self, page_name, page_namespace, as_next=True):
         page_name_menu = page_name
-        if page_namespace == mw.api.CATEGORY_NAMESPACE:
+        if page_namespace == utils.api.CATEGORY_NAMESPACE:
             page_name_menu = self.get_category_as_next(page_name) if as_next else self.get_category_as_prev(page_name)
         self.pages[page_name] = page_namespace
         self.pages_names.append(page_name_menu)
 
     def get_list_data(self, category_root):
         ''' get objects list by category name '''
-        return mw.api.get_subcategories(category_root=category_root)
+        return utils.api.get_subcategories(category_root=category_root)
 
     def get_category_as_next(self, category_string):
         return '%s%s' % (self.CATEGORY_NEXT_PREFIX_MENU, category_string)
@@ -111,13 +111,13 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
         if index >= 0:
             # escape from quick panel return -1
             page_name = self.category_strip_special_prefix(self.pages_names[index])
-            if self.pages[page_name] == mw.api.CATEGORY_NAMESPACE:
+            if self.pages[page_name] == utils.api.CATEGORY_NAMESPACE:
                 self.update_category_path(page_name)
                 self.show_list(page_name)
             else:
                 try:
-                    sublime.active_window().run_command(mw.cmd('page'), {
-                        'action': mw.cmd('show_page'),
+                    sublime.active_window().run_command(utils.cmd('page'), {
+                        'action': utils.cmd('show_page'),
                         'action_params': {
                             'title': page_name
                         }

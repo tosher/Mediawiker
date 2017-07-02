@@ -514,3 +514,7 @@ Support folding/unfolding for:
 == Mediawiker 3.4.1 ==
 * Subpages support (beta)
 * New snippet: {{Snippet|syntaxhighlight}}, with trigger <code>wss</code>. Thanks to [https://github.com/rabin-io @rabin-io].
+
+== Mediawiker 3.4.2 ==
+* Upload file from url;
+* Properties loading refactoring.

@@ -27,96 +27,103 @@ if pythonver >= 3:
     # else:
     #     from . import mwclient
     import base64
-    from . import mw_properties as mwprops
+    from . import mw_properties as p
     from . import mw_parser as par
     from html.parser import HTMLParser
     from ..lib import mwclient
     from ..lib import browser_cookie3
 else:
-    import mw_properties as mwprops
+    import mw_properties as p
     from HTMLParser import HTMLParser
     from lib import mwclient
-
 
 # linting skips
 # all must be ovverrided in plugin_loaded
 
-def get_setting(key, default_value=None):
-    pass
+# def get_setting(key, default_value=None):
+#     pass
 
 
-def set_setting(key, value):
-    pass
+# def set_setting(key, value):
+#     pass
 
 
-def del_setting(key):
-    pass
+# def del_setting(key):
+#     pass
 
 
-def get_default_setting(key, default_value=None):
-    pass
+# def get_default_setting(key, default_value=None):
+#     pass
 
 
-def from_package(*path):
-    pass
-
+# def from_package(*path):
+#     pass
 
 conman = None
 api = None
 props = None
 
+# def plugin_loaded():
+#     mw = sys.modules[__name__]
+#     props = p.MediawikerProperties()
+#     setattr(mw, 'props', props)
+
+#     for attr in dir(mw_properties):
+#         if isinstance(getattr(mw_properties, attr), (str, int)) and not attr.startswith('_'):
+#             setattr(mw, attr, getattr(mw_properties, attr))
+
+#     setattr(mw, 'from_package', mw_properties.from_package)
+#     setattr(mw, 'get_setting', props.get_setting)
+#     setattr(mw, 'set_setting', props.set_setting)
+#     setattr(mw, 'del_setting', props.del_setting)
+#     setattr(mw, 'get_default_setting', props.get_default_setting)
+
+#     if not mw.props.get_setting('offline_mode'):
+#         conman = MediawikerConnectionManager()
+#         setattr(mw, 'conman', conman)
+#         setattr(mw, 'api', PreAPI(conman=conman))
+
 
 def plugin_loaded():
+    props = p.MediawikerProperties()
+    conman = MediawikerConnectionManager()
+    api = PreAPI(conman=conman)
     mw = sys.modules[__name__]
-    props = mwprops.MediawikerProperties()
     setattr(mw, 'props', props)
-
-    for attr in dir(mwprops):
-        if isinstance(getattr(mwprops, attr), (str, int)) and not attr.startswith('_'):
-            setattr(mw, attr, getattr(mwprops, attr))
-
-    setattr(mw, 'from_package', mwprops.from_package)
-    setattr(mw, 'get_setting', props.get_setting)
-    setattr(mw, 'set_setting', props.set_setting)
-    setattr(mw, 'del_setting', props.del_setting)
-    setattr(mw, 'get_default_setting', props.get_default_setting)
-
-    if not mw.props.get_setting('offline_mode'):
-        conman = MediawikerConnectionManager()
-        setattr(mw, 'conman', conman)
-        setattr(mw, 'api', PreAPI(conman=conman))
+    setattr(mw, 'conman', conman)
+    setattr(mw, 'api', api)
 
 
 def set_syntax(page_name=None, page_namespace=None):
-    syntax = get_setting('syntax')
+    syntax = props.get_setting('syntax')
 
     if page_name and page_namespace:
         syntax_ext = 'sublime-syntax' if int(sublime.version()) >= 3084 else 'tmLanguage'
 
         # Scribunto lua modules, except doc subpage
         if page_namespace == api.SCRIBUNTO_NAMESPACE and not page_name.lower().endswith('/doc'):
-            syntax = from_package('Lua.%s' % syntax_ext, name='Lua')
+            syntax = p.from_package('Lua.%s' % syntax_ext, name='Lua')
         elif page_name.lower().endswith('.css'):
-            syntax = from_package('CSS.%s' % syntax_ext, name='CSS')
+            syntax = p.from_package('CSS.%s' % syntax_ext, name='CSS')
         elif page_name.endswith('.js'):
-            syntax = from_package('Javascript.%s' % syntax_ext, name='Javascript')
+            syntax = p.from_package('Javascript.%s' % syntax_ext, name='Javascript')
 
     sublime.active_window().active_view().set_syntax_file(syntax)
 
 
 def cmd(cmd):
-    if cmd.startswith(mwprops.PML):
+    if cmd.startswith(p.PML):
         return cmd
     else:
-        return '_'.join([mwprops.PML, cmd])
+        return '_'.join([p.PML, cmd])
 
 
 def get_view_site():
     try:
-        return props.get_view_setting(sublime.active_window().active_view(), 'site', get_setting('site_active'))
+        return props.get_view_setting(sublime.active_window().active_view(), 'site', props.get_setting('site_active'))
     except:
         # st2 exception on start.. sublime not available on activated..
-        return get_setting('site_active')
+        return props.get_setting('site_active')
 
 
 def enco(value):
@@ -157,7 +164,7 @@ def get_title():
         # haven't view.name, try to get from view.file_name (without extension)
         file_name = sublime.active_window().active_view().file_name()
         if file_name:
-            wiki_extensions = get_setting('files_extension')
+            wiki_extensions = props.get_setting('files_extension')
             title, ext = os.path.splitext(os.path.basename(file_name))
             if ext[1:] in wiki_extensions and title:
                 return title
@@ -181,7 +188,7 @@ def process_red_links(view, page):
     status_message('Processing red_links for page [[%s]].. ' % api.page_attr(page, 'name'), new_line=False)
 
     view.erase_phantoms('redlink')
-    red_link_icon = get_setting('red_link_icon')
+    red_link_icon = props.get_setting('red_link_icon')
     linksgen = api.get_page_links(page, generator=True)
 
     links_d = {}
@@ -218,7 +225,7 @@ def process_red_links(view, page):
 
 def pagename_clear(pagename):
     """ Return clear pagename if page-url was set instead of.."""
-    site = get_setting('site').get(get_view_site())
+    site = props.get_setting('site').get(get_view_site())
     host = site.get('host', None)
     pagepath = site.get('pagepath', None)
 
@@ -241,9 +248,9 @@ def pagename_clear(pagename):
 def save_mypages(title, storage_name='pagelist'):
 
     title = title.replace('_', ' ')  # for wiki '_' and ' ' are equal in page name
-    pagelist_maxsize = get_setting('pagelist_maxsize')
+    pagelist_maxsize = props.get_setting('pagelist_maxsize')
     site_active = get_view_site()
-    pagelist = get_setting(storage_name, {})
+    pagelist = props.get_setting(storage_name, {})
 
     if site_active not in pagelist:
         pagelist[site_active] = []
@@ -258,7 +265,7 @@ def save_mypages(title, storage_name='pagelist'):
             # for sorting
             my_pages.remove(title)
     my_pages.append(title)
-    set_setting(storage_name, pagelist)
+    props.set_setting(storage_name, pagelist)
 
 
 def get_hlevel(header_string, substring):
@@ -278,7 +285,7 @@ def get_page_url(page_name=None):
     if page_name is None:
         page_name = strquote(get_title())
 
-    site = get_setting('site').get(get_view_site())
+    site = props.get_setting('site').get(get_view_site())
     host = site['host']
     proto = 'https' if site.get('https', True) else 'http'
     pagepath = site.get("pagepath", '/wiki/')
@@ -297,18 +304,18 @@ def status_message(message, replace=None, is_panel=None, new_line=True, panel_na
                 message = message.replace(r, '')
         sublime.status_message(message)
 
-    is_use_message_panel = is_panel if is_panel is not None else get_setting('use_status_messages_panel', True)
+    is_use_message_panel = is_panel if is_panel is not None else props.get_setting('use_status_messages_panel', True)
 
     if is_use_message_panel:
         panel = None
         if panel_name is None:
-            panel_name = '%s_panel' % mwprops.PML
+            panel_name = '%s_panel' % p.PML
 
         if syntax is None:
             if int(sublime.version()) >= 3000:
-                syntax = from_package('MediawikerPanel.sublime-syntax')
+                syntax = p.from_package('MediawikerPanel.sublime-syntax')
             else:
-                syntax = from_package('MediawikiNG_ST2.tmLanguage')
+                syntax = p.from_package('MediawikiNG_ST2.tmLanguage')
 
         if int(sublime.version()) >= 3000:
             if not new:
@@ -373,7 +380,7 @@ class PreAPI(object):
             status_message('Anonymous connection detected, forcing new connection.. ')
             sitecon = self.conman.get_connect(force=True)
 
-        if not sitecon and get_setting('offline_mode'):
+        if not sitecon and props.get_setting('offline_mode'):
             raise ConnectionFailed("Connection not available in offline mode")
         if not sitecon:
             raise ConnectionFailed("No valid connection available")
@@ -598,8 +605,8 @@ class PreAPI(object):
     def get_search_result(self, search, limit, namespace):
         return self.get_connect().search(search=search, what='text', limit=limit, namespace=namespace)
 
-    def process_upload(self, file_handler, filename, description):
-        return self.get_connect().upload(file_handler, filename, description)
+    def process_upload(self, file_handler=None, filename=None, description='', url=None):
+        return self.get_connect().upload(file=file_handler, filename=filename, description=description, url=url)
 
     def get_namespace_number(self, name):
         if name is None:
@@ -631,7 +638,7 @@ class MediawikerConnectionManager(object):
 
     def get_site_config(self, name):
         ''' get site settings '''
-        site_config = get_setting('site').get(name)
+        site_config = props.get_setting('site').get(name)
         self.validate_site(name, site_config)
 
     def is_site_changed(self, oldsite, newsite):
@@ -724,7 +731,7 @@ class MediawikerConnectionManager(object):
         }
 
     def debug_flush(self):
-        if get_setting('debug'):
+        if props.get_setting('debug'):
             for msg in self.debug_msgs:
                 status_message("'''DEBUG''' %s" % msg)
         self.debug_msgs = []
@@ -732,7 +739,7 @@ class MediawikerConnectionManager(object):
     def get_connect(self, name=None, force=False):
         ''' setup new connection (call connect()) or returns exists '''
 
-        if get_setting('offline_mode'):
+        if props.get_setting('offline_mode'):
             return None
 
         self.debug_msgs.append('Get connection from connection manager.')
@@ -787,7 +794,7 @@ class MediawikerConnectionManager(object):
                     requests=self.get_requests_config(name)
                 )
             except requests.exceptions.HTTPError as e:
-                if get_setting('debug'):
+                if props.get_setting('debug'):
                     self.debug_msgs.append('HTTP response: %s' % e)
 
                 # additional http auth (basic, digest)
@@ -805,7 +812,7 @@ class MediawikerConnectionManager(object):
 
         if connection:
             status_message(' done.')
-            if get_setting('debug'):
+            if props.get_setting('debug'):
                 self.debug_msgs.append('Connection: %s' % connection.connection)
 
             status_message('Login in with authorization type %s.. ' % site['authorization_type'], new_line=False)
@@ -815,7 +822,7 @@ class MediawikerConnectionManager(object):
                 try:
                     connection.login(cookies=site['cookies'])
 
-                    if get_setting('debug'):
+                    if props.get_setting('debug'):
                         self.debug_msgs.append('Username: %s' % connection.username.strip())
                         # not connection.logged_in and self.debug_msgs.append('* Anonymous connection: True')
                         self.debug_msgs.append('Anonymous connection: True') if not connection.logged_in else None
@@ -867,12 +874,12 @@ class MediawikerConnectionManager(object):
         if site['authorization_type'] != self.AUTH_TYPE_COOKIES:
             return None
 
-        cookie_files = get_setting('%s_cookie_files' % site['cookies_browser'], [])
+        cookie_files = props.get_setting('%s_cookie_files' % site['cookies_browser'], [])
         if not cookie_files:
             cookie_files = None
 
         if site['cookies_browser'] == "firefox":
-            return browser_cookie3.firefox(cookie_files=cookie_files, domain_name=site['host'], copy_path=from_package(name='User', posix=True, is_abs=True))
+            return browser_cookie3.firefox(cookie_files=cookie_files, domain_name=site['host'], copy_path=p.from_package(name='User', posix=True, is_abs=True))
         elif site['cookies_browser'] == 'chrome':
             return browser_cookie3.chrome(cookie_files=cookie_files, domain_name=site['host'])
         else:
@@ -979,7 +986,7 @@ class InputPanelPageTitle(InputPanel):
         if not title:
             title_pre = ''
             # use clipboard or selected text for page name
-            if bool(get_setting('clipboard_as_defaultpagename')):
+            if bool(props.get_setting('clipboard_as_defaultpagename')):
                 title_pre = sublime.get_clipboard().strip()
             if not title_pre:
                 selection = self.window.active_view().sel()
@@ -1014,7 +1021,7 @@ class InputPanelPassword(InputPanel):
         if site['username']:
             # auth required if username exists in settings
             if not password:
-                self.is_hide_password = get_setting('password_input_hide')
+                self.is_hide_password = props.get_setting('password_input_hide')
                 if self.is_hide_password:
                     self.ph = PasswordHider()
                 self.show_input('Password:', '')
@@ -1044,7 +1051,7 @@ class PasswordHider(object):
     password = ''
 
     def hide(self, password):
-        password_char = get_setting('password_char', '*')
+        password_char = props.get_setting('password_char', '*')
         if len(password) < len(self.password):
             self.password = self.password[:len(password)]
         else:
@@ -1116,12 +1123,11 @@ class WikiaInfoboxParser(HTMLParser):
     def get_params_list(self):
         params_list = []
         if self.params:
-            for p in self.params.keys():
-                param = '%s=%s' % (p, self.params[p])
+            for pk in self.params.keys():
+                param = '%s=%s' % (pk, self.params[pk])
                 params_list.append(param)
         return params_list
 
 
 if pythonver < 3:
     plugin_loaded()
-

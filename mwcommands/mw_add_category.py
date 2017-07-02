@@ -8,19 +8,19 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerSetCategoryCommand(sublime_plugin.WindowCommand):
     ''' alias to Add category command '''
 
     def run(self):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
-        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('add_category')})
+        self.window.run_command(utils.cmd('page'), {"action": utils.cmd('add_category')})
 
 
 class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
@@ -32,24 +32,24 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
     # TODO: back in category tree..
 
     def run(self, edit):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
-        self.category_root = mw.get_category(mw.get_setting('category_root'))[1]
+        self.category_root = utils.get_category(utils.props.get_setting('category_root'))[1]
         sublime.active_window().show_input_panel('Category:', self.category_root, self.get_category_menu, None, None)
 
     def get_category_menu(self, category_root):
-        categories = mw.api.call('get_subcategories', category_root=category_root)
+        categories = utils.api.call('get_subcategories', category_root=category_root)
         self.categories_list_names = []
         self.categories_list_values = []
 
-        self.categories_list_values.append(mw.api.page_attr(categories, 'name'))
-        self.categories_list_names.append(mw.api.page_attr(categories, 'page_title'))
+        self.categories_list_values.append(utils.api.page_attr(categories, 'name'))
+        self.categories_list_names.append(utils.api.page_attr(categories, 'page_title'))
 
         for category in categories:
-            if mw.api.page_attr(category, 'namespace') == mw.api.CATEGORY_NAMESPACE:
-                self.categories_list_values.append(mw.api.page_attr(category, 'name'))
-                self.categories_list_names.append(mw.api.page_attr(category, 'page_title'))
+            if utils.api.page_attr(category, 'namespace') == utils.api.CATEGORY_NAMESPACE:
+                self.categories_list_values.append(utils.api.page_attr(category, 'name'))
+                self.categories_list_names.append(utils.api.page_attr(category, 'page_title'))
 
         sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.categories_list_names, self.on_done), 1)
 
@@ -62,7 +62,7 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
 
     def set_category(self, category):
         index_of_textend = self.view.size()
-        self.view.run_command(mw.cmd('insert_text'), {'position': index_of_textend, 'text': '[[%s]]' % category})
+        self.view.run_command(utils.cmd('insert_text'), {'position': index_of_textend, 'text': '[[%s]]' % category})
         self.view.show(self.view.size())
 
     def on_done_final(self, idx):

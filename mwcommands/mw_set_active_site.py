@@ -8,9 +8,9 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
@@ -20,8 +20,8 @@ class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
     site_active = ''
 
     def run(self):
-        self.site_active = mw.get_view_site()
-        sites = mw.get_setting('site')
+        self.site_active = utils.get_view_site()
+        sites = utils.props.get_setting('site')
         self.site_keys = [self.is_checked(x) for x in sorted(sites.keys(), key=str.lower)]
         sublime.set_timeout(lambda: self.window.show_quick_panel(self.site_keys, self.on_done), 1)
 
@@ -36,6 +36,6 @@ class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
             if site_active.startswith(self.SITE_ON):
                 site_active = site_active[len(self.SITE_ON):]
             # force to set site_active in global and in view settings
-            if mw.props.get_view_setting(self.window.active_view(), 'is_here'):
-                mw.props.set_view_setting(self.window.active_view(), 'site', site_active)
-            mw.set_setting("site_active", site_active)
+            if utils.props.get_view_setting(self.window.active_view(), 'is_here'):
+                utils.props.set_view_setting(self.window.active_view(), 'site', site_active)
+            utils.props.set_setting("site_active", site_active)

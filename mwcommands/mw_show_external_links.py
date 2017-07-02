@@ -9,10 +9,10 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
     from . import mw_parser as par
 else:
-    import mw_utils as mw
+    import mw_utils as utils
     import mw_parser as par
 
 
@@ -20,12 +20,12 @@ class MediawikerShowExternalLinksCommand(sublime_plugin.TextCommand):
     actions = ['Goto external link', 'Open link in browser']
 
     def run(self, edit):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
         self.item = None
-        page = mw.api.get_page(mw.get_title())
-        linksgen = mw.api.get_page_extlinks(page)
+        page = utils.api.get_page(utils.get_title())
+        linksgen = utils.api.get_page_extlinks(page)
 
         self.p = par.Parser(self.view)
         self.p.register_all(par.Comment, par.Pre, par.Source, par.Link, par.ExternalLink)
@@ -39,10 +39,10 @@ class MediawikerShowExternalLinksCommand(sublime_plugin.TextCommand):
         if self.items_menu:
             sublime.set_timeout(lambda: self.view.window().show_quick_panel(self.items_menu, self.on_select), 1)
         else:
-            mw.status_message('No external links was found.')
+            utils.status_message('No external links was found.')
 
     def link_for_menu(self, link):
-        return mw.strunquote(link.split('#')[0])
+        return utils.strunquote(link.split('#')[0])
 
     def on_select(self, index):
         if index >= 0:

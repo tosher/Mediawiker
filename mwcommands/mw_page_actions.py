@@ -8,9 +8,9 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerPageCommand(sublime_plugin.WindowCommand):
@@ -20,11 +20,11 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
         self.action = action
         self.action_params = action_params
 
-        if not mw.conman.require_password():
-            panel_passwd = mw.InputPanelPassword(callback=self.command_run)
+        if not utils.conman.require_password():
+            panel_passwd = utils.InputPanelPassword(callback=self.command_run)
             panel_passwd.get_password()
         else:
-            mw.set_timeout_async(self.command_run, 0)
+            utils.set_timeout_async(self.command_run, 0)
 
     def command_run(self):
         self.window.active_view().run_command(self.action, self.action_params)

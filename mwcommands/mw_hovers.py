@@ -9,14 +9,15 @@ import webbrowser
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
     from . import mw_html
     from . import mw_parser as par
     from html import escape
 else:
-    import mw_utils as mw
+    import mw_utils as utils
     import mw_html
     from cgi import escape
+
 
 html = mw_html.MwHtmlAdv(html_id='mediawiker_hover', user_css=False)
 html.css_rules['ul'] = {'margin-left': '0', 'padding-left': '0rem'}
@@ -30,9 +31,9 @@ html.css_rules['.redlink'] = {'padding': '0px', 'color': '#c0392b'}
 
 
 def get_popup_flags(view):
-    if mw.props.get_view_setting(view, 'popups_off'):
+    if utils.props.get_view_setting(view, 'popups_off'):
         return None
-    popup_type = mw.get_setting('popup_type')
+    popup_type = utils.props.get_setting('popup_type')
     if popup_type == 'manual':
         return 0
     elif popup_type == 'auto':
@@ -102,12 +103,12 @@ def on_hover_internal_link(view, point):
     def on_navigate(link):
         page_name = link.split(':', 1)[-1].replace(' ', '_')
         if link.startswith('open'):
-            view.window().run_command(mw.cmd('page'), {
-                'action': mw.cmd('show_page'),
+            view.window().run_command(utils.cmd('page'), {
+                'action': utils.cmd('show_page'),
                 'action_params': {'title': page_name}
             })
         elif link.startswith('browse'):
-            url = mw.get_page_url(page_name)
+            url = utils.get_page_url(page_name)
             webbrowser.open(url)
         elif link.startswith('get_image'):
             webbrowser.open(page_name)
@@ -130,21 +131,21 @@ def on_hover_internal_link(view, point):
                 page_name = l.name
                 if l.name.startswith('/'):
                     # subpage
-                    page_name = '%s%s' % (mw.get_title(), l.name)
+                    page_name = '%s%s' % (utils.get_title(), l.name)
 
-                page = mw.api.get_page(page_name)
+                page = utils.api.get_page(page_name)
                 css_class = None if page.exists else 'redlink'
-                page_talk = mw.api.get_page_talk_page(page)
+                page_talk = utils.api.get_page_talk_page(page)
                 css_class_talk = None if page_talk.exists else 'redlink'
 
                 img_data = None
-                if mw.get_setting('show_image_in_popup'):
+                if utils.props.get_setting('show_image_in_popup'):
                     try:
-                        img_data, img_size, img_url = mw.api.call('get_image', title=page_name, thumb_size=mw.get_setting('popup_image_size'))
+                        img_data, img_size, img_url = utils.api.call('get_image', title=page_name, thumb_size=utils.props.get_setting('popup_image_size'))
                     except:
                         pass
 
-                h = 'Page "%s"' % html.span(page_name, css_class=css_class) if not img_data else 'File "%s"' % mw.api.page_attr(page, 'page_title')
+                h = 'Page "%s"' % html.span(page_name, css_class=css_class) if not img_data else 'File "%s"' % utils.api.page_attr(page, 'page_title')
                 content = [
                     html.h(lvl=4, title=h),
                     html.img(uri=img_data) if img_data else '',
@@ -157,8 +158,8 @@ def on_hover_internal_link(view, point):
                     ),
                     html.br(cnt=1),
                     html.join(
-                        html.link('open:%s' % mw.api.page_attr(page_talk, 'name'), 'Open talk page' if page_talk.exists else 'Create talk page', css_class=css_class_talk),
-                        html.link('browse:%s' % mw.api.page_attr(page_talk, 'name'), 'View talk page in browser', css_class=css_class_talk),
+                        html.link('open:%s' % utils.api.page_attr(page_talk, 'name'), 'Open talk page' if page_talk.exists else 'Create talk page', css_class=css_class_talk),
+                        html.link('browse:%s' % utils.api.page_attr(page_talk, 'name'), 'View talk page in browser', css_class=css_class_talk),
                         char=html.span('|', css_class='wide')
                     )
                 ]
@@ -191,8 +192,8 @@ def on_hover_template(view, point):
                     r.unfold()
                     return
         else:
-            sublime.active_window().run_command(mw.cmd('page'), {
-                'action': mw.cmd('show_page'),
+            sublime.active_window().run_command(utils.cmd('page'), {
+                'action': utils.cmd('show_page'),
                 'action_params': {'title': link.replace(' ', '_')}
             })
 
@@ -222,7 +223,7 @@ def on_hover_template(view, point):
                 template_type = 'Variable'
 
             if r.mode != r.MODE_VAR:
-                page = mw.api.get_page(r.page_name)
+                page = utils.api.get_page(r.page_name)
                 css_class = None if page.exists else 'redlink'
                 page_exists = page.exists
 
@@ -368,7 +369,7 @@ def on_hover_tag(view, point):
     if popup_flags is None:
         return
 
-    fold_tags = mw.get_setting("fold_tags")
+    fold_tags = utils.props.get_setting("fold_tags")
 
     p = par.Parser(view)
     p.register_all(

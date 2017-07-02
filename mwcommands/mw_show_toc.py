@@ -5,12 +5,6 @@
 import sublime
 import sublime_plugin
 
-# pythonver = sys.version_info[0]
-# if pythonver >= 3:
-#     from . import mw_utils as mw
-# else:
-#     import mw_utils as mw
-
 
 class MediawikerShowTocCommand(sublime_plugin.TextCommand):
     items = []

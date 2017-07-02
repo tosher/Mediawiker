@@ -3,22 +3,22 @@
 
 import sys
 
-import sublime
+# import sublime
 import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerEditPanelCommand(sublime_plugin.WindowCommand):
     options = []
 
     def run(self):
-        self.SNIPPET_CHAR = mw.get_setting('snippet_char')
-        self.options = [el for el in mw.get_setting('panel', []) if (not el.get('online', True) or el.get('online', True) != mw.get_setting('offline_mode'))]
+        self.SNIPPET_CHAR = utils.props.get_setting('snippet_char')
+        self.options = [el for el in utils.props.get_setting('panel', []) if (not el.get('online', True) or el.get('online', True) != utils.props.get_setting('offline_mode'))]
         if self.options:
             office_panel_list = ['%s' % val['caption'] if val['type'] != 'snippet' else '%s %s' % (
                 self.SNIPPET_CHAR, val['caption']) for val in self.options]
@@ -40,4 +40,4 @@ class MediawikerEditPanelCommand(sublime_plugin.WindowCommand):
                     # run text command
                     self.window.active_view().run_command(action_value)
             except ValueError as e:
-                mw.status_message(e)
+                utils.status_message(e)

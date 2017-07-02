@@ -9,25 +9,25 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerSearchStringCommand(sublime_plugin.WindowCommand):
     ''' alias to Search string list command '''
 
     def run(self):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
-        self.window.run_command(mw.cmd('page'), {"action": mw.cmd('search_string_list')})
+        self.window.run_command(utils.cmd('page'), {"action": utils.cmd('search_string_list')})
 
 
 class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        if mw.get_setting('offline_mode'):
+        if utils.props.get_setting('offline_mode'):
             return
 
         search_pre = ''
@@ -36,9 +36,9 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
         sublime.active_window().show_input_panel('Wiki search:', search_pre, self.show_results, None, None)
 
     def do_search(self, string_value):
-        namespace = mw.get_setting('search_namespaces')
-        search_limit = mw.get_setting('search_results_count', 20)
-        return mw.api.call('get_search_result', search=string_value, limit=search_limit, namespace=namespace)
+        namespace = utils.props.get_setting('search_namespaces')
+        search_limit = utils.props.get_setting('search_results_count', 20)
+        return utils.api.call('get_search_result', search=string_value, limit=search_limit, namespace=namespace)
 
     def show_results(self, search_value=''):
         # TODO: paging?
@@ -59,10 +59,10 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
             if text:
                 self.view = sublime.active_window().new_file()
                 # TODO: view set attrs in utils..
-                syntax_file = mw.get_setting('syntax')
+                syntax_file = utils.props.get_setting('syntax')
                 self.view.set_syntax_file(syntax_file)
                 self.view.set_name('Wiki search results: %s' % search_value)
-                self.view.run_command(mw.cmd('insert_text'), {'position': 0, 'text': text})
+                self.view.run_command(utils.cmd('insert_text'), {'position': 0, 'text': text})
             elif search_value:
                 sublime.message_dialog('No results for: %s' % search_value)
 
@@ -82,4 +82,3 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
         text = re.sub(r'<\/div>', '', text)
         text = text.replace('`', "'''")  # search words highlight
         return text.strip()
-

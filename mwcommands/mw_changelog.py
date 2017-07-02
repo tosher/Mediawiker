@@ -9,10 +9,10 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
     from . import mw_html
 else:
-    import mw_utils as mw
+    import mw_utils as utils
     import mw_html
 
 
@@ -28,23 +28,23 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
             else:
                 return
 
-        self.MARKED = mw.get_setting('config_icon_checked')
-        self.UNMARKED = mw.get_setting('config_icon_unchecked')
-        self.RADIO_MARKED = mw.get_setting('config_icon_radio_checked')
-        self.RADIO_UNMARKED = mw.get_setting('config_icon_radio_unchecked')
-        self.EDIT_ICON = mw.get_setting('config_icon_edit')
-        self.BACK_ICON = mw.get_setting('config_icon_back')
-        self.LIST_ICON = mw.get_setting('config_icon_unnumbered_list')
+        self.MARKED = utils.props.get_setting('config_icon_checked')
+        self.UNMARKED = utils.props.get_setting('config_icon_unchecked')
+        self.RADIO_MARKED = utils.props.get_setting('config_icon_radio_checked')
+        self.RADIO_UNMARKED = utils.props.get_setting('config_icon_radio_unchecked')
+        self.EDIT_ICON = utils.props.get_setting('config_icon_edit')
+        self.BACK_ICON = utils.props.get_setting('config_icon_back')
+        self.LIST_ICON = utils.props.get_setting('config_icon_unnumbered_list')
 
         self.html = mw_html.MwHtmlAdv(html_id='mediawiker_changelog', user_css=False)
         self.set_css()
         # self.html.debug = True
 
         if pythonver >= 3:
-            with open(mw.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r', encoding='utf-8') as cl:
+            with open(p.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r', encoding='utf-8') as cl:
                 log = cl.read()
         else:
-            with open(mw.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r') as cl:
+            with open(p.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r') as cl:
                 log = cl.read().decode('utf-8')
 
         self.process_h2_regions(log, 2, version)
@@ -110,14 +110,14 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
 
         if version == 'sublime':
             view = sublime.active_window().new_file()
-            view.set_name('%s changelog' % mw.PM)
+            view.set_name('%s changelog' % p.PM)
             view.settings().set('gutter', False)
             view.settings().set('word_wrap', True)
             view.settings().set('wrap_width', 120)
             view.add_phantom('changelog', view.sel()[0], html, sublime.LAYOUT_INLINE, on_navigate=self.on_navigate)
             view.set_scratch(True)
         elif version == 'browser':
-            preview_file = mw.from_package('%s_changelog.html' % mw.PML, name='User', posix=False, is_abs=True)
+            preview_file = p.from_package('%s_changelog.html' % p.PML, name='User', posix=False, is_abs=True)
             html = html.replace('<html>', '<html><head><meta charset="UTF-8"/></head>')
             if pythonver >= 3:
                 with open(preview_file, 'w', encoding='utf-8') as tf:

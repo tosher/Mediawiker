@@ -14,10 +14,10 @@ import sublime_plugin
 pythonver = sys.version_info[0]
 
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
     from . import mw_html
 else:
-    import mw_utils as mw
+    import mw_utils as utils
     import mw_html
 
 
@@ -36,13 +36,13 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
     PROPERTY_SITE_NAME = 'name'
 
     def run(self, edit):
-        self.MARKED = mw.get_setting('config_icon_checked')
-        self.UNMARKED = mw.get_setting('config_icon_unchecked')
-        self.RADIO_MARKED = mw.get_setting('config_icon_radio_checked')
-        self.RADIO_UNMARKED = mw.get_setting('config_icon_radio_unchecked')
-        self.EDIT_ICON = mw.get_setting('config_icon_edit')
-        self.BACK_ICON = mw.get_setting('config_icon_back')
-        self.LIST_ICON = mw.get_setting('config_icon_unnumbered_list')
+        self.MARKED = utils.props.get_setting('config_icon_checked')
+        self.UNMARKED = utils.props.get_setting('config_icon_unchecked')
+        self.RADIO_MARKED = utils.props.get_setting('config_icon_radio_checked')
+        self.RADIO_UNMARKED = utils.props.get_setting('config_icon_radio_unchecked')
+        self.EDIT_ICON = utils.props.get_setting('config_icon_edit')
+        self.BACK_ICON = utils.props.get_setting('config_icon_back')
+        self.LIST_ICON = utils.props.get_setting('config_icon_unnumbered_list')
 
         self.html = mw_html.MwHtmlAdv(html_id='mediawiker_configurator')
         self.set_css()
@@ -125,9 +125,9 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
             goto=section
         )
 
-        self.options_default = mw.get_default_setting('panel')
-        self.options = mw.get_setting('panel')
-        snippet_char = mw.get_setting('snippet_char')
+        self.options_default = utils.props.get_default_setting('panel')
+        self.options = utils.props.get_setting('panel')
+        snippet_char = utils.props.get_setting('snippet_char')
 
         for idx, option in enumerate(self.options_default):
             option_value = True if option in self.options else False
@@ -174,10 +174,10 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
         popup.append(self.html.h2('Preferences'))
 
         popup.append(self.html.ul())
-        for option in sorted(mw.props.props, key=lambda k: mw.props.props[k]['text'].lower()):
-            value = mw.get_setting(option)
-            name = mw.props.props.get(option)['text']
-            option_default_value = mw.props.get_default_setting(option)
+        for option in sorted(utils.props.props, key=lambda k: utils.props.props[k]['text'].lower()):
+            value = utils.props.get_setting(option)
+            name = utils.props.props.get(option)['text']
+            option_default_value = utils.props.get_default_setting(option)
             if isinstance(option_default_value, bool):
 
                 status = self.icon(
@@ -218,8 +218,8 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
     def show_select_wiki(self, section, popup):
         popup.append(self.html.h2('Select wiki'))
-        sites = mw.get_setting('site')
-        site_active = mw.get_view_site()
+        sites = utils.props.get_setting('site')
+        site_active = utils.get_view_site()
 
         popup.append(self.html.ul())
 
@@ -269,16 +269,16 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
         if site == 'new':
             site = ''
-            settings_default = {self.PROPERTY_SITE_NAME: mw.props.props_site[self.PROPERTY_SITE_NAME]}
+            settings_default = {self.PROPERTY_SITE_NAME: utils.props.props_site[self.PROPERTY_SITE_NAME]}
 
         else:
-            settings_default = mw.props.props_site
+            settings_default = utils.props.props_site
 
         popup.append(self.html.ul())
         for option in sorted(settings_default, key=lambda k: settings_default[k]['text'].lower()):
-            option_pretty = mw.props.props_site[option]['text']
-            value = mw.props.get_site_setting(site, option) if option != self.PROPERTY_SITE_NAME else site
-            if mw.props.props_site[option]['type'] is bool:
+            option_pretty = utils.props.props_site[option]['text']
+            value = utils.props.get_site_setting(site, option) if option != self.PROPERTY_SITE_NAME else site
+            if utils.props.props_site[option]['type'] is bool:
 
                 name = option_pretty
                 status = self.icon(
@@ -291,7 +291,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
             else:
                 if option.endswith(('password', 'secret', 'token')):
                     option_type = self.TYPE_PASSWORD
-                    value_pretty = mw.get_setting('password_char') * 8 if value else '""'
+                    value_pretty = utils.props.get_setting('password_char') * 8 if value else '""'
                 else:
                     option_type = str.__name__
                     value_pretty = '"%s"' % self.html.code(value) if value else '""'
@@ -321,14 +321,14 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
     def show_tab_options(self, section, popup):
         popup.append(self.html.h2('Tab options'))
 
-        settings_default = mw.props.props_view
+        settings_default = utils.props.props_view
 
         popup.append(self.html.ul())
 
         for option in settings_default.keys():
             name = settings_default[option]['text']
             option_type = settings_default[option]['type']
-            value = mw.props.get_view_setting(self.view, option)
+            value = utils.props.get_view_setting(self.view, option)
 
             if option_type is bool:
                 status = self.icon(self.MARKED if value else self.UNMARKED, 'success' if value else 'error')
@@ -405,7 +405,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
     def toggle_edit_panel(self, value, idx):
         elem = self.options_default[idx]
         if value == 'all_on':
-            mw.del_setting('panel')
+            utils.props.del_setting('panel')
         else:
             if value == 'all_off':
                 self.options = []
@@ -413,7 +413,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
                 self.options.append(elem)
             elif elem in self.options:
                 self.options.remove(elem)
-            mw.set_setting('panel', self.options)
+            utils.props.set_setting('panel', self.options)
 
     def on_navigate_edit_panel(self, section, value, params, goto):
         idx = int(params)
@@ -424,7 +424,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
         is_async = False
         option, option_type = params
         if option_type == bool.__name__:
-            mw.set_setting(option, value)
+            utils.props.set_setting(option, value)
         elif option_type in (str.__name__, int.__name__):
             is_async = True
             option_pretty = self.pretty(option)
@@ -435,9 +435,9 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
     def on_navigate_select_wiki(self, section, value, params, goto):
         if value != 'edit':
-            if mw.props.get_view_setting(self.view, 'is_here', False):
-                mw.props.set_view_setting(self.view, 'site', params)
-            mw.set_setting("site_active", params)
+            if utils.props.get_view_setting(self.view, 'is_here', False):
+                utils.props.set_view_setting(self.view, 'site', params)
+            utils.props.set_setting("site_active", params)
 
         return False
 
@@ -449,7 +449,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
             panel = InputSiteValue(callback=self.show, site=site, option=option, goto=goto)
             panel.show_input(panel_title=option_pretty, value_pre=value)
         elif option_type == bool.__name__:
-            mw.props.set_site_setting(site, option, value)
+            utils.props.set_site_setting(site, option, value)
         elif option_type in (str.__name__, self.TYPE_PASSWORD):
             is_async = True
             option_pretty = self.pretty(option)
@@ -465,7 +465,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
         is_async = False
         option, option_type = params
         if option_type == bool.__name__:
-            mw.props.set_view_setting(self.view, option, value)
+            utils.props.set_view_setting(self.view, option, value)
         elif option_type in (int.__name__, str.__name__):
             is_async = True
             option_pretty = self.pretty(option)
@@ -513,7 +513,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
             self.show(goto)
 
 
-class InputValue(mw.InputPanel):
+class InputValue(utils.InputPanel):
 
     def __init__(self, callback, option, goto, option_type=str.__name__):
         super(InputValue, self).__init__(callback=callback)
@@ -527,21 +527,21 @@ class InputValue(mw.InputPanel):
         self.set_setting()
 
     def on_cancel(self):
-        mw.set_timeout_async(self.callback(self.goto), 0)
+        utils.set_timeout_async(self.callback(self.goto), 0)
 
     def set_setting(self):
-        mw.set_setting(self.option, self.value)
-        mw.set_timeout_async(self.callback(self.goto), 0)
+        utils.props.set_setting(self.option, self.value)
+        utils.set_timeout_async(self.callback(self.goto), 0)
 
 
 class InputTabValue(InputValue):
 
     def set_setting(self):
-        mw.props.set_view_setting(sublime.active_window().active_view(), self.option, self.value)
-        mw.set_timeout_async(self.callback(self.goto), 0)
+        utils.props.set_view_setting(sublime.active_window().active_view(), self.option, self.value)
+        utils.set_timeout_async(self.callback(self.goto), 0)
 
 
-class InputSiteValue(mw.InputPanel):
+class InputSiteValue(utils.InputPanel):
 
     def __init__(self, callback, site, option, goto):
         super(InputSiteValue, self).__init__(callback=callback)
@@ -556,7 +556,7 @@ class InputSiteValue(mw.InputPanel):
         self.window.show_input_panel(panel_title, value_pre, self.on_done, self.on_change, self.on_cancel)
 
     def show_input_passwd(self, value_pre):
-        self.ph = mw.PasswordHider()
+        self.ph = utils.PasswordHider()
         password = self.ph.hide(value_pre)
         self.show_input(panel_title='Password', value_pre=password)
 
@@ -571,11 +571,11 @@ class InputSiteValue(mw.InputPanel):
         self.set_setting()
 
     def on_cancel(self):
-        mw.set_timeout_async(self.callback(self.goto), 0)
+        utils.set_timeout_async(self.callback(self.goto), 0)
 
     def set_setting(self):
         if self.option == 'name':
-            settings = mw.get_setting('site')
+            settings = utils.props.get_setting('site')
             if not self.value_pre or self.value_pre not in settings:
                 settings[self.value] = {}
             else:
@@ -583,8 +583,8 @@ class InputSiteValue(mw.InputPanel):
                 del settings[self.value_pre]
             section = self.goto.split('/')[0]
             self.goto = '/'.join([section, self.value])
-            mw.set_setting('site', settings)
+            utils.props.set_setting('site', settings)
         else:
-            mw.props.set_site_setting(self.site, self.option, self.value if self.value is not None else '')
+            utils.props.set_site_setting(self.site, self.option, self.value if self.value is not None else '')
 
-        mw.set_timeout_async(self.callback(self.goto), 0)
+        utils.set_timeout_async(self.callback(self.goto), 0)

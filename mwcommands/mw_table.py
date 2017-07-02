@@ -9,9 +9,9 @@ import sublime_plugin
 
 pythonver = sys.version_info[0]
 if pythonver >= 3:
-    from . import mw_utils as mw
+    from . import mw_utils as utils
 else:
-    import mw_utils as mw
+    import mw_utils as utils
 
 
 class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
@@ -21,11 +21,11 @@ class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
 
     # TODO: rewrite as simple to wiki command
     def run(self, edit):
-        self.delimiter = mw.get_setting('csvtable_delimiter', '|')
+        self.delimiter = utils.props.get_setting('csvtable_delimiter', '|')
         table_header = '{|'
         table_footer = '|}'
-        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw.get_setting('wikitable_properties', {}).items()])
-        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw.get_setting('wikitable_cell_properties', {}).items()])
+        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in utils.props.get_setting('wikitable_properties', {}).items()])
+        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in utils.props.get_setting('wikitable_cell_properties', {}).items()])
         if cell_properties:
             cell_properties = ' %s | ' % cell_properties
 
@@ -96,7 +96,7 @@ class MediawikerTableWikiToSimpleCommand(sublime_plugin.TextCommand):
             try:
                 self.view.run_command('table_editor_enable_for_current_view', {'prop': 'enable_table_editor'})
             except Exception as e:
-                mw.status_message('Need to correct install plugin TableEditor: %s' % e)
+                utils.status_message('Need to correct install plugin TableEditor: %s' % e)
 
     def table_get(self, text):
         tbl_row_delimiter = r'\|\-(.*)'
@@ -208,7 +208,7 @@ class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
         REPLACE_STR = ':::'
 
         text_wikitable = ''
-        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw.get_setting('wikitable_properties', {}).items()])
+        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in utils.props.get_setting('wikitable_properties', {}).items()])
 
         need_header = table_list[0][0]['is_header']
         is_first_line = True
@@ -228,9 +228,9 @@ class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
     def getrow(self, delimiter, rowlist=None):
         if rowlist is None:
             rowlist = []
-        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in mw.get_setting('wikitable_cell_properties', {}).items()])
+        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in utils.props.get_setting('wikitable_cell_properties', {}).items()])
         cell_properties = '%s | ' % cell_properties if cell_properties else ''
         try:
             return delimiter.join(' %s%s ' % (cell_properties, cell['cell_data'].strip()) for cell in rowlist)
         except Exception as e:
-            mw.status_message('Error in data: %s' % e)
+            utils.status_message('Error in data: %s' % e)
