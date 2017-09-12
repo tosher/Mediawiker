@@ -41,10 +41,10 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
         # self.html.debug = True
 
         if pythonver >= 3:
-            with open(p.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r', encoding='utf-8') as cl:
+            with open(utils.p.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r', encoding='utf-8') as cl:
                 log = cl.read()
         else:
-            with open(p.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r') as cl:
+            with open(utils.p.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r') as cl:
                 log = cl.read().decode('utf-8')
 
         self.process_h2_regions(log, 2, version)
@@ -110,14 +110,14 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
 
         if version == 'sublime':
             view = sublime.active_window().new_file()
-            view.set_name('%s changelog' % p.PM)
+            view.set_name('%s changelog' % utils.p.PM)
             view.settings().set('gutter', False)
             view.settings().set('word_wrap', True)
             view.settings().set('wrap_width', 120)
             view.add_phantom('changelog', view.sel()[0], html, sublime.LAYOUT_INLINE, on_navigate=self.on_navigate)
             view.set_scratch(True)
         elif version == 'browser':
-            preview_file = p.from_package('%s_changelog.html' % p.PML, name='User', posix=False, is_abs=True)
+            preview_file = utils.p.from_package('%s_changelog.html' % utils.p.PML, name='User', posix=False, is_abs=True)
             html = html.replace('<html>', '<html><head><meta charset="UTF-8"/></head>')
             if pythonver >= 3:
                 with open(preview_file, 'w', encoding='utf-8') as tf:

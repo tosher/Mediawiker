@@ -516,5 +516,11 @@ Support folding/unfolding for:
 * New snippet: {{Snippet|syntaxhighlight}}, with trigger <code>wss</code>. Thanks to [https://github.com/rabin-io @rabin-io].
 
 == Mediawiker 3.4.2 ==
-* Upload file from url;
+* Upload file from url with the same way as from local path;
+* New command: {{Command|Open section of a page}} - possibility to edit page's section instead of whole page;
+** Also, section can be opened by title like <code>Page_name::Section_number</code>.
 * Properties loading refactoring.
+
+== Mediawiker 3.4.3 ==
+* Lost command {{Command|Open section of a page}}
+

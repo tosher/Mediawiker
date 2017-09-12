@@ -34,7 +34,22 @@ class MediawikerOpenPageCommand(sublime_plugin.WindowCommand):
         if utils.props.get_setting('offline_mode'):
             return
 
-        self.window.run_command(utils.cmd('page'), {"action": utils.cmd('show_page')})
+        self.window.run_command(utils.cmd('page'), {
+            "action": utils.cmd('show_page')
+        })
+
+
+class MediawikerOpenPageSectionCommand(sublime_plugin.WindowCommand):
+    ''' alias to Get page command '''
+
+    def run(self):
+        if utils.props.get_setting('offline_mode'):
+            return
+
+        self.window.run_command(utils.cmd('page'), {
+            "action": utils.cmd('show_page'),
+            'action_params': {'by_section': True}
+        })
 
 
 class MediawikerReopenPageCommand(sublime_plugin.WindowCommand):
@@ -44,9 +59,10 @@ class MediawikerReopenPageCommand(sublime_plugin.WindowCommand):
             return
 
         title = utils.get_title()
+        section = utils.props.get_view_setting(self.window.active_view(), 'section', None)
         self.window.run_command(utils.cmd('page'), {
             'action': utils.cmd('show_page'),
-            'action_params': {'title': title, 'new_tab': False}
+            'action_params': {'title': title, 'new_tab': False, 'section': section}
         })
 
 
@@ -62,7 +78,13 @@ class MediawikerPostPageCommand(sublime_plugin.WindowCommand):
 
 class MediawikerShowPageCommand(sublime_plugin.TextCommand):
 
-    def run(self, edit, title=None, new_tab=None, site_active=None):
+    SECTION_SPLITTER = '::'
+
+    def run(self, edit, title=None, new_tab=None, site_active=None, section=None, by_section=False):
+        self.title = title
+        self.section = section
+        self.by_section = by_section
+        self.sections_idx = []
         if utils.props.get_setting('offline_mode'):
             return
 
@@ -74,10 +96,40 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         # from view with undefined site (new) open page by global site_active setting
         self.site_active = site_active if site_active else utils.get_view_site()
 
-        panel = utils.InputPanelPageTitle(callback=self.page_open)
+        panel = utils.InputPanelPageTitle(callback=self.get_section_number)
         panel.get_title(title)
 
+    def get_section_number(self, title):
+        self.title = title
+        # if splitter in title => force set and open section
+        # if section defined => force open section
+        # if section undefined, no splitter and by_section is True => get section, open section
+        # if section undefined, no splitter and by_section is False => just open page
+        if not self.section and self.SECTION_SPLITTER in self.title:
+            title_parts = self.title.split(self.SECTION_SPLITTER)
+            self.title = title_parts[0]
+            self.section = int(title_parts[1])
+            return self.page_open(self.title)
+        elif self.section or not self.by_section:
+            return self.page_open(self.title)
+
+        page = utils.api.call('get_page', title=title)
+        sections = utils.api.call('page_sections', page=page)
+        sections_menu = []
+        self.sections_idx = []
+        for section in sections:
+            subtitle = '%s%s' % ('  ' * int(section['toclevel']), section['line'])
+            sections_menu.append(subtitle)
+            self.sections_idx.append(section['index'])
+        sublime.active_window().show_quick_panel(sections_menu, self.on_done_get_section)
+
+    def on_done_get_section(self, section_idx):
+        if section_idx > -1 and self.sections_idx:
+            self.section = int(self.sections_idx[section_idx])
+            self.page_open(self.title)
+
     def page_open(self, title):
+        self.title = title
 
         if self.new_tab:
             view = sublime.active_window().new_file()
@@ -85,7 +137,8 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         else:
             view = self.view
 
-        page = utils.api.call('get_page', title=title)
+        page = utils.api.call('get_page', title=self.title)
+        utils.props.set_view_setting(view, 'section', self.section if self.section is not None else 0)
 
         if utils.api.page_can_edit(page):
             # can read and edit
@@ -100,23 +153,22 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
             view.close()
             return
 
-        text = utils.api.page_get_text(page)
+        text = utils.api.page_get_text(page, self.section)
         page_namespace = utils.api.page_attr(page, 'namespace')
 
         if not text:
-            utils.status_message('Page [[%s]] is not exists. You can create new..' % (title))
+            utils.status_message('Page [[%s]] is not exists. You can create new..' % (self.title))
             text = '<!-- New wiki page: Remove this with text of the new page -->'
 
         view.run_command(utils.cmd('insert_text'), {'position': 0, 'text': text, 'with_erase': True})
 
         if utils.props.get_site_setting(self.site_active, 'show_red_links'):
             utils.show_red_links(view, page)
-        utils.status_message('Page [[%s]] was opened successfully from "%s".' % (title, utils.get_view_site()), replace=['[', ']'])
-        utils.set_syntax(title, page_namespace)
+        utils.status_message('Page [[%s]] was opened successfully from "%s".' % (self.title, utils.get_view_site()), replace=['[', ']'])
+        utils.set_syntax(self.title, page_namespace)
         utils.props.set_view_setting(view, 'is_here', True)
         utils.props.set_view_setting(view, 'wiki_instead_editor', utils.props.get_setting('wiki_instead_editor'))
-        view.set_name(title)
-
+        view.set_name(self.title)
         view.set_scratch(True)
         # own is_changed flag instead of is_dirty for possib. to reset..
         utils.props.set_view_setting(view, 'is_changed', False)
@@ -178,7 +230,15 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
         if summary[0] == '!':
             mark_as_minor = not mark_as_minor
             summary = summary[1:]
-        utils.api.save_page(self.page, self.current_text, summary, mark_as_minor)
+
+        section = utils.props.get_view_setting(self.view, 'section', None)
+        utils.api.save_page(
+            page=self.page,
+            text=self.current_text,
+            summary=summary,
+            mark_as_minor=mark_as_minor,
+            section=section
+        )
 
         # update revision for page in view
         self.page = utils.api.get_page(self.title)

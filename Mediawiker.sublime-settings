@@ -130,6 +130,7 @@
     "mediawiker_panel":
     [
         {"caption": "Open page", "type": "window_command", "value": "mediawiker_open_page", "online": true},
+        {"caption": "Open section of a page", "type": "window_command", "value": "mediawiker_open_page_section", "online": true},
         {"caption": "Post page", "type": "window_command", "value": "mediawiker_post_page", "online": true},
         {"caption": "Move page", "type": "window_command", "value": "mediawiker_move_page", "online": true},
         {"caption": "Pages history", "type": "window_command", "value": "mediawiker_page_list", "online": true},

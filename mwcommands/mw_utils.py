@@ -225,9 +225,9 @@ def process_red_links(view, page):
 
 def pagename_clear(pagename):
     """ Return clear pagename if page-url was set instead of.."""
-    site = props.get_setting('site').get(get_view_site())
-    host = site.get('host', None)
-    pagepath = site.get('pagepath', None)
+    site = get_view_site()
+    host = props.get_site_setting(site, 'host')
+    pagepath = props.get_site_setting(site, 'pagepath')
 
     if not host or not pagepath:
         return pagename
@@ -510,7 +510,8 @@ class PreAPI(object):
     def get_page_langlinks(self, page):
         return page.langlinks()
 
-    def save_page(self, page, text, summary, mark_as_minor):
+    def save_page(self, page, text, summary, mark_as_minor, section=None):
+        section = int(section) if section else None
         try:
             # verify connection
             self.get_connect()
@@ -518,7 +519,7 @@ class PreAPI(object):
             status_message('%s exception: %s' % (type(e).__name__, e))
 
         try:
-            page.save(text, summary=summary.strip(), minor=mark_as_minor)
+            page.save(text, summary=summary.strip(), minor=mark_as_minor, section=section)
         except Exception as e:
             status_message('%s exception: %s' % (type(e).__name__, e))
 
@@ -539,13 +540,21 @@ class PreAPI(object):
     def page_can_edit(self, page):
         return page.can('edit')
 
-    def page_get_text(self, page):
+    def page_get_text(self, page, section=None):
+        section = int(section) if section else None
         try:
             if self.page_can_read(page):
-                return page.text()
+                return page.text(section=section)
         except:
             pass
         return ''
+
+    def page_sections(self, page):
+        con = self.get_connect()
+        data = con.parse(page=self.page_attr(page, 'page_title'), prop='sections')
+        if data:
+            return data.get('sections', [])
+        return []
 
     def get_subcategories(self, category_root):
         return self.get_connect().Categories.get(category_root, [])

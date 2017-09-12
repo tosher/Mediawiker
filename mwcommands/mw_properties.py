@@ -113,7 +113,8 @@ class MediawikerProperties(object):
         'site': {'text': 'Mediawiki site in view', 'default': '', 'type': str},
         'page_revision': {'text': 'Page revision number', 'default': 0, 'type': int},
         'is_changed': {'text': 'Page has changes', 'default': False, 'type': bool},
-        'popups_off': {'text': 'Turn off popups', 'default': False, 'type': bool}
+        'popups_off': {'text': 'Turn off popups', 'default': False, 'type': bool},
+        'section': {'text': 'Page section', 'default': 0, 'type': int}
     }
 
     props_site = {
