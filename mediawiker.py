@@ -31,33 +31,34 @@ class MediawikerOpenPageCommand(sublime_plugin.WindowCommand):
     ''' alias to Get page command '''
 
     def run(self):
-        if utils.props.get_setting('offline_mode'):
-            return
-
         self.window.run_command(utils.cmd('page'), {
             "action": utils.cmd('show_page')
         })
+
+    def is_visible(self, *args):
+        if utils.props.get_setting('offline_mode'):
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
 
 
 class MediawikerOpenPageSectionCommand(sublime_plugin.WindowCommand):
     ''' alias to Get page command '''
 
     def run(self):
-        if utils.props.get_setting('offline_mode'):
-            return
-
         self.window.run_command(utils.cmd('page'), {
             "action": utils.cmd('show_page'),
             'action_params': {'by_section': True}
         })
 
+    def is_visible(self, *args):
+        if utils.props.get_setting('offline_mode'):
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
+
 
 class MediawikerReopenPageCommand(sublime_plugin.WindowCommand):
 
     def run(self):
-        if utils.props.get_setting('offline_mode'):
-            return
-
         title = utils.get_title()
         section = utils.props.get_view_setting(self.window.active_view(), 'section', None)
         self.window.run_command(utils.cmd('page'), {
@@ -65,15 +66,22 @@ class MediawikerReopenPageCommand(sublime_plugin.WindowCommand):
             'action_params': {'title': title, 'new_tab': False, 'section': section}
         })
 
+    def is_visible(self, *args):
+        if utils.props.get_setting('offline_mode'):
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
+
 
 class MediawikerPostPageCommand(sublime_plugin.WindowCommand):
     ''' alias to Publish page command '''
 
     def run(self):
-        if utils.props.get_setting('offline_mode'):
-            return
-
         self.window.run_command(utils.cmd('page'), {"action": utils.cmd('publish_page')})
+
+    def is_visible(self, *args):
+        if utils.props.get_setting('offline_mode'):
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
 
 
 class MediawikerShowPageCommand(sublime_plugin.TextCommand):
@@ -266,10 +274,12 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 
 class MediawikerMovePageCommand(sublime_plugin.TextCommand):
 
-    def run(self, edit):
+    def is_visible(self, *args):
         if utils.props.get_setting('offline_mode'):
-            return
+            return False
+        return utils.props.get_view_setting(self.view, 'is_here')
 
+    def run(self, edit):
         self.title = utils.get_title()
         if self.title:
             self.page = utils.api.get_page(self.title)
@@ -318,10 +328,12 @@ class MediawikerMovePageCommand(sublime_plugin.TextCommand):
 class MediawikerOpenTalkPageCommand(sublime_plugin.WindowCommand):
     ''' Open talk page for current page '''
 
-    def run(self):
+    def is_visible(self, *args):
         if utils.props.get_setting('offline_mode'):
-            return
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
 
+    def run(self):
         page = utils.api.get_page(utils.get_title())
         page_talk = utils.api.get_page_talk_page(page)
 
@@ -342,3 +354,8 @@ class MediawikerPopupCommand(sublime_plugin.WindowCommand):
     def run(self):
         view = self.window.active_view()
         MediawikerEvents.on_hover(self, view, view.sel()[0].a, sublime.HOVER_TEXT)
+
+    def is_visible(self, *args):
+        if utils.props.get_setting('offline_mode'):
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')

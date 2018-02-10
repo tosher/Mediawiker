@@ -1076,7 +1076,7 @@ contexts:
             2: entity.name.tag.validhtml.mediawiki
           pop: true
         - include: inline
-    - match: '(?i:(<(span|font|div)(\b[^>]*)>))'
+    - match: '(?i:(<(span|font|div|html5media)(\b[^>]*)>))'
       captures:
         1: meta.tag.validhtml.mediawiki
         2: entity.name.tag.validhtml.mediawiki
@@ -1330,6 +1330,7 @@ contexts:
             - include: block_pre_spaced_in_templates
             - include: inline
             - include: block
+            - include: block_highlight # TODO: test
 
   template_parameters:
     # comment: Template parameters in template declaration (on template page)

@@ -17,10 +17,12 @@ class MediawikerShowPageBacklinksCommand(sublime_plugin.WindowCommand):
     ''' alias to PageBacklinks command '''
 
     def run(self):
-        if utils.props.get_setting('offline_mode'):
-            return
-
         self.window.run_command(utils.cmd('page'), {"action": utils.cmd('page_backlinks')})
+
+    def is_visible(self, *args):
+        if utils.props.get_setting('offline_mode'):
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
 
 
 class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):

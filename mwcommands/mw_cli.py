@@ -16,9 +16,6 @@ else:
 class MediawikerCliCommand(sublime_plugin.WindowCommand):
 
     def run(self, url):
-        if utils.props.get_setting('offline_mode'):
-            return
-
         if url:
             url = utils.strunquote(url)
             sublime.set_timeout(lambda: self.window.run_command(utils.cmd('page'), {
@@ -32,3 +29,8 @@ class MediawikerCliCommand(sublime_plugin.WindowCommand):
         elif sublime.platform() == 'linux' and url.startswith("'") and url.endswith("'"):
             url = url[1:-1]
         return url.split("://")[1]
+
+    def is_visible(self, *args):
+        if utils.props.get_setting('offline_mode'):
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')

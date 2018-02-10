@@ -19,6 +19,9 @@ class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
 
     delimiter = '|'
 
+    def is_visible(self, *args):
+        return utils.props.get_view_setting(self.view, 'is_here')
+
     # TODO: rewrite as simple to wiki command
     def run(self, edit):
         self.delimiter = utils.props.get_setting('csvtable_delimiter', '|')
@@ -77,6 +80,9 @@ class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
 
 class MediawikerTableWikiToSimpleCommand(sublime_plugin.TextCommand):
     ''' convert selected (or under cursor) wiki table to Simple table (TableEdit plugin) '''
+
+    def is_visible(self, *args):
+        return utils.props.get_view_setting(self.view, 'is_here')
 
     # TODO: wiki table properties will be lost now...
     def run(self, edit):
@@ -151,6 +157,9 @@ class MediawikerTableWikiToSimpleCommand(sublime_plugin.TextCommand):
 
 class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
     ''' convert selected (or under cursor) Simple table (TableEditor plugin) to wiki table '''
+
+    def is_visible(self, *args):
+        return utils.props.get_view_setting(self.view, 'is_here')
 
     def run(self, edit):
         selection = self.view.sel()

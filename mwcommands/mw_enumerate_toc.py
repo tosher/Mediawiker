@@ -18,6 +18,9 @@ class MediawikerEnumerateTocCommand(sublime_plugin.TextCommand):
     items = []
     regions = []
 
+    def is_visible(self, *args):
+        return utils.props.get_view_setting(self.view, 'is_here')
+
     def run(self, edit):
         self.items = []
         self.regions = []

@@ -524,3 +524,9 @@ Support folding/unfolding for:
 == Mediawiker 3.4.3 ==
 * Lost command {{Command|Open section of a page}}
 
+== Mediawiker 3.4.4 ==
+* Default/User settings in one window
+* Extension [https://www.mediawiki.org/wiki/Extension:Html5mediator Html5mediator] tag support
+* Search fix
+* Commands visibility in offline mode
+

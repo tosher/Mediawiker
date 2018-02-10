@@ -22,6 +22,9 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
     DRAW_TYPE = sublime.HIDDEN + sublime.PERSISTENT
     point = None
 
+    def is_visible(self, *args):
+        return utils.props.get_view_setting(self.view, 'is_here')
+
     def get_colapse_headers(self, headers):
         if headers:
             level = headers[0].level

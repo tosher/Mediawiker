@@ -22,6 +22,11 @@ class MediawikerCategoryTreeCommand(sublime_plugin.WindowCommand):
 
         self.window.run_command(utils.cmd('page'), {"action": utils.cmd('category_list')})
 
+    def is_visible(self, *args):
+        if utils.props.get_setting('offline_mode'):
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
+
 
 class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
     pages = {}  # pagenames -> namespaces

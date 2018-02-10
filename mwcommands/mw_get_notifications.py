@@ -20,10 +20,12 @@ class MediawikerNotificationsCommand(sublime_plugin.WindowCommand):
     https://www.mediawiki.org/wiki/Extension:Echo
     '''
 
-    def run(self):
+    def is_visible(self, *args):
         if utils.props.get_setting('offline_mode'):
-            return
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
 
+    def run(self):
         ignore_read = not utils.props.get_setting('notifications_show_all')
         read_sign = utils.props.get_setting('notifications_read_sign')
         self.msgs = utils.api.get_notifications_list(ignore_read=ignore_read)

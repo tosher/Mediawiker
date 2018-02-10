@@ -67,63 +67,20 @@
                             },
                             { "caption": "-" },
                             {
-                                "command": "open_file",
-                                "args": {"file": "${packages}/Mediawiker/Mediawiker.sublime-settings"},
-                                "caption": "Settings - Default"
-                            },
-                            {
-                                "command": "open_file",
-                                "args": {"file": "${packages}/User/Mediawiker.sublime-settings"},
-                                "caption": "Settings – User"
-                            },
-                            { "caption": "-" },
-                            {
-                                "command": "open_file",
+                                "command": "edit_settings",
                                 "args": {
-                                    "file": "${packages}/Mediawiker/Default (Windows).sublime-keymap",
-                                    "platform": "Windows"
+                                    "base_file": "${packages}/Mediawiker/Mediawiker.sublime-settings",
+                                    "default": "{\n\t$0\n}\n"
                                 },
-                                "caption": "Key Bindings – Default"
+                                "caption": "Settings"
                             },
                             {
-                                "command": "open_file",
+                                "command": "edit_settings",
                                 "args": {
-                                    "file": "${packages}/Mediawiker/Default (OSX).sublime-keymap",
-                                    "platform": "OSX"
+                                    "base_file": "${packages}/Mediawiker/Default ($platform).sublime-keymap",
+                                    "default": "[\n\t$0\n]\n"
                                 },
-                                "caption": "Key Bindings – Default"
-                            },
-                            {
-                                "command": "open_file",
-                                "args": {
-                                    "file": "${packages}/Mediawiker/Default (Linux).sublime-keymap",
-                                    "platform": "Linux"
-                                },
-                                "caption": "Key Bindings – Default"
-                            },
-                            {
-                                "command": "open_file",
-                                "args": {
-                                    "file": "${packages}/User/Default (Windows).sublime-keymap",
-                                    "platform": "Windows"
-                                },
-                                "caption": "Key Bindings – User"
-                            },
-                            {
-                                "command": "open_file",
-                                "args": {
-                                    "file": "${packages}/User/Default (OSX).sublime-keymap",
-                                    "platform": "OSX"
-                                },
-                                "caption": "Key Bindings – User"
-                            },
-                            {
-                                "command": "open_file",
-                                "args": {
-                                    "file": "${packages}/User/Default (Linux).sublime-keymap",
-                                    "platform": "Linux"
-                                },
-                                "caption": "Key Bindings – User"
+                                "caption": "Key Bindings"
                             }
                         ]
                     }

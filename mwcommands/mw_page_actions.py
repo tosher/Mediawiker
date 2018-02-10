@@ -28,3 +28,6 @@ class MediawikerPageCommand(sublime_plugin.WindowCommand):
 
     def command_run(self):
         self.window.active_view().run_command(self.action, self.action_params)
+
+    def is_visible(self, *args):
+        return False

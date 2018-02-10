@@ -19,10 +19,12 @@ class MediawikerShowDiffCommand(sublime_plugin.WindowCommand):
     ''' alias to MediawikerPageDiffVsServerCommand '''
 
     def run(self):
-        if utils.props.get_setting('offline_mode'):
-            return
-
         self.window.run_command(utils.cmd('page'), {"action": utils.cmd('page_diff_vs_server')})
+
+    def is_visible(self, *args):
+        if utils.props.get_setting('offline_mode'):
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
 
 
 class MediawikerPageDiffVsServerCommand(sublime_plugin.TextCommand):

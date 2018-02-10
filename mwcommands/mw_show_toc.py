@@ -1,15 +1,24 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
-# import sys
+import sys
 import sublime
 import sublime_plugin
+
+pythonver = sys.version_info[0]
+if pythonver >= 3:
+    from . import mw_utils as utils
+else:
+    import mw_utils as utils
 
 
 class MediawikerShowTocCommand(sublime_plugin.TextCommand):
     items = []
     regions = []
     pattern = r'^(={1,5})\s?(.*?)\s?={1,5}$'
+
+    def is_visible(self, *args):
+        return utils.props.get_view_setting(self.view, 'is_here')
 
     def run(self, edit):
         self.items = []

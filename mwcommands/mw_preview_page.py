@@ -21,10 +21,12 @@ class MediawikerPreviewCommand(sublime_plugin.WindowCommand):
     ''' alias to Preview page command '''
 
     def run(self):
-        if utils.props.get_setting('offline_mode'):
-            return
-
         self.window.run_command(utils.cmd('page'), {"action": utils.cmd('preview_page')})
+
+    def is_visible(self, *args):
+        if utils.props.get_setting('offline_mode'):
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
 
 
 class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
