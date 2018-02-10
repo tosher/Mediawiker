@@ -18,21 +18,20 @@ class MediawikerSearchStringCommand(sublime_plugin.WindowCommand):
     ''' alias to Search string list command '''
 
     def run(self):
-        if utils.props.get_setting('offline_mode'):
-            return
-
         self.window.run_command(utils.cmd('page'), {"action": utils.cmd('search_string_list')})
+
+    def is_visible(self, *args):
+        if utils.props.get_setting('offline_mode'):
+            return False
+        return True
 
 
 class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        if utils.props.get_setting('offline_mode'):
-            return
-
         search_pre = ''
         selection = self.view.sel()
-        search_pre = self.view.substr(selection[0]).strip() if selection and selection[0] else ''
+        search_pre = self.view.substr(selection[0]).strip() if selection and len(selection) > 0 else ''
         sublime.active_window().show_input_panel('Wiki search:', search_pre, self.show_results, None, None)
 
     def do_search(self, string_value):
