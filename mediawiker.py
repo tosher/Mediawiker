@@ -240,13 +240,16 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             summary = summary[1:]
 
         section = utils.props.get_view_setting(self.view, 'section', None)
-        utils.api.save_page(
+        is_success = utils.api.save_page(
             page=self.page,
             text=self.current_text,
             summary=summary,
             mark_as_minor=mark_as_minor,
             section=section
         )
+        if not is_success:
+            utils.status_message('There was an error while trying to publish page [[%s]] to wiki "%s".' % (self.title, utils.get_view_site()), replace=['[', ']'])
+            return
 
         # update revision for page in view
         self.page = utils.api.get_page(self.title)

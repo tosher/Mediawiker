@@ -517,11 +517,14 @@ class PreAPI(object):
             self.get_connect()
         except Exception as e:
             status_message('%s exception: %s' % (type(e).__name__, e))
+            return False
 
         try:
             page.save(text, summary=summary.strip(), minor=mark_as_minor, section=section)
+            return True
         except Exception as e:
             status_message('%s exception: %s' % (type(e).__name__, e))
+        return False
 
     def page_attr(self, page, attr_name):
         try:
