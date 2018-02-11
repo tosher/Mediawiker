@@ -73,8 +73,11 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
         else:
             self.file_descr = '%s as %s' % (os.path.basename(self.file_path), self.file_destname)
         try:
-            self.upload()
-            utils.status_message('File %s successfully uploaded to wiki as %s' % (self.file_path, self.file_destname))
+            is_success = self.upload()
+            if is_success:
+                utils.status_message('File %s successfully uploaded to wiki as %s' % (self.file_path, self.file_destname))
+            else:
+                utils.status_message('Error while trying to upload file %s to wiki as %s' % (self.file_path, self.file_destname))
         except IOError as e:
             sublime.message_dialog('Upload io error: %s' % e)
         except Exception as e:
@@ -83,7 +86,6 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
     def upload(self):
         if self.file_path.startswith('http'):
             # require `$wgAllowCopyUploads = true` in LocalSettings.php
-            utils.api.call('process_upload', url=self.file_path, filename=self.file_destname, description=self.file_descr)
-            return
+            return utils.api.call('process_upload', url=self.file_path, filename=self.file_destname, description=self.file_descr)
         with open(self.file_path, 'rb') as f:
-            utils.api.call('process_upload', file_handler=f, filename=self.file_destname, description=self.file_descr)
+            return utils.api.call('process_upload', file_handler=f, filename=self.file_destname, description=self.file_descr)

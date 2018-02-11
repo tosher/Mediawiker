@@ -369,6 +369,7 @@ class PreAPI(object):
     INTERNAL_LINK_SPLITTER = u'|'
     PAGE_CANNOT_READ_MESSAGE = 'You have not rights to read/edit this page.'
     PAGE_CANNOT_EDIT_MESSAGE = 'You have not rights to edit this page.'
+    UPLOAD_SUCCESS = 'Success'
 
     def __init__(self, conman):
         self.conman = conman
@@ -618,7 +619,16 @@ class PreAPI(object):
         return self.get_connect().search(search=search, what='text', limit=limit, namespace=namespace)
 
     def process_upload(self, file_handler=None, filename=None, description='', url=None):
-        return self.get_connect().upload(file=file_handler, filename=filename, description=description, url=url)
+        try:
+            res = self.get_connect().upload(file=file_handler, filename=filename, description=description, url=url)
+            if res['result'] == self.UPLOAD_SUCCESS:
+                return True
+            else:
+                status_message('Error while trying to upload file %s: %s' % (filename, res))
+                return False
+        except Exception as e:
+            status_message('Exception while trying to upload file %s: %s' % (filename, e))
+        return False
 
     def get_namespace_number(self, name):
         if name is None:
