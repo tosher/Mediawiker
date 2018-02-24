@@ -530,3 +530,6 @@ Support folding/unfolding for:
 * Search fix
 * Commands visibility in offline mode
 
+== Mediawiker 3.4.5 ==
+* Save page reasult showing fix
+* Upload file fix
