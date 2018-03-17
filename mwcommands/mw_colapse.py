@@ -73,7 +73,7 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
         p = par.Parser(self.view)
         p.register_all(
             par.Comment, par.TemplateAttribute, par.Template, par.Link, par.Pre,
-            par.Source, par.WikiTable,
+            par.Nowiki, par.Source, par.WikiTable,
             par.HeaderOne, par.HeaderTwo, par.HeaderThree,
             par.HeaderFour, par.HeaderFive
         )

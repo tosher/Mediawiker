@@ -161,6 +161,7 @@
         {"caption": "Show unsaved changes", "type": "window_command", "value": "mediawiker_show_diff", "online": true},
         {"caption": "Get Notifications", "type": "window_command", "value": "mediawiker_notifications", "online": true},
         {"caption": "Open talk page", "type": "window_command", "value": "mediawiker_open_talk_page", "online": true},
+        {"caption": "Copy remote page", "type": "text_command", "value": "mediawiker_page_copy", "online": true},
         {"caption": "Create/edit an issue", "type": "window_command", "value": "mediawiker_open_issue", "online": true},
         {"caption": "Heading 2", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_h2.sublime-snippet", "online": false},
         {"caption": "Heading 3", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_h3.sublime-snippet", "online": false},

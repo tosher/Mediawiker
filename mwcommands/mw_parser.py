@@ -25,12 +25,13 @@ import sublime
 
 class Element(object):
 
-    # selfgreedy? template inside template - ok, source inside source - NOT!
     greedy = 0  # greedy level, max => greediest
     open_tag = None
     close_tag = None
     own_tags = []
     debug = False
+    # template inside template - ok, source inside source - NOT!
+    selfgreedy = False
 
     def __init__(self, view):
         self.points = [None, None]
@@ -282,6 +283,7 @@ class Comment(Element):
     START = ('<!--',)
     STOP = ('-->',)
     greedy = 1
+    selfgreedy = True
 
     def set_attrs(self):
         self.text = self.get_text()
@@ -300,6 +302,7 @@ class Pre(SimpleHtml):
     START = ('<pre',)
     STOP = ('</pre>',)
     greedy = 1
+    selfgreedy = True
     own_tags = ['pre']
 
 
@@ -307,7 +310,16 @@ class Source(SimpleHtml):
     START = ('<source', '<syntaxhighlight')
     STOP = ('</source>', '</syntaxhighlight>')
     greedy = 1  # TODO: inside tag comment maybe greedy
+    selfgreedy = True
     own_tags = ['source', 'syntaxhighlight']
+
+
+class Nowiki(SimpleHtml):
+    START = ('<nowiki>',)
+    STOP = ('</nowiki>',)
+    greedy = 1
+    selfgreedy = True
+    own_tags = ['nowiki']
 
 
 class HeaderOne(Element):
@@ -481,7 +493,7 @@ class Parser(object):
         ''' get list of elements of class c '''
         return getattr(self, self.elist_name(c))
 
-    def elem_greedy_validate(self, c, r):
+    def elem_greedy_validate(self, c, r, on_close=False):
 
         def get_min_el_with_max_greedy():
             lmax = [e for e in els_greedy if e.greedy == el_max_greedy]
@@ -498,7 +510,8 @@ class Parser(object):
             return True
         elif c.greedy == el_max_greedy:
             el_min_max_greedy = get_min_el_with_max_greedy()
-            return True if c is el_min_max_greedy.__class__ or r.a < el_min_max_greedy.points[0] else False
+            # return True if c is el_min_max_greedy.__class__ or r.a < el_min_max_greedy.points[0] else False
+            return True if c is el_min_max_greedy.__class__ and (on_close or not c.selfgreedy) or r.a < el_min_max_greedy.points[0] else False
         return False
 
     def exists_greedy(self):
@@ -532,7 +545,9 @@ class Parser(object):
         e = self.get_max_opened_element(self.elist(c))
         if not e:
             return False
-        if e.validate_stop(r, tag) and self.elem_greedy_validate(c, r):
+
+        # if e.validate_stop(r, tag) and self.elem_greedy_validate(c, r):
+        if e.validate_stop(r, tag) and self.elem_greedy_validate(c, r, on_close=True):
             if not e.is_closed():
                 res = e.stop(r.b, tag)
                 if not res:
@@ -594,7 +609,7 @@ class Parser(object):
                         # try force closing
                         e.stop(e.points[0] + len(e.open_tag), '')
                         is_valid = True
-                    except:
+                    except Exception:
                         return False
         return is_valid
 

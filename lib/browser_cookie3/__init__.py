@@ -399,7 +399,25 @@ class Firefox(BrowserCookieLoader):
                         for window in json_data.get('windows', []):
                             for cookie in window.get('cookies', []):
                                 if not self.domain_name_tld or cookie.get('host', '').endswith(self.domain_name_tld):
-                                    yield create_cookie(cookie.get('host', ''), cookie.get('path', ''), False, expires, cookie.get('name', ''), cookie.get('value', ''))
+                                    yield create_cookie(
+                                        cookie.get('host', ''),
+                                        cookie.get('path', ''),
+                                        False,
+                                        expires,
+                                        cookie.get('name', ''),
+                                        cookie.get('value', '')
+                                    )
+                        for cookie in json_data.get('cookies', []):
+                            if not self.domain_name_tld or cookie.get('host', '').endswith(self.domain_name_tld):
+                                yield create_cookie(
+                                    cookie.get('host', ''),
+                                    cookie.get('path', ''),
+                                    False,
+                                    expires,
+                                    cookie.get('name', ''),
+                                    cookie.get('value', '')
+                                )
+
                 # it's normal, when browser is not running..
                 # else:
                 #     print('Firefox session filename does not exist:', session_file)

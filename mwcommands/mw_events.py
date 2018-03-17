@@ -31,11 +31,11 @@ if pythonver >= 3:
 
                         cnt_delta = self.view.change_count() - self.cnt
                         if cnt_delta > ch_cnt:
-                            sublime.status_message('Autoreload: Generating preview..')
+                            utils.status_message('Autoreload: Generating preview..')
                             sublime.active_window().run_command(utils.cmd('preview'))
                             self.cnt = None
                         else:
-                            sublime.status_message('\nAutoreload: change %s of %s..' % (cnt_delta, ch_cnt))
+                            utils.status_message('\nAutoreload: change %s of %s..' % (cnt_delta, ch_cnt))
                 except Exception as e:
                     utils.status_message('Preview exception: %s' % e)
 else:

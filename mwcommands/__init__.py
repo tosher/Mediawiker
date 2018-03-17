@@ -31,6 +31,7 @@ from .mw_events import MediawikerViewEvents, MediawikerEvents
 from .mw_changelog import MediawikerChangelogCommand
 from .mw_red_links import MediawikerShowRedLinksCommand, MediawikerHideRedLinksCommand
 from .mw_diff import MediawikerShowDiffCommand, MediawikerPageDiffVsServerCommand
+from .mw_page_copy import MediawikerPageCopyCommand
 
 __all__ = [
     'MediawikerAddCategoryCommand',
@@ -78,5 +79,6 @@ __all__ = [
     'MediawikerShowRedLinksCommand',
     'MediawikerHideRedLinksCommand',
     'MediawikerShowDiffCommand',
-    'MediawikerPageDiffVsServerCommand'
+    'MediawikerPageDiffVsServerCommand',
+    'MediawikerPageCopyCommand'
 ]

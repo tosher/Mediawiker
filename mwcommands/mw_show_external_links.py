@@ -30,7 +30,7 @@ class MediawikerShowExternalLinksCommand(sublime_plugin.TextCommand):
         linksgen = utils.api.get_page_extlinks(page)
 
         self.p = par.Parser(self.view)
-        self.p.register_all(par.Comment, par.Pre, par.Source, par.Link, par.ExternalLink)
+        self.p.register_all(par.Comment, par.Pre, par.Source, par.Nowiki, par.Link, par.ExternalLink)
         if not self.p.parse():
             return
 

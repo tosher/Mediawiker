@@ -2,12 +2,12 @@
 
 <nowiki>
 // <- meta.tag.validhtml.mediawiki
- // <- entity.name.tag.validhtml.mediawiki
+ // <- entity.name.tag.nowiki.validhtml.mediawiki
 ''' bold no wiki '''
 // <- meta.tag.source.validhtml.mediawiki
 </nowiki>
 // <- meta.tag.validhtml.mediawiki
-  // <- entity.name.tag.validhtml.mediawiki
+  // <- entity.name.tag.nowiki.validhtml.mediawiki
 
 = Header1 Test =
 // <- markup.heading.tag.mediawiki

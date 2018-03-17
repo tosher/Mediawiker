@@ -526,10 +526,18 @@ Support folding/unfolding for:
 
 == Mediawiker 3.4.4 ==
 * Default/User settings in one window
-* Extension [https://www.mediawiki.org/wiki/Extension:Html5mediator Html5mediator] tag support
+* Extension [https://www.mediawiki.org/wiki/Extension:Html5mediator Html5mediator] tag support ({{Tag|html5media}})
 * Search fix
 * Commands visibility in offline mode
 
 == Mediawiker 3.4.5 ==
 * Save page reasult showing fix
 * Upload file fix
+
+== Mediawiker 3.4.6 ==
+* Fix for Firefox cookie reader
+* Parsing/highlighting fixes for {{Tag|nowiki}} tag
+* Parsing fixes for greedy {{Tag|source}}/{{Tag|syntaxhighlight}}/{{Tag|pre}} tags, comments, etc.
+* [https://www.mediawiki.org/wiki/Extension:CategoryTree CategoryTree] extension tag support ({{Tag|categorytree}})
+* Page save with empty summary fix
+* Experimental new command {{Command|Copy remote page}} for copying pages from one wiki to another (with templates and files, optional).

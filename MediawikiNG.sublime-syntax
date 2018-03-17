@@ -811,7 +811,7 @@ contexts:
         - meta_scope: comment.block.html.mediawiki
         - match: '--\s*>'
           pop: true
-        - match: "--"
+        - match: "<!--"
           scope: invalid.illegal.bad-comments-or-CDATA.html.mediawiki
 
   entities:
@@ -1076,7 +1076,7 @@ contexts:
             2: entity.name.tag.validhtml.mediawiki
           pop: true
         - include: inline
-    - match: '(?i:(<(span|font|div|html5media)(\b[^>]*)>))'
+    - match: '(?i:(<(span|font|div)(\b[^>]*)>))'
       captures:
         1: meta.tag.validhtml.mediawiki
         2: entity.name.tag.validhtml.mediawiki
@@ -1087,6 +1087,22 @@ contexts:
           captures:
             1: meta.tag.validhtml.mediawiki
             2: entity.name.tag.validhtml.mediawiki
+          pop: true
+        - include: inline
+        - include: block
+        - include: block_highlight
+        - include: block_pre_spaced
+    - match: '(?i:(<(html5media|categorytree)(\b[^>]*)>))'
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.extension.validhtml.mediawiki
+        3: entity.other.attributes.validhtml.mediawiki
+      push:
+        - meta_content_scope: markup.other.inline-styles.html.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.extension.validhtml.mediawiki
           pop: true
         - include: inline
         - include: block
@@ -1106,7 +1122,18 @@ contexts:
           pop: true
           # no markup in pre
           # - include: '#inline'
-    - match: (?i:(<(nowiki|noinclude|includeonly)>))
+    - match: (?i:(<(nowiki)>))
+      captures:
+        1: meta.tag.validhtml.mediawiki
+        2: entity.name.tag.nowiki.validhtml.mediawiki
+      push:
+        - meta_content_scope: meta.tag.source.validhtml.mediawiki
+        - match: (</(\2)>)
+          captures:
+            1: meta.tag.validhtml.mediawiki
+            2: entity.name.tag.nowiki.validhtml.mediawiki
+          pop: true
+    - match: (?i:(<(noinclude|includeonly)>))
       captures:
         1: meta.tag.validhtml.mediawiki
         2: entity.name.tag.validhtml.mediawiki
@@ -1283,7 +1310,7 @@ contexts:
             - match: '(?=^\s*\||^\s*!|\|\||!!|\|\-|\|\})'
               pop: true
             - include: inline
-            - match: '([^\s])(=["'']?)'
+            - match: '([^\s]+)(=["'']?)'
               captures:
                 1: entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki
                 2: entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki

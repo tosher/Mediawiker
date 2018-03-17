@@ -33,7 +33,7 @@ class MediawikerShowInternalLinksCommand(sublime_plugin.TextCommand):
         linksgen = utils.api.get_page_links(page, generator=True)
 
         self.p = par.Parser(self.view)
-        self.p.register_all(par.Comment, par.Pre, par.Source, par.Link, par.TemplateAttribute, par.Template)
+        self.p.register_all(par.Comment, par.Pre, par.Source, par.Nowiki, par.Link, par.TemplateAttribute, par.Template)
         if not self.p.parse():
             return
 

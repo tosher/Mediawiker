@@ -201,7 +201,7 @@ def process_red_links(view, page):
         links_d[link.namespace]['data'].append(link)
 
     p = par.Parser(view)
-    p.register_all(par.Comment, par.Link, par.Pre, par.Source)
+    p.register_all(par.Comment, par.Link, par.Pre, par.Source, par.Nowiki)
     if not p.parse():
         return
 
@@ -302,7 +302,7 @@ def status_message(message, replace=None, is_panel=None, new_line=True, panel_na
         if replace:
             for r in replace:
                 message = message.replace(r, '')
-        sublime.status_message(message)
+        sublime.active_window().status_message(message)
 
     is_use_message_panel = is_panel if is_panel is not None else props.get_setting('use_status_messages_panel', True)
 
@@ -371,15 +371,16 @@ class PreAPI(object):
     PAGE_CANNOT_EDIT_MESSAGE = 'You have not rights to edit this page.'
     UPLOAD_SUCCESS = 'Success'
 
-    def __init__(self, conman):
+    def __init__(self, conman, site_name=None):
         self.conman = conman
+        self.site_name = site_name
 
     def get_connect(self, force=False):
-        sitecon = self.conman.get_connect(force=force)
+        sitecon = self.conman.get_connect(name=self.site_name, force=force)
 
         if sitecon and (not hasattr(sitecon, 'logged_in') or not sitecon.logged_in):
             status_message('Anonymous connection detected, forcing new connection.. ')
-            sitecon = self.conman.get_connect(force=True)
+            sitecon = self.conman.get_connect(name=self.site_name, force=True)
 
         if not sitecon and props.get_setting('offline_mode'):
             raise ConnectionFailed("Connection not available in offline mode")
@@ -549,7 +550,7 @@ class PreAPI(object):
         try:
             if self.page_can_read(page):
                 return page.text(section=section)
-        except:
+        except Exception:
             pass
         return ''
 
@@ -1004,7 +1005,7 @@ class InputPanel(object):
 
 class InputPanelPageTitle(InputPanel):
 
-    def get_title(self, title):
+    def get_title(self, title=None):
         if not title:
             title_pre = ''
             # use clipboard or selected text for page name

@@ -118,7 +118,7 @@ def on_hover_internal_link(view, point):
         return
 
     p = par.Parser(view)
-    p.register_all(par.Comment, par.Link, par.Pre, par.Source)
+    p.register_all(par.Comment, par.Link, par.Pre, par.Source, par.Nowiki)
     if not p.parse():
         return
 
@@ -202,7 +202,8 @@ def on_hover_template(view, point):
         return
 
     p = par.Parser(view)
-    p.register_all(par.Comment, par.TemplateAttribute, par.Template, par.Pre, par.Source)
+    # p.debug = True
+    p.register_all(par.Comment, par.TemplateAttribute, par.Template, par.Pre, par.Source, par.Nowiki)
     if not p.parse():
         return
 
@@ -268,7 +269,7 @@ def on_hover_table(view, point):
         return
 
     p = par.Parser(view)
-    p.register_all(par.Comment, par.TemplateAttribute, par.Template, par.Pre, par.Source, par.WikiTable)
+    p.register_all(par.Comment, par.TemplateAttribute, par.Template, par.Pre, par.Source, par.Nowiki, par.WikiTable)
     if not p.parse():
         return
 
@@ -319,7 +320,7 @@ def on_hover_heading(view, point):
     p = par.Parser(view)
     p.register_all(
         par.Comment, par.Pre,
-        par.Source, par.HeaderOne,
+        par.Source, par.Nowiki, par.HeaderOne,
         par.HeaderTwo, par.HeaderThree,
         par.HeaderFour, par.HeaderFive
     )
@@ -374,7 +375,7 @@ def on_hover_tag(view, point):
     p = par.Parser(view)
     p.register_all(
         par.Comment, par.TemplateAttribute, par.Template, par.Link, par.Pre,
-        par.Source
+        par.Source, par.Nowiki
     )
 
     for tag in fold_tags:
@@ -441,7 +442,7 @@ def on_hover_comment(view, point):
 
     p = par.Parser(view)
     p.register_all(
-        par.Comment, par.Pre, par.Source
+        par.Comment, par.Pre, par.Source, par.Nowiki
     )
     if not p.parse():
         return

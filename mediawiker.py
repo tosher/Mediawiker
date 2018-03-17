@@ -226,7 +226,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                         'action_params': {'title': self.title, 'new_tab': True}
                     })
             else:
-                utils.status_message('You have not rights to edit this page')
+                utils.status_message(utils.api.PAGE_CANNOT_EDIT_MESSAGE)
         else:
             utils.status_message('Can\'t publish page with empty title')
             return
@@ -235,7 +235,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
         summary = '%s%s' % (summary, utils.props.get_setting('summary_postfix'))
         mark_as_minor = utils.props.get_setting('mark_as_minor')
         # invert minor settings command '!'
-        if summary[0] == '!':
+        if summary and summary[0] == '!':
             mark_as_minor = not mark_as_minor
             summary = summary[1:]
 
