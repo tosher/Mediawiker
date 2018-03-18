@@ -28,7 +28,7 @@
 * Context opening - possibility to open included page, template, function by inline context.
 * Configurator - visual configuration of important settings.
 
-![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/wiki/Mediawiker_Dark.png)
+![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/blob/gh-pages/screens/Mediawiker_Dark.png)
 *Screenshot using the Mediawiker_Dark color scheme*
 
 ## External dependencies (with modifications or not)
@@ -48,8 +48,6 @@
 
 ## Install
 
-### Package Control
-
     Package Control 3.0 now required for work.
 
 The easiest way to install this is with [Package Control](http://wbond.net/sublime\_packages/package\_control).
@@ -61,32 +59,15 @@ The easiest way to install this is with [Package Control](http://wbond.net/subli
 
 Package Control will automatically keep Mediawiker up to date with the latest version.
 
-### Other methods
-First find your Sublime Text 2 Packages folder:
-
-    - OS X: ~/Library/Application Support/Sublime Text 2/Packages/
-    - Windows: %APPDATA%/Sublime Text 2/Packages/
-    - Linux: ~/.Sublime Text 2/Packages/
-
-If you have Git, you can clone this repo to "/packages-folder/Mediawiker/"
-
-or,
-
-Download this repo using the "ZIP" button above, unzip and place the files in "/packages-folder/Mediawiker/"
-
 ## Documentation
 * **Note**: Not all color schemes fully supports syntax highlighting scopes required by markup languages like Mediawiki or Markdown. On this moment, color schemes with better support are: **Twilight**, **Sunburst**, **Eiffel**. Also, Mediawiker package includes **Twilight (Mediawiki)**, **Eiffel (Mediawiki)** and **Mediawiker_Dark**/**Mediawiker_Light** schemes with improved highlighting for mediawiki syntax. 
 * Check [plugin wiki](https://github.com/tosher/Mediawiker/wiki) for setup instructions.
-* Use Preferences / Package settings / Mediawiker / "Settings  - Default" and "Settings - User" for setup wiki connection and plugin options.
-* Some connection specific rules:
- * If user-name is empty, then authorization will not be used.
- * If user-name is not empty, but user-password is empty, you will be prompted for password on action.
-* All settings are available under the Main menu / Preferences / Package Settings / Mediawiker.
+* Use `Preferences / Package settings / Mediawiker / Settings` for setup wiki connection and plugin options.
 
 ### Configurator
 GUI configurator for important settings.
 
-![Mediawiker configurator](https://github.com/tosher/Mediawiker/wiki/Mediawiker_Configurator.png)
+![Mediawiker configurator](https://github.com/tosher/Mediawiker/blob/gh-pages/screens/Mediawiker_Configurator.png)
 
 ### Commands
 * **Edit panel** with all commands and snippets in ordered list (can be customized in the settings).
