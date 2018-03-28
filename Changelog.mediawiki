@@ -541,3 +541,6 @@ Support folding/unfolding for:
 * [https://www.mediawiki.org/wiki/Extension:CategoryTree CategoryTree] extension tag support ({{Tag|categorytree}})
 * Page save with empty summary fix
 * Experimental new command {{Command|Copy remote page}} for copying pages from one wiki to another (with templates and files, optional).
+
+== Mediawiker 3.4.7 ==
+* Fixed error in command {{Command|Show unsaved changes}}

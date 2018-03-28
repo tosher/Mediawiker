@@ -22,7 +22,7 @@ contexts:
         1: meta.tag.validhtml.mediawiki
         2: punctuation.definition.tag.begin.html
         3: entity.name.tag.validhtml.source.mediawiki
-        4: entity.other.attribute-name.mediawiki
+        4: entity.other.attribute-name.validhtml.mediawiki
         5: entity.other.attributes.validhtml.mediawiki
         6: entity.other.quote.validhtml.mediawiki
       push:
@@ -510,7 +510,7 @@ contexts:
           captures:
             1: meta.tag.validhtml.mediawiki
             2: punctuation.definition.tag.begin.html
-            3: entity.name.tag.source.mediawiki
+            3: entity.name.tag.validhtml.source.mediawiki
             4: punctuation.definition.tag.end.html
           pop: true
   block:
@@ -525,14 +525,14 @@ contexts:
     - match: " ?(<)(uml)(>)"
       captures:
         1: meta.tag.validhtml.mediawiki
-        2: entity.name.tag.source.mediawiki
+        2: entity.name.tag.validhtml.source.mediawiki
         3: meta.tag.validhtml.mediawiki
       push:
         - meta_content_scope: meta.tag.source.mediawiki
         - match: " ?(</)(uml)(>)"
           captures:
             1: meta.tag.validhtml.mediawiki
-            2: entity.name.tag.source.mediawiki
+            2: entity.name.tag.validhtml.source.mediawiki
             3: meta.tag.validhtml.mediawiki
           pop: true
     - match: '^(={1})(?=[^=].*[^=]\={1}\s*$)'

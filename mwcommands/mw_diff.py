@@ -58,5 +58,5 @@ class MediawikerPageDiffVsServerCommand(sublime_plugin.TextCommand):
                 utils.status_message('Page versions has no differencies')
             else:
                 syntax_filename = 'Diff.sublime-syntax' if pythonver >= 3 else 'Diff.tmLanguage'
-                syntax = p.from_package(syntax_filename, name='Diff')
+                syntax = utils.p.from_package(syntax_filename, name='Diff')
                 utils.status_message(diff_text, panel_name='Show differences', syntax=syntax, new=True)
