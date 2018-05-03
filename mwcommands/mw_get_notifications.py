@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import sys
+from datetime import datetime
 import webbrowser
 
-import sublime
+# import sublime
 import sublime_plugin
 
 pythonver = sys.version_info[0]
@@ -29,14 +30,16 @@ class MediawikerNotificationsCommand(sublime_plugin.WindowCommand):
         ignore_read = not utils.props.get_setting('notifications_show_all')
         read_sign = utils.props.get_setting('notifications_read_sign')
         self.msgs = utils.api.get_notifications_list(ignore_read=ignore_read)
-        self.msgs = sorted(self.msgs, key=lambda k: k['read'])
+        self.msgs = sorted(self.msgs, key=lambda k: (k['read'], -k['timestamp']))
         n_list = ['All in browser']
+        print(self.msgs)
         for m in self.msgs:
-            line = '%s, %s: %s (%s)%s' % (
+            print(m['timestamp'])
+            line = '%s, %s: (%s) at %s %s' % (
                 m['title'],
                 m['agent'],
-                m['timestamp'],
                 m['type'],
+                datetime.fromtimestamp(m['timestamp']),
                 ' %s' % read_sign if m['read'] else ''
             )
             n_list.append(line)

@@ -576,9 +576,13 @@ class PreAPI(object):
             m = {}
             m['title'] = msg.get('title', {}).get('full')
             m['type'] = msg.get('type', None)
-            m['timestamp'] = msg.get('timestamp', {}).get('date', None)
+            m['date'] = msg.get('timestamp', {}).get('date', None)
             m['agent'] = msg.get('agent', {}).get('name', None)
             m['read'] = True if msg.get('read', False) else False
+            try:
+                m['timestamp'] = int(msg.get('timestamp', {}).get('utcunix'))
+            except Exception:
+                m['timestamp'] = 0
             return m
 
         ns = self.call('get_notifications')

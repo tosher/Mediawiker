@@ -228,7 +228,7 @@ As command or from Context menu.
 
 : Parameter {{Property|preview_custom_head}} with list of lines, for example:
 
-<source lang="javascript">
+<source lang="javascript1">
 "English wikipedia":
 {
     "domain": "",
@@ -544,3 +544,6 @@ Support folding/unfolding for:
 
 == Mediawiker 3.4.7 ==
 * Fixed error in command {{Command|Show unsaved changes}}
+
+== Mediawiker 3.4.8 ==
+* Notifications sorting by read flag, then by timestamp (inverted)
