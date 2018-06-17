@@ -971,8 +971,8 @@ class MediawikerConnectionManager(object):
         ]):
             try:
                 connection = mwclient.Site(
-                    host=self.hosturl,
-                    path=self.path,
+                    host=site['hosturl'],
+                    path=site['path'],
                     retry_timeout=None,
                     max_retries=None,
                     consumer_token=site['oauth_consumer_token'],
