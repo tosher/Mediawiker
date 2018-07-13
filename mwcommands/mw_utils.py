@@ -106,7 +106,7 @@ def set_syntax(page_name=None, page_namespace=None):
         elif page_name.lower().endswith('.css'):
             syntax = p.from_package('CSS.%s' % syntax_ext, name='CSS')
         elif page_name.endswith('.js'):
-            syntax = p.from_package('Javascript.%s' % syntax_ext, name='Javascript')
+            syntax = p.from_package('JavaScript.%s' % syntax_ext, name='JavaScript')
 
     sublime.active_window().active_view().set_syntax_file(syntax)
 
