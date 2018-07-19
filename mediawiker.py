@@ -165,8 +165,11 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         page_namespace = utils.api.page_attr(page, 'namespace')
 
         if not text:
-            utils.status_message('Page [[%s]] is not exists. You can create new..' % (self.title))
-            text = '<!-- New wiki page: Remove this with text of the new page -->'
+            utils.status_message('Page [[%s]] does not exist. You can create.' % (self.title))
+            try:
+                text = utils.get_new_text(self.title, page_namespace)
+            except AttributeError:
+                text = "local p = {}\nfunction p.main(frame)\n	if frame == mw.getCurrentFrame() then\n		args = require('Module:ProcessArgs').merge(true)\n	else\n		frame = mw.getCurrentFrame()\n	end\nend\nreturn p"
 
         view.run_command(utils.cmd('insert_text'), {'position': 0, 'text': text, 'with_erase': True})
 
