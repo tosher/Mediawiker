@@ -93,6 +93,11 @@ def plugin_loaded():
     setattr(mw, 'conman', conman)
     setattr(mw, 'api', api)
 
+def get_new_text(page_name, page_namespace):
+    if page_namespace == api.SCRIBUNTO_NAMESPACE and not page_name.lower().endswith('/doc'):
+        return "local p = {}\nfunction p.main(frame)\n	if frame == mw.getCurrentFrame() then\n		args = require('Module:ProcessArgs').merge(true)\n	else\n		frame = mw.getCurrentFrame()\n	end\nend\nreturn p"
+    else:
+        return '<!-- New wiki page: Remove this with text of the new page -->'
 
 def set_syntax(page_name=None, page_namespace=None):
     syntax = props.get_setting('syntax')
@@ -102,7 +107,7 @@ def set_syntax(page_name=None, page_namespace=None):
 
         # Scribunto lua modules, except doc subpage
         if page_namespace == api.SCRIBUNTO_NAMESPACE and not page_name.lower().endswith('/doc'):
-            syntax = p.from_package('Lua.%s' % syntax_ext, name='Lua')
+            syntax = p.from_package('LuaExtended.%s' % syntax_ext, name='LuaExtended')
         elif page_name.lower().endswith('.css'):
             syntax = p.from_package('CSS.%s' % syntax_ext, name='CSS')
         elif page_name.endswith('.js'):
@@ -971,8 +976,8 @@ class MediawikerConnectionManager(object):
         ]):
             try:
                 connection = mwclient.Site(
-                    host=site['hosturl'],
-                    path=site['path'],
+                    host=self.hosturl,
+                    path=self.path,
                     retry_timeout=None,
                     max_retries=None,
                     consumer_token=site['oauth_consumer_token'],
@@ -1018,7 +1023,7 @@ class InputPanelPageTitle(InputPanel):
             if not title_pre:
                 selection = self.window.active_view().sel()
                 title_pre = self.window.active_view().substr(selection[0]).strip()
-            self.show_input('Wiki page name:', title_pre)
+            self.show_input('Wiki page name:', 'Module:')
         else:
             self.on_done(title)
 
