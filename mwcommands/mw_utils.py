@@ -98,15 +98,18 @@ def set_syntax(page_name=None, page_namespace=None):
     syntax = props.get_setting('syntax')
 
     if page_name and page_namespace:
-        syntax_ext = 'sublime-syntax' if int(sublime.version()) >= 3084 else 'tmLanguage'
+        # syntax_ext = 'sublime-syntax' if int(sublime.version()) >= 3084 else 'tmLanguage'
 
         # Scribunto lua modules, except doc subpage
         if page_namespace == api.SCRIBUNTO_NAMESPACE and not page_name.lower().endswith('/doc'):
-            syntax = p.from_package('Lua.%s' % syntax_ext, name='Lua')
+            # syntax = p.from_package('Lua.%s' % syntax_ext, name='Lua')
+            syntax = props.get_setting('syntax_lua')
         elif page_name.lower().endswith('.css'):
-            syntax = p.from_package('CSS.%s' % syntax_ext, name='CSS')
+            # syntax = p.from_package('CSS.%s' % syntax_ext, name='CSS')
+            syntax = props.get_setting('syntax_css')
         elif page_name.endswith('.js'):
-            syntax = p.from_package('Javascript.%s' % syntax_ext, name='Javascript')
+            # syntax = p.from_package('Javascript.%s' % syntax_ext, name='Javascript')
+            syntax = props.get_setting('syntax_js')
 
     sublime.active_window().active_view().set_syntax_file(syntax)
 

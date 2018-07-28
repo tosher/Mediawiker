@@ -547,3 +547,7 @@ Support folding/unfolding for:
 
 == Mediawiker 3.4.8 ==
 * Notifications sorting by read flag, then by timestamp (inverted)
+
+== Mediawiker 3.4.9 ==
+* Fixed OAuth (pull-request by [https://github.com/danmichaelo @danmichaelo])
+* Customized Lua, CSS, JavaScript syntaxes (with settings: {{Property|mediawiker_syntax_lua}}, {{Property|mediawiker_syntax_css}}, {{Property|mediawiker_syntax_js}})

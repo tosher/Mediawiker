@@ -76,6 +76,9 @@
         }
     },
     "mediawiker_syntax": "Packages/Mediawiker/MediawikiNG.sublime-syntax",
+    "mediawiker_syntax_lua": "Packages/Lua/Lua.sublime-syntax",
+    "mediawiker_syntax_css": "Packages/CSS/CSS.sublime-syntax",
+    "mediawiker_syntax_js": "Packages/JavaScript/JavaScript.sublime-syntax",
     "mediawiker_site_active": "English wikipedia",
     "mediawiker_summary_postfix": " (by SublimeText.Mediawiker)",
     "mediawiker_skip_summary": false,
