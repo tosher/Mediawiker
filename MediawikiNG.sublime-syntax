@@ -662,12 +662,12 @@ contexts:
       push:
         - meta_include_prototype: false
         - meta_content_scope: meta.environment.embedded.text.html.basic.mediawiki source.text.html.basic.embedded
-        - match: "((</)(math)(>))"
+        - match: "((</)(table)(>))"
           captures:
-            1: meta.tag.validhtml.math.tex.mediawiki
-            2: meta.tag.validhtml.math.tex.mediawiki
-            3: entity.name.tag.math.tex.mediawiki
-            4: meta.tag.validhtml.math.tex.mediawiki
+            1: meta.tag.validhtml.table.tex.mediawiki
+            2: meta.tag.validhtml.table.tex.mediawiki
+            3: entity.name.tag.table.tex.mediawiki
+            4: meta.tag.validhtml.table.tex.mediawiki
           pop: true
         - include: scope:text.html.basic
     - match: ((<)(ref)(>))
@@ -1352,6 +1352,9 @@ contexts:
             4: punctuation.definition.tag.equals-sign.template.mediawiki
           push:
             - meta_content_scope: meta.function.parameters.template.mediawiki
+            - match: ^\s*(?=\}\})
+              # hack: prevent closing brackets line started with space to match as markup.raw.block.mediawiki (block_pre_spaced)
+              scope: markup.non-raw.template.mediawiki
             - match: '(?=\||\}{2})'  # | or }}
               pop: true
             - include: block_pre_spaced_in_templates
