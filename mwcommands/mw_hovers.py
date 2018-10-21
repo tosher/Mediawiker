@@ -220,16 +220,18 @@ def on_hover_template(view, point):
                 template_type = 'Scribunto module'
             elif r.mode == r.MODE_TRANSCLUSION:
                 template_type = 'Transclusion of page'
+            elif r.mode == r.MODE_FUNCTION:
+                template_type = 'Function'
             elif r.mode == r.MODE_VAR:
                 template_type = 'Variable'
 
-            if r.mode != r.MODE_VAR:
+            if r.page_name:
                 page = utils.api.get_page(r.page_name)
                 css_class = None if page.exists else 'redlink'
                 page_exists = page.exists
 
             content = [
-                html.h(4, '%s "%s"' % (template_type, r.page_name) if r.page_name else template_type),
+                html.h(4, '%s "%s"' % (template_type, r.page_name or r.title) if (r.page_name or r.title) else template_type),
                 html.join(
                     html.link(r.page_name, 'Open' if page_exists else 'Create', css_class=css_class) if r.page_name else '',
                     html.link('fold', 'Fold'),

@@ -554,3 +554,6 @@ Support folding/unfolding for:
 
 == Mediawiker 3.4.10 ==
 * Syntax highlighting fixes
+
+== Mediawiker 3.4.11 ==
+* ParserFunctions folding improvements

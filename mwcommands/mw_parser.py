@@ -119,25 +119,75 @@ class WikiTable(Element):
 
 
 class Template(Element):
-    START = ('{{', '{{:', '{{#invoke:', '{{#var:', '{{#vardefine:', '{{#expr:', '{{#vardefineecho:', '{{#varexists:', '{{#var_final:')
+    START = (
+        '{{',
+        '{{:',
+        '{{#invoke:',
+        # ParserFunctions: https://www.mediawiki.org/wiki/Help:Extension:ParserFunctions
+        '{{#expr:',
+        '{{#ifeq:',
+        '{{#iferror:',
+        '{{#ifexpr:',
+        '{{#ifexist:',
+        '{{#if:',
+        '{{#rel2abs:',
+        '{{#switch:',
+        '{{#timel:',
+        '{{#time:',
+        '{{#titleparts:',
+        # StringFunctions: https://www.mediawiki.org/wiki/Extension:StringFunctions
+        '{{#len:',
+        '{{#pos:',
+        '{{#rpos:',
+        '{{#sub:',
+        '{{#pad:',
+        '{{#replace:',
+        '{{#explode:',
+        '{{#urlencode:',
+        '{{#urldecode:',
+        '{{#var:',
+        '{{#vardefine:',
+        '{{#vardefineecho:',
+        '{{#varexists:',
+        '{{#var_final:'
+    )
     STOP = ('}}',)
 
     MODE_TEMPLATE = 'template'
     MODE_TRANSCLUSION = 'transclusion'
     MODE_SCRIBUNTO = 'scribunto'
+    MODE_FUNCTION = 'Function'
     MODE_VAR = 'Variable'
 
     modes = {
         START[0]: MODE_TEMPLATE,
         START[1]: MODE_TRANSCLUSION,
         START[2]: MODE_SCRIBUNTO,
-        START[3]: MODE_VAR,
-        START[4]: MODE_VAR,
-        START[5]: MODE_VAR,
-        START[6]: MODE_VAR,
-        START[7]: MODE_VAR,
-        START[8]: MODE_VAR
-
+        START[3]: MODE_FUNCTION,
+        START[4]: MODE_FUNCTION,
+        START[5]: MODE_FUNCTION,
+        START[6]: MODE_FUNCTION,
+        START[7]: MODE_FUNCTION,
+        START[8]: MODE_FUNCTION,
+        START[9]: MODE_FUNCTION,
+        START[10]: MODE_FUNCTION,
+        START[11]: MODE_FUNCTION,
+        START[12]: MODE_FUNCTION,
+        START[13]: MODE_FUNCTION,
+        START[14]: MODE_FUNCTION,
+        START[15]: MODE_FUNCTION,
+        START[16]: MODE_FUNCTION,
+        START[17]: MODE_FUNCTION,
+        START[18]: MODE_FUNCTION,
+        START[19]: MODE_FUNCTION,
+        START[20]: MODE_FUNCTION,
+        START[21]: MODE_FUNCTION,
+        START[22]: MODE_FUNCTION,
+        START[23]: MODE_VAR,
+        START[24]: MODE_VAR,
+        START[25]: MODE_VAR,
+        START[26]: MODE_VAR,
+        START[27]: MODE_VAR
     }
 
     def mode(self):
@@ -150,6 +200,8 @@ class Template(Element):
             return 'Module'
         elif self.mode == self.MODE_TRANSCLUSION:
             return ''
+        elif self.mode == self.MODE_FUNCTION:
+            return 'Function'
         elif self.mode == self.MODE_VAR:
             return 'Variable'
         else:
@@ -159,18 +211,19 @@ class Template(Element):
         return self.text.split('|')[0].strip()
 
     def get_title(self):
-
         if self.mode == self.MODE_SCRIBUNTO:
             return self.name.split(':')[-1]
         elif self.mode == self.MODE_TRANSCLUSION:
             return self.name[1:]
+        elif self.mode == self.MODE_FUNCTION:
+            return self.open_tag[3:-1]
         else:
             return self.name
 
     def get_page_name(self):
         if self.mode == self.MODE_TRANSCLUSION:
             return self.name
-        if self.mode == self.MODE_VAR:
+        if self.mode in [self.MODE_VAR, self.MODE_FUNCTION]:
             return None
         else:
             return '%s:%s' % (self.namespace, self.title)
