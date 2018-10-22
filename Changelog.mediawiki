@@ -557,3 +557,6 @@ Support folding/unfolding for:
 
 == Mediawiker 3.4.11 ==
 * ParserFunctions folding improvements
+
+== Mediawiker 3.4.12 ==
+* New variable for {{Property|preview_custom_head}} Jinja template - <code>title</code> as page title.

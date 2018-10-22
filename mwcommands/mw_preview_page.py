@@ -34,12 +34,21 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
     Very restricted HTML Preview
     '''
 
+    def template_args(self, site):
+        return {
+            'http': 'https' if site['https'] else 'http',
+            'host': site['host'],
+            'path': site['path'],
+            'lang': utils.props.get_setting('preview_lang'),
+            'geshi_css': self.get_geshi_langs(),
+            'title': utils.get_title()
+        }
+
     def run(self, edit):
         if utils.props.get_setting('offline_mode'):
             return
 
         text = self.view.substr(sublime.Region(0, self.view.size()))
-        # site = utils.props.get_setting('site').get(utils.get_view_site())
         site = utils.conman.get_site()
 
         page_css = utils.api.call('get_page', title='MediaWiki:Common.css')
@@ -53,13 +62,9 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         else:
             common_css = ''
 
-        host = site['host']
-        path = site['path']
-        head = '\n'.join(site['preview_custom_head'] or utils.props.get_setting('preview_head'))
-        lang = utils.props.get_setting('preview_lang')
-        self.page_id = '%s: %s' % (host, utils.get_title())
+        head_tpl_args = self.template_args(site)
+        self.page_id = '%s: %s' % (head_tpl_args['host'], utils.get_title())
         self.preview_file = utils.p.from_package('%s_preview_file.html' % utils.p.PML, name='User', posix=False, is_abs=True)
-        site_http = 'https' if site['https'] else 'http'
 
         html_header_lines = [
             '<!DOCTYPE html>',
@@ -71,15 +76,15 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
             '<body style="margin:20px;">'
         ]
 
-        geshi_css = self.get_geshi_langs()
+        head = '\n'.join(site['preview_custom_head'] or utils.props.get_setting('preview_head'))
         head_tpl = Template(head)
-        head_str = head_tpl.render(http=site_http, host=host, path=path, lang=lang, geshi_css=geshi_css)
+        head_str = head_tpl.render(**head_tpl_args)
         html_header = '\n'.join(html_header_lines) % {'head': head_str, 'common_css': common_css}
         html_footer = '</body></html>'
 
         html = utils.api.call('get_parse_result', text=text, title=utils.get_title())
-        html = html.replace('"//', '"%s://' % site_http)  # internal links: images,..
-        html = html.replace('"/', '"%s://%s/' % (site_http, host))  # internal local links: images,..
+        html = html.replace('"//', '"%s://' % head_tpl_args['http'])  # internal links: images,..
+        html = html.replace('"/', '"%s://%s/' % (head_tpl_args['http'], head_tpl_args['host']))  # internal local links: images,..
 
         page_id_old = self.get_page_id()
         page = self.generate_preview(html_header, html, html_footer)
