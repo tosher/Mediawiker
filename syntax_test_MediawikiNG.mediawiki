@@ -244,3 +244,17 @@ from __future__ import with_statement
 // ^ meta.tag.validhtml.mediawiki
 //  ^ entity.name.tag.validhtml.source.mediawiki
 </source>
+
+{{FULLPAGENAMEE}}
+//    ^^^ keyword.control.magic.mediawiki
+//             ^^ meta.tag.magic.stop.mediawiki
+// <- meta.tag.magic.start.mediawiki
+
+{{!}}
+//^ keyword.control.magic.mediawiki
+
+{{#special:userlogin}}
+//      ^^^ keyword.control.magic.mediawiki
+{{#speciale:userlogin}} {{#specialno:userlogin}}
+//      ^^^ keyword.control.magic.mediawiki
+//                               ^^^^^ entity.name.function.template.mediawiki

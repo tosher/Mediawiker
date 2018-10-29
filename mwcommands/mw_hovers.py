@@ -1,22 +1,13 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
-import sys
-
 import sublime
 # import sublime_plugin
 import webbrowser
-
-pythonver = sys.version_info[0]
-if pythonver >= 3:
-    from . import mw_utils as utils
-    from . import mw_html
-    from . import mw_parser as par
-    from html import escape
-else:
-    import mw_utils as utils
-    import mw_html
-    from cgi import escape
+from . import mw_utils as utils
+from . import mw_html
+from . import mw_parser as par
+from html import escape
 
 
 html = mw_html.MwHtmlAdv(html_id='mediawiker_hover', user_css=False)
@@ -191,6 +182,8 @@ def on_hover_template(view, point):
                 if t.region.contains(point):
                     r.unfold()
                     return
+        elif link.startswith('http'):
+            webbrowser.open(link)
         else:
             sublime.active_window().run_command(utils.cmd('page'), {
                 'action': utils.cmd('show_page'),
@@ -222,8 +215,18 @@ def on_hover_template(view, point):
                 template_type = 'Transclusion of page'
             elif r.mode == r.MODE_FUNCTION:
                 template_type = 'Function'
+                if r.title in par.Template.PARSER_FUNCTIONS:
+                    help_link = 'https://www.mediawiki.org/wiki/Help:Extension:ParserFunctions##{title}'.format(title=r.title)
+                elif r.title in par.Template.STRING_FUNCTIONS:
+                    help_link = 'https://www.mediawiki.org/wiki/Extension:StringFunctions##{title}:'.format(title=r.title)
+                else:
+                    help_link = ''
             elif r.mode == r.MODE_VAR:
-                template_type = 'Variable'
+                template_type = 'Variable function'
+                if r.title in par.Template.VARIABLES:
+                    help_link = 'https://www.mediawiki.org/wiki/Extension:Variables##{title}'.format(title=r.title)
+                else:
+                    help_link = ''
 
             if r.page_name:
                 page = utils.api.get_page(r.page_name)
@@ -236,6 +239,7 @@ def on_hover_template(view, point):
                     html.link(r.page_name, 'Open' if page_exists else 'Create', css_class=css_class) if r.page_name else '',
                     html.link('fold', 'Fold'),
                     html.link('unfold', 'Unfold'),
+                    html.link(help_link, 'Help') if r.mode in [r.MODE_FUNCTION, r.MODE_VAR] else '',
                     char=html.span('|', css_class='wide')
                 )
             ]

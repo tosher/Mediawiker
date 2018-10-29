@@ -7,14 +7,6 @@
             "python-jinja2",
             "markupsafe",
             "python-pywin32"
-        ],
-        "<3000": [
-            "requests",
-            "oauthlib",
-            "requests-oauthlib",
-            "python-jinja2",
-            "markupsafe",
-            "ordereddict"
         ]
    },
    "linux": {
@@ -24,15 +16,6 @@
             "requests-oauthlib",
             "python-jinja2",
             "markupsafe"
-        ],
-        "<3000": [
-            "requests",
-            "oauthlib",
-            "requests-oauthlib",
-            "python-jinja2",
-            "markupsafe",
-            "fileio",
-            "ordereddict"
         ]
    },
    "osx": {
@@ -42,14 +25,6 @@
             "requests-oauthlib",
             "python-jinja2",
             "markupsafe"
-        ],
-        "<3000": [
-            "requests",
-            "oauthlib",
-            "requests-oauthlib",
-            "python-jinja2",
-            "markupsafe",
-            "ordereddict"
         ]
     }
 }

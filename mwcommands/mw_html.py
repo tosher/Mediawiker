@@ -1,22 +1,10 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
-import sys
 import sublime
 # import sublime_plugin
-pythonver = sys.version_info[0]
-
-if pythonver >= 3:
-    from . import mw_utils as utils
-else:
-    import mw_utils as utils
-
-try:
-    # Python 2.7+
-    from collections import OrderedDict
-except ImportError:
-    # Python 2.6
-    from ordereddict import OrderedDict
+from . import mw_utils as utils
+from collections import OrderedDict
 
 
 class MwHtml(object):

@@ -2,40 +2,29 @@
 # -*- coding: utf-8 -*-
 
 import sys
-
 import os
 import re
 import urllib
 import traceback
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
+from collections import OrderedDict
 
 import sublime
 # import sublime_plugin
 import requests
 
-pythonver = sys.version_info[0]
-if pythonver >= 3:
-    # NOTE: load from package, not used now because custom ssl
-    # current_dir = dirname(__file__)
-    # if '.sublime-package' in current_dir:
-    #     sys.path.append(current_dir)
-    #     import mwclient
-    # else:
-    #     from . import mwclient
-    import base64
-    from . import mw_properties as p
-    from . import mw_parser as par
-    from html.parser import HTMLParser
-    from ..lib import mwclient
-    from ..lib import browser_cookie3
-else:
-    import mw_properties as p
-    from HTMLParser import HTMLParser
-    from lib import mwclient
+# NOTE: load from package, not used now because custom ssl
+# current_dir = dirname(__file__)
+# if '.sublime-package' in current_dir:
+#     sys.path.append(current_dir)
+#     import mwclient
+# else:
+#     from . import mwclient
+import base64
+from . import mw_properties as p
+from . import mw_parser as par
+from html.parser import HTMLParser
+from ..lib import mwclient
+from ..lib import browser_cookie3
 
 # linting skips
 # all must be ovverrided in plugin_loaded
@@ -131,30 +120,20 @@ def get_view_site():
 
 def enco(value):
     ''' for md5 hashing string must be encoded '''
-    if pythonver >= 3:
-        return value.encode('utf-8')
-    return value
+    return value.encode('utf-8')
 
 
 def deco(value):
     ''' for py3 decode from bytes '''
-    if pythonver >= 3:
-        return value.decode('utf-8')
-    return value
+    return value.decode('utf-8')
 
 
 def strunquote(string_value):
-    if pythonver >= 3:
-        return urllib.parse.unquote(string_value)
-    else:
-        return urllib.unquote(string_value.encode('utf-8')).decode('utf-8')
+    return urllib.parse.unquote(string_value)
 
 
 def strquote(string_value):
-    if pythonver >= 3:
-        return urllib.parse.quote(string_value)
-    else:
-        return urllib.quote(string_value.encode('utf-8'))
+    return urllib.parse.quote(string_value)
 
 
 def get_title():
@@ -182,12 +161,6 @@ def show_red_links(view, page):
 
 
 def process_red_links(view, page):
-
-    # ST2 hasn't phantoms
-    if pythonver < 3:
-        status_message('Commands "Show red links/Hide red links" supported in Sublime text 3 only.')
-        return
-
     status_message('Processing red_links for page [[%s]].. ' % api.page_attr(page, 'name'), new_line=False)
 
     view.erase_phantoms('redlink')
@@ -347,10 +320,7 @@ def status_message(message, replace=None, is_panel=None, new_line=True, panel_na
 
 
 def set_timeout_async(callback, delay):
-    if pythonver >= 3000:
-        sublime.set_timeout_async(callback, delay)
-    else:
-        sublime.set_timeout(callback, delay)
+    sublime.set_timeout_async(callback, delay)
 
 
 # classes..
@@ -863,7 +833,7 @@ class MediawikerConnectionManager(object):
                         ) for t in connection.tokens.keys()]) if connection.tokens else '<empty>'))
 
                 except mwclient.LoginError as exc:
-                    e = exc.args if pythonver >= 3 else exc
+                    e = exc.args
                     status_message(' failed: %s' % e[1]['result'])
                     return
             # Login/Password auth
@@ -871,7 +841,7 @@ class MediawikerConnectionManager(object):
                 try:
                     connection.login(username=site['username'], password=site['password'], domain=site['domain'])
                 except mwclient.LoginError as exc:
-                    e = exc.args if pythonver >= 3 else exc
+                    e = exc.args
                     status_message(' failed: %s' % e[1]['result'])
                     return
             # elif self.auth_type == self.AUTH_TYPE_OAUTH:
@@ -986,7 +956,7 @@ class MediawikerConnectionManager(object):
                 )
                 return connection
             except mwclient.OAuthAuthorizationError as exc:
-                e = exc.args if pythonver >= 3 else exc
+                e = exc.args
                 status_message('OAuth login failed: %s' % e[1])
         return None
 
@@ -1157,7 +1127,3 @@ class WikiaInfoboxParser(HTMLParser):
                 param = '%s=%s' % (pk, self.params[pk])
                 params_list.append(param)
         return params_list
-
-
-if pythonver < 3:
-    plugin_loaded()

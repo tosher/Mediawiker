@@ -1,25 +1,12 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
-import sys
 import os
 import sublime
 
-pythonver = sys.version_info[0]
 PM = 'Mediawiker'
 PML = 'mediawiker'
-
-# if pythonver < 3:
-#     import json
-
-# python 3
-# def from_package(*path, name=PM, posix=True, is_abs=False):
-
-#     def posixer(line):
-#         return line.replace('\\', '/') if posix else line
-
-#     root = sublime.packages_path() if is_abs else 'Packages'
-#     return posixer(os.path.join(root, name, *path))
+PROJECT_SETTINGS_PREFIX = 'mediawiker'
 
 
 def from_package(*path, **kwargs):
@@ -35,24 +22,23 @@ def from_package(*path, **kwargs):
 
 
 class MediawikerProperties(object):
-
     settings_default = None
     settings_user = None
 
     props = {
-        'site': {'text': 'Sites configurations', 'deprecated': 'mediawiki_site'},
-        'syntax': {'text': 'Preferred mediawiki syntax', 'deprecated': 'mediawiki_syntax'},
-        'site_active': {'text': 'Default site', 'deprecated': 'mediawiki_site_active'},
+        'site': {'text': 'Sites configurations'},
+        'syntax': {'text': 'Preferred mediawiki syntax'},
+        'site_active': {'text': 'Default site'},
         'summary_postfix': {'text': 'Postfix in post summary'},
         'skip_summary': {'text': 'Skip summary input'},
         'clipboard_as_defaultpagename': {'text': 'Use clipboard data as page name'},
         'newtab_ongetpage': {'text': 'Open pages in new tab'},
-        'clearpagename_oninput': {'text': 'Automatic convertion of Url to page name'},
+        'clearpagename_oninput': {'text': 'Automatic conversion of Url to page name'},
         'password_input_hide': {'text': 'Hide password on input'},
         'password_char': {'text': 'Password character'},
         'snippet_char': {'text': 'Snippet character'},
         'pagelist_maxsize': {'text': 'History size'},
-        'files_extension': {'text': 'Extentions of wiki files'},
+        'files_extension': {'text': 'Extensions of wiki files'},
         'category_root': {'text': 'Root category for CategoryTree'},
         'mark_as_minor': {'text': 'By default, changes are minor'},
         'csvtable_delimiter': {'text': 'CVS data delimiter'},
@@ -61,16 +47,16 @@ class MediawikerProperties(object):
         'image_prefix_min_length': {'text': 'Minimal required image prefix for search'},
         'wiki_instead_editor': {'text': 'Save to page post'},
         'show_image_in_popup': {'text': 'Show images in popups'},
-        'validate_revision_on_post': {'text': 'Check server page revision on post', 'deprecated': 'mediawiki_validate_revision_on_post'},
-        'linkstopage_limit': {'text': 'Max count of links to page', 'deprecated': 'mediawiki_linkstopage_limit'},
-        'preview_lang': {'text': 'Default language for preview', 'deprecated': 'mediawiki_preview_lang'},
+        'validate_revision_on_post': {'text': 'Check server page revision on post'},
+        'linkstopage_limit': {'text': 'Max count of links to page'},
+        'preview_lang': {'text': 'Default language for preview'},
         'fold_tags': {'text': 'Fold tags list'},
-        'preview_head': {'text': 'HTML head lines for preview', 'deprecated': 'mediawiki_preview_head'},
-        'notifications_show_all': {'text': 'Show all notifications', 'deprecated': 'mediawiki_notifications_show_all'},
-        'notifications_read_sign': {'text': 'Character for read notifications', 'deprecated': 'mediawiki_notifications_read_sign'},
+        'preview_head': {'text': 'HTML head lines for preview'},
+        'notifications_show_all': {'text': 'Show all notifications'},
+        'notifications_read_sign': {'text': 'Character for read notifications'},
         'wikitable_properties': {'text': 'Default mediawiki table properties'},
         'wikitable_cell_properties': {'text': 'Default mediawiki table cell properties'},
-        'use_status_messages_panel': {'text': 'Use separate panel instead status line', 'deprecated': 'use_status_messages_panel'},
+        'use_status_messages_panel': {'text': 'Use separate panel instead status line'},
         'firefox_cookie_files': {'text': 'Custom path to Firefox cookies'},
         'chrome_cookie_files': {'text': 'Custom path to Chrome cookies'},
         'config_icon_checked': {'text': 'Configurator: checked item character'},
@@ -101,9 +87,6 @@ class MediawikerProperties(object):
     }
 
     props_autoremove = [
-        'mediawiki_search_syntax',
-        'mediawiker_preview_file',
-        'mediawiker_config_html'
     ]
 
     props_view = {
@@ -146,16 +129,8 @@ class MediawikerProperties(object):
     def __init__(self):
         self.reload_settings()
         self.deprecated = self.get_deprecated()
-        if pythonver >= 3:
-            self.settings_default = sublime.decode_value(sublime.load_resource(from_package('Mediawiker.sublime-settings')))
-        else:
-            # TODO: strip commments
-            # with open(from_package('Mediawiker.sublime-settings', posix=True, is_abs=True)) as setdef:
-            #     self.settings_default = json.load(setdef)
-            # not used in ST2
-            self.settings_default = {}
-
-        self.autoremove_deprecated()
+        # self.autoremove_deprecated()
+        self.autoconvert_settings()
 
         # settings for plugin's panel
         panel_settings_file_name = '%sPanel.sublime-settings' % PM
@@ -165,17 +140,29 @@ class MediawikerProperties(object):
             sublime.save_settings(panel_settings_file_name)
 
     def reload_settings(self):
+        self.settings_default = sublime.decode_value(sublime.load_resource(from_package('Mediawiker.sublime-settings')))
         self.settings = sublime.load_settings('Mediawiker.sublime-settings')
-        if pythonver >= 3:
-            try:
-                self.settings_user = sublime.decode_value(sublime.load_resource(from_package('Mediawiker.sublime-settings', name='User')))
-            except IOError as e:
-                self.settings_user = {}
-        else:
-            # with open(from_package('Mediawiker.sublime-settings', name='User', posix=True, is_abs=True)) as setu:
-            #     self.settings_user = json.load(setu)
-            # not used in ST2
+        try:
+            self.settings_user = sublime.decode_value(sublime.load_resource(from_package('Mediawiker.sublime-settings', name='User')))
+        except IOError:
             self.settings_user = {}
+
+    def autoconvert_settings(self):
+        need_update = False
+        for key in self.settings_user.copy().keys():
+            if key.startswith(PML):
+                try:
+                    if self.prop(key) not in self.settings_default:
+                        print("Unknown option in user configuration: %s" % key)
+                    else:
+                        need_update = True
+                        self.settings.set(self.prop(key), self.settings_user.get(key))
+                        self.settings.erase(key)
+                except Exception as e:
+                    print("Exception while processing settings key %s: %s" % (key, e))
+
+        if need_update:
+            sublime.save_settings('Mediawiker.sublime-settings')
 
     def autoremove_deprecated(self):
         for key in self.settings_user:
@@ -188,9 +175,9 @@ class MediawikerProperties(object):
 
     def prop(self, key):
         if key.startswith(PML):
-            return key
+            return key.split('_', 1)[1]
         elif key in self.props:
-            return self.get_name(key)
+            return key
         return key
 
     def get_name(self, name):
@@ -200,22 +187,13 @@ class MediawikerProperties(object):
         return name[len(PML) + 1:]
 
     def get_deprecated(self):
-        # python 3
-        # return {self.props[k].get('deprecated'): self.get_name(k) for k in self.props.keys() if self.props[k].get('deprecated', None)}
-        return dict((self.props[k].get('deprecated'), self.get_name(k)) for k in self.props.keys() if self.props[k].get('deprecated', None))
+        return {self.props[k].get('deprecated'): self.get_name(k) for k in self.props.keys() if self.props[k].get('deprecated', None)}
 
     def is_deprecated(self, key):
         if key in self.deprecated:
             return True
         return False
 
-    # props_dependencies = {
-    #     'popup_type': {
-    #         'dep_property': 'offline_mode',
-    #         'dep_value': True,
-    #         'value': 'off'
-    #     }
-    # }
     def get_dependency_value(self, key):
         ''' Dependencies between settings - overrides real value '''
         try:
@@ -239,7 +217,12 @@ class MediawikerProperties(object):
             return dep_value
 
         key = self.prop(key)
-        return self.settings.get(key, default_value)
+        # return self.settings.get(key, default_value)
+        view = sublime.active_window().active_view()
+        val = None
+        if view is not None:
+            val = sublime.active_window().active_view().settings().get('%s.%s' % (PROJECT_SETTINGS_PREFIX, key), None)
+        return self.settings.get(key, default_value) if val is None else val
 
     def set_setting(self, key, value):
 
@@ -265,7 +248,7 @@ class MediawikerProperties(object):
             key = self.remove_prefix(key)
 
         if plugin:
-            assert key in self.props_view, 'Uknown property for view: %s' % key
+            assert key in self.props_view, 'Unknown property for view: %s' % key
 
             default_value = self.props_view[key]['default'] if default_value is None else default_value
             key_type = self.props_view[key]['type']
@@ -280,7 +263,7 @@ class MediawikerProperties(object):
             key = self.remove_prefix(key)
 
         if plugin:
-            assert key in self.props_view, 'Uknown property for view: %s' % key
+            assert key in self.props_view, 'Unknown property for view: %s' % key
             assert isinstance(value, self.props_view[key]['type']), 'Incorrect type value for %s: %s instead of %s' % (key, type(value), self.props_view[key]['type'])
             key = self.get_name(key)
 
@@ -288,7 +271,7 @@ class MediawikerProperties(object):
 
     def get_site_setting(self, site, key, default_value=None):
 
-        assert key in self.props_site, 'Uknown property for site: %s' % key
+        assert key in self.props_site, 'Unknown property for site: %s' % key
 
         default_value = self.props_site[key]['default'] if default_value is None else default_value
         key_type = self.props_site[key]['type']
@@ -296,7 +279,7 @@ class MediawikerProperties(object):
 
     def set_site_setting(self, site, key, value):
 
-        assert key in self.props_site, 'Uknown property for site: %s' % key
+        assert key in self.props_site, 'Unknown property for site: %s' % key
         key_type = self.props_site[key]['type']
         assert isinstance(value, key_type), 'Incorrect type value for %s: %s instead of %s' % (key, type(value), key_type)
 

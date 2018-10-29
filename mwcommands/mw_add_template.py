@@ -1,17 +1,10 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
-import sys
 import re
-
 import sublime
 import sublime_plugin
-
-pythonver = sys.version_info[0]
-if pythonver >= 3:
-    from . import mw_utils as utils
-else:
-    import mw_utils as utils
+from . import mw_utils as utils
 
 
 class MediawikerInsertTemplateCommand(sublime_plugin.WindowCommand):

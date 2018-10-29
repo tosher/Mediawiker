@@ -560,3 +560,10 @@ Support folding/unfolding for:
 
 == Mediawiker 3.4.12 ==
 * New variable for {{Property|preview_custom_head}} Jinja template - <code>title</code> as page title.
+
+== Mediawiker 3.5.0 ==
+* Sublime text 2 is not supported anymore. Please, use Sublime text 3.
+* Prefix <code>mediawiker_</code> was removed from the plugin settings. User settings will be auto-converted into the new format.
+* Project settings support (overrides user settings). Options must be defined with <code>mediawiker.</code> prefix, example: <code>mediawiker.skip_summary</code>.
+* Syntax highlighting for magic words was improved.
+* Popups for Parser/String/Variable functions has a link to help page.

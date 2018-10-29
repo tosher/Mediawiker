@@ -1,6 +1,6 @@
 # Sublime Text plugin: Mediawiker
 
-[Mediawiker](https://github.com/tosher/Mediawiker) is a plugin for Sublime Text editor (ver. 2/3) that adds possibility to use it as Wiki Editor on [Mediawiki](http://mediawiki.org) based sites like [Wikipedia](http://en.wikipedia.org) and [many other](http://www.mediawiki.org/wiki/Sites_using_MediaWiki/en).
+[Mediawiker](https://github.com/tosher/Mediawiker) is a plugin for Sublime Text editor that adds possibility to use it as Wiki Editor on [Mediawiki](http://mediawiki.org) based sites like [Wikipedia](http://en.wikipedia.org) and [many other](http://www.mediawiki.org/wiki/Sites_using_MediaWiki/en).
 
 ## Main features
 * [MWClient](https://github.com/mwclient/mwclient) library based.
@@ -32,7 +32,7 @@
 *Screenshot using the Mediawiker_Dark color scheme*
 
 ## External dependencies (with modifications or not)
-* [Mwclient](https://github.com/mwclient/mwclient) - the Corrrre!
+* [Mwclient](https://github.com/mwclient/mwclient) - the core!
 * [Browsercookie](https://bitbucket.org/richardpenman/browsercookie), [Browser_cookie3](https://github.com/borisbabic/browser_cookie3)
     - [Keyring](https://pypi.python.org/pypi/keyring)
     - [Pbkdf2](https://pypi.python.org/pypi/pbkdf2)

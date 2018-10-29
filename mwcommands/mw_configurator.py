@@ -1,8 +1,6 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
-import sys
-
 try:
     import json
 except ImportError:
@@ -10,15 +8,8 @@ except ImportError:
 
 import sublime
 import sublime_plugin
-
-pythonver = sys.version_info[0]
-
-if pythonver >= 3:
-    from . import mw_utils as utils
-    from . import mw_html
-else:
-    import mw_utils as utils
-    import mw_html
+from . import mw_utils as utils
+from . import mw_html
 
 
 class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
@@ -46,11 +37,6 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
         self.html = mw_html.MwHtmlAdv(html_id='mediawiker_configurator')
         self.set_css()
-
-        if pythonver < 3:
-            sublime.message_dialog('Only Sublime Text 3 supported')
-            return
-
         self.show()
 
     def set_css(self):

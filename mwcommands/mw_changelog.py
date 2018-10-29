@@ -1,19 +1,12 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
-import sys
 import re
 import webbrowser
 import sublime
 import sublime_plugin
-
-pythonver = sys.version_info[0]
-if pythonver >= 3:
-    from . import mw_utils as utils
-    from . import mw_html
-else:
-    import mw_utils as utils
-    import mw_html
+from . import mw_utils as utils
+from . import mw_html
 
 
 class MediawikerChangelogCommand(sublime_plugin.TextCommand):
@@ -21,13 +14,6 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
     DRAW_TYPE = sublime.HIDDEN + sublime.PERSISTENT
 
     def run(self, edit, version='sublime'):
-
-        if pythonver < 3 and version == 'sublime':
-            if sublime.ok_cancel_dialog('For Sublime Text 2 version, changelog will be opened in browser'):
-                version = 'browser'
-            else:
-                return
-
         self.MARKED = utils.props.get_setting('config_icon_checked')
         self.UNMARKED = utils.props.get_setting('config_icon_unchecked')
         self.RADIO_MARKED = utils.props.get_setting('config_icon_radio_checked')
@@ -40,12 +26,8 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
         self.set_css()
         # self.html.debug = True
 
-        if pythonver >= 3:
-            with open(utils.p.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r', encoding='utf-8') as cl:
-                log = cl.read()
-        else:
-            with open(utils.p.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r') as cl:
-                log = cl.read().decode('utf-8')
+        with open(utils.p.from_package('Changelog.mediawiki', posix=False, is_abs=True), 'r', encoding='utf-8') as cl:
+            log = cl.read()
 
         self.process_h2_regions(log, 2, version)
 
@@ -119,12 +101,8 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
         elif version == 'browser':
             preview_file = utils.p.from_package('%s_changelog.html' % utils.p.PML, name='User', posix=False, is_abs=True)
             html = html.replace('<html>', '<html><head><meta charset="UTF-8"/></head>')
-            if pythonver >= 3:
-                with open(preview_file, 'w', encoding='utf-8') as tf:
-                    tf.write(html)
-            else:
-                with open(preview_file, 'w') as tf:
-                    tf.write(html.encode('utf-8'))
+            with open(preview_file, 'w', encoding='utf-8') as tf:
+                tf.write(html)
 
             webbrowser.open(tf.name)
 

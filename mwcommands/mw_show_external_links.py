@@ -1,19 +1,11 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
-import sys
 import webbrowser
-
 import sublime
 import sublime_plugin
-
-pythonver = sys.version_info[0]
-if pythonver >= 3:
-    from . import mw_utils as utils
-    from . import mw_parser as par
-else:
-    import mw_utils as utils
-    import mw_parser as par
+from . import mw_utils as utils
+from . import mw_parser as par
 
 
 class MediawikerShowExternalLinksCommand(sublime_plugin.TextCommand):

@@ -1,18 +1,10 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
-import sys
-
 import sublime
 import sublime_plugin
-
 import difflib
-
-pythonver = sys.version_info[0]
-if pythonver >= 3:
-    from . import mw_utils as utils
-else:
-    import mw_utils as utils
+from . import mw_utils as utils
 
 
 class MediawikerShowDiffCommand(sublime_plugin.WindowCommand):
@@ -57,6 +49,6 @@ class MediawikerPageDiffVsServerCommand(sublime_plugin.TextCommand):
             if not diff_text:
                 utils.status_message('Page versions has no differencies')
             else:
-                syntax_filename = 'Diff.sublime-syntax' if pythonver >= 3 else 'Diff.tmLanguage'
+                syntax_filename = 'Diff.sublime-syntax'
                 syntax = utils.p.from_package(syntax_filename, name='Diff')
                 utils.status_message(diff_text, panel_name='Show differences', syntax=syntax, new=True)

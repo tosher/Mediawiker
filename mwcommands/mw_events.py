@@ -1,50 +1,34 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
-import sys
-
 import sublime
 import sublime_plugin
+from . import mw_utils as utils
+from . import mw_hovers as hovers
 
-pythonver = sys.version_info[0]
-if pythonver >= 3:
-    from . import mw_utils as utils
-    from . import mw_hovers as hovers
-else:
-    import mw_utils as utils
-    import mw_hovers as hovers
 
-if pythonver >= 3:
+class MediawikerViewEvents(sublime_plugin.ViewEventListener):
 
-    class MediawikerViewEvents(sublime_plugin.ViewEventListener):
+    cnt = None
 
-        cnt = None
+    def on_modified(self):
+        if utils.props.get_view_setting(self.view, 'is_here'):
+            self.view.hide_popup()
+            try:
+                ch_cnt = utils.props.get_view_setting(self.view, 'autoreload')
+                if ch_cnt:
+                    if not self.cnt:
+                        self.cnt = self.view.change_count()
 
-        def on_modified(self):
-            if utils.props.get_view_setting(self.view, 'is_here'):
-                self.view.hide_popup()
-                try:
-                    ch_cnt = utils.props.get_view_setting(self.view, 'autoreload')
-                    if ch_cnt:
-                        if not self.cnt:
-                            self.cnt = self.view.change_count()
-
-                        cnt_delta = self.view.change_count() - self.cnt
-                        if cnt_delta > ch_cnt:
-                            utils.status_message('Autoreload: Generating preview..')
-                            sublime.active_window().run_command(utils.cmd('preview'))
-                            self.cnt = None
-                        else:
-                            utils.status_message('\nAutoreload: change %s of %s..' % (cnt_delta, ch_cnt))
-                except Exception as e:
-                    utils.status_message('Preview exception: %s' % e)
-else:
-
-    class MediawikerViewEvents(object):
-        cnt = None
-
-        def on_modified(self):
-            pass
+                    cnt_delta = self.view.change_count() - self.cnt
+                    if cnt_delta > ch_cnt:
+                        utils.status_message('Autoreload: Generating preview..')
+                        sublime.active_window().run_command(utils.cmd('preview'))
+                        self.cnt = None
+                    else:
+                        utils.status_message('\nAutoreload: change %s of %s..' % (cnt_delta, ch_cnt))
+            except Exception as e:
+                utils.status_message('Preview exception: %s' % e)
 
 
 class MediawikerEvents(sublime_plugin.EventListener):

@@ -1,19 +1,10 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
-import sys
-# import re
-
 import sublime
 import sublime_plugin
-
-pythonver = sys.version_info[0]
-if pythonver >= 3:
-    from . import mw_utils as utils
-    from . import mw_parser as par
-else:
-    import mw_utils as utils
-    import mw_parser as par
+from . import mw_utils as utils
+from . import mw_parser as par
 
 
 class MediawikerColapseCommand(sublime_plugin.TextCommand):
@@ -29,35 +20,35 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
         if headers:
             level = headers[0].level
             gutter_png = ''
-            if utils.props.get_setting('show_gutters') and pythonver >= 3:
+            if utils.props.get_setting('show_gutters'):
                 gutter_png = utils.p.from_package('img', 'gutter_h%s.png' % level)
             self.view.add_regions('h_%s' % level, [r.region for r in headers], 'comment', gutter_png, self.DRAW_TYPE)
 
     def get_colapse_templates(self, templates):
         if templates:
             gutter_png = ''
-            if utils.props.get_setting('show_gutters') and pythonver >= 3:
+            if utils.props.get_setting('show_gutters'):
                 gutter_png = utils.p.from_package('img', 'gutter_t.png')
             self.view.add_regions('templates', [r.region for r in templates], 'comment', gutter_png, self.DRAW_TYPE)
 
     def get_colapse_tags(self, tag, tags):
         if tags:
             gutter_png = ''
-            if utils.props.get_setting('show_gutters') and pythonver >= 3:
+            if utils.props.get_setting('show_gutters'):
                 gutter_png = utils.p.from_package('img', 'gutter_tag.png')
             self.view.add_regions(tag, [r.region for r in tags], 'comment', gutter_png, self.DRAW_TYPE)
 
     def get_colapse_tables(self, tables):
         if tables:
             gutter_png = ''
-            if utils.props.get_setting('show_gutters') and pythonver >= 3:
+            if utils.props.get_setting('show_gutters'):
                 gutter_png = utils.p.from_package('img', 'gutter_t.png')
             self.view.add_regions('tables', [r.region for r in tables], 'comment', gutter_png, self.DRAW_TYPE)
 
     def get_colapse_comments(self, comments):
         if comments:
             gutter_png = ''
-            if utils.props.get_setting('show_gutters') and pythonver >= 3:
+            if utils.props.get_setting('show_gutters'):
                 gutter_png = utils.p.from_package('img', 'gutter_tag.png')
             self.view.add_regions('comment', [r.region for r in comments], 'comment', gutter_png, self.DRAW_TYPE)
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python\n
 # -*- coding: utf-8 -*-
 
-import sys
+# import sys
 import sublime
 import sublime_plugin
 
@@ -14,13 +14,8 @@ import sublime_plugin
 import warnings
 warnings.simplefilter("ignore", DeprecationWarning)
 
-pythonver = sys.version_info[0]
-if pythonver >= 3:
-    from .mwcommands import mw_utils as utils
-    from .mwcommands import *
-else:
-    from mwcommands import mw_utils as utils
-    from mwcommands import *
+from .mwcommands import mw_utils as utils
+from .mwcommands import *
 
 
 def plugin_loaded():

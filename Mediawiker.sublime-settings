@@ -1,5 +1,5 @@
 {
-    "mediawiker_site":
+    "site":
     {
         "English wikipedia": {
             "authorization_type": "login",  // Authorization type: "login" / "oauth" / "cookies"
@@ -75,62 +75,62 @@
             "show_red_links": false
         }
     },
-    "mediawiker_syntax": "Packages/Mediawiker/MediawikiNG.sublime-syntax",
-    "mediawiker_syntax_lua": "Packages/Lua/Lua.sublime-syntax",
-    "mediawiker_syntax_css": "Packages/CSS/CSS.sublime-syntax",
-    "mediawiker_syntax_js": "Packages/JavaScript/JavaScript.sublime-syntax",
-    "mediawiker_site_active": "English wikipedia",
-    "mediawiker_summary_postfix": " (by SublimeText.Mediawiker)",
-    "mediawiker_skip_summary": false,
-    "mediawiker_clipboard_as_defaultpagename": false,
-    "mediawiker_newtab_ongetpage": true,
-    "mediawiker_clearpagename_oninput": true,
-    "mediawiker_password_input_hide": true,
-    "mediawiker_password_char": "•",
-    "mediawiker_snippet_char": "{☼}",
-    "mediawiker_pagelist_maxsize": 100,
-    "mediawiker_files_extension": ["mediawiki", "wiki", "wikipedia", ""],
-    "mediawiker_category_root": "Category:Help",
-    "mediawiker_mark_as_minor": false,
-    "mediawiker_csvtable_delimiter": "|",
-    "mediawiker_search_namespaces": "0,6,14",  // Wiki namespaces for search
-    "mediawiker_search_results_count": 50,
-    "mediawiker_image_prefix_min_length": 0,
-    "mediawiker_wiki_instead_editor": true,
-    "mediawiker_show_image_in_popup": true,
-    "mediawiker_popup_image_size": 300,  // px
-    "mediawiker_popup_type": "auto",  // "manual", "auto", "off"
-    "mediawiker_validate_revision_on_post": true,
-    "mediawiker_linkstopage_limit": 50,
-    "mediawiker_preview_lang": "en",
-    "mediawiker_fold_tags": ["div"],
-    "mediawiker_debug": false,
-    "mediawiker_preview_head": [
+    "syntax": "Packages/Mediawiker/MediawikiNG.sublime-syntax",
+    "syntax_lua": "Packages/Lua/Lua.sublime-syntax",
+    "syntax_css": "Packages/CSS/CSS.sublime-syntax",
+    "syntax_js": "Packages/JavaScript/JavaScript.sublime-syntax",
+    "site_active": "English wikipedia",
+    "summary_postfix": " (by SublimeText.Mediawiker)",
+    "skip_summary": false,
+    "clipboard_as_defaultpagename": false,
+    "newtab_ongetpage": true,
+    "clearpagename_oninput": true,
+    "password_input_hide": true,
+    "password_char": "•",
+    "snippet_char": "{☼}",
+    "pagelist_maxsize": 100,
+    "files_extension": ["mediawiki", "wiki", "wikipedia", ""],
+    "category_root": "Category:Help",
+    "mark_as_minor": false,
+    "csvtable_delimiter": "|",
+    "search_namespaces": "0,6,14",  // Wiki namespaces for search
+    "search_results_count": 50,
+    "image_prefix_min_length": 0,
+    "wiki_instead_editor": true,
+    "show_image_in_popup": true,
+    "popup_image_size": 300,  // px
+    "popup_type": "auto",  // "manual", "auto", "off"
+    "validate_revision_on_post": true,
+    "linkstopage_limit": 50,
+    "preview_lang": "en",
+    "fold_tags": ["div"],
+    "debug": false,
+    "preview_head": [
         "<meta charset=\"UTF-8\"/>",
         "<link rel=\"stylesheet\" href=\"{{ http }}://{{ host }}{{ path }}load.php?debug=false&amp;lang={{ lang }}&amp;modules=site&amp;only=styles&amp;skin=vector\"/>",
         "<link rel=\"stylesheet\" href=\"{{ http }}://{{ host }}{{ path }}load.php?debug=false&amp;lang={{ lang }}&amp;modules={{ geshi_css }}ext.visualEditor.viewPageTarget.noscript|mediawiki.legacy.commonPrint,shared|mediawiki.sectionAnchor|mediawiki.skinning.interface|mediawiki.ui.button|skins.vector.styles&amp;only=styles&amp;skin=vector&amp;*\" />"
     ],
-    "mediawiker_notifications_show_all": true,
-    "mediawiker_notifications_read_sign": " ✓",
-    "mediawiker_wikitable_properties":
+    "notifications_show_all": true,
+    "notifications_read_sign": " ✓",
+    "wikitable_properties":
     {
         "class": "wikitable"
     },
-    "mediawiker_wikitable_cell_properties": {},
-    "mediawiker_use_status_messages_panel": true,
-    "mediawiker_firefox_cookie_files": [],
-    "mediawiker_chrome_cookie_files": [],
-    "mediawiker_config_icon_checked": "✓",
-    "mediawiker_config_icon_unchecked": "✗",
-    "mediawiker_config_icon_radio_checked": "✓",
-    "mediawiker_config_icon_radio_unchecked": "⭕",
-    "mediawiker_config_icon_edit": "→",
-    "mediawiker_config_icon_back": "←",
-    "mediawiker_config_icon_unnumbered_list": "•",
-    "mediawiker_red_link_icon": "✘",
-    "mediawiker_css_html": {},
-    "mediawiker_show_gutters": true,
-    "mediawiker_panel":
+    "wikitable_cell_properties": {},
+    "use_status_messages_panel": true,
+    "firefox_cookie_files": [],
+    "chrome_cookie_files": [],
+    "config_icon_checked": "✓",
+    "config_icon_unchecked": "✗",
+    "config_icon_radio_checked": "✓",
+    "config_icon_radio_unchecked": "⭕",
+    "config_icon_edit": "→",
+    "config_icon_back": "←",
+    "config_icon_unnumbered_list": "•",
+    "red_link_icon": "✘",
+    "css_html": {},
+    "show_gutters": true,
+    "panel":
     [
         {"caption": "Open page", "type": "window_command", "value": "mediawiker_open_page", "online": true},
         {"caption": "Open section of a page", "type": "window_command", "value": "mediawiker_open_page_section", "online": true},
@@ -183,9 +183,9 @@
         {"caption": "Code", "type": "snippet", "value": "Packages/Mediawiker/snippets/mw_code.sublime-snippet", "online": false},
         {"caption": "Changelog", "type": "window_command", "value": "mediawiker_changelog", "online": false}
     ],
-    "mediawiker_favorites": {},
-    "mediawiker_pagelist": {},
-    "mediawiker_offline_mode": false
+    "favorites": {},
+    "pagelist": {},
+    "offline_mode": false
 
 }
 

@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import sys
-pythonver = sys.version_info[0]
-
 import sublime
 
 # p = Parser(view)
@@ -119,38 +117,23 @@ class WikiTable(Element):
 
 
 class Template(Element):
-    START = (
-        '{{',
-        '{{:',
-        '{{#invoke:',
-        # ParserFunctions: https://www.mediawiki.org/wiki/Help:Extension:ParserFunctions
-        '{{#expr:',
-        '{{#ifeq:',
-        '{{#iferror:',
-        '{{#ifexpr:',
-        '{{#ifexist:',
-        '{{#if:',
-        '{{#rel2abs:',
-        '{{#switch:',
-        '{{#timel:',
-        '{{#time:',
-        '{{#titleparts:',
-        # StringFunctions: https://www.mediawiki.org/wiki/Extension:StringFunctions
-        '{{#len:',
-        '{{#pos:',
-        '{{#rpos:',
-        '{{#sub:',
-        '{{#pad:',
-        '{{#replace:',
-        '{{#explode:',
-        '{{#urlencode:',
-        '{{#urldecode:',
-        '{{#var:',
-        '{{#vardefine:',
-        '{{#vardefineecho:',
-        '{{#varexists:',
-        '{{#var_final:'
+    # ParserFunctions: https://www.mediawiki.org/wiki/Help:Extension:ParserFunctions
+    PARSER_FUNCTIONS = (
+        'expr', 'ifeq', 'iferror', 'ifexpr', 'ifexist', 'if', 'rel2abs', 'switch',
+        'timel', 'time', 'titleparts'
     )
+    # StringFunctions: https://www.mediawiki.org/wiki/Extension:StringFunctions
+    STRING_FUNCTIONS = (
+        'len', 'pos', 'rpos', 'sub', 'pad', 'replace', 'explode', 'urlencode', 'urldecode'
+    )
+
+    # Variables: https://www.mediawiki.org/wiki/Extension:Variables
+    VARIABLES = ('vardefineecho', 'vardefine', 'varexists', 'var_final', 'var')
+
+    START = ('{{', '{{:', '{{#invoke:') \
+        + tuple(['{{#%s:' % f for f in PARSER_FUNCTIONS]) \
+        + tuple(['{{#%s:' % f for f in STRING_FUNCTIONS]) \
+        + tuple(['{{#%s:' % f for f in VARIABLES])
     STOP = ('}}',)
 
     MODE_TEMPLATE = 'template'
@@ -215,7 +198,7 @@ class Template(Element):
             return self.name.split(':')[-1]
         elif self.mode == self.MODE_TRANSCLUSION:
             return self.name[1:]
-        elif self.mode == self.MODE_FUNCTION:
+        elif self.mode in [self.MODE_VAR, self.MODE_FUNCTION]:
             return self.open_tag[3:-1]
         else:
             return self.name
@@ -508,11 +491,7 @@ class Parser(object):
         if name in self.owned_tags:
             return
 
-        if pythonver >= 3:
-            class_name = name.title()
-        else:
-            class_name = name.title().encode('utf-8')
-
+        class_name = name.title()
         this = sys.modules[__name__]
 
         attrs = {
