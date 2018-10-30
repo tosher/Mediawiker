@@ -28,6 +28,9 @@ class MediawikerProperties(object):
     props = {
         'site': {'text': 'Sites configurations'},
         'syntax': {'text': 'Preferred mediawiki syntax'},
+        'syntax_lua': {'text': 'Preferred syntax for Lua'},
+        'syntax_css': {'text': 'Preferred syntax for CSS'},
+        'syntax_js': {'text': 'Preferred syntax for JS'},
         'site_active': {'text': 'Default site'},
         'summary_postfix': {'text': 'Postfix in post summary'},
         'skip_summary': {'text': 'Skip summary input'},
