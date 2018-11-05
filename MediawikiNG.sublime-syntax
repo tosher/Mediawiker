@@ -1023,28 +1023,6 @@ contexts:
         1: meta.tag.magic.start.mediawiki
         2: keyword.control.magic.mediawiki
         3: meta.tag.magic.stop.mediawiki
-    - match: '(\{{2})(CURRENTYEAR|CURRENTMONTH|CURRENTMONTH1|CURRENTMONTHNAME|CURRENTMONTHNAMEGEN|CURRENTMONTHABBREV
-        |CURRENTDAY|CURRENTDAY2|CURRENTDOW|CURRENTDAYNAME|CURRENTTIME|CURRENTHOUR|CURRENTWEEK|CURRENTTIMESTAMP
-        |LOCALYEAR|LOCALMONTH|LOCALMONTH1|LOCALMONTHNAME|LOCALMONTHNAMEGEN|LOCALMONTHABBREV|LOCALDAY|LOCALDAY2
-        |LOCALDOW|LOCALDAYNAME|LOCALTIME|LOCALHOUR|LOCALWEEK|LOCALTIMESTAMP
-        |SITENAME|SERVER|SERVERNAME|DIRMARK|DIRECTIONMARK|SCRIPTPATH|STYLEPATH|CURRENTVERSION|CONTENTLANGUAGE
-        |CONTENTLANG|PAGEID:?[^}]*|PAGESIZE:?[^}]*|PAGELANGUAGE|PROTECTIONLEVEL:?[^}]*|PROTECTIONEXPIRY:?[^}]*|CASCADINGSOURCES:?[^}]*|REVISIONID:?[^}]*|REVISIONDAY:?[^}]*
-        |REVISIONDAY2:?[^}]*|REVISIONMONTH:?[^}]*|REVISIONMONTH1:?[^}]*|REVISIONYEAR:?[^}]*|REVISIONTIMESTAMP:?[^}]*|REVISIONUSER:?[^}]*|REVISIONSIZE
-        |DISPLAYTITLE:?[^}]*|DEFAULTSORT:?[^}]*|DEFAULTSORTKEY:?[^}]*|DEFAULTCATEGORYSORT:?[^}]*
-        |NUMBEROFPAGES|NUMBEROFARTICLES|NUMBEROFFILES|NUMBEROFEDITS|NUMBEROFVIEWS|NUMBEROFUSERS|NUMBEROFADMINS|NUMBEROFACTIVEUSERS
-        |PAGESINCATEGORY:?[^}]*|PAGESINCAT:?[^}]*|NUMBERINGROUP:?[^}]*|NUMINGROUP:?[^}]*|PAGESINNS:?[^}]*|PAGESINNAMESPACE:\d+
-        |FULLPAGENAMEE?|PAGENAMEE?|BASEPAGENAMEE?|SUBPAGENAMEE?|SUBJECTPAGENAMEE?|ARTICLEPAGENAMEE?|TALKPAGENAMEE?|ROOTPAGENAMEE?
-        |NAMESPACEE?:?[^}]*|NAMESPACENUMBER:?[^}]*|SUBJECTSPACEE?:?[^}]*|ARTICLESPACEE?:?[^}]*|TALKSPACEE?:?[^}]*
-        |\!|ns:[^}]*|localurl:[^}]*|fullurl:[^}]*|canonicalurl:[^}]*|filepath:[^}]*|urlencode:[^}]*|anchorencode:[^}]*
-        |formatnum:[^}]*|#dateformat:[^}]*|#formatdate:[^}]*|lc:[^}]*|lcfirst:[^}]*|uc:[^}]*|ucfirst:[^}]*
-        |padleft:[^}]*|padright:[^}]*|plural:[^}]*|grammar:[^}]*|gender:[^}]*|int:[^}]*|raw:[^}]*|msgnw:[^}]*|subst:[^}]*|safesubst:[^}]*
-        |#language:[^}]*|#speciale?:[^}]*|#tag:[^}]*|)(\}{2})'
-      # comment: add other types of magic words..
-      # scope: keyword.control.magic.mediawiki
-      captures:
-        1: meta.tag.magic.start.mediawiki
-        2: keyword.control.magic.mediawiki
-        3: meta.tag.magic.stop.mediawiki
 
   style:
     - match: (''')
@@ -1397,6 +1375,25 @@ contexts:
       push:
         - meta_content_scope: meta.template.mediawiki
         # comment: scope as meta.function-call as the closest thing to a template with parameters, etc.
+        # magic words/functions with {{..}} syntax
+        - match: '(CURRENTYEAR|CURRENTMONTH|CURRENTMONTH1|CURRENTMONTHNAME|CURRENTMONTHNAMEGEN|CURRENTMONTHABBREV
+            |CURRENTDAY|CURRENTDAY2|CURRENTDOW|CURRENTDAYNAME|CURRENTTIME|CURRENTHOUR|CURRENTWEEK|CURRENTTIMESTAMP
+            |LOCALYEAR|LOCALMONTH|LOCALMONTH1|LOCALMONTHNAME|LOCALMONTHNAMEGEN|LOCALMONTHABBREV|LOCALDAY|LOCALDAY2
+            |LOCALDOW|LOCALDAYNAME|LOCALTIME|LOCALHOUR|LOCALWEEK|LOCALTIMESTAMP
+            |SITENAME|SERVER|SERVERNAME|DIRMARK|DIRECTIONMARK|SCRIPTPATH|STYLEPATH|CURRENTVERSION|CONTENTLANGUAGE
+            |CONTENTLANG|PAGEID:?|PAGESIZE:?|PAGELANGUAGE|PROTECTIONLEVEL:?|PROTECTIONEXPIRY:?|CASCADINGSOURCES:?|REVISIONID:?|REVISIONDAY:?
+            |REVISIONDAY2:?|REVISIONMONTH:?|REVISIONMONTH1:?|REVISIONYEAR:?|REVISIONTIMESTAMP:?|REVISIONUSER:?|REVISIONSIZE
+            |DISPLAYTITLE:?|DEFAULTSORT:?|DEFAULTSORTKEY:?|DEFAULTCATEGORYSORT:?
+            |NUMBEROFPAGES|NUMBEROFARTICLES|NUMBEROFFILES|NUMBEROFEDITS|NUMBEROFVIEWS|NUMBEROFUSERS|NUMBEROFADMINS|NUMBEROFACTIVEUSERS
+            |PAGESINCATEGORY:?|PAGESINCAT:?|NUMBERINGROUP:?|NUMINGROUP:?|PAGESINNS:?|PAGESINNAMESPACE:\d+
+            |FULLPAGENAMEE?|PAGENAMEE?|BASEPAGENAMEE?|SUBPAGENAMEE?|SUBJECTPAGENAMEE?|ARTICLEPAGENAMEE?|TALKPAGENAMEE?|ROOTPAGENAMEE?
+            |NAMESPACEE?:?|NAMESPACENUMBER:?|SUBJECTSPACEE?:?|ARTICLESPACEE?:?|TALKSPACEE?:?
+            |\!|ns:|localurl:|fullurl:|canonicalurl:|filepath:|urlencode:|anchorencode:
+            |formatnum:|#dateformat:|#formatdate:|lc:|lcfirst:|uc:|ucfirst:
+            |padleft:|padright:|plural:|grammar:|gender:|int:|raw:|msgnw:|subst:|safesubst:
+            |#language:|#speciale?:|#tag:)'
+          captures:
+            1: keyword.control.magic.mediawiki
         - match: '(?![^\}]\})(\}{2})(?!\}([^\}]|$))'
           captures:
             1: meta.tag.inline.stop.template.mediawiki

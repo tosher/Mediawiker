@@ -247,8 +247,8 @@ from __future__ import with_statement
 
 {{FULLPAGENAMEE}}
 //    ^^^ keyword.control.magic.mediawiki
-//             ^^ meta.tag.magic.stop.mediawiki
-// <- meta.tag.magic.start.mediawiki
+//             ^^ meta.tag.inline.stop.template.mediawiki
+// <- meta.tag.inline.start.template.mediawiki
 
 {{!}}
 //^ keyword.control.magic.mediawiki
