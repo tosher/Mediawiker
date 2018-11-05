@@ -42,9 +42,10 @@ contexts:
         - match: '(ini){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.ini.mediawiki source.ini.embedded
@@ -54,9 +55,10 @@ contexts:
         - match: '(javascript){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.js.mediawiki source.js.embedded
@@ -66,9 +68,10 @@ contexts:
         - match: '(c){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.c.mediawiki source.c.embedded
@@ -78,9 +81,10 @@ contexts:
         - match: '(actionscript){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.actionscript.2.mediawiki source.actionscript.2.embedded
@@ -90,9 +94,10 @@ contexts:
         - match: '(applescript){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.applescript.mediawiki source.applescript.embedded
@@ -102,9 +107,10 @@ contexts:
         - match: '(asp){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.asp.mediawiki source.asp.embedded
@@ -114,9 +120,10 @@ contexts:
         - match: '(dos){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.dosbatch.mediawiki source.dosbatch.embedded
@@ -126,9 +133,10 @@ contexts:
         - match: '(csharp){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.cs.mediawiki source.cs.embedded
@@ -138,9 +146,10 @@ contexts:
         - match: '(cpp){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.c++.mediawiki source.c++.embedded
@@ -150,9 +159,10 @@ contexts:
         - match: '(clojure){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.clojure.mediawiki source.clojure.embedded
@@ -162,9 +172,10 @@ contexts:
         - match: '(css){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.css.mediawiki source.css.embedded
@@ -174,9 +185,10 @@ contexts:
         - match: '(d){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.d.mediawiki source.d.embedded
@@ -186,9 +198,10 @@ contexts:
         - match: '(erlang){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.erlang.mediawiki source.erlang.embedded
@@ -198,9 +211,10 @@ contexts:
         - match: '(go){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.go.mediawiki source.go.embedded
@@ -210,9 +224,10 @@ contexts:
         - match: '(haskell){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.haskell.mediawiki source.haskell.embedded
@@ -222,9 +237,10 @@ contexts:
         - match: '(java){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.java.mediawiki source.java.embedded
@@ -234,9 +250,10 @@ contexts:
         - match: '(groovy){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.groovy.mediawiki source.groovy.embedded
@@ -246,9 +263,10 @@ contexts:
         - match: '(latex){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.text.tex.latex.mediawiki source.text.tex.latex.embedded
@@ -258,9 +276,10 @@ contexts:
         - match: '(lisp){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.lisp.mediawiki source.lisp.embedded
@@ -270,9 +289,10 @@ contexts:
         - match: '(lua){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.lua.mediawiki source.lua.embedded
@@ -282,9 +302,10 @@ contexts:
         - match: '(make){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.makefile.mediawiki source.makefile.embedded
@@ -294,9 +315,10 @@ contexts:
         - match: '(matlab){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.matlab.mediawiki source.matlab.embedded
@@ -306,9 +328,10 @@ contexts:
         - match: '(objc){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.objc.mediawiki source.objc.embedded
@@ -318,9 +341,10 @@ contexts:
         - match: '(ocaml){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.ocaml.mediawiki source.ocaml.embedded
@@ -330,9 +354,10 @@ contexts:
         - match: '(pascal){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.pascal.mediawiki source.pascal.embedded
@@ -342,9 +367,10 @@ contexts:
         - match: '(perl){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.perl.mediawiki source.perl.embedded
@@ -354,9 +380,10 @@ contexts:
         - match: '(php){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.php.mediawiki source.php.embedded
@@ -366,9 +393,10 @@ contexts:
         - match: '(r){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.r.mediawiki source.r.embedded
@@ -378,9 +406,10 @@ contexts:
         - match: '(rails){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.ruby.rails.mediawiki source.ruby.rails.embedded
@@ -390,9 +419,10 @@ contexts:
         - match: '(ruby){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.ruby.mediawiki source.ruby.embedded
@@ -402,9 +432,10 @@ contexts:
         - match: '(scala){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.scala.mediawiki source.scala.embedded
@@ -414,9 +445,10 @@ contexts:
         - match: '(bash){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.shell.mediawiki source.shell.embedded
@@ -426,9 +458,10 @@ contexts:
         - match: '(sql){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.sql.mediawiki source.sql.embedded
@@ -438,9 +471,10 @@ contexts:
         - match: '(tsql){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.tsql.mediawiki source.tsql.embedded
@@ -450,9 +484,10 @@ contexts:
         - match: '(tcl){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.tcl.mediawiki source.tcl.embedded
@@ -462,9 +497,10 @@ contexts:
         - match: '(xml){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.text.xml.mediawiki source.text.xml.embedded
@@ -474,9 +510,10 @@ contexts:
         - match: '(yaml){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.yaml.mediawiki source.yaml.embedded
@@ -487,9 +524,10 @@ contexts:
           # conflicts with php and asp
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_include_prototype: false
             - meta_content_scope: meta.environment.embedded.text.html.basic.mediawiki source.text.html.basic.embedded
@@ -499,9 +537,10 @@ contexts:
         - match: '([^"]+){{src_tag_after_lang}}'
           captures:
             1: string.quoted.mediawiki
-            2: entity.other.quote.validhtml.mediawiki
-            3: entity.other.attributes.validhtml.mediawiki
-            5: meta.tag.validhtml.mediawiki
+            2: meta.tag.validhtml.mediawiki
+            3: entity.other.quote.validhtml.mediawiki
+            4: meta.tag.validhtml.mediawiki
+            6: punctuation.definition.tag.begin.html
           push:
             - meta_content_scope: meta.tag.source.unknown.validhtml.mediawiki
             - match: (?=</(source|syntaxhighlight)>)
@@ -1335,6 +1374,7 @@ contexts:
             - match: '(?=^\s*\||^\s*!|\|\||!!|\|\-|\|\})'
               pop: true
             - include: inline
+            - include: block
             - match: '([^\s]+)(=["'']?)'
               captures:
                 1: entity.other.attributes.table.cellcontents.cell-html.validhtml.mediawiki
@@ -1369,7 +1409,6 @@ contexts:
         - include: template_parameters
         - match: '\s*([^\{\}\|]+)'
           scope: entity.name.function.template.mediawiki
-        # - match: '(\|)\s*(([^\{\}\|=]+)(=))?'
         - match: '(\|)\s*(([\w\-]+)(=))?'
           captures:
             1: meta.tag.param-delimiter.template.mediawiki
