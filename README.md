@@ -28,7 +28,7 @@
 * Context opening - possibility to open included page, template, function by inline context.
 * Configurator - visual configuration of important settings.
 
-![Subime Text Wiki editor plugin - Mediawiker](https://github.com/tosher/Mediawiker/blob/gh-pages/screens/Mediawiker_Dark.png)
+![Subime Text Wiki editor plugin - Mediawiker](https://raw.githubusercontent.com/wiki/tosher/Mediawiker/Mediawiker_Dark.png)
 *Screenshot using the Mediawiker_Dark color scheme*
 
 ## External dependencies (with modifications or not)
