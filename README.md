@@ -67,7 +67,7 @@ Package Control will automatically keep Mediawiker up to date with the latest ve
 ### Configurator
 GUI configurator for important settings.
 
-![Mediawiker configurator](https://github.com/tosher/Mediawiker/blob/gh-pages/screens/Mediawiker_Configurator.png)
+![Mediawiker configurator](https://raw.githubusercontent.com/wiki/tosher/Mediawiker/Mediawiker_Configurator.png)
 
 ### Commands
 * **Edit panel** with all commands and snippets in ordered list (can be customized in the settings).
