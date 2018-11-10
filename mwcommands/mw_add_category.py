@@ -3,8 +3,6 @@
 
 import sublime
 import sublime_plugin
-
-
 from . import mw_utils as utils
 
 
@@ -20,52 +18,109 @@ class MediawikerSetCategoryCommand(sublime_plugin.WindowCommand):
         return utils.props.get_view_setting(self.window.active_view(), 'is_here')
 
 
+class SCategories(object):
+    TAB = ' ' * 4
+
+    def __init__(self, root):
+        self.cats = {}
+        self.root = root
+        self.root_title = utils.api.page_attr(self.root, 'page_title')
+        self.root_name = utils.api.page_attr(self.root, 'name')
+
+    def append(self, category):
+        if utils.api.page_attr(category, 'namespace') == utils.api.CATEGORY_NAMESPACE:
+            ctitle = utils.api.page_attr(category, 'page_title')
+            self.cats[ctitle] = category
+
+    def subtitles(self):
+        return sorted([utils.api.page_attr(k, 'page_title') for k in self.cats.values()])
+
+    def titles_menu(self):
+        if self.root.exists and self.exists_subcategories():
+            root_title_menu = self.root_title
+        elif self.root.exists:
+            root_title_menu = [
+                self.root_title,
+                'No sub-categories'
+            ]
+        else:
+            root_title_menu = [
+                self.root_title,
+                'New category, no sub-categories'
+            ]
+        return [root_title_menu] + ['{}{}'.format(self.TAB, t) for t in self.subtitles()]
+
+    def titles(self):
+        return [self.root_title] + [t for t in self.subtitles()]
+
+    def get(self, title):
+        if title == self.root_title:
+            return self.root
+        return self.cats[title]
+
+    def exists_subcategories(self):
+        return len(self.cats.keys()) > 0
+
+
 class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
-    categories_list = None
-
-    category_root = ''
-    category_options = [['Set category', ''], ['Open category', ''], ['Back to root', '']]
-
-    # TODO: back in category tree..
 
     def run(self, edit):
         if utils.props.get_setting('offline_mode'):
             return
 
-        self.category_root = utils.get_category(utils.props.get_setting('category_root'))[1]
-        sublime.active_window().show_input_panel('Category:', self.category_root, self.get_category_menu, None, None)
+        self.category_title_default = utils.get_category(utils.props.get_setting('category_root'))[1]
+        sublime.active_window().show_input_panel('Category:', self.category_title_default, self.category_menu_show, None, None)
 
-    def get_category_menu(self, category_root):
-        categories = utils.api.call('get_subcategories', category_root=category_root)
-        self.categories_list_names = []
-        self.categories_list_values = []
+    def update_categories(self, category_title):
+        category = utils.api.get_page('{}:{}'.format('Category', category_title))
+        self.cats = SCategories(root=category)
+        subcategories = utils.api.call('get_subcategories', category_root=category_title)
+        for category in subcategories:
+            self.cats.append(category)
 
-        self.categories_list_values.append(utils.api.page_attr(categories, 'name'))
-        self.categories_list_names.append(utils.api.page_attr(categories, 'page_title'))
+    def category_menu_show(self, category_title):
+        self.update_categories(category_title)
 
-        for category in categories:
-            if utils.api.page_attr(category, 'namespace') == utils.api.CATEGORY_NAMESPACE:
-                self.categories_list_values.append(utils.api.page_attr(category, 'name'))
-                self.categories_list_names.append(utils.api.page_attr(category, 'page_title'))
-
-        sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.categories_list_names, self.on_done), 1)
-
-    def on_done(self, idx):
-        # the dialog was cancelled
-        if idx >= 0:
-            self.category_options[0][1] = self.categories_list_values[idx]
-            self.category_options[1][1] = self.categories_list_names[idx]
-            sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.category_options, self.on_done_final), 1)
-
-    def set_category(self, category):
-        index_of_textend = self.view.size()
-        self.view.run_command(utils.cmd('insert_text'), {'position': index_of_textend, 'text': '[[%s]]' % category})
-        self.view.show(self.view.size())
-
-    def on_done_final(self, idx):
-        if idx == 0:
-            self.set_category(self.category_options[idx][1])
-        elif idx == 1:
-            self.get_category_menu(self.category_options[idx][1])
+        if self.cats.exists_subcategories():
+            sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.cats.titles_menu(), self.category_action_select), 1)
         else:
-            self.get_category_menu(self.category_root)
+            self.category_action_select(0)
+
+    def category_action_select(self, idx):
+        if idx >= 0:
+            self.category_title = self.cats.titles()[idx]
+            self.update_categories(self.category_title)
+            category = self.cats.get(self.category_title)
+
+            menu = []
+            if category.exists:
+                menu.append('Set category: {}'.format(self.category_title))
+            else:
+                menu.append('Set new category: {}'.format(self.category_title))
+
+            menu.append('Open root category: {}'.format(self.category_title_default))
+
+            if category.exists and self.cats.exists_subcategories():
+                menu.append('Open category: {}'.format(self.category_title))
+
+            sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(menu, self.category_action_run), 1)
+
+    def category_action_run(self, idx):
+        if idx == 0:
+            self.set_category(self.category_title)
+        elif idx == 1:
+            self.category_menu_show(self.category_title_default)
+        elif idx == 2:
+            self.category_menu_show(self.category_title)
+
+    def set_category(self, category_title):
+        index_of_textend = self.view.size()
+        category = self.cats.get(self.category_title)
+        self.view.run_command(
+            utils.cmd('insert_text'),
+            {
+                'position': index_of_textend,
+                'text': '[[{name}]]'.format(name=utils.api.page_attr(category, 'name'))
+            }
+        )
+        self.view.show(self.view.size())

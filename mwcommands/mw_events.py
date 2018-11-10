@@ -12,6 +12,11 @@ class MediawikerViewEvents(sublime_plugin.ViewEventListener):
     cnt = None
 
     def on_modified(self):
+        preview_cmd = utils.props.get_view_setting(self.view, 'preview_cmd')
+
+        if not preview_cmd:
+            return
+
         if utils.props.get_view_setting(self.view, 'is_here'):
             self.view.hide_popup()
             try:
@@ -23,7 +28,7 @@ class MediawikerViewEvents(sublime_plugin.ViewEventListener):
                     cnt_delta = self.view.change_count() - self.cnt
                     if cnt_delta > ch_cnt:
                         utils.status_message('Autoreload: Generating preview..')
-                        sublime.active_window().run_command(utils.cmd('preview'))
+                        sublime.active_window().run_command(utils.cmd(preview_cmd))
                         self.cnt = None
                     else:
                         utils.status_message('\nAutoreload: change %s of %s..' % (cnt_delta, ch_cnt))

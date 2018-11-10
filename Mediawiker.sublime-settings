@@ -23,7 +23,8 @@
             "preview_custom_head": [],  // List of custom html head tags for preview generation
             "retry_timeout": 30, // Timeout in seconds for http requests
             "is_wikia": false,  // is wikia site
-            "show_red_links": false  // validate red links on open/post page (not recommended, use command instead)
+            "show_red_links": false,  // validate red links on open/post page (not recommended, use command instead)
+            "preview_sandbox": "" // sandbox page for preview
         },
         "Russian wikipedia": {
             "authorization_type": "login",
@@ -130,6 +131,7 @@
     "red_link_icon": "✘",
     "css_html": {},
     "show_gutters": true,
+    "show_favorites_and_history_by_site_host": true,
     "panel":
     [
         {"caption": "Open page", "type": "window_command", "value": "mediawiker_open_page", "online": true},
@@ -161,6 +163,7 @@
         {"caption": "Wiki table to Simple (for plugin TableEdit)", "type": "text_command", "value": "mediawiker_table_wiki_to_simple", "online": false},
         {"caption": "Simple table to wiki (for plugin TableEdit)", "type": "text_command", "value": "mediawiker_table_simple_to_wiki", "online": false},
         {"caption": "Page preview", "type": "window_command", "value": "mediawiker_preview", "online": true},
+        {"caption": "Page preview in sandbox", "type": "window_command", "value": "mediawiker_preview_sandbox", "online": true},
         {"caption": "Show unsaved changes", "type": "window_command", "value": "mediawiker_show_diff", "online": true},
         {"caption": "Get Notifications", "type": "window_command", "value": "mediawiker_notifications", "online": true},
         {"caption": "Open talk page", "type": "window_command", "value": "mediawiker_open_talk_page", "online": true},

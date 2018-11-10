@@ -78,6 +78,7 @@ class MediawikerProperties(object):
         'debug': {'text': 'Advanced logging mode'},
         'popup_type': {'text': 'Popup type (manual/auto/off)'},
         'show_gutters': {'text': 'Show gutters'},
+        'show_favorites_and_history_by_site_host': {'text': 'Show history and favorites pages by host'},
         'offline_mode': {'text': 'Offline mode'}
     }
 
@@ -100,6 +101,7 @@ class MediawikerProperties(object):
         'page_revision': {'text': 'Page revision number', 'default': 0, 'type': int},
         'is_changed': {'text': 'Page has changes', 'default': False, 'type': bool},
         'popups_off': {'text': 'Turn off popups', 'default': False, 'type': bool},
+        'preview_cmd': {'text': 'Command for page preview', 'default': 'preview', 'type': str},
         'section': {'text': 'Page section', 'default': 0, 'type': int}
     }
 
@@ -126,6 +128,7 @@ class MediawikerProperties(object):
         'is_wikia': {'text': 'Is a Wikia site', 'type': bool, 'default': False},
         'retry_timeout': {'text': 'Requests timeout', 'type': int, 'default': 30},
         'preview_custom_head': {'text': 'Custom html head tags for preview', 'type': list, 'default': []},
+        'preview_sandbox': {'text': 'Special rewritable page for preview', 'type': str, 'default': ''},
         'show_red_links': {'text': 'Mark red links in page text', 'type': bool, 'default': False}
     }
 

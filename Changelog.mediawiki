@@ -567,3 +567,13 @@ Support folding/unfolding for:
 * Project settings support (overrides user settings). Options must be defined with <code>mediawiker.</code> prefix, example: <code>mediawiker.skip_summary</code>.
 * Syntax highlighting for magic words was improved.
 * Popups for Parser/String/Variable functions has a link to help page.
+
+== Mediawiker 3.5.1 ==
+* New theme, based on <code>base16-classic-dark</code> (<code>base16-classic-dark.mediawiker.tmTheme</code>). All the plugin's themes files moved to <code>themes</code> subdirectory, please change your settings if you have it in your configuration.
+* Syntax highlighting fixes
+* History and favorites pages showing by site's {{Property|host}} value (settings option {{Property|show_favorites_and_history_by_site_host}})
+* Command {{Command|Set category}} was updated
+* Command {{Command|Select wiki}} was updated
+* New command {{Command|Page preview in sandbox}} - preview page generation in user-defined rewritable "sandbox" page on wiki site. Sandbox page must be defined with site's option {{Property|preview_sandbox}}, for example: <code>"preview_sanbox": "User:WikiUserName/sandbox"</code>. Auto-reloading works in the same manner as with command {{Command|Page preview}}.
+
+{{Note|Command {{Command|Page preview in sandbox}} doesn't require any additional settings like css or js scripts.}}

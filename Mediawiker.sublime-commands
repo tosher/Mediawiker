@@ -29,6 +29,7 @@
     { "caption": "Mediawiker: Show language links", "command": "mediawiker_show_page_langlinks"},
     { "caption": "Mediawiker: Show links to page", "command": "mediawiker_show_page_backlinks"},
     { "caption": "Mediawiker: Page preview", "command": "mediawiker_preview"},
+    { "caption": "Mediawiker: Page preview in sandbox", "command": "mediawiker_preview_sandbox"},
     { "caption": "Mediawiker: Get notifications", "command": "mediawiker_notifications"},
     { "caption": "Mediawiker: Fold", "command": "mediawiker_colapse", "args": {"type": "fold"}},
     { "caption": "Mediawiker: Unfold", "command": "mediawiker_colapse", "args": {"type": "unfold"}},

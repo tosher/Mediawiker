@@ -41,6 +41,8 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         if utils.props.get_setting('offline_mode'):
             return
 
+        utils.props.set_view_setting(self.view, 'preview_cmd', 'preview')
+
         text = self.view.substr(sublime.Region(0, self.view.size()))
         site = utils.conman.get_site()
 
