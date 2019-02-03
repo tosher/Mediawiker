@@ -83,24 +83,32 @@ def plugin_loaded():
     setattr(mw, 'api', api)
 
 
-def set_syntax(page_name=None, page_namespace=None):
-    syntax = props.get_setting('syntax')
-
+def get_syntax_property(page_name=None, page_namespace=None):
     if page_name and page_namespace:
-        # syntax_ext = 'sublime-syntax' if int(sublime.version()) >= 3084 else 'tmLanguage'
-
-        # Scribunto lua modules, except doc subpage
         if page_namespace == api.SCRIBUNTO_NAMESPACE and not page_name.lower().endswith('/doc'):
-            # syntax = p.from_package('Lua.%s' % syntax_ext, name='Lua')
-            syntax = props.get_setting('syntax_lua')
+            # Scribunto lua modules, except doc subpage
+            return 'syntax_lua'
         elif page_name.lower().endswith('.css'):
-            # syntax = p.from_package('CSS.%s' % syntax_ext, name='CSS')
-            syntax = props.get_setting('syntax_css')
-        elif page_name.endswith('.js'):
-            # syntax = p.from_package('Javascript.%s' % syntax_ext, name='Javascript')
-            syntax = props.get_setting('syntax_js')
+            return 'syntax_css'
+        elif page_name.lower().endswith('.js'):
+            return 'syntax_js'
+    return 'syntax'
 
-    sublime.active_window().active_view().set_syntax_file(syntax)
+
+def set_syntax(page_name=None, page_namespace=None):
+    syntax_prop = get_syntax_property(page_name, page_namespace)
+    sublime.active_window().active_view().set_syntax_file(props.get_setting(syntax_prop))
+
+
+def comment(text, page_name=None, page_namespace=None):
+    syntax_prop = get_syntax_property(page_name, page_namespace)
+    if syntax_prop == 'syntax_lua':
+        return '-- {}'.format(text)
+    elif syntax_prop == 'syntax_css':
+        return '/* {} */'.format(text)
+    elif syntax_prop == 'syntax_js':
+        return '// {}'.format(text)
+    return '<!-- {} -->'.format(text)
 
 
 def cmd(cmd):
@@ -113,7 +121,7 @@ def cmd(cmd):
 def get_view_site():
     try:
         return props.get_view_setting(sublime.active_window().active_view(), 'site', props.get_setting('site_active'))
-    except:
+    except Exception:
         # st2 exception on start.. sublime not available on activated..
         return props.get_setting('site_active')
 
@@ -288,20 +296,26 @@ def status_message(message, replace=None, is_panel=None, new_line=True, panel_na
             panel_name = '%s_panel' % p.PML
 
         if syntax is None:
-            if int(sublime.version()) >= 3000:
-                syntax = p.from_package('MediawikerPanel.sublime-syntax')
-            else:
-                syntax = p.from_package('MediawikiNG_ST2.tmLanguage')
+            # if int(sublime.version()) >= 3000:
+            #     syntax = p.from_package('MediawikerPanel.sublime-syntax')
+            # else:
+            #     syntax = p.from_package('MediawikiNG_ST2.tmLanguage')
+            syntax = p.from_package('MediawikerPanel.sublime-syntax')
 
-        if int(sublime.version()) >= 3000:
-            if not new:
-                panel = sublime.active_window().find_output_panel(panel_name)
+        # if int(sublime.version()) >= 3000:
+        #     if not new:
+        #         panel = sublime.active_window().find_output_panel(panel_name)
 
-            if panel is None:
-                panel = sublime.active_window().create_output_panel(panel_name)
+        #     if panel is None:
+        #         panel = sublime.active_window().create_output_panel(panel_name)
 
-        else:
-            panel = sublime.active_window().get_output_panel(panel_name)
+        # else:
+        #     panel = sublime.active_window().get_output_panel(panel_name)
+        if not new:
+            panel = sublime.active_window().find_output_panel(panel_name)
+
+        if panel is None:
+            panel = sublime.active_window().create_output_panel(panel_name)
 
         if panel is not None:
             panel.set_syntax_file(syntax)

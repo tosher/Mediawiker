@@ -46,18 +46,15 @@
 * [markupsafe](https://bitbucket.org/teddy_beer_maniac/sublime-text-dependency-markupsafe)
 * [python-pywin32](https://github.com/randy3k/sublime-pywin32)
 
-## Install
+## Installation
+The easiest way to install this is with [Package Control](https://packagecontrol.io/packages/Mediawiker).
 
-    Package Control 3.0 now required for work.
+* If you just went and installed [Package Control](https://packagecontrol.io/installation), you probably need to restart Sublime Text before doing this next bit.
+* Bring up the Command Palette (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on OS X, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on Linux/Windows).
+* Select **Package Control: Install Package** (it'll take a few seconds)
+* Select `Mediawiker` when the list appears.
 
-The easiest way to install this is with [Package Control](http://wbond.net/sublime\_packages/package\_control).
-
- * If you just went and installed Package Control, you probably need to restart Sublime Text 2 before doing this next bit.
- * Bring up the Command Palette (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on OS X, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>p</kbd> on Linux/Windows).
- * Select "Package Control: Install Package" (it'll take a few seconds)
- * Select Mediawiker when the list appears.
-
-Package Control will automatically keep Mediawiker up to date with the latest version.
+Package Control will automatically keep `Mediawiker` up to date with the latest version.
 
 ## Documentation
 * **Note**: Not all color schemes fully supports syntax highlighting scopes required by markup languages like Mediawiki or Markdown. On this moment, color schemes with better support are: **Twilight**, **Sunburst**, **Eiffel**. Also, Mediawiker package includes **Twilight (Mediawiki)**, **Eiffel (Mediawiki)** and **Mediawiker_Dark**/**Mediawiker_Light** schemes with improved highlighting for mediawiki syntax. 

@@ -577,3 +577,8 @@ Support folding/unfolding for:
 * New command {{Command|Page preview in sandbox}} - preview page generation in user-defined rewritable "sandbox" page on wiki site. Sandbox page must be defined with site's option {{Property|preview_sandbox}}, for example: <code>"preview_sanbox": "User:WikiUserName/sandbox"</code>. Auto-reloading works in the same manner as with command {{Command|Page preview}}.
 
 {{Note|Command {{Command|Page preview in sandbox}} doesn't require any additional settings like css or js scripts.}}
+
+== Mediawikier 3.5.2 ==
+* Using <kbd>Command</kbd> key for base OSX shortcuts (Save, Bold, Italic, etc.)
+* Using page language specific syntax for new page comment
+

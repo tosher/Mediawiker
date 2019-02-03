@@ -1,2 +1,3 @@
 #python
 *.pyc
+.tags*

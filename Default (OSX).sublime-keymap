@@ -8,11 +8,11 @@
     { "keys": ["alt+f10"], "command": "mediawiker_page_list" },
     { "keys": ["alt+f11"], "command": "show_overlay", "args": {"overlay": "command_palette", "text":"Mediawiker"} },
     {
-        "keys": ["ctrl+b"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_bold.sublime-snippet"},
+        "keys": ["super+b"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_bold.sublime-snippet"},
         "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
     },
     {
-        "keys": ["ctrl+i"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_italic.sublime-snippet"},
+        "keys": ["super+i"], "command": "insert_snippet", "args": {"name": "Packages/Mediawiker/snippets/mw_italic.sublime-snippet"},
         "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
     },
     {
@@ -35,7 +35,7 @@
         "keys": ["f5"], "command": "mediawiker_reopen_page", "context": [{"key": "setting.mediawiker_is_here", "operand": true}]
     },
     {
-        "keys": ["ctrl+s"], "command": "mediawiker_post_page", "context": [
+        "keys": ["super+s"], "command": "mediawiker_post_page", "context": [
             {"key": "setting.mediawiker_is_here", "operand": true},
             {"key": "setting.mediawiker_wiki_instead_editor", "operand": true}
         ]
