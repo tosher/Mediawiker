@@ -940,7 +940,7 @@ contexts:
     - match: |-
         (?x:
         ({{)                        (?# opening brackets)
-        ([Rr]edirect|subst:.*)      (?# redirect?)
+        ([Rr]edirect)               (?# redirect?)
         [ ]*                        (?# spaces)
         (\\
         |)                          (?# pipe)

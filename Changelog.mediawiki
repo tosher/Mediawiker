@@ -582,3 +582,6 @@ Support folding/unfolding for:
 * Using <kbd>Command</kbd> key for base OSX shortcuts (Save, Bold, Italic, etc.)
 * Using page language specific syntax for new page comment
 
+== Mediawikier 3.5.3 ==
+* Template highlighting fix
+
