@@ -585,3 +585,13 @@ Support folding/unfolding for:
 == Mediawikier 3.5.3 ==
 * Template highlighting fix
 
+== Mediawikier 3.5.4 ==
+* Ability to create child wiki sites with the same settings as the parent host: site option {{Property|parent}}, example:
+<source lang="javascript1">
+"Italian wikipedia":
+{
+    "host": "it.wikipedia.org",
+    "parent": "en.wikipedia.org"
+}
+</source>
+* New command {{Command|Add single sign-on wiki}} for easy way to create child wiki site in teh settings.

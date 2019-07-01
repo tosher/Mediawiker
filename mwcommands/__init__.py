@@ -34,6 +34,7 @@ from .mw_diff import MediawikerShowDiffCommand, MediawikerPageDiffVsServerComman
 from .mw_page_copy import MediawikerPageCopyCommand
 from .mw_preview_page_with_sandbox import MediawikerPreviewSandboxCommand
 from .mw_preview_page_with_sandbox import MediawikerPreviewPageSandboxCommand
+from .mw_add_child_site import MediawikerAddChildSiteCommand
 
 __all__ = [
     'MediawikerAddCategoryCommand',
@@ -84,5 +85,6 @@ __all__ = [
     'MediawikerPageDiffVsServerCommand',
     'MediawikerPageCopyCommand',
     'MediawikerPreviewSandboxCommand',
-    'MediawikerPreviewPageSandboxCommand'
+    'MediawikerPreviewPageSandboxCommand',
+    'MediawikerAddChildSiteCommand'
 ]

@@ -6,15 +6,11 @@ import sublime_plugin
 from . import mw_utils as utils
 
 
-class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
-    site_keys = []
-    SITE_ON = '> '
-    SITE_OFF = ' ' * 4
+class MediawikerAddChildSiteCommand(sublime_plugin.WindowCommand):
     TAB = ' ' * 6
-    site_active = ''
 
     def run(self):
-        self.site_active = utils.get_view_site()
+        self.site_parent = None
         sites = utils.props.get_setting('site')
 
         self.sites_list = []
@@ -28,10 +24,7 @@ class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
                 auth_src = utils.props.get_site_setting(k, 'cookies_browser')
 
             rec = [
-                '{activated} {name}'.format(
-                    activated=self.SITE_ON if self.activated(k) else self.SITE_OFF,
-                    name=k
-                ),
+                '{}'.format(k),
                 '{tab}Auth type: {auth_type}{auth_src}'.format(
                     tab=self.TAB,
                     auth_type=auth_type,
@@ -40,17 +33,18 @@ class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
             ]
             self.sites_list.append(rec)
             self.sites_names.append(k)
-        sublime.set_timeout(lambda: self.window.show_quick_panel(self.sites_list, self.on_done), 1)
+        sublime.set_timeout(lambda: self.window.show_quick_panel(self.sites_list, self.on_done_parent), 1)
 
-    def activated(self, site_name):
-        if site_name == self.site_active:
-            return True
-        return False
-
-    def on_done(self, index):
+    def on_done_parent(self, index):
         if index >= 0:
-            site_active = self.sites_names[index]
-            # force to set site_active in global and in view settings
-            if utils.props.get_view_setting(self.window.active_view(), 'is_here'):
-                utils.props.set_view_setting(self.window.active_view(), 'site', site_active)
-            utils.props.set_setting("site_active", site_active)
+            self.site_parent = self.sites_names[index]
+
+        self.window.show_input_panel('Site host:', '', self.on_done, None, None)
+
+    def on_done(self, host):
+        sites = utils.props.get_setting('site')
+        if host not in sites:
+            sites[host] = {}
+            utils.props.set_setting('site', sites)
+        utils.props.set_site_setting(host, 'host', host)
+        utils.props.set_site_setting(host, 'parent', self.site_parent)

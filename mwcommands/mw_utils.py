@@ -652,7 +652,7 @@ class MediawikerConnectionManager(object):
 
     def get_site_config(self, name):
         ''' get site settings '''
-        site_config = props.get_setting('site').get(name)
+        site_config = props.get_site(name)
         self.validate_site(name, site_config)
 
     def is_site_changed(self, oldsite, newsite):
@@ -682,6 +682,7 @@ class MediawikerConnectionManager(object):
             if 'connection' in site:
                 site['connection'] = None
 
+            # TODO: rework with props
             site['config'] = site_config
             site['host'] = site_config['host']
             site['username'] = site_config.get('username', None)

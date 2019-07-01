@@ -129,7 +129,8 @@ class MediawikerProperties(object):
         'retry_timeout': {'text': 'Requests timeout', 'type': int, 'default': 30},
         'preview_custom_head': {'text': 'Custom html head tags for preview', 'type': list, 'default': []},
         'preview_sandbox': {'text': 'Special rewritable page for preview', 'type': str, 'default': ''},
-        'show_red_links': {'text': 'Mark red links in page text', 'type': bool, 'default': False}
+        'show_red_links': {'text': 'Mark red links in page text', 'type': bool, 'default': False},
+        'parent': {'text': 'Parent site name', 'type': str, 'default': ''}
     }
 
     def __init__(self):
@@ -206,7 +207,7 @@ class MediawikerProperties(object):
             dep_property = self.props_dependencies.get(key, {}).get('dep_property', None)
             if dep_property is not None and self.get_setting(dep_property) == self.props_dependencies[key]['dep_value']:
                 return self.props_dependencies.get(key, {}).get('value')
-        except:
+        except Exception:
             pass
         return None
 
@@ -275,13 +276,51 @@ class MediawikerProperties(object):
 
         view.settings().set(key, value)
 
-    def get_site_setting(self, site, key, default_value=None):
+    def get_site(self, name):
+        ''' get site settings '''
+
+        site_settings = self.get_setting('site').get(name)
+        if site_settings.get('parent'):
+            site_settings = self.get_child_site(site_settings['parent'], site_settings)
+        return site_settings
+
+    def get_child_site(self, parent_name, site):
+        '''
+        Merge parent/default site settings with child settings
+        '''
+
+        site_settings = {}
+
+        for prop_name in self.props_site.keys():
+            if prop_name in site:
+                site_settings[prop_name] = site[prop_name]
+            else:
+                site_settings[prop_name] = self._get_site_setting_direct(parent_name, prop_name)
+        return site_settings
+
+    def _get_site_setting_direct(self, name, key, default_value=None):
+        '''
+        Returns direct site option from configuration
+        '''
 
         assert key in self.props_site, 'Unknown property for site: %s' % key
 
         default_value = self.props_site[key]['default'] if default_value is None else default_value
         key_type = self.props_site[key]['type']
-        return key_type(self.get_setting('site').get(site).get(key, default_value))
+        return key_type(self.get_setting('site').get(name).get(key, default_value))
+
+    def get_site_setting(self, name, key, default_value=None):
+        '''
+        Returns real site option for base/child sites
+        '''
+
+        assert key in self.props_site, 'Unknown property for site: %s' % key
+
+        default_value = self.props_site[key]['default'] if default_value is None else default_value
+        key_type = self.props_site[key]['type']
+
+        site_settings = self.get_site(name)
+        return key_type(site_settings.get(key, default_value))
 
     def set_site_setting(self, site, key, value):
 

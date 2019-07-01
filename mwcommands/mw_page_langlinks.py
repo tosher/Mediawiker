@@ -70,7 +70,7 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
             host_new = '%s.%s' % (self.lang_prefix, domain_first)
             # if host_new exists in settings we can open page
             for site in sites:
-                if sites[site]['host'] == host_new:
+                if sites[site]['host'].split(':')[0] == host_new:
                     site_active_new = site
                     break
             if site_active_new:

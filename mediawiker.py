@@ -160,7 +160,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         page_namespace = utils.api.page_attr(page, 'namespace')
 
         if not text:
-            utils.status_message('Page [[%s]] is not exists. You can create new..' % (self.title))
+            utils.status_message('Page [[%s]] does not exist. You can create it..' % (self.title))
             text = utils.comment(
                 'New wiki page: Remove this with text of the new page',
                 page_name=self.title,
