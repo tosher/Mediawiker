@@ -28,11 +28,11 @@
         },
         "Russian wikipedia": {
             "host": "ru.wikipedia.org",
-            "parent": "en.wikipedia.org"  // link to parent site
+            "parent": "English wikipedia"  // link to parent site
         },
         "Mediawiki": {
             "host": "www.mediawiki.org",
-            "parent": "en.wikipedia.org"
+            "parent": "English wikipedia"
         }
     },
     "syntax": "Packages/Mediawiker/MediawikiNG.sublime-syntax",

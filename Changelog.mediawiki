@@ -595,3 +595,6 @@ Support folding/unfolding for:
 }
 </source>
 * New command {{Command|Add single sign-on wiki}} for easy way to create child wiki site in the settings.
+
+== Mediawikier 3.5.5 ==
+* Default site settings fix
