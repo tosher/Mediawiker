@@ -48,6 +48,7 @@ class MediawikerProperties(object):
         'search_namespaces': {'text': 'Namespaces to search'},
         'search_results_count': {'text': 'Max count of search result'},
         'image_prefix_min_length': {'text': 'Minimal required image prefix for search'},
+        'page_prefix_min_length': {'text': 'Minimal required page prefix for autocompletion'},
         'wiki_instead_editor': {'text': 'Save to page post'},
         'show_image_in_popup': {'text': 'Show images in popups'},
         'validate_revision_on_post': {'text': 'Check server page revision on post'},
