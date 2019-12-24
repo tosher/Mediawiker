@@ -92,14 +92,14 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
 
         if version == 'sublime':
             view = sublime.active_window().new_file()
-            view.set_name('%s changelog' % utils.p.PM)
+            view.set_name('{} changelog'.format(utils.p.PM))
             view.settings().set('gutter', False)
             view.settings().set('word_wrap', True)
             view.settings().set('wrap_width', 120)
             view.add_phantom('changelog', view.sel()[0], html, sublime.LAYOUT_INLINE, on_navigate=self.on_navigate)
             view.set_scratch(True)
         elif version == 'browser':
-            preview_file = utils.p.from_package('%s_changelog.html' % utils.p.PML, name='User', posix=False, is_abs=True)
+            preview_file = utils.p.from_package('{}_changelog.html'.format(utils.p.PML), name='User', posix=False, is_abs=True)
             html = html.replace('<html>', '<html><head><meta charset="UTF-8"/></head>')
             with open(preview_file, 'w', encoding='utf-8') as tf:
                 tf.write(html)

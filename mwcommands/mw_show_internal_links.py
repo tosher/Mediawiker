@@ -29,7 +29,7 @@ class MediawikerShowInternalLinksCommand(sublime_plugin.TextCommand):
         if not self.p.parse():
             return
 
-        self.menu_items = ['%s %s' % (utils.api.page_attr(v, 'name'), red_link_icon if not v.exists else '  ') for v in linksgen]
+        self.menu_items = ['{} {}'.format(utils.api.page_attr(v, 'name'), red_link_icon if not v.exists else '  ') for v in linksgen]
         self.find_items = [v.strip_namespace(utils.api.page_attr(v, 'name')) for v in linksgen]
         self.open_items = [utils.api.page_attr(v, 'name') for v in linksgen]
         self.ns_items = [utils.api.page_attr(v, 'namespace') for v in linksgen]

@@ -53,16 +53,16 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
                 # TODO: view set attrs in utils..
                 syntax_file = utils.props.get_setting('syntax')
                 self.view.set_syntax_file(syntax_file)
-                self.view.set_name('Wiki search results: %s' % search_value)
+                self.view.set_name('Wiki search results: {}'.format(search_value))
                 self.view.run_command(utils.cmd('insert_text'), {'position': 0, 'text': text})
             elif search_value:
-                sublime.message_dialog('No results for: %s' % search_value)
+                sublime.message_dialog('No results for: {}'.format(search_value))
 
     def get_block(self, hit):
-        return '* [[%(internal)s]]\n%(data)s\n\n' % {
-            'internal': hit.get('title', '-'),
-            'data': self.antispan(hit.get('snippet', '...'))
-        }
+        return '* [[{internal}]]\n{data}\n\n'.format(
+            internal=hit.get('title', '-'),
+            data=self.antispan(hit.get('snippet', '...'))
+        )
 
     def antispan(self, text):
         span_replace_open = "`"

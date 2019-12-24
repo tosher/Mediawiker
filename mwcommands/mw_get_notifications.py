@@ -28,12 +28,12 @@ class MediawikerNotificationsCommand(sublime_plugin.WindowCommand):
         print(self.msgs)
         for m in self.msgs:
             print(m['timestamp'])
-            line = '%s, %s: (%s) at %s %s' % (
+            line = '{}, {}: ({}) at {} {}'.format(
                 m['title'],
                 m['agent'],
                 m['type'],
                 datetime.fromtimestamp(m['timestamp']),
-                ' %s' % read_sign if m['read'] else ''
+                ' {}'.format(read_sign) if m['read'] else ''
             )
             n_list.append(line)
 

@@ -46,8 +46,9 @@ class Element(object):
         self.points[0] = r_a
         self.open_tag = tag
         if self.debug:
-            print('Got start of %s, open with: %s at %s' % (
-                self.__class__.__name__, self.open_tag, self.points[0]))
+            print('Got start of {}, open with: {} at {}'.format(
+                self.__class__.__name__, self.open_tag, self.points[0]
+            ))
 
         return True
 
@@ -60,9 +61,10 @@ class Element(object):
         self.text = self.get_text()
         self.set_attrs()
         if self.debug:
-            print('Got new closed %s: %s, open: %s, close: %s(%s-%s)' % (
+            print('Got new closed {}: {}, open: {}, close: {}({}-{})'.format(
                 self.__class__.__name__, self.data, self.open_tag, self.close_tag,
-                self.region.a, self.region.b))
+                self.region.a, self.region.b
+            ))
 
         return True
 
@@ -209,7 +211,7 @@ class Template(Element):
         if self.mode in [self.MODE_VAR, self.MODE_FUNCTION]:
             return None
         else:
-            return '%s:%s' % (self.namespace, self.title)
+            return '{}:{}'.format(self.namespace, self.title)
 
     def set_attrs(self):
         self.mode = self.mode()
@@ -302,7 +304,7 @@ class Link(Element):
 
     def get_titled(self, text):
         if len(text) > 1:
-            return '%s%s' % (text[0].upper(), text[1:])
+            return '{}{}'.format(text[0].upper(), text[1:])
         elif len(text) == 1:
             return text.upper()
         return ''
@@ -475,11 +477,11 @@ class Parser(object):
         self.owned_tags = []
 
     def elist_name(self, c):
-        return '%ss' % c.__name__.lower()
+        return '{}s'.format(c.__name__.lower())
 
     def elist_by_name(self, name):
         try:
-            return getattr(self, '%ss' % name)
+            return getattr(self, '{}s'.format(name))
         except AttributeError:
             return None
 
@@ -495,8 +497,8 @@ class Parser(object):
         this = sys.modules[__name__]
 
         attrs = {
-            'START': ('<%s' % name,),
-            'STOP': ('</%s>' % name,)
+            'START': ('<{}'.format(name),),
+            'STOP': ('</{}>'.format(name),)
         }
         for key in kwargs.keys():
             attrs[key] = kwargs[key]
@@ -631,7 +633,7 @@ class Parser(object):
             for e in self.elist(el):
                 if not e.is_closed():
                     is_valid = False
-                    print('Warning: Page has en unclosed element of type %s at position %s, force closing at %s..' % (
+                    print('Warning: Page has en unclosed element of type {} at position {}, force closing at {}..'.format(
                         e.__class__.__name__,
                         e.points[0],
                         e.points[0] + len(e.open_tag)
@@ -699,13 +701,13 @@ class Parser(object):
                         _to_remove.append(_t)
 
                     if self.debug and (t in self.debug_regions or _t in self.debug_regions):
-                        print('%s%s %s %s%s' % (v.substr(t), t, 'contains' if t.contains(_t) else 'not contains', v.substr(_t), _t))
+                        print('{}{} {} {}{}'.format(v.substr(t), t, 'contains' if t.contains(_t) else 'not contains', v.substr(_t), _t))
 
                 for _r in _to_remove:
                     tags_regions.remove(_r)  # TODO: make intersect
 
                     if self.debug and _r in self.debug_regions:
-                        print('%s%s removed' % (v.substr(_r), _r))
+                        print('{}{} removed'.format(v.substr(_r), _r))
 
             all_tags_regions += tags_regions
         for tag_region in sorted(all_tags_regions, key=lambda x: x.a):

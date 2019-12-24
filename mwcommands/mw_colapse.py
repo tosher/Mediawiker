@@ -21,8 +21,8 @@ class MediawikerColapseCommand(sublime_plugin.TextCommand):
             level = headers[0].level
             gutter_png = ''
             if utils.props.get_setting('show_gutters'):
-                gutter_png = utils.p.from_package('img', 'gutter_h%s.png' % level)
-            self.view.add_regions('h_%s' % level, [r.region for r in headers], 'comment', gutter_png, self.DRAW_TYPE)
+                gutter_png = utils.p.from_package('img', 'gutter_h{}.png'.format(level))
+            self.view.add_regions('h_{}'.format(level), [r.region for r in headers], 'comment', gutter_png, self.DRAW_TYPE)
 
     def get_colapse_templates(self, templates):
         if templates:

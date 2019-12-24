@@ -57,7 +57,6 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
             link = self.html.link(
                 url=self.to_s({'section': 'BACK', 'value': 'BACK', 'params': '', 'goto': 'Main'}),
-                # text=self.FORMAT_SECTION % {'name': '%s Back' % self.icon(self.BACK_ICON)}
                 text='Back'
             )
             status = self.icon(self.BACK_ICON)
@@ -70,11 +69,10 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
         link = self.html.link(
             url=self.to_s({'section': section, 'value': value, 'params': params, 'goto': goto}),
-            # text=self.FORMAT_OPTION % {'status': status, 'name': name}
             text=name
         )
 
-        popup.append(self.html.li('%s%s' % (link, adv), icon=status['icon'], css_class=status['css_class']))
+        popup.append(self.html.li('{}{}'.format(link, adv), icon=status['icon'], css_class=status['css_class']))
         return popup
 
     def icon(self, icon, css_class='success'):
@@ -117,7 +115,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
         for idx, option in enumerate(self.options_default):
             option_value = True if option in self.options else False
-            option_text = '%s %s' % (snippet_char, option.get('caption')) if option.get('type') == 'snippet' else option.get('caption')
+            option_text = '{} {}'.format(snippet_char, option.get('caption')) if option.get('type') == 'snippet' else option.get('caption')
             popup = self.append_toggle(
                 popup=popup,
                 name=option_text,
@@ -143,7 +141,6 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
         for option in self.MENU:
             link = self.html.link(
                 url=self.to_s({'section': section, 'value': '', 'params': '', 'goto': option}),
-                # text=self.FORMAT_SECTION % {'name': option}
                 text=option
             )
             popup.append(self.html.li(link, icon='&nbsp;'))
@@ -175,13 +172,13 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
             elif not isinstance(option_default_value, list) and not isinstance(option_default_value, dict):
                 if isinstance(option_default_value, int):
-                    value_pretty = '%s' % self.html.code(value)
+                    value_pretty = self.html.code(value)
                     option_type = int.__name__
                 else:
                     option_type = str.__name__
-                    value_pretty = '"%s"' % self.html.code(value) if value else '""'
+                    value_pretty = '"{}"'.format(self.html.code(value)) if value else '""'
 
-                name = '%s: %s' % (name, value_pretty)
+                name = '{}: {}'.format(name, value_pretty)
                 status = self.icon(self.LIST_ICON)
                 params = (option, option_type)
             else:
@@ -226,11 +223,11 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
                     'section': section,
                     'value': 'edit',
                     'params': site,
-                    'goto': 'Edit site/%s' % site
+                    'goto': 'Edit site/{}'.format(site)
                 }),
                 text=self.html.span(self.icon(self.EDIT_ICON)['icon'], self.icon(self.EDIT_ICON)['css_class'])
             )
-            adv = '&nbsp;&nbsp;%s' % (link)
+            adv = '&nbsp;&nbsp;{}'.format(link)
             popup = self.append_toggle(
                 popup=popup,
                 name=site,
@@ -251,7 +248,7 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
 
     def show_edit_site(self, section, popup):
         section_clear, site = section.split('/')
-        popup.append(self.html.h2('Edit site: %s' % site))
+        popup.append(self.html.h2('Edit site: {}'.format(site)))
 
         if site == 'new':
             site = ''
@@ -280,9 +277,9 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
                     value_pretty = utils.props.get_setting('password_char') * 8 if value else '""'
                 else:
                     option_type = str.__name__
-                    value_pretty = '"%s"' % self.html.code(value) if value else '""'
+                    value_pretty = '"{}"'.format(self.html.code(value)) if value else '""'
 
-                name = '%s: %s' % (option_pretty, value_pretty)
+                name = '{}: {}'.format(option_pretty, value_pretty)
                 status = self.icon(
                     self.LIST_ICON,
                     'success' if value else 'undefined'
@@ -322,8 +319,8 @@ class MediawikerConfiguratorCommand(sublime_plugin.TextCommand):
             else:
                 value_pretty = self.html.code(value) if value is not None else ''
                 if option_type is str:
-                    value_pretty = '"%s"' % value_pretty
-                name = '%s: %s' % (name, value_pretty)
+                    value_pretty = '"{}"'.format(value_pretty)
+                name = '{}: {}'.format(name, value_pretty)
                 status = self.icon(self.LIST_ICON)
 
             popup = self.append_toggle(

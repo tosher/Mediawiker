@@ -38,17 +38,15 @@ class MediawikerPageDiffVsServerCommand(sublime_plugin.TextCommand):
         text = utils.api.page_get_text(page)
 
         if not text:
-            # Uh, well, what if it does exist, but it is empty?
-            msg = 'Wiki page %s does not exists.' % (title,)
-            utils.status_message(msg)
+            utils.error_message('Wiki page "{}" does not exists.'.format(title))
         else:
             new_lines = view_text.splitlines(True)
             old_lines = text.splitlines(True)
             diff_lines = difflib.unified_diff(old_lines, new_lines, fromfile="Server revision", tofile="Buffer view")
             diff_text = ''.join(diff_lines)
             if not diff_text:
-                utils.status_message('Page versions has no differencies')
+                utils.status_message('Page versions has no differencies', is_panel=True)
             else:
                 syntax_filename = 'Diff.sublime-syntax'
                 syntax = utils.p.from_package(syntax_filename, name='Diff')
-                utils.status_message(diff_text, panel_name='Show differences', syntax=syntax, new=True)
+                utils.status_message(diff_text, is_panel=True, panel_name='Show differences', syntax=syntax, new=True)

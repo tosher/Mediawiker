@@ -64,7 +64,7 @@ def on_hover_selected(view, point):
 
             content = [
                 html.unnumbered_list(
-                    html.span('from %s to %s' % (r.a, r.b)),
+                    html.span('from {} to {}'.format(r.a, r.b)),
                     html.link('bold', 'Bold'),
                     html.link('italic', 'Italic'),
                     html.link('code', 'Code'),
@@ -122,7 +122,7 @@ def on_hover_internal_link(view, point):
                 page_name = l.name
                 if l.name.startswith('/'):
                     # subpage
-                    page_name = '%s%s' % (utils.get_title(), l.name)
+                    page_name = '{}{}'.format(utils.get_title(), l.name)
 
                 page = utils.api.get_page(page_name)
                 css_class = None if page.exists else 'redlink'
@@ -133,24 +133,27 @@ def on_hover_internal_link(view, point):
                 if utils.props.get_setting('show_image_in_popup'):
                     try:
                         img_data, img_size, img_url = utils.api.call('get_image', title=page_name, thumb_size=utils.props.get_setting('popup_image_size'))
-                    except:
+                    except Exception:
                         pass
 
-                h = 'Page "%s"' % html.span(page_name, css_class=css_class) if not img_data else 'File "%s"' % utils.api.page_attr(page, 'page_title')
+                h = '{} "{}"'.format(
+                    'File' if img_data else 'Page',
+                    utils.api.page_attr(page, 'page_title') if img_data else html.span(page_name, css_class=css_class)
+                )
                 content = [
                     html.h(lvl=4, title=h),
                     html.img(uri=img_data) if img_data else '',
                     html.br(cnt=2) if img_data else '',
                     html.join(
-                        html.link('open:%s' % page_name, 'Open' if page.exists else 'Create', css_class=css_class),
-                        html.link('browse:%s' % page_name, 'View in browser', css_class=css_class),
-                        html.link('get_image:%s' % img_url, 'View image in browser') if img_data else '',
+                        html.link('open:{}'.format(page_name), 'Open' if page.exists else 'Create', css_class=css_class),
+                        html.link('browse:{}'.format(page_name), 'View in browser', css_class=css_class),
+                        html.link('get_image:{}'.format(img_url), 'View image in browser') if img_data else '',
                         char=html.span('|', css_class='wide')
                     ),
                     html.br(cnt=1),
                     html.join(
-                        html.link('open:%s' % utils.api.page_attr(page_talk, 'name'), 'Open talk page' if page_talk.exists else 'Create talk page', css_class=css_class_talk),
-                        html.link('browse:%s' % utils.api.page_attr(page_talk, 'name'), 'View talk page in browser', css_class=css_class_talk),
+                        html.link('open:{}'.format(utils.api.page_attr(page_talk, 'name')), 'Open talk page' if page_talk.exists else 'Create talk page', css_class=css_class_talk),
+                        html.link('browse:{}'.format(utils.api.page_attr(page_talk, 'name')), 'View talk page in browser', css_class=css_class_talk),
                         char=html.span('|', css_class='wide')
                     )
                 ]
@@ -234,7 +237,7 @@ def on_hover_template(view, point):
                 page_exists = page.exists
 
             content = [
-                html.h(4, '%s "%s"' % (template_type, r.page_name or r.title) if (r.page_name or r.title) else template_type),
+                html.h(4, '{} "{}"'.format(template_type, r.page_name or r.title) if (r.page_name or r.title) else template_type),
                 html.join(
                     html.link(r.page_name, 'Open' if page_exists else 'Create', css_class=css_class) if r.page_name else '',
                     html.link('fold', 'Fold'),
@@ -338,7 +341,7 @@ def on_hover_heading(view, point):
     for h in headers:
         if h.region.contains(point):
             content = [
-                html.h(4, 'Heading "%s"' % h.title),
+                html.h(4, 'Heading "{}"'.format(h.title)),
                 html.join(
                     html.link('fold', 'Fold'),
                     html.link('unfold', 'Unfold'),
@@ -401,7 +404,7 @@ def on_hover_tag(view, point):
         if tag.region.contains(point):
 
             content = [
-                html.h(4, 'Tag "%s"' % tag.title.title()),
+                html.h(4, 'Tag "{}"'.format(tag.title.title())),
                 html.join(
                     html.link('fold', 'Fold'),
                     html.link('unfold', 'Unfold'),

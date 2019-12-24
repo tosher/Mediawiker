@@ -32,11 +32,11 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
         for lang_prefix in self.links.keys():
             self.lang_prefixes.append(lang_prefix)
 
-        self.links_names = ['%s: %s' % (lp, self.links[lp]) for lp in self.lang_prefixes]
+        self.links_names = ['{}: {}'.format(lp, self.links[lp]) for lp in self.lang_prefixes]
         if self.links_names:
             sublime.active_window().show_quick_panel(self.links_names, self.on_done)
         else:
-            utils.status_message('Unable to find laguage links for "%s"' % title)
+            utils.status_message('Unable to find laguage links for "{}"'.format(title))
 
     def mw_get_page_langlinks(self, title):
         self.links = {}
@@ -67,7 +67,7 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
             host = sites[site_active]['host']
             domain_first = '.'.join(host.split('.')[-2:])
             # NOTE: only links like lang_prefix.site.com supported.. (like en.wikipedia.org)
-            host_new = '%s.%s' % (self.lang_prefix, domain_first)
+            host_new = '{}.{}'.format(self.lang_prefix, domain_first)
             # if host_new exists in settings we can open page
             for site in sites:
                 if sites[site]['host'].split(':')[0] == host_new:
@@ -80,6 +80,6 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
                     'action_params': {'title': self.page_name, 'site_active': site_active_new}
                 })
             else:
-                utils.status_message('Settings not found for host %s.' % (host_new))
+                utils.error_message('Settings not found for host "{}".'.format(host_new))
         elif index == 1:
             self.view.run_command(utils.cmd('replace_text'), {'text': self.page_name})

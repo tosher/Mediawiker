@@ -48,7 +48,7 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
         category_root = utils.get_category(category_root)[1]
 
         if not self.category_path:
-            self.update_category_path('%s:%s' % (self.get_category_prefix(), category_root))
+            self.update_category_path('{}:{}'.format(self.get_category_prefix(), category_root))
 
         if len(self.category_path) > 1:
             self.add_page(self.get_category_prev(), utils.api.CATEGORY_NAMESPACE, False)
@@ -63,7 +63,7 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
             self.pages_names.sort()
             sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.pages_names, self.get_page), 1)
         else:
-            sublime.message_dialog('Category %s is empty' % category_root)
+            sublime.message_dialog('Category {} is empty'.format(category_root))
 
     def add_page(self, page_name, page_namespace, as_next=True):
         page_name_menu = page_name
@@ -77,10 +77,10 @@ class MediawikerCategoryListCommand(sublime_plugin.TextCommand):
         return utils.api.get_subcategories(category_root=category_root)
 
     def get_category_as_next(self, category_string):
-        return '%s%s' % (self.CATEGORY_NEXT_PREFIX_MENU, category_string)
+        return '{}{}'.format(self.CATEGORY_NEXT_PREFIX_MENU, category_string)
 
     def get_category_as_prev(self, category_string):
-        return '%s%s' % (self.CATEGORY_PREV_PREFIX_MENU, category_string)
+        return '{}{}'.format(self.CATEGORY_PREV_PREFIX_MENU, category_string)
 
     def category_strip_special_prefix(self, category_string):
         return category_string.lstrip(self.CATEGORY_NEXT_PREFIX_MENU).lstrip(self.CATEGORY_PREV_PREFIX_MENU)

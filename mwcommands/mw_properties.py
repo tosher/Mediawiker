@@ -48,7 +48,6 @@ class MediawikerProperties(object):
         'search_namespaces': {'text': 'Namespaces to search'},
         'search_results_count': {'text': 'Max count of search result'},
         'image_prefix_min_length': {'text': 'Minimal required image prefix for search'},
-        'page_prefix_min_length': {'text': 'Minimal required page prefix for autocompletion'},
         'wiki_instead_editor': {'text': 'Save to page post'},
         'show_image_in_popup': {'text': 'Show images in popups'},
         'validate_revision_on_post': {'text': 'Check server page revision on post'},
@@ -60,7 +59,8 @@ class MediawikerProperties(object):
         'notifications_read_sign': {'text': 'Character for read notifications'},
         'wikitable_properties': {'text': 'Default mediawiki table properties'},
         'wikitable_cell_properties': {'text': 'Default mediawiki table cell properties'},
-        'use_status_messages_panel': {'text': 'Use separate panel instead status line'},
+        'use_panel_on_success': {'text': 'Use panel for success messages'},
+        'use_panel_on_error': {'text': 'Use panel for error messages'},
         'firefox_cookie_files': {'text': 'Custom path to Firefox cookies'},
         'chrome_cookie_files': {'text': 'Custom path to Chrome cookies'},
         'config_icon_checked': {'text': 'Configurator: checked item character'},
@@ -141,7 +141,7 @@ class MediawikerProperties(object):
         self.autoconvert_settings()
 
         # settings for plugin's panel
-        panel_settings_file_name = '%sPanel.sublime-settings' % PM
+        panel_settings_file_name = '{}Panel.sublime-settings'.format(PM)
         if not os.path.exists(from_package(panel_settings_file_name, name='User', posix=False, is_abs=True)):
             panel_settings = sublime.load_settings(panel_settings_file_name)
             panel_settings.set('font_size', 10)
@@ -161,13 +161,13 @@ class MediawikerProperties(object):
             if key.startswith(PML):
                 try:
                     if self.prop(key) not in self.settings_default:
-                        print("Unknown option in user configuration: %s" % key)
+                        print("Unknown option in user configuration: {}".format(key))
                     else:
                         need_update = True
                         self.settings.set(self.prop(key), self.settings_user.get(key))
                         self.settings.erase(key)
                 except Exception as e:
-                    print("Exception while processing settings key %s: %s" % (key, e))
+                    print("Exception while processing settings key {}: {}".format(key, e))
 
         if need_update:
             sublime.save_settings('Mediawiker.sublime-settings')
@@ -189,7 +189,7 @@ class MediawikerProperties(object):
         return key
 
     def get_name(self, name):
-        return '%s_%s' % (PML, name)
+        return '{}_{}'.format(PML, name)
 
     def remove_prefix(self, name):
         return name[len(PML) + 1:]
@@ -229,7 +229,7 @@ class MediawikerProperties(object):
         view = sublime.active_window().active_view()
         val = None
         if view is not None:
-            val = sublime.active_window().active_view().settings().get('%s.%s' % (PROJECT_SETTINGS_PREFIX, key), None)
+            val = sublime.active_window().active_view().settings().get('{}.{}'.format(PROJECT_SETTINGS_PREFIX, key), None)
         return self.settings.get(key, default_value) if val is None else val
 
     def set_setting(self, key, value):
@@ -256,7 +256,7 @@ class MediawikerProperties(object):
             key = self.remove_prefix(key)
 
         if plugin:
-            assert key in self.props_view, 'Unknown property for view: %s' % key
+            assert key in self.props_view, 'Unknown property for view: {}'.format(key)
 
             default_value = self.props_view[key]['default'] if default_value is None else default_value
             key_type = self.props_view[key]['type']
@@ -271,8 +271,8 @@ class MediawikerProperties(object):
             key = self.remove_prefix(key)
 
         if plugin:
-            assert key in self.props_view, 'Unknown property for view: %s' % key
-            assert isinstance(value, self.props_view[key]['type']), 'Incorrect type value for %s: %s instead of %s' % (key, type(value), self.props_view[key]['type'])
+            assert key in self.props_view, 'Unknown property for view: {}'.format(key)
+            assert isinstance(value, self.props_view[key]['type']), 'Incorrect type value for {}: {} instead of {}'.format(key, type(value), self.props_view[key]['type'])
             key = self.get_name(key)
 
         view.settings().set(key, value)
@@ -304,7 +304,7 @@ class MediawikerProperties(object):
         Returns direct site option from configuration
         '''
 
-        assert key in self.props_site, 'Unknown property for site: %s' % key
+        assert key in self.props_site, 'Unknown property for site: {}'.format(key)
 
         default_value = self.props_site[key]['default'] if default_value is None else default_value
         key_type = self.props_site[key]['type']
@@ -315,7 +315,7 @@ class MediawikerProperties(object):
         Returns real site option for base/child sites
         '''
 
-        assert key in self.props_site, 'Unknown property for site: %s' % key
+        assert key in self.props_site, 'Unknown property for site: {}'.format(key)
 
         default_value = self.props_site[key]['default'] if default_value is None else default_value
         key_type = self.props_site[key]['type']
@@ -325,9 +325,9 @@ class MediawikerProperties(object):
 
     def set_site_setting(self, site, key, value):
 
-        assert key in self.props_site, 'Unknown property for site: %s' % key
+        assert key in self.props_site, 'Unknown property for site: {}'.format(key)
         key_type = self.props_site[key]['type']
-        assert isinstance(value, key_type), 'Incorrect type value for %s: %s instead of %s' % (key, type(value), key_type)
+        assert isinstance(value, key_type), 'Incorrect type value for {}: {} instead of {}'.format(key, type(value), key_type)
 
         settings = self.get_setting('site')
         settings[site][key] = value

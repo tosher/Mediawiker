@@ -31,9 +31,9 @@ class MediawikerViewEvents(sublime_plugin.ViewEventListener):
                         sublime.active_window().run_command(utils.cmd(preview_cmd))
                         self.cnt = None
                     else:
-                        utils.status_message('\nAutoreload: change %s of %s..' % (cnt_delta, ch_cnt))
+                        utils.status_message('\nAutoreload: change {} of {}..'.format(cnt_delta, ch_cnt))
             except Exception as e:
-                utils.status_message('Preview exception: %s' % e)
+                utils.error_message('Preview exception: {}'.format(e))
 
 
 class MediawikerEvents(sublime_plugin.EventListener):
@@ -141,7 +141,7 @@ class MediawikerEvents(sublime_plugin.EventListener):
                         ns_text_number = utils.api.call('get_namespace_number', name=ns_text)
 
                     if internal_link.startswith('/'):
-                        internal_link = '%s%s' % (utils.get_title(), internal_link)
+                        internal_link = '{}{}'.format(utils.get_title(), internal_link)
 
                     # TODO: recheck completions
 
@@ -161,11 +161,11 @@ class MediawikerEvents(sublime_plugin.EventListener):
                                     if int(ns) in (utils.api.CATEGORY_NAMESPACE, utils.api.IMAGE_NAMESPACE):
                                         page_insert = page_name
                                     else:
-                                        page_insert = '%s|%s' % (page_name, utils.api.page_attr(p, 'page_title'))
+                                        page_insert = '{}|{}'.format(page_name, utils.api.page_attr(p, 'page_title'))
                                 else:
                                     ns_name = '(Main)'
                                     page_insert = utils.api.page_attr(p, 'page_title')
-                                page_show = '%s\t%s' % (utils.api.page_attr(p, 'page_title'), ns_name)
+                                page_show = '{}\t{}'.format(utils.api.page_attr(p, 'page_title'), ns_name)
                                 completions.append((page_show, page_insert))
 
             return completions

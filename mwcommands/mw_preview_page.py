@@ -51,22 +51,22 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         if text_css:
             common_css = '''
             <style type="text/css">
-            %s
+            {}
             </style>
-            ''' % text_css
+            '''.format(text_css)
         else:
             common_css = ''
 
         head_tpl_args = self.template_args(site)
-        self.page_id = '%s: %s' % (head_tpl_args['host'], utils.get_title())
-        self.preview_file = utils.p.from_package('%s_preview_file.html' % utils.p.PML, name='User', posix=False, is_abs=True)
+        self.page_id = '{}: {}'.format(head_tpl_args['host'], utils.get_title())
+        self.preview_file = utils.p.from_package('{}_preview_file.html'.format(utils.p.PML), name='User', posix=False, is_abs=True)
 
         html_header_lines = [
             '<!DOCTYPE html>',
             '<html>',
             '<head>',
-            '%(head)s',
-            '%(common_css)s'
+            '{head}',
+            '{common_css}'
             '</head>',
             '<body style="margin:20px;">'
         ]
@@ -74,17 +74,17 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         head = '\n'.join(site['preview_custom_head'] or utils.props.get_setting('preview_head'))
         head_tpl = Template(head)
         head_str = head_tpl.render(**head_tpl_args)
-        html_header = '\n'.join(html_header_lines) % {'head': head_str, 'common_css': common_css}
+        html_header = '\n'.join(html_header_lines).format(head=head_str, common_css=common_css)
         html_footer = '</body></html>'
 
         html = utils.api.call('get_parse_result', text=text, title=utils.get_title())
-        html = html.replace('"//', '"%s://' % head_tpl_args['http'])  # internal links: images,..
-        html = html.replace('"/', '"%s://%s/' % (head_tpl_args['http'], head_tpl_args['host']))  # internal local links: images,..
+        html = html.replace('"//', '"{}://'.format(head_tpl_args['http']))  # internal links: images,..
+        html = html.replace('"/', '"{}://{}/'.format(head_tpl_args['http'], head_tpl_args['host']))  # internal local links: images,..
 
         page_id_old = self.get_page_id()
         page = self.generate_preview(html_header, html, html_footer)
         if self.page_id != page_id_old or utils.props.get_view_setting(self.view, 'autoreload') == 0:
-            webbrowser.open('file:///%s' % page)
+            webbrowser.open('file:///{}'.format(page))
 
     def get_page_id(self):
         if not os.path.exists(self.preview_file):
@@ -95,7 +95,7 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
 
     def generate_preview(self, header, data, footer):
         with open(self.preview_file, 'w', encoding='utf-8') as tf:
-            tf.write('<!--%s-->\n' % self.page_id)
+            tf.write('<!--{}-->\n'.format(self.page_id))
             tf.write(header)
             tf.write(data)
             tf.write(footer)
@@ -110,4 +110,4 @@ class MediawikerPreviewPageCommand(sublime_plugin.TextCommand):
         for r in self.regions:
             lang = re.sub(pattern, r'\2', self.view.substr(r))
             langs.append(lang)
-        return 'ext.geshi.language.%s|' % ','.join(set(langs)) if langs else ''
+        return 'ext.geshi.language.{}|'.format(','.join(set(langs)) if langs else '')

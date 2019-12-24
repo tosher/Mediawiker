@@ -20,10 +20,10 @@ class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
         self.delimiter = utils.props.get_setting('csvtable_delimiter', '|')
         table_header = '{|'
         table_footer = '|}'
-        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in utils.props.get_setting('wikitable_properties', {}).items()])
-        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in utils.props.get_setting('wikitable_cell_properties', {}).items()])
+        table_properties = ' '.join(['{}="{}"'.format(prop, value) for prop, value in utils.props.get_setting('wikitable_properties', {}).items()])
+        cell_properties = ' '.join(['{}="{}"'.format(prop, value) for prop, value in utils.props.get_setting('wikitable_cell_properties', {}).items()])
         if cell_properties:
-            cell_properties = ' %s | ' % cell_properties
+            cell_properties = ' {} | '.format(cell_properties)
 
         for region in self.view.sel():
             table_data_dic_tmp = []
@@ -50,9 +50,9 @@ class MediawikerCsvTableCommand(sublime_plugin.TextCommand):
 
                         for col in row:
                             col_sep = column_separator if row.index(col) else column_separator[0]
-                            table_data += '%s%s%s ' % (col_sep, cell_properties, col)
+                            table_data += '{}{}{} '.format(col_sep, cell_properties, col)
 
-                self.view.replace(edit, region, '%s %s\n%s\n%s' % (table_header, table_properties, table_data, table_footer))
+                self.view.replace(edit, region, '{} {}\n{}\n{}'.format(table_header, table_properties, table_data, table_footer))
 
     def get_table_data(self, line):
         while '  ' in line:
@@ -95,7 +95,7 @@ class MediawikerTableWikiToSimpleCommand(sublime_plugin.TextCommand):
             try:
                 self.view.run_command('table_editor_enable_for_current_view', {'prop': 'enable_table_editor'})
             except Exception as e:
-                utils.status_message('Need to correct install plugin TableEditor: %s' % e)
+                utils.error_message('Need to correct install plugin TableEditor: {}'.format(e))
 
     def table_get(self, text):
         tbl_row_delimiter = r'\|\-(.*)'
@@ -126,9 +126,9 @@ class MediawikerTableWikiToSimpleCommand(sublime_plugin.TextCommand):
         tbl_data = ''
         for row in table_data:
             if row:
-                row_data = ''.join(['%s%s%s' % (CELL_LEFT_BORDER, cell, CELL_RIGHT_BORDER) for cell in row])
-                row_data = '%s%s%s' % (ROW_LEFT_BORDER, row_data, ROW_RIGHT_BORDER)
-                tbl_data += '%s\n' % (row_data)
+                row_data = ''.join(['{}{}{}'.format(CELL_LEFT_BORDER, cell, CELL_RIGHT_BORDER) for cell in row])
+                row_data = '{}{}{}'.format(ROW_LEFT_BORDER, row_data, ROW_RIGHT_BORDER)
+                tbl_data += '{}\n'.format(row_data)
         return tbl_data
 
     def table_getregion(self):
@@ -210,29 +210,29 @@ class MediawikerTableSimpleToWikiCommand(sublime_plugin.TextCommand):
         REPLACE_STR = ':::'
 
         text_wikitable = ''
-        table_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in utils.props.get_setting('wikitable_properties', {}).items()])
+        table_properties = ' '.join(['{}="{}"'.format(prop, value) for prop, value in utils.props.get_setting('wikitable_properties', {}).items()])
 
         need_header = table_list[0][0]['is_header']
         is_first_line = True
         for row in table_list:
             if need_header or is_first_line:
-                text_wikitable += '%s\n%s' % (TBL_ROW_START, CELL_HEAD_FIRST_DELIM)
+                text_wikitable += '{}\n{}'.format(TBL_ROW_START, CELL_HEAD_FIRST_DELIM)
                 text_wikitable += self.getrow(CELL_HEAD_DELIM, row)
                 is_first_line = False
                 need_header = False
             else:
-                text_wikitable += '\n%s\n%s' % (TBL_ROW_START, CELL_FIRST_DELIM)
+                text_wikitable += '\n{}\n{}'.format(TBL_ROW_START, CELL_FIRST_DELIM)
                 text_wikitable += self.getrow(CELL_DELIM, row)
                 text_wikitable = text_wikitable.replace(REPLACE_STR, '|')
 
-        return '%s %s\n%s\n%s' % (TBL_START, table_properties, text_wikitable, TBL_STOP)
+        return '{} {}\n{}\n{}'.format(TBL_START, table_properties, text_wikitable, TBL_STOP)
 
     def getrow(self, delimiter, rowlist=None):
         if rowlist is None:
             rowlist = []
-        cell_properties = ' '.join(['%s="%s"' % (prop, value) for prop, value in utils.props.get_setting('wikitable_cell_properties', {}).items()])
-        cell_properties = '%s | ' % cell_properties if cell_properties else ''
+        cell_properties = ' '.join(['{}="{}"'.format(prop, value) for prop, value in utils.props.get_setting('wikitable_cell_properties', {}).items()])
+        cell_properties = '{} | '.format(cell_properties) if cell_properties else ''
         try:
-            return delimiter.join(' %s%s ' % (cell_properties, cell['cell_data'].strip()) for cell in rowlist)
+            return delimiter.join(' {}{} '.format(cell_properties, cell['cell_data'].strip()) for cell in rowlist)
         except Exception as e:
-            utils.status_message('Error in data: %s' % e)
+            utils.error_message('Error in data: {}'.format(e))

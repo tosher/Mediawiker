@@ -56,6 +56,7 @@
     "search_namespaces": "0,6,14",  // Wiki namespaces for search
     "search_results_count": 50,
     "image_prefix_min_length": 0,
+    "page_prefix_min_length": 3,
     "wiki_instead_editor": true,
     "show_image_in_popup": true,
     "popup_image_size": 300,  // px
@@ -77,7 +78,8 @@
         "class": "wikitable"
     },
     "wikitable_cell_properties": {},
-    "use_status_messages_panel": true,
+    "use_panel_on_success": true,
+    "use_panel_on_error": true,
     "firefox_cookie_files": [],
     "chrome_cookie_files": [],
     "config_icon_checked": "✓",

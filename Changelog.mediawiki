@@ -598,3 +598,6 @@ Support folding/unfolding for:
 
 == Mediawikier 3.5.5 ==
 * Default site settings fix
+
+== Mediawikier 3.5.6 ==
+* Status reports were splitted into success and error messages. Option {{Property|use_panel_on_success}} (default: <code>true</code>) to show success messages on panel, {{Property|use_panel_on_error}} (default: <code>true</code>) to show error messages. If option value is <code>false</code>, messages will be shown on status line. Old option {{Property|use_status_messages_panel}} was removed.

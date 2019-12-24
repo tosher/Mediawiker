@@ -32,7 +32,7 @@ class MediawikerPageListCommand(sublime_plugin.WindowCommand):
             self.my_pages.reverse()
             sublime.set_timeout(lambda: self.window.show_quick_panel(self.my_pages, self.on_done), 1)
         else:
-            utils.status_message('List of pages for wiki "%s" is empty.' % (site_name_active))
+            utils.error_message('List of pages for wiki "{}" is empty.'.format(site_name_active))
 
     def get_pages(self, site_name):
         return self.pagelist.get(site_name, [])

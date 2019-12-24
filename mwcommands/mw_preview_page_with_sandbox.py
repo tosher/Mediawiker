@@ -36,7 +36,7 @@ class MediawikerPreviewPageSandboxCommand(sublime_plugin.TextCommand):
         page_sandbox_name = utils.props.get_site_setting(utils.get_view_site(), 'preview_sandbox')
 
         if not page_sandbox_name:
-            utils.status_message('Sandbox preview page for site %s is not defined in the settings (option "preview_sandbox").' % (utils.get_view_site()))
+            utils.error_message('Sandbox preview page for site "{}" is not defined in the settings (option "preview_sandbox").'.format(utils.get_view_site()))
             return
 
         page_sandbox_url = utils.get_page_url(page_sandbox_name)
@@ -49,7 +49,9 @@ class MediawikerPreviewPageSandboxCommand(sublime_plugin.TextCommand):
             mark_as_minor=True
         )
         if not is_success:
-            utils.status_message('There was an error while trying to post page [[%s]] to sandbox page %s. Site: "%s".' % (title, page_sandbox_name, utils.get_view_site()), replace=['[', ']'])
+            utils.error_message('There was an error while trying to post page [[{}]] to sandbox page {}. Site: "{}".'.format(
+                title, page_sandbox_name, utils.get_view_site()
+            ), replace_patterns=['[', ']'])
             return
 
         if utils.props.get_view_setting(self.view, 'autoreload') == 0:

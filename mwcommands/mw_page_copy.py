@@ -37,7 +37,7 @@ class MediawikerPageCopyCommand(sublime_plugin.TextCommand):
         text = src_api.page_get_text(src_page)
 
         cnt = len([i for i in src_page.images()])
-        if sublime.ok_cancel_dialog('Copy %s images from source page?' % cnt):
+        if sublime.ok_cancel_dialog('Copy {} images from source page?'.format(cnt)):
             images = src_page.images()
             for image in images:
                 file_name = src_api.page_attr(image, 'page_title')
@@ -45,15 +45,15 @@ class MediawikerPageCopyCommand(sublime_plugin.TextCommand):
                     'process_upload',
                     url=image.imageinfo['url'],
                     filename=file_name,
-                    description='Image for page "%s", copied from "%s"' % (self.title, self.src_site_name)
+                    description='Image for page "{}", copied from "{}"'.format(self.title, self.src_site_name)
                 )
                 if is_success:
-                    utils.status_message('File %s successfully copied to wiki' % (file_name))
+                    utils.status_message('File "{}" successfully copied to wiki'.format(file_name))
                 else:
-                    utils.status_message('Error while trying to copy file %s to wiki' % (file_name))
+                    utils.error_message('Error while trying to copy file "{}" to wiki'.format(file_name))
 
         cnt = len([i for i in src_page.templates()])
-        if sublime.ok_cancel_dialog('Copy %s templates (only first level) from source page?' % cnt):
+        if sublime.ok_cancel_dialog('Copy {} templates (only first level) from source page?'.format(cnt)):
             templates = src_page.templates()
             for template in templates:
                 template_name = src_api.page_attr(template, 'page_title')
@@ -61,24 +61,24 @@ class MediawikerPageCopyCommand(sublime_plugin.TextCommand):
                 is_success = utils.api.save_page(
                     page=template,
                     text=template_text,
-                    summary='Template copy from %s for page %s' % (self.src_site_name, self.title),
+                    summary='Template copy from "{}" for page "{}"'.format(self.src_site_name, self.title),
                     mark_as_minor=False
                 )
                 if not is_success:
-                    utils.status_message(
-                        'There was an error while trying to copy template [[%s]] to wiki "%s".' % (
+                    utils.error_message(
+                        'There was an error while trying to copy template [[{}]] to wiki "{}".'.format(
                             template_name,
                             utils.get_view_site()
                         ),
-                        replace=['[', ']']
+                        replace_patterns=['[', ']']
                     )
                 else:
                     utils.status_message(
-                        'Template [[%s]] was successfully copied to wiki "%s".' % (
+                        'Template [[{}]] was successfully copied to wiki "{}".'.format(
                             self.title,
                             utils.get_view_site()
                         ),
-                        replace=['[', ']']
+                        replace_patterns=['[', ']']
                     )
 
         # get local page
@@ -86,25 +86,25 @@ class MediawikerPageCopyCommand(sublime_plugin.TextCommand):
         is_success = utils.api.save_page(
             page=page,
             text=text,
-            summary='Page copy from %s' % self.src_site_name,
+            summary='Page copy from "{}"'.format(self.src_site_name),
             mark_as_minor=False
         )
         if not is_success:
-            utils.status_message(
-                'There was an error while trying to copy page [[%s]] to wiki "%s".' % (
+            utils.error_message(
+                'There was an error while trying to copy page [[{}]] to wiki "{}".'.format(
                     self.title,
                     utils.get_view_site()
                 ),
-                replace=['[', ']']
+                replace_patterns=['[', ']']
             )
             return
         else:
             utils.status_message(
-                'Page [[%s]] was successfully copied to wiki "%s".' % (
+                'Page [[{}]] was successfully copied to wiki "{}".'.format(
                     self.title,
                     utils.get_view_site()
                 ),
-                replace=['[', ']']
+                replace_patterns=['[', ']']
             )
 
         self.view.window().run_command(utils.cmd('page'), {

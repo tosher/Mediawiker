@@ -121,7 +121,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         sections_menu = []
         self.sections_idx = []
         for section in sections:
-            subtitle = '%s%s' % ('  ' * int(section['toclevel']), section['line'])
+            subtitle = '{}{}'.format('  ' * int(section['toclevel']), section['line'])
             sections_menu.append(subtitle)
             self.sections_idx.append(section['index'])
         sublime.active_window().show_quick_panel(sections_menu, self.on_done_get_section)
@@ -151,7 +151,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
             sublime.message_dialog(utils.api.PAGE_CANNOT_READ_MESSAGE)
             view.close()
             return
-        elif not sublime.ok_cancel_dialog('%s Click OK button to view its source.' % utils.api.PAGE_CANNOT_EDIT_MESSAGE):
+        elif not sublime.ok_cancel_dialog('{} Click OK button to view its source.'.format(utils.api.PAGE_CANNOT_EDIT_MESSAGE)):
             # can not edit, but can read, but not want
             view.close()
             return
@@ -160,7 +160,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         page_namespace = utils.api.page_attr(page, 'namespace')
 
         if not text:
-            utils.status_message('Page [[%s]] does not exist. You can create it..' % (self.title))
+            utils.error_message('Page [[{}]] does not exist. You can create it..'.format(self.title))
             text = utils.comment(
                 'New wiki page: Remove this with text of the new page',
                 page_name=self.title,
@@ -171,7 +171,11 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
 
         if utils.props.get_site_setting(self.site_active, 'show_red_links'):
             utils.show_red_links(view, page)
-        utils.status_message('Page [[%s]] was opened successfully from "%s".' % (self.title, utils.get_view_site()), replace=['[', ']'])
+        utils.status_message('Page [[{}]] was opened successfully from "{}".'.format(
+            self.title,
+            utils.get_view_site()
+        ), replace_patterns=['[', ']']
+        )
         utils.set_syntax(self.title, page_namespace)
         utils.props.set_view_setting(view, 'is_here', True)
         utils.props.set_view_setting(view, 'wiki_instead_editor', utils.props.get_setting('wiki_instead_editor'))
@@ -183,7 +187,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         try:
             self.get_notifications()
         except Exception as e:
-            utils.status_message('%s notifications exception: %s' % (p.PM, e))
+            utils.error_message('{} notifications exception: {}'.format(utils.props.PM, e))
 
     def get_notifications(self):
         is_unread_notify_exists = utils.api.exists_unread_notifications()
@@ -215,7 +219,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                 if is_process_post:
                     self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
                     if not is_skip_summary:
-                        summary_message = 'Changes summary (%s):' % utils.get_view_site()
+                        summary_message = 'Changes summary ({}):'.format(utils.get_view_site())
                         utils.set_timeout_async(self.view.window().show_input_panel(summary_message, '', self.on_done, None, None), 0)
                     else:
                         utils.set_timeout_async(self.on_done, 0)
@@ -225,13 +229,13 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                         'action_params': {'title': self.title, 'new_tab': True}
                     })
             else:
-                utils.status_message(utils.api.PAGE_CANNOT_EDIT_MESSAGE)
+                utils.error_message(utils.api.PAGE_CANNOT_EDIT_MESSAGE)
         else:
-            utils.status_message('Can\'t publish page with empty title')
+            utils.error_message('Can\'t publish page with empty title')
             return
 
     def post_page(self, summary):
-        summary = '%s%s' % (summary, utils.props.get_setting('summary_postfix'))
+        summary = '{}{}'.format(summary, utils.props.get_setting('summary_postfix'))
         mark_as_minor = utils.props.get_setting('mark_as_minor')
         # invert minor settings command '!'
         if summary and summary[0] == '!':
@@ -247,7 +251,10 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             section=section
         )
         if not is_success:
-            utils.status_message('There was an error while trying to publish page [[%s]] to wiki "%s".' % (self.title, utils.get_view_site()), replace=['[', ']'])
+            utils.error_message('There was an error while trying to publish page [[{}]] to wiki "{}".'.format(
+                self.title,
+                utils.get_view_site()
+            ), replace_patterns=['[', ']'])
             return
 
         # update revision for page in view
@@ -259,7 +266,11 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 
         self.view.set_scratch(True)
         utils.props.set_view_setting(self.view, 'is_changed', False)  # reset is_changed flag
-        utils.status_message('Page [[%s]] was successfully published to wiki "%s".' % (self.title, utils.get_view_site()), replace=['[', ']'])
+        utils.status_message('Page [[{}]] was successfully published to wiki "{}".'.format(
+            self.title,
+            utils.get_view_site()),
+            replace_patterns=['[', ']']
+        )
         utils.save_mypages(self.title)
 
     def on_done(self, summary=None):
@@ -269,9 +280,9 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             if utils.api.page_can_edit(self.page):
                 self.post_page(summary=summary)
             else:
-                utils.status_message(utils.api.PAGE_CANNOT_EDIT_MESSAGE)
+                utils.error_message(utils.api.PAGE_CANNOT_EDIT_MESSAGE)
         except utils.mwclient.EditError as e:
-            utils.status_message('Can\'t publish page [[%s]] (%s)' % (self.title, e), replace=['[', ']'])
+            utils.error_message('Can\'t publish page [[{}]] ({})'.format(self.title, e), replace=['[', ']'])
 
 
 class MediawikerMovePageCommand(sublime_plugin.TextCommand):
@@ -288,7 +299,7 @@ class MediawikerMovePageCommand(sublime_plugin.TextCommand):
             if utils.api.page_can_edit(self.page):
                 utils.set_timeout_async(self.view.window().show_input_panel('New title', '', self.on_done_name, None, None), 0)
             else:
-                utils.status_message('You have not rights to move this page')
+                utils.error_message('You have not rights to move this page')
 
     def on_done_name(self, name):
         self.new_title = name
@@ -298,28 +309,28 @@ class MediawikerMovePageCommand(sublime_plugin.TextCommand):
         self.reason = reason
 
         message = '''
-        Old name: "%s"
-        New name: "%s"
-        Reason: %s
+        Old name: "{}"
+        New name: "{}"
+        Reason: {}
 
         Leave a redirect behind?
-        ''' % (self.title, self.new_title, self.reason)
+        '''.format(self.title, self.new_title, self.reason)
 
         is_make_redirect = sublime.yes_no_cancel_dialog(message, 'Yes', 'No')
 
         if is_make_redirect != sublime.DIALOG_CANCEL:
             no_redirect = True if is_make_redirect == sublime.DIALOG_NO else False
             utils.api.page_move(self.page, self.new_title, self.reason, no_redirect)
-            utils.status_message('Page [[%s]] was moved successfully to [[%s]], leave redirect: %s' % (self.title, self.new_title, not no_redirect))
+            utils.status_message('Page [[{}]] was moved successfully to [[{}]], leave redirect: {}'.format(self.title, self.new_title, not no_redirect))
 
             if not no_redirect:
-                utils.status_message('Refreshing old page (redirect): [[%s]]' % self.title)
+                utils.status_message('Refreshing old page (redirect): [[{}]]'.format(self.title))
                 self.view.window().run_command(utils.cmd('reopen_page'))
             else:
-                utils.status_message('Closing old page: [[%s]]' % self.title)
+                utils.status_message('Closing old page: [[{}]]'.format(self.title))
                 self.view.close()
 
-            utils.status_message('Opening new page: [[%s]]' % self.new_title)
+            utils.status_message('Opening new page: [[{}]]'.format(self.new_title))
             sublime.set_timeout(
                 lambda: sublime.active_window().run_command(utils.cmd('page'), {
                     'action': utils.cmd('show_page'),

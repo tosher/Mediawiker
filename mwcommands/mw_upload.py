@@ -35,7 +35,7 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
         if file_path:
             self.file_path = file_path
             file_destname = os.path.basename(file_path)
-            sublime.active_window().show_input_panel('Destination file name [%s]:' % (file_destname), file_destname, self.get_filedescr, None, None)
+            sublime.active_window().show_input_panel('Destination file name [{}]:'.format(file_destname), file_destname, self.get_filedescr, None, None)
         # else:
         #     # try to get clipboard and upload
         #     try:
@@ -46,9 +46,9 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
         #             data = win32clipboard.GetClipboardData(win32clipboard.CF_DIB)
         #         win32clipboard.CloseClipboard()
         #     except Exception as e:
-        #         print('Exception from clipboard %s' % e)
+        #         print('Exception from clipboard {}'.format(e))
         #         return
-        #     upload_file = p.from_package('%s_upload_data.png' % p.PML, name='User', posix=False, is_abs=True)
+        #     upload_file = p.from_package('{}_upload_data.png'.format(p.PML), name='User', posix=False, is_abs=True)
         #     print(upload_file)
         #     with open(upload_file, 'w+b') as tf:
         #         tf.write(data)
@@ -64,17 +64,17 @@ class MediawikerUploadCommand(sublime_plugin.TextCommand):
         if file_descr:
             self.file_descr = file_descr
         else:
-            self.file_descr = '%s as %s' % (os.path.basename(self.file_path), self.file_destname)
+            self.file_descr = '{} as {}'.format(os.path.basename(self.file_path), self.file_destname)
         try:
             is_success = self.upload()
             if is_success:
-                utils.status_message('File %s successfully uploaded to wiki as %s' % (self.file_path, self.file_destname))
+                utils.status_message('File "{}" successfully uploaded to wiki as "{}"'.format(self.file_path, self.file_destname))
             else:
-                utils.status_message('Error while trying to upload file %s to wiki as %s' % (self.file_path, self.file_destname))
+                utils.error_message('Error while trying to upload file "{}" to wiki as "{}"'.format(self.file_path, self.file_destname))
         except IOError as e:
-            sublime.message_dialog('Upload io error: %s' % e)
+            utils.error_message('Upload io error: {}'.format(e))
         except Exception as e:
-            sublime.message_dialog('Upload error: %s' % e)
+            utils.error_message('Upload error: {}'.format(e))
 
     def upload(self):
         if self.file_path.startswith('http'):

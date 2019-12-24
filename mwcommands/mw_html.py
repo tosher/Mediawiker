@@ -11,9 +11,9 @@ class MwHtml(object):
 
     HTML_HEADER = ''' \
     <html>
-        <body id="%(html_id)s">
+        <body id="{html_id}">
             <style>
-                %(style_css)s
+                {style_css}
             </style>
             <div>
     '''
@@ -78,25 +78,25 @@ class MwHtml(object):
 
     def h(self, lvl, title, css_class=None):
         if css_class is None:
-            return '<h%(level)s>%(title)s</h%(level)s>' % {
-                'level': lvl,
-                'title': title
-            }
+            return '<h{level}>{title}</h{level}>'.format(
+                level=lvl,
+                title=title
+            )
         else:
-            return '<h%(level)s class="%(css_class)s">%(title)s</h%(level)s>' % {
-                'level': lvl,
-                'title': title,
-                'css_class': css_class
-            }
+            return '<h{level} class="{css_class}">{title}</h{level}>'.format(
+                level=lvl,
+                title=title,
+                css_class=css_class
+            )
 
     def h2(self, title, css_class=None):
         return self.h(2, title, css_class)
 
     def link(self, url, text, css_class=None):
         if not css_class:
-            return '<a href="%s">%s</a>' % (url, text)
+            return '<a href="{}">{}</a>'.format(url, text)
         else:
-            return '<a href="%s" class="%s">%s</a>' % (url, css_class, text)
+            return '<a href="{}" class="{}">{}</a>'.format(url, css_class, text)
 
     def a(self, url, text, css_class=None):
         ''' just alias to link '''
@@ -104,11 +104,11 @@ class MwHtml(object):
 
     def simple_tag(self, tag, text, css_class=None, close=True):
         if close:
-            close_tag = '</%(tag)s>' % {'tag': tag}
+            close_tag = '</{tag}>'.format(tag=tag)
         if not css_class:
-            return '<%(tag)s>%(text)s%(close_tag)s' % {'tag': tag, 'text': text, 'close_tag': close_tag}
+            return '<{tag}>{text}{close_tag}'.format(tag=tag, text=text, close_tag=close_tag)
         else:
-            return '<%(tag)s class="%(css_class)s">%(text)s%(close_tag)s' % {'tag': tag, 'text': text, 'css_class': css_class, 'close_tag': close_tag}
+            return '<{tag} class="{css_class}">{text}{close_tag}'.format(tag=tag, text=text, css_class=css_class, close_tag=close_tag)
 
     def ul(self, close=False):
         return '<ul>' if not close else '</ul>'
@@ -144,7 +144,7 @@ class MwHtml(object):
     def img(self, uri):
         if not uri:
             return ''
-        return '<img src="%s">' % uri
+        return '<img src="{}">'.format(uri)
 
     def br(self, cnt=1):
         return '<br>' * cnt
@@ -159,7 +159,7 @@ class MwHtml(object):
 
     def build(self, lines):
 
-        html = "%s\n%s\n%s" % (self.HTML_HEADER % {'html_id': self.html_id, 'style_css': self.build_css()}, '\n'.join(lines), self.HTML_FOOTER)
+        html = "{}\n{}\n{}".format(self.HTML_HEADER.format(html_id=self.html_id, style_css=self.build_css()), '\n'.join(lines), self.HTML_FOOTER)
         if self.debug:
             self.debug_html(html)
         return html
@@ -193,19 +193,19 @@ class MwHtmlAdv(MwHtml):
         return '\n'.join([
             '<div class="note_base">',
             '   <div class="note_head">',
-            '       %(title)s' % {'title': title},
+            '       {title}'.format(title=title),
             '   </div>',
             '   <div class="note">',
-            '       <code style="font-size: %(font-size)s">' % {'font-size': self.get_font_size(self.css_rules['code']['font-size'], -0.3)} if code else '',
-            '       %(msg)s' % {'msg': msg},
+            '       <code style="font-size: {font_size}">'.format(font_size=self.get_font_size(self.css_rules['code']['font-size'], -0.3)) if code else '',
+            '       {msg}'.format(msg=msg),
             '       </code>' if code else '',
             '   </div>',
             '</div>'
         ])
 
     def with_border(self, elem, border, color='#c0c0c0'):
-        return '<div style="padding: %(border)spx; background-color: %(color)s;">%(elem)s</div>' % {
-            'border': border,
-            'color': color,
-            'elem': elem
-        }
+        return '<div style="padding: {border}spx; background-color: {color};">{elem}</div>'.format(
+            border=border,
+            color=color,
+            elem=elem
+        )

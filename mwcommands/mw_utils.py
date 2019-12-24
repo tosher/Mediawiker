@@ -26,28 +26,6 @@ from html.parser import HTMLParser
 from ..lib import mwclient
 from ..lib import browser_cookie3
 
-# linting skips
-# all must be ovverrided in plugin_loaded
-
-# def get_setting(key, default_value=None):
-#     pass
-
-
-# def set_setting(key, value):
-#     pass
-
-
-# def del_setting(key):
-#     pass
-
-
-# def get_default_setting(key, default_value=None):
-#     pass
-
-
-# def from_package(*path):
-#     pass
-
 conman = None
 api = None
 props = None
@@ -159,7 +137,7 @@ def get_title():
             if ext[1:] in wiki_extensions and title:
                 return title
             else:
-                status_message('Unauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
+                error_message('Unauthorized file extension for mediawiki publishing. Check your configuration for correct extensions.')
                 return ''
     return ''
 
@@ -169,7 +147,7 @@ def show_red_links(view, page):
 
 
 def process_red_links(view, page):
-    status_message('Processing red_links for page [[%s]].. ' % api.page_attr(page, 'name'), new_line=False)
+    status_message('Processing red_links for page [[{}]].. '.format(api.page_attr(page, 'name')), new_line=False)
 
     view.erase_phantoms('redlink')
     red_link_icon = props.get_setting('red_link_icon')
@@ -201,7 +179,7 @@ def process_red_links(view, page):
                 view.add_phantom(
                     'redlink',
                     sublime.Region(l.region.a + 2, l.region.a + 2),
-                    '<strong style="padding: 0px; color: #c0392b;">%s</strong>' % red_link_icon,
+                    '<strong style="padding: 0px; color: #c0392b;">{}</strong>'.format(red_link_icon),
                     sublime.LAYOUT_INLINE
                 )
     status_message('done.')
@@ -275,62 +253,59 @@ def get_page_url(page_name=None):
     pagepath = site.get("pagepath", '/wiki/')
 
     if page_name:
-        return '%s://%s%s%s' % (proto, host, pagepath, page_name)
+        return '{}://{}{}{}'.format(proto, host, pagepath, page_name)
 
     return ''
 
 
-def status_message(message, replace=None, is_panel=None, new_line=True, panel_name=None, syntax=None, new=False):
+def status_message(message, replace_patterns=None, is_panel=None, new_line=True, panel_name=None, syntax=None, new=False):
 
-    def status_message_sublime(message, replace=None):
-        if replace:
-            for r in replace:
-                message = message.replace(r, '')
+    def status_message_sublime(message, replace_patterns=None):
+        if replace_patterns:
+            for rp in replace_patterns:
+                message = message.replace(rp, '')
         sublime.active_window().status_message(message)
 
-    is_use_message_panel = is_panel if is_panel is not None else props.get_setting('use_status_messages_panel', True)
+    if is_panel is None:
+        is_panel = False
+        if props.get_setting('use_panel_on_success', True):
+            is_panel = True
 
-    if is_use_message_panel:
-        panel = None
-        if panel_name is None:
-            panel_name = '%s_panel' % p.PML
+    if not is_panel:
+        status_message_sublime(message, replace_patterns)
+        return
 
-        if syntax is None:
-            # if int(sublime.version()) >= 3000:
-            #     syntax = p.from_package('MediawikerPanel.sublime-syntax')
-            # else:
-            #     syntax = p.from_package('MediawikiNG_ST2.tmLanguage')
-            syntax = p.from_package('MediawikerPanel.sublime-syntax')
+    panel = None
+    if panel_name is None:
+        panel_name = '{p.PML}_panel'
 
-        # if int(sublime.version()) >= 3000:
-        #     if not new:
-        #         panel = sublime.active_window().find_output_panel(panel_name)
+    if syntax is None:
+        syntax = p.from_package('MediawikerPanel.sublime-syntax')
 
-        #     if panel is None:
-        #         panel = sublime.active_window().create_output_panel(panel_name)
+    if not new:
+        panel = sublime.active_window().find_output_panel(panel_name)
 
-        # else:
-        #     panel = sublime.active_window().get_output_panel(panel_name)
-        if not new:
-            panel = sublime.active_window().find_output_panel(panel_name)
+    if panel is None:
+        panel = sublime.active_window().create_output_panel(panel_name)
 
-        if panel is None:
-            panel = sublime.active_window().create_output_panel(panel_name)
+    if panel is not None:
+        panel.set_syntax_file(syntax)
+        sublime.active_window().run_command("show_panel", {"panel": "output.{}".format(panel_name)})
+        props.set_view_setting(panel, 'is_here', True)
+        panel.set_read_only(False)
+        last_position = panel.size()
+        panel.run_command(cmd('insert_text'), {'position': panel.size(), 'text': '{}{}'.format(message, '\n' if new_line else '')})
+        panel.show_at_center(last_position)
+        panel.set_read_only(True)
 
-        if panel is not None:
-            panel.set_syntax_file(syntax)
-            sublime.active_window().run_command("show_panel", {"panel": "output.%s" % panel_name})
-            props.set_view_setting(panel, 'is_here', True)
-            panel.set_read_only(False)
-            last_position = panel.size()
-            panel.run_command(cmd('insert_text'), {'position': panel.size(), 'text': '%s%s' % (message, '\n' if new_line else '')})
-            panel.show_at_center(last_position)
-            panel.set_read_only(True)
-
-        else:
-            status_message_sublime(message, replace)
     else:
-        status_message_sublime(message, replace)
+        status_message_sublime(message, replace_patterns)
+
+
+def error_message(message, replace_patterns=None, is_panel=None, new_line=True, panel_name=None, syntax=None, new=False):
+    if is_panel or props.get_setting('use_panel_on_error', True):
+        is_panel = True
+    status_message(message, replace_patterns, is_panel, new_line, panel_name, syntax, new)
 
 
 def set_timeout_async(callback, delay):
@@ -378,13 +353,13 @@ class PreAPI(object):
     def call(self, func, **kwargs):
 
         if not isinstance(func, str):
-            status_message('Error: PreAPI call arg must be a string, not %s.' % type(func))
+            error_message('Error: PreAPI call arg must be a string, not {}.'.format(type(func)))
             return
 
         try:
             funcobj = getattr(self, func)
         except AttributeError as e:
-            status_message('PreAPI %s error in %s: %s' % (type(e).__name__, func, e))
+            error_message('PreAPI {} error in {}: {}'.format(type(e).__name__, func, e))
             return
 
         if funcobj:
@@ -392,20 +367,20 @@ class PreAPI(object):
                 try:
                     return funcobj(**kwargs)
                 except mwclient.errors.APIError as e:
-                    status_message("%s exception for %s: %s, trying to reconnect.. " % (type(e).__name__, func, e))
+                    error_message("{} exception for {}: {}, trying to reconnect.. ".format(type(e).__name__, func, e))
                     try:
-                        status_message('Forcing new connection.. ')
+                        error_message('Forcing new connection.. ')
                         _ = self.get_connect(force=True)  # one time try to reconnect
                         if _:
                             return funcobj(**kwargs)
                         else:
-                            status_message('Failed to call %s' % funcobj.__name__)  # TODO: check
+                            error_message('Failed to call {}'.format(funcobj.__name__))  # TODO: check
                             break
                     except Exception as e:
-                        status_message("%s exception for %s: %s" % (type(e).__name__, func, e))
+                        error_message("{} exception for {}: {}".format(type(e).__name__, func, e))
                         break
                 except Exception as e:
-                    status_message("%s exception for %s: %s" % (type(e).__name__, func, e))
+                    error_message("{} exception for {}: {}".format(type(e).__name__, func, e))
                     break
 
     def get_page(self, title):
@@ -429,7 +404,7 @@ class PreAPI(object):
         if self.page_attr(page, 'namespace') == self.IMAGE_NAMESPACE:
             # Link like [[File:Filename]] has not imageinfo, only [[Image:Imagename]]
             if not hasattr(page, 'imageinfo'):
-                page = self.get_page('Image:%s' % self.page_attr(page, 'page_title'))
+                page = self.get_page('Image:{}'.format(self.page_attr(page, 'page_title')))
             img_width = page.imageinfo.get('width', thumb_size)
             img_url = page.imageinfo.get('url', thumb_size)
             img_size_request = min(img_width, thumb_size)
@@ -478,20 +453,20 @@ class PreAPI(object):
         title = self.page_attr(page, 'page_title')
 
         if ns == self.CATEGORY_NAMESPACE:
-            return self.get_page('Category_talk:%s' % title)
+            return self.get_page('Category_talk:{}'.format(title))
         elif ns == self.IMAGE_NAMESPACE:
-            return self.get_page('File_talk:%s' % title)
+            return self.get_page('File_talk:{}'.format(title))
         elif ns == self.TEMPLATE_NAMESPACE:
-            return self.get_page('Template_talk:%s' % title)
+            return self.get_page('Template_talk:{}'.format(title))
         elif ns == self.SCRIBUNTO_NAMESPACE:
-            return self.get_page('Module_talk:%s' % title)
+            return self.get_page('Module_talk:{}'.format(title))
         elif ns == self.USER_NAMESPACE:
-            return self.get_page('User_talk:%s' % title)
+            return self.get_page('User_talk:{}'.format(title))
         elif ns == self.MEDIAWIKI_NAMESPACE:
-            return self.get_page('Mediawiki_talk:%s' % title)
+            return self.get_page('Mediawiki_talk:{}'.format(title))
         elif ns == self.PROJECT_NAMESPACE:
-            return self.get_page('Project_talk:%s' % title)
-        return self.get_page('Talk:%s' % title)
+            return self.get_page('Project_talk:{}'.format(title))
+        return self.get_page('Talk:{}'.format(title))
 
     def get_page_extlinks(self, page):
         return [l for l in page.extlinks()]
@@ -505,14 +480,14 @@ class PreAPI(object):
             # verify connection
             self.get_connect()
         except Exception as e:
-            status_message('%s exception: %s' % (type(e).__name__, e))
+            error_message('{} exception: {}'.format(type(e).__name__, e))
             return False
 
         try:
             page.save(text, summary=summary.strip(), minor=mark_as_minor, section=section)
             return True
         except Exception as e:
-            status_message('%s exception: %s' % (type(e).__name__, e))
+            error_message('{} exception: {}'.format(type(e).__name__, e))
         return False
 
     def page_attr(self, page, attr_name):
@@ -524,7 +499,7 @@ class PreAPI(object):
             return getattr(page, attr_name)
 
         except AttributeError as e:
-            status_message('%s exception: %s' % (type(e).__name__, e))
+            error_message('{} exception: {}'.format(type(e).__name__, e))
 
     def page_can_read(self, page):
         return page.can('read')
@@ -616,10 +591,10 @@ class PreAPI(object):
             if res['result'] == self.UPLOAD_SUCCESS:
                 return True
             else:
-                status_message('Error while trying to upload file %s: %s' % (filename, res))
+                error_message('Error while trying to upload file {}: {}'.format(filename, res))
                 return False
         except Exception as e:
-            status_message('Exception while trying to upload file %s: %s' % (filename, e))
+            error_message('Exception while trying to upload file {}: {}'.format(filename, e))
         return False
 
     def get_namespace_number(self, name):
@@ -669,16 +644,16 @@ class MediawikerConnectionManager(object):
         def get_proto():
             return 'https' if site['https'] else 'http'
 
-        assert 'host' in site_config, 'Host is not defined for site %s' % name
+        assert 'host' in site_config, 'Host is not defined for site "{}"'.format(name)
 
         site = self.sites.get(name, {})
         site_config_old = site.get('config', {})
 
         if self.is_site_changed(site_config_old, site_config):
             if not site_config_old:
-                status_message("'''Setup new connection to \"%s\".'''" % name)
+                status_message("'''Setup new connection to \"{}\".'''".format(name))
             else:
-                status_message("'''Site configuration is changed, setup new connection to \"%s\".. '''" % name)
+                status_message("'''Site configuration is changed, setup new connection to \"{}\".. '''".format(name))
             if 'connection' in site:
                 site['connection'] = None
 
@@ -736,7 +711,7 @@ class MediawikerConnectionManager(object):
         #   proxy host like: http(s)://user:pass@10.10.1.10:3128
         #   Note: PC uses requests ver. 2.7.0. Per-host proxies supported from 2.8.0 version only.
         #   http://docs.python-requests.org/en/latest/community/updates/#id4
-        #   host_key = '%s://%s' % ('https' if self.is_https else 'http', self.site)
+        #   host_key = '{}://{}'.format('https' if self.is_https else 'http', self.site)
         #   using proto only..
 
         return {
@@ -748,7 +723,7 @@ class MediawikerConnectionManager(object):
     def debug_flush(self):
         if props.get_setting('debug'):
             for msg in self.debug_msgs:
-                status_message("'''DEBUG''' %s" % msg)
+                error_message("'''DEBUG''' {}".format(msg))
         self.debug_msgs = []
 
     def get_connect(self, name=None, force=False):
@@ -764,7 +739,7 @@ class MediawikerConnectionManager(object):
             cj = self.get_cookies(name=name) if site['authorization_type'] == self.AUTH_TYPE_COOKIES else None
 
             if site['authorization_type'] == self.AUTH_TYPE_COOKIES and not self.is_eq_cookies(site['cookies'], cj):
-                self.debug_msgs.append('New cookies: %s' % cj)
+                self.debug_msgs.append('New cookies: {}'.format(cj))
                 site['cookies'] = cj
             elif not force and (site['authorization_type'] != self.AUTH_TYPE_LOGIN or not site['username'] or site['password']):
                 connection = site.get('connection', None)
@@ -777,12 +752,12 @@ class MediawikerConnectionManager(object):
         except Exception as e:
             formatted_lines = traceback.format_exc().splitlines()
             for line in formatted_lines:
-                status_message(line)
+                error_message(line)
 
         try:
             connection = self.connect(name=name)
         except Exception as e:
-            self.debug_msgs.append('Connection exception: %s' % e)
+            self.debug_msgs.append('Connection exception: {}'.format(e))
 
         self.debug_flush()
 
@@ -793,7 +768,7 @@ class MediawikerConnectionManager(object):
 
         site = self.get_site(name)
 
-        status_message('Connecting to %s .. ' % self.url(name), new_line=False)
+        status_message('Connecting to "{}" .. '.format(self.url(name)), new_line=False)
 
         if site['authorization_type'] == self.AUTH_TYPE_OAUTH:
             # oauth authorization
@@ -810,27 +785,27 @@ class MediawikerConnectionManager(object):
                 )
             except requests.exceptions.HTTPError as e:
                 if props.get_setting('debug'):
-                    self.debug_msgs.append('HTTP response: %s' % e)
+                    self.debug_msgs.append('HTTP response: {}'.format(e))
 
                 # additional http auth (basic, digest)
                 if e.response.status_code == 401 and site['use_http_auth']:
                     http_auth_header = e.response.headers.get('www-authenticate', '')
                     connection = self._http_auth(http_auth_header=http_auth_header, name=name)
                 else:
-                    # sublime.message_dialog('HTTP connection failed: %s' % e[1])
-                    status_message(' failed: %s' % e[1])
+                    # sublime.message_dialog('HTTP connection failed: {}'.format(e[1]))
+                    error_message(' failed: {}'.format(e[1]))
                     return
             except Exception as e:
-                # sublime.message_dialog('Connection failed for %s: %s' % (site['hosturl'], e))
-                status_message(' failed: %s' % e)
+                # sublime.message_dialog('Connection failed for {}: {}'.format(site['hosturl'], e))
+                error_message(' failed: {}'.format(e))
                 return
 
         if connection:
             status_message(' done.')
             if props.get_setting('debug'):
-                self.debug_msgs.append('Connection: %s' % connection.connection)
+                self.debug_msgs.append('Connection: {}'.format(connection.connection))
 
-            status_message('Login in with authorization type %s.. ' % site['authorization_type'], new_line=False)
+            status_message('Login in with authorization type {}.. '.format(site['authorization_type']), new_line=False)
             success_message = ' done'
             # Cookie auth
             if site['authorization_type'] == self.AUTH_TYPE_COOKIES and site['cookies']:
@@ -838,18 +813,18 @@ class MediawikerConnectionManager(object):
                     connection.login(cookies=site['cookies'])
 
                     if props.get_setting('debug'):
-                        self.debug_msgs.append('Username: %s' % connection.username.strip())
+                        self.debug_msgs.append('Username: {}'.format(connection.username.strip()))
                         # not connection.logged_in and self.debug_msgs.append('* Anonymous connection: True')
                         self.debug_msgs.append('Anonymous connection: True') if not connection.logged_in else None
-                        self.debug_msgs.append('Connection rights: %s' % (', '.join(connection.rights)))
-                        self.debug_msgs.append('Connection tokens: %s' % (', '.join(['%s: %s' % (
+                        self.debug_msgs.append('Connection rights: {}'.format(', '.join(connection.rights)))
+                        self.debug_msgs.append('Connection tokens: {}'.format(', '.join(['{}: {}'.format(
                             t,
                             connection.tokens[t]
                         ) for t in connection.tokens.keys()]) if connection.tokens else '<empty>'))
 
                 except mwclient.LoginError as exc:
                     e = exc.args
-                    status_message(' failed: %s' % e[1]['result'])
+                    error_message(' failed: {}'.format(e[1]['result']))
                     return
             # Login/Password auth
             elif site['authorization_type'] == self.AUTH_TYPE_LOGIN and site['username'] and site['password']:
@@ -857,7 +832,7 @@ class MediawikerConnectionManager(object):
                     connection.login(username=site['username'], password=site['password'], domain=site['domain'])
                 except mwclient.LoginError as exc:
                     e = exc.args
-                    status_message(' failed: %s' % e[1]['result'])
+                    error_message(' failed: {}'.format(e[1]['result']))
                     return
             # elif self.auth_type == self.AUTH_TYPE_OAUTH:
             else:
@@ -868,7 +843,7 @@ class MediawikerConnectionManager(object):
             site['connection'] = connection
             return connection
         else:
-            status_message(' failed.')
+            error_message(' failed.')
 
         return None
 
@@ -889,7 +864,7 @@ class MediawikerConnectionManager(object):
         if site['authorization_type'] != self.AUTH_TYPE_COOKIES:
             return None
 
-        cookie_files = props.get_setting('%s_cookie_files' % site['cookies_browser'], [])
+        cookie_files = props.get_setting('{}_cookie_files'.format(site['cookies_browser']), [])
         if not cookie_files:
             cookie_files = None
 
@@ -898,7 +873,7 @@ class MediawikerConnectionManager(object):
         elif site['cookies_browser'] == 'chrome':
             return browser_cookie3.chrome(cookie_files=cookie_files, domain_name=site['host'])
         else:
-            sublime.message_dialog("Incompatible browser for cookie: %s" % (site['cookies_browser'] or "Not defined"))
+            sublime.message_dialog("Incompatible browser for cookie: {}".format(site['cookies_browser'] or "Not defined"))
 
         return None
 
@@ -940,7 +915,7 @@ class MediawikerConnectionManager(object):
                     requests=self.get_requests_config(name))
                 return connection
         else:
-            status_message('HTTP connection failed: Unknown realm.')
+            error_message('HTTP connection failed: Unknown realm.')
 
         return None
 
@@ -972,7 +947,7 @@ class MediawikerConnectionManager(object):
                 return connection
             except mwclient.OAuthAuthorizationError as exc:
                 e = exc.args
-                status_message('OAuth login failed: %s' % e[1])
+                error_message('OAuth login failed: {}'.format(e[1]))
         return None
 
 
@@ -1071,15 +1046,15 @@ class PasswordHider(object):
             self.password = self.password[:len(password)]
         else:
             try:
-                self.password = '%s%s' % (self.password, password.replace(password_char, ''))
-            except:
+                self.password = '{}{}'.format(self.password, password.replace(password_char, ''))
+            except Exception:
                 pass
         return password_char * len(self.password)
 
     def done(self):
         try:
             return self.password
-        except:
+        except Exception:
             pass
         finally:
             self.password = ''
@@ -1139,6 +1114,6 @@ class WikiaInfoboxParser(HTMLParser):
         params_list = []
         if self.params:
             for pk in self.params.keys():
-                param = '%s=%s' % (pk, self.params[pk])
+                param = '{}={}'.format(pk, self.params[pk])
                 params_list.append(param)
         return params_list

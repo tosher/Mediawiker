@@ -45,10 +45,9 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
             infobox.feed(text)
             params_list = infobox.get_params_list()
             if params_list:
-                return ''.join(['|%s\n' % p for p in params_list])
+                return ''.join(['|{}\n'.format(p) for p in params_list])
 
         params_list = []
-        # ex: {{{title|{{PAGENAME}}}}}
         pattern = r'(\{{3}.*?\}{3,})'
         parameters = re.findall(pattern, text)
         for param in parameters:
@@ -62,19 +61,20 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
             if close_brackets_diff > 0:
                 param = param[:-close_brackets_diff]
             # default value or not..
-            param = param.replace('|', '=') if '|' in param else '%s=' % param
+            param = param.replace('|', '=') if '|' in param else '{}='.format(param)
             if param not in params_list:
                 params_list.append(param)
-        return ''.join(['|%s\n' % p for p in params_list])
+        return ''.join(['|{}\n'.format(p) for p in params_list])
 
     def on_done(self, idx):
         if idx >= 0:
-            template = utils.api.get_page('Template:%s' % self.templates_names[idx])
+            template = utils.api.get_page('Template:{}'.format(self.templates_names[idx]))
             if utils.api.page_can_read(template):
                 text = utils.api.page_get_text(page=template)
                 params_text = self.get_template_params(text)
                 index_of_cursor = self.view.sel()[0].begin()
-                template_text = '{{%s%s}}' % (self.templates_names[idx], params_text)
+                # {{ - escapes {
+                template_text = '{{{{{0}{1}}}}}'.format(self.templates_names[idx], params_text)
                 self.view.run_command(utils.cmd('insert_text'), {'position': index_of_cursor, 'text': template_text})
-            else:
-                utils.status_message('')
+            # else:
+            #     utils.status_message('')

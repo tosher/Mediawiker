@@ -13,7 +13,7 @@ class MediawikerOpenPageInBrowserCommand(sublime_plugin.WindowCommand):
         if url:
             webbrowser.open(url)
         else:
-            utils.status_message('Can\'t open page with empty title')
+            utils.error_message('Can\'t open page with empty title')
             return
 
     def is_visible(self, *args):

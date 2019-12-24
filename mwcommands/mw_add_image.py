@@ -28,7 +28,7 @@ class MediawikerAddImageCommand(sublime_plugin.TextCommand):
             return
 
         self.image_prefix_min_lenght = utils.props.get_setting('image_prefix_min_length', 4)
-        sublime.active_window().show_input_panel('Wiki image prefix (min %s):' % self.image_prefix_min_lenght, '', self.show_list, None, None)
+        sublime.active_window().show_input_panel('Wiki image prefix (min {}):'.format(self.image_prefix_min_lenght), '', self.show_list, None, None)
 
     def show_list(self, image_prefix):
         if len(image_prefix) >= self.image_prefix_min_lenght:
@@ -36,9 +36,9 @@ class MediawikerAddImageCommand(sublime_plugin.TextCommand):
             self.images_names = [utils.api.page_attr(x, 'page_title') for x in images]
             sublime.set_timeout(lambda: sublime.active_window().show_quick_panel(self.images_names, self.on_done), 1)
         else:
-            sublime.message_dialog('Image prefix length must be more than %s. Operation canceled.' % self.image_prefix_min_lenght)
+            sublime.message_dialog('Image prefix length must be more than {}. Operation canceled.'.format(self.image_prefix_min_lenght))
 
     def on_done(self, idx):
         if idx >= 0:
             index_of_cursor = self.view.sel()[0].begin()
-            self.view.run_command(utils.cmd('insert_text'), {'position': index_of_cursor, 'text': '[[Image:%s]]' % self.images_names[idx]})
+            self.view.run_command(utils.cmd('insert_text'), {'position': index_of_cursor, 'text': '[[Image:{}]]'.format(self.images_names[idx])})

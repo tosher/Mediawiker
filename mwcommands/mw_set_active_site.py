@@ -35,7 +35,7 @@ class MediawikerSetActiveSiteCommand(sublime_plugin.WindowCommand):
                 '{tab}Auth type: {auth_type}{auth_src}'.format(
                     tab=self.TAB,
                     auth_type=auth_type,
-                    auth_src=' (%s)' % auth_src if auth_src else ''
+                    auth_src=' ({})'.format(auth_src) if auth_src else ''
                 )
             ]
             self.sites_list.append(rec)

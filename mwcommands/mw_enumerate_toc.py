@@ -44,7 +44,7 @@ class MediawikerEnumerateTocCommand(sublime_plugin.TextCommand):
                     # reset sub-levels numbers
                     header_level_number[i:] = [0] * len(header_level_number[i:])
                 if header_number:
-                    current_number_str = "%s.%s" % (current_number_str, header_number) if current_number_str else '%s' % (header_number)
+                    current_number_str = "{}.{}".format(current_number_str, header_number) if current_number_str else str(header_number)
                 # incr. level
                 i += 1
 
@@ -52,6 +52,6 @@ class MediawikerEnumerateTocCommand(sublime_plugin.TextCommand):
             header_text_clear = header_text.strip(' =\t')
             header_text_clear = re.sub(r'^(\d+\.)+\s+(.*)', r'\2', header_text_clear)
             header_tag = '=' * level
-            header_text_numbered = '%s %s. %s %s' % (header_tag, current_number_str, header_text_clear, header_tag)
+            header_text_numbered = '{} {}. {} {}'.format(header_tag, current_number_str, header_text_clear, header_tag)
             len_delta += len(header_text_numbered) - region_len
             self.view.replace(edit, r_new, header_text_numbered)
