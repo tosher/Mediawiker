@@ -103,6 +103,7 @@
         {"caption": "Add to Favorites", "type": "window_command", "value": "mediawiker_favorites_add", "online": true},
         {"caption": "Favorite pages", "type": "window_command", "value": "mediawiker_favorites_open", "online": true},
         {"caption": "Reopen page", "type": "window_command", "value": "mediawiker_reopen_page", "online": true},
+        {"caption": "Reopen all", "type": "window_command", "value": "mediawiker_reopen_all_pages", "online": true},
         {"caption": "Open page in browser", "type": "window_command", "value": "mediawiker_open_page_in_browser"},
         {"caption": "Set Category", "type": "window_command", "value": "mediawiker_set_category", "online": true},
         {"caption": "Insert image", "type": "window_command", "value": "mediawiker_insert_image", "online": true},

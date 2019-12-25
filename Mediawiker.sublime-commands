@@ -11,6 +11,7 @@
     { "caption": "Mediawiker: Numbered TOC", "command": "mediawiker_enumerate_toc" },
     { "caption": "Mediawiker: CSV to table", "command": "mediawiker_csv_table" },
     { "caption": "Mediawiker: Reopen page", "command": "mediawiker_reopen_page" },
+    { "caption": "Mediawiker: Reopen All", "command": "mediawiker_reopen_all_pages" },
     { "caption": "Mediawiker: Wiki table to Simple (for plugin TableEdit)", "command": "mediawiker_table_wiki_to_simple" },
     { "caption": "Mediawiker: Simple table to wiki (for plugin TableEdit)", "command": "mediawiker_table_simple_to_wiki" },
     { "caption": "Mediawiker: Edit panel", "command": "mediawiker_edit_panel" },

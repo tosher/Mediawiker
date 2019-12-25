@@ -277,7 +277,7 @@ def status_message(message, replace_patterns=None, is_panel=None, new_line=True,
 
     panel = None
     if panel_name is None:
-        panel_name = '{p.PML}_panel'
+        panel_name = '{}_panel'.format(p.PML)
 
     if syntax is None:
         syntax = p.from_package('MediawikerPanel.sublime-syntax')
@@ -305,6 +305,7 @@ def status_message(message, replace_patterns=None, is_panel=None, new_line=True,
 def error_message(message, replace_patterns=None, is_panel=None, new_line=True, panel_name=None, syntax=None, new=False):
     if is_panel or props.get_setting('use_panel_on_error', True):
         is_panel = True
+    message = ' '.join(['  >>>', message])
     status_message(message, replace_patterns, is_panel, new_line, panel_name, syntax, new)
 
 
@@ -850,7 +851,7 @@ class MediawikerConnectionManager(object):
     def require_password(self, name=None):
 
         site = self.get_site(name)
-        if site['authorization_type'] == self.AUTH_TYPE_LOGIN and not site.get('password', None):
+        if site['authorization_type'] == self.AUTH_TYPE_LOGIN and site.get('username') and not site.get('password'):
             return True
         return False
 

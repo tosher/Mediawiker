@@ -67,6 +67,34 @@ class MediawikerReopenPageCommand(sublime_plugin.WindowCommand):
         return utils.props.get_view_setting(self.window.active_view(), 'is_here')
 
 
+class MediawikerReopenAllPagesCommand(sublime_plugin.WindowCommand):
+
+    def run(self):
+        if utils.conman.require_password():
+            utils.error_message('Unable to peform couple page reopening without authorization')
+            return
+
+        for view in self.window.views():
+            if not view.settings().get('mediawiker_is_here'):
+                continue
+
+            title = view.name()
+            if not title:
+                continue
+
+            if view.is_dirty():
+                utils.error_message('Page [[{}]] has unsaved changes - reopen skipped.'.format(title))
+                continue
+
+            section = utils.props.get_view_setting(view, 'section', None)
+            view.run_command(utils.cmd('show_page'), {'title': title, 'new_tab': False, 'section': section})
+
+    def is_visible(self, *args):
+        if utils.props.get_setting('offline_mode'):
+            return False
+        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
+
+
 class MediawikerPostPageCommand(sublime_plugin.WindowCommand):
     ''' alias to Publish page command '''
 
