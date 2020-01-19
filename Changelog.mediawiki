@@ -604,3 +604,6 @@ Support folding/unfolding for:
 
 == Mediawikier 3.5.7 ==
 * New command {{Command|Reopen all}} (beta) - reopen all opened pages from wiki (if the page has no unsaved changes).
+
+== Mediawikier 3.5.8 ==
+* Fixed command {{Command|Open page in browser}} for child hosts (parent wiki settings ignoring).

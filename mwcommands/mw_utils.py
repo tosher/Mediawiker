@@ -247,10 +247,10 @@ def get_page_url(page_name=None):
     if page_name is None:
         page_name = strquote(get_title())
 
-    site = props.get_setting('site').get(get_view_site())
+    site = props.get_site(get_view_site())
     host = site['host']
     proto = 'https' if site.get('https', True) else 'http'
-    pagepath = site.get("pagepath", '/wiki/')
+    pagepath = site.get('pagepath', '/wiki/')
 
     if page_name:
         return '{}://{}{}{}'.format(proto, host, pagepath, page_name)
