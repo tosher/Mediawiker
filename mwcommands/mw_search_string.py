@@ -28,7 +28,7 @@ class MediawikerSearchStringListCommand(sublime_plugin.TextCommand):
         sublime.active_window().show_input_panel('Wiki search:', search_pre, self.show_results, None, None)
 
     def do_search(self, string_value):
-        namespace = utils.props.get_setting('search_namespaces')
+        namespace = '|'.join(utils.get_search_ns())
         search_limit = utils.props.get_setting('search_results_count', 20)
         return utils.api.call('get_search_result', search=string_value, limit=search_limit, namespace=namespace)
 

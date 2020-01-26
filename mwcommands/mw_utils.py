@@ -258,6 +258,19 @@ def get_page_url(page_name=None):
     return ''
 
 
+def get_search_ns():
+    '''
+    Returns 'search_namespaces':
+    * if defined on site level, then site-level-namespaces
+    * else global option
+    '''
+
+    nses = props.get_site_setting(get_view_site(), 'search_namespaces')
+    if not nses:
+        nses = props.get_setting('search_namespaces')
+    return [ns.strip() for ns in nses.split(',')]
+
+
 def status_message(message, replace_patterns=None, is_panel=None, new_line=True, panel_name=None, syntax=None, new=False):
 
     def status_message_sublime(message, replace_patterns=None):

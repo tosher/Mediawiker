@@ -607,3 +607,6 @@ Support folding/unfolding for:
 
 == Mediawikier 3.5.8 ==
 * Fixed command {{Command|Open page in browser}} for child hosts (parent wiki settings ignoring).
+
+== Mediawikier 3.5.9 ==
+* Site-level option {{Property|search_namespaces}}, it overrides the global value.

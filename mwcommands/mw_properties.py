@@ -131,7 +131,8 @@ class MediawikerProperties(object):
         'preview_custom_head': {'text': 'Custom html head tags for preview', 'type': list, 'default': []},
         'preview_sandbox': {'text': 'Special rewritable page for preview', 'type': str, 'default': ''},
         'show_red_links': {'text': 'Mark red links in page text', 'type': bool, 'default': False},
-        'parent': {'text': 'Parent site name', 'type': str, 'default': ''}
+        'parent': {'text': 'Parent site name', 'type': str, 'default': ''},
+        'search_namespaces': {'text': 'Site level option: namespaces to search ', 'type': str, 'default': ''}
     }
 
     def __init__(self):
