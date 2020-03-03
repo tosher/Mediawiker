@@ -40,6 +40,7 @@
     "syntax_css": "Packages/CSS/CSS.sublime-syntax",
     "syntax_js": "Packages/JavaScript/JavaScript.sublime-syntax",
     "site_active": "English wikipedia",
+    "summary_prefix": "",
     "summary_postfix": " (by SublimeText.Mediawiker)",
     "skip_summary": false,
     "clipboard_as_defaultpagename": false,
