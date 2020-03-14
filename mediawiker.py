@@ -263,7 +263,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             return
 
     def post_page(self, summary):
-        summary = '{}{}'.format(summary, utils.props.get_setting('summary_postfix'))
+        summary = '{}{}{}'.format(utils.props.get_setting('summary_prefix'), summary, utils.props.get_setting('summary_postfix'))
         mark_as_minor = utils.props.get_setting('mark_as_minor')
         # invert minor settings command '!'
         if summary and summary[0] == '!':
