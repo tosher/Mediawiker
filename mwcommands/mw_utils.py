@@ -995,7 +995,7 @@ class InputPanelPageTitle(InputPanel):
             if not title_pre:
                 selection = self.window.active_view().sel()
                 title_pre = self.window.active_view().substr(selection[0]).strip()
-            self.show_input('Wiki page name:', title_pre)
+            self.show_input('Wiki page name ({}):'.format(get_view_site()), title_pre)
         else:
             self.on_done(title)
 
@@ -1003,7 +1003,8 @@ class InputPanelPageTitle(InputPanel):
         if title:
             pagename_cleared = pagename_clear(title)
             if title != pagename_cleared:
-                self.window.show_input_panel('Wiki page name:', pagename_cleared, self.on_done, self.on_change, None)
+                self.window.show_input_panel('Wiki page name ({}):'.format(get_view_site()),
+                                             pagename_cleared, self.on_done, self.on_change, None)
 
     def on_done(self, title):
         set_timeout_async(self.callback(title), 0)
