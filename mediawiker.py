@@ -247,8 +247,9 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                 if is_process_post:
                     self.current_text = self.view.substr(sublime.Region(0, self.view.size()))
                     if not is_skip_summary:
-                        summary_message = 'Changes summary ({}):'.format(utils.get_view_site())
-                        utils.set_timeout_async(self.view.window().show_input_panel(summary_message, '', self.on_done, None, None), 0)
+                        summary_title = 'Changes summary ({}):'.format(utils.get_view_site())
+                        summary_buffered = self.get_summary_buffer()
+                        utils.set_timeout_async(self.view.window().show_input_panel(summary_title, summary_buffered, self.on_done, None, None), 0)
                     else:
                         utils.set_timeout_async(self.on_done, 0)
                 else:
@@ -263,7 +264,11 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             return
 
     def post_page(self, summary):
-        summary = '{}{}{}'.format(utils.props.get_setting('summary_prefix'), summary, utils.props.get_setting('summary_postfix'))
+        summary = '{}{}{}'.format(
+            utils.props.get_setting('summary_prefix'),
+            summary,
+            utils.props.get_setting('summary_postfix')
+        )
         mark_as_minor = utils.props.get_setting('mark_as_minor')
         # invert minor settings command '!'
         if summary and summary[0] == '!':
@@ -271,18 +276,32 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             summary = summary[1:]
 
         section = utils.props.get_view_setting(self.view, 'section', None)
-        is_success = utils.api.save_page(
-            page=self.page,
-            text=self.current_text,
-            summary=summary,
-            mark_as_minor=mark_as_minor,
-            section=section
-        )
+
+        exc = None
+        is_success = False
+        try:
+            is_success = utils.api.save_page(
+                page=self.page,
+                text=self.current_text,
+                summary=summary,
+                mark_as_minor=mark_as_minor,
+                section=section
+            )
+
+        except Exception as e:
+            exc = e
+            is_success = False
+
         if not is_success:
-            utils.error_message('There was an error while trying to publish page [[{}]] to wiki "{}".'.format(
+            err_msg = 'There was an error while trying to publish page [[{}]] to wiki "{}".'.format(
                 self.title,
-                utils.get_view_site()
-            ), replace_patterns=['[', ']'])
+                utils.get_view_site(),
+            )
+            if exc:
+                err_msg += ', {} exception: {}'.format(type(exc).__name__, exc)
+
+            utils.error_message(err_msg, replace_patterns=['[', ']'])
+            self.set_summary_buffer(summary)
             return
 
         # update revision for page in view
@@ -300,17 +319,31 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             replace_patterns=['[', ']']
         )
         utils.save_mypages(self.title)
+        self.erase_summary_buffer()
+
+    def get_summary_buffer(self):
+        if utils.props.get_setting('summary_save_on_fail'):
+            return utils.props.get_site_setting(utils.get_view_site(), 'summary_fail_buf')
+        return ''
+
+    def set_summary_buffer(self, summary):
+        if utils.props.get_setting('summary_save_on_fail'):
+            utils.props.set_site_setting(utils.get_view_site(), 'summary_fail_buf', summary)
+
+    def erase_summary_buffer(self):
+        if utils.props.get_setting('summary_save_on_fail'):
+            utils.props.set_site_setting(utils.get_view_site(), 'summary_fail_buf', '')
 
     def on_done(self, summary=None):
         if summary is None:
             summary = ''
-        try:
-            if utils.api.page_can_edit(self.page):
-                self.post_page(summary=summary)
-            else:
-                utils.error_message(utils.api.PAGE_CANNOT_EDIT_MESSAGE)
-        except utils.mwclient.EditError as e:
-            utils.error_message('Can\'t publish page [[{}]] ({})'.format(self.title, e), replace=['[', ']'])
+
+        if not utils.api.page_can_edit(self.page):
+            self.set_summary_buffer(summary)
+            utils.error_message(utils.api.PAGE_CANNOT_EDIT_MESSAGE)
+            return
+
+        self.post_page(summary=summary)
 
 
 class MediawikerMovePageCommand(sublime_plugin.TextCommand):

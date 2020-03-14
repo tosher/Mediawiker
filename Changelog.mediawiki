@@ -610,3 +610,8 @@ Support folding/unfolding for:
 
 == Mediawikier 3.5.9 ==
 * Site-level option {{Property|search_namespaces}}, it overrides the global value.
+
+== Mediawikier 3.6.0 ==
+* {{Command|Post page}} - possibility to set prefix for summary messages (defined by {{Property|summary_prefix}}) (pull-request by [https://github.com/RheingoldRiver @RheingoldRiver])
+* Show name of current wiki in input panel on opening page (pull-request by [https://github.com/RheingoldRiver @RheingoldRiver])
+* Possibility to disable search/autocomletions on site level by set {{Property|mediawiker_search_namespaces}} to <code>disabled</code> value.

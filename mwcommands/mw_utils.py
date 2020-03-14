@@ -30,6 +30,8 @@ conman = None
 api = None
 props = None
 
+NS_SEARCH_DISABLED = 'disabled'
+
 # def plugin_loaded():
 #     mw = sys.modules[__name__]
 #     props = p.MediawikerProperties()
@@ -262,12 +264,19 @@ def get_search_ns():
     '''
     Returns 'search_namespaces':
     * if defined on site level, then site-level-namespaces
+    * if magic word NS_SEARCH_DISABLED (const) defined as value on site level, returns None
     * else global option
     '''
 
     nses = props.get_site_setting(get_view_site(), 'search_namespaces')
+    # we can disable search on site level
+    # * slow page completions, etc
+    if nses == NS_SEARCH_DISABLED:
+        return None
+
     if not nses:
         nses = props.get_setting('search_namespaces')
+
     return [ns.strip() for ns in nses.split(',')]
 
 

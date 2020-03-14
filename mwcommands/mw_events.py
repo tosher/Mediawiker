@@ -137,6 +137,9 @@ class MediawikerEvents(sublime_plugin.EventListener):
 
                 if len(internal_link) >= word_cursor_min_len:
                     namespaces_search = utils.get_search_ns()
+                    if not namespaces_search:
+                        return completions
+
                     if ns_text:
                         ns_text_number = utils.api.call('get_namespace_number', name=ns_text)
 

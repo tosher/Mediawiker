@@ -2,29 +2,56 @@
     "site":
     {
         "English wikipedia": {
-            "authorization_type": "login",  // Authorization type: "login" / "oauth" / "cookies"
-            "host": "en.wikipedia.org",  // Site url
-            "path": "/w/",  // API path (https://en.wikipedia.org/wiki/Special:Version)
-            "pagepath": "/wiki/",  // Pages path (https://en.wikipedia.org/wiki/Special:Version)
-            "username": "",  // Login authorization type
-            "password": "", // Login authorization type
-            "domain": "",  // Domain for corp. wikies with LDAP authorization
-            "https": true,  // Using HTTPS protocol instead of HTTP
-            "is_ssl_cert_verify": true,  // Verify server SSL certificates on connection
-            "proxy_host": "",  // Connection through proxy server: like http[s]://[login:password@]domain.com[:3128]
-            "use_http_auth": false,  // Additional HTTP authorization: Basic or Digest
-            "http_auth_login": "",  // Additional HTTP authorization: Basic or Digest
-            "http_auth_password": "",  // Additional HTTP authorization: Basic or Digest
-            "oauth_access_secret": "",  // OAuth authorization type
-            "oauth_access_token": "",  // OAuth authorization type
-            "oauth_consumer_secret": "",  // OAuth authorization type
-            "oauth_consumer_token": "",  // OAuth authorization type
-            "cookies_browser": "chrome",  // Cookies authorization type: "chrome" or "firefox"
-            "preview_custom_head": [],  // List of custom html head tags for preview generation
-            "retry_timeout": 30, // Timeout in seconds for http requests
-            "is_wikia": false,  // is wikia site
-            "show_red_links": false,  // validate red links on open/post page (not recommended, use command instead)
-            "preview_sandbox": "" // sandbox page for preview
+            // Authorization type: "login" / "oauth" / "cookies"
+            "authorization_type": "login",
+            // Site url
+            "host": "en.wikipedia.org",
+            // API path (https://en.wikipedia.org/wiki/Special:Version)
+            "path": "/w/",
+            // Pages path (https://en.wikipedia.org/wiki/Special:Version)
+            "pagepath": "/wiki/",
+            // Login authorization type
+            "username": "",
+            // Login authorization type
+            "password": "",
+            // Domain for corp. wikies with LDAP authorization
+            "domain": "",
+            // Using HTTPS protocol instead of HTTP
+            "https": true,
+            // Verify server SSL certificates on connection
+            "is_ssl_cert_verify": true,
+            // Connection through proxy server: like http[s]://[login:password@]domain.com[:3128]
+            "proxy_host": "",
+            // Additional HTTP authorization: Basic or Digest
+            "use_http_auth": false,
+            // Additional HTTP authorization: Basic or Digest
+            "http_auth_login": "",
+            // Additional HTTP authorization: Basic or Digest
+            "http_auth_password": "",
+            // OAuth authorization type
+            "oauth_access_secret": "",
+            // OAuth authorization type
+            "oauth_access_token": "",
+            // OAuth authorization type
+            "oauth_consumer_secret": "",
+            // OAuth authorization type
+            "oauth_consumer_token": "",
+            // Cookies authorization type: "chrome" or "firefox"
+            "cookies_browser": "chrome",
+            // List of custom html head tags for preview generation
+            "preview_custom_head": [],
+            // Timeout in seconds for http requests
+            "retry_timeout": 30,
+            // is wikia site
+            "is_wikia": false,
+            // validate red links on open/post page (not recommended, use command instead)
+            "show_red_links": false,
+            // sandbox page for preview
+            "preview_sandbox": "",
+            // override global option for site, "disable" to switch off search, auto-completions
+            "search_namespaces": "",
+            // Summary message buffer for failed posts (no needs to define)
+            "summary_fail_buf": ""
         },
         "Russian wikipedia": {
             "host": "ru.wikipedia.org",
@@ -44,6 +71,7 @@
     "summary_postfix": " (by SublimeText.Mediawiker)",
     "skip_summary": false,
     "clipboard_as_defaultpagename": false,
+    "summary_save_on_fail": false,
     "newtab_ongetpage": true,
     "clearpagename_oninput": true,
     "password_input_hide": true,
@@ -54,7 +82,8 @@
     "category_root": "Category:Help",
     "mark_as_minor": false,
     "csvtable_delimiter": "|",
-    "search_namespaces": "0,6,14",  // Wiki namespaces for search
+    // Wiki namespaces for search
+    "search_namespaces": "0,6,14",
     "search_results_count": 50,
     "image_prefix_min_length": 0,
     "page_prefix_min_length": 3,
