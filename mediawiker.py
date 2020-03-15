@@ -2,7 +2,13 @@
 # -*- coding: utf-8 -*-
 
 # import sys
+import os
 import sublime
+from jinja2 import Environment, FileSystemLoader
+# suppress deprecation warnings (turned on in mwclient lib: mwclient/__init__.py)
+import warnings
+warnings.simplefilter("ignore", DeprecationWarning)
+
 import sublime_plugin
 
 # https://github.com/wbond/sublime_package_control/wiki/Sublime-Text-3-Compatible-Packages
@@ -10,9 +16,6 @@ import sublime_plugin
 # http://www.sublimetext.com/docs/3/api_reference.html
 # sublime.message_dialog
 
-# suppress deprecation warnings (turned on in mwclient lib: mwclient/__init__.py)
-import warnings
-warnings.simplefilter("ignore", DeprecationWarning)
 
 from .mwcommands import mw_utils as utils
 from .mwcommands import *
@@ -194,6 +197,12 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
                 page_name=self.title,
                 page_namespace=page_namespace
             )
+            text = self.render_page_template(
+                site_name=utils.get_view_site(),
+                page_name=self.title,
+                page_namespace=page_namespace,
+                page_text=text
+            )
 
         view.run_command(utils.cmd('insert_text'), {'position': 0, 'text': text, 'with_erase': True})
 
@@ -221,6 +230,20 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         is_unread_notify_exists = utils.api.exists_unread_notifications()
         if is_unread_notify_exists and sublime.ok_cancel_dialog('You have new notifications.'):
             self.view.window().run_command(utils.cmd('notifications'))
+
+    def render_page_template(self, **kwargs):
+        tpl_path = utils.props.get_setting('new_page_template_path')
+        if not tpl_path:
+            return kwargs.get('page_text', '')
+
+        if not os.path.isabs(tpl_path):
+            tpl_path = utils.p.from_package(tpl_path, name='User', is_abs=True)
+
+        # keep_trailing_newline=True
+        env = Environment(loader=FileSystemLoader(searchpath=os.path.dirname(tpl_path)))
+        template = env.get_template(os.path.basename(tpl_path))
+        text = template.render(**kwargs)
+        return text
 
 
 class MediawikerPublishPageCommand(sublime_plugin.TextCommand):

@@ -171,6 +171,7 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
             if line.startswith('</source>'):
                 is_source = False
                 src = '\n<br>'.join(lines_src)
+                lines_src = []
                 lines.append(self.html.note('Source', src, code=True))
                 continue
 

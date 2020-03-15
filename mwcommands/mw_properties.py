@@ -82,7 +82,8 @@ class MediawikerProperties(object):
         'show_gutters': {'text': 'Show gutters'},
         'show_favorites_and_history_by_site_host': {'text': 'Show history and favorites pages by host'},
         'offline_mode': {'text': 'Offline mode'},
-        'summary_save_on_fail': {'text': 'Save summary on failed post for next try'}
+        'summary_save_on_fail': {'text': 'Save summary on failed post for next try'},
+        'new_page_template_path': {'text': 'Path to Jinja2 template for predefined text for new pages'}
     }
 
     props_dependencies = {
