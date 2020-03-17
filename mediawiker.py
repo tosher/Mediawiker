@@ -286,10 +286,11 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             utils.error_message('Can\'t publish page with empty title')
             return
 
-    def post_page(self, summary):
+    def post_page(self, summary_input):
+        # remember summary_input for the buffer later in case the save fails
         summary = '{}{}{}'.format(
             utils.props.get_setting('summary_prefix'),
-            summary,
+            summary_input,
             utils.props.get_setting('summary_postfix')
         )
         mark_as_minor = utils.props.get_setting('mark_as_minor')
@@ -324,7 +325,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
                 err_msg += ', {} exception: {}'.format(type(exc).__name__, exc)
 
             utils.error_message(err_msg, replace_patterns=['[', ']'])
-            self.set_summary_buffer(summary)
+            self.set_summary_buffer(summary_input)
             return
 
         # update revision for page in view
@@ -366,7 +367,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             utils.error_message(utils.api.PAGE_CANNOT_EDIT_MESSAGE)
             return
 
-        self.post_page(summary=summary)
+        self.post_page(summary)
 
 
 class MediawikerMovePageCommand(sublime_plugin.TextCommand):
