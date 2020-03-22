@@ -4,7 +4,7 @@
 # import sys
 import os
 import sublime
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Template
 # suppress deprecation warnings (turned on in mwclient lib: mwclient/__init__.py)
 import warnings
 warnings.simplefilter("ignore", DeprecationWarning)
@@ -236,12 +236,19 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
         if not tpl_path:
             return kwargs.get('page_text', '')
 
-        if not os.path.isabs(tpl_path):
-            tpl_path = utils.p.from_package(tpl_path, name='User', is_abs=True)
+        if tpl_path.startswith('wiki:'):
+            page_tpl = utils.api.call('get_page', title=tpl_path.split(':', 1)[-1])
+            if not page_tpl:
+                utils.error_message('Incorrect value for option "new_page_template_path", wiki page name is empty!'.format(self.title))
+            text_tpl = utils.api.page_get_text(page_tpl)
+            template = Template(text_tpl)
+        else:
+            if not os.path.isabs(tpl_path):
+                tpl_path = utils.p.from_package(tpl_path, name='User', is_abs=True)
+            # keep_trailing_newline=True
+            env = Environment(loader=FileSystemLoader(searchpath=os.path.dirname(tpl_path)))
+            template = env.get_template(os.path.basename(tpl_path))
 
-        # keep_trailing_newline=True
-        env = Environment(loader=FileSystemLoader(searchpath=os.path.dirname(tpl_path)))
-        template = env.get_template(os.path.basename(tpl_path))
         text = template.render(**kwargs)
         return text
 
@@ -438,12 +445,49 @@ class MediawikerOpenTalkPageCommand(sublime_plugin.WindowCommand):
             sublime.message_dialog('There is a talk page already.')
 
         sublime.set_timeout(
-            lambda: sublime.active_window().run_command(
+            lambda: self.window.run_command(
                 utils.cmd('page'), {
                     'action': utils.cmd('show_page'),
                     'action_params': {'title': utils.api.page_attr(page_talk, 'name'), 'new_tab': True}
                 }
             ), 2)
+
+
+class MediawikerOpenNewPageTemplateCommand(sublime_plugin.TextCommand):
+    ''' Open template for new pages '''
+    OPTION_NAME = 'new_page_template_path'
+
+    def run(self, edit):
+        tpl_path = utils.props.get_setting(self.OPTION_NAME)
+        if not tpl_path:
+            utils.error_message('Path to template does not defined, please set this via "{}" option'.format(self.OPTION_NAME))
+            return
+
+        if tpl_path.startswith('wiki:'):
+
+            if utils.props.get_setting('offline_mode'):
+                utils.error_message('Wiki based new page template does not available in offline mode')
+                return
+
+            page_name = tpl_path.split(':', 1)[-1]
+            if not page_name:
+                utils.error_message('Empty value for option "{}", wiki page name is empty!'.format(self.OPTION_NAME))
+
+            sublime.set_timeout(
+                lambda: self.view.window().run_command(
+                    utils.cmd('page'),
+                    {
+                        'action': utils.cmd('show_page'),
+                        'action_params': {'title': page_name, 'new_tab': True}
+                    }
+                ),
+                2
+            )
+
+        else:
+            if not os.path.isabs(tpl_path):
+                tpl_path = utils.p.from_package(tpl_path, name='User', is_abs=True)
+            self.view.window().open_file(tpl_path)
 
 
 class MediawikerPopupCommand(sublime_plugin.WindowCommand):

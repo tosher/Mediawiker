@@ -50,5 +50,6 @@
     { "caption": "Mediawiker: Show unsaved changes", "command": "mediawiker_show_diff" },
     { "caption": "Mediawiker: Fire popup", "command": "mediawiker_popup" },
     { "caption": "Mediawiker: Copy remote page", "command": "mediawiker_page_copy" },
-    { "caption": "Mediawiker: Add single sign-on wiki", "command": "mediawiker_add_child_site" }
+    { "caption": "Mediawiker: Add single sign-on wiki", "command": "mediawiker_add_child_site" },
+    { "caption": "Mediawiker: Open template for new pages", "command": "mediawiker_open_new_page_template" }
 ]

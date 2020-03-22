@@ -104,7 +104,7 @@ class MediawikerChangelogCommand(sublime_plugin.TextCommand):
             with open(preview_file, 'w', encoding='utf-8') as tf:
                 tf.write(html)
 
-            webbrowser.open(tf.name)
+            webbrowser.open('file://{}'.format(tf.name))
 
     def on_navigate(self, url):
         webbrowser.open(url)
