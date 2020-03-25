@@ -646,3 +646,7 @@ Template example (<code>wiki_new_page.j2</code>):
 * Template for new pages can be opened via:
 ** Edit panel
 ** Menu Tools/Mediawiker/Open template for new pages
+
+== Mediawikier 3.6.2 ==
+* Fix broken flag (<code>!</code>) for inverting option {{Property|mark_as_minor}} value on page post.
+* Fix saved summary message, without prefix and postfix
