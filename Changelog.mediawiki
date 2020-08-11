@@ -617,7 +617,7 @@ Support folding/unfolding for:
 * Changelog generator fix: source code parsing
 * {{Command|Post page}} - possibility to set prefix for summary messages (defined by {{Property|summary_prefix}}) (#153, pull-request by [https://github.com/RheingoldRiver @RheingoldRiver])
 * Show name of current wiki in input panel on opening page (#154, pull-request by [https://github.com/RheingoldRiver @RheingoldRiver])
-* (#151) Possibility to disable search/autocomletions on site level by set {{Property|search_namespaces}} to <code>disabled</code> value.
+* (#151) Possibility to disable search/autocompletions on site level by set {{Property|search_namespaces}} to <code>disabled</code> value.
 * (#152) Remember summary text on failed posts
 * (#143) Possibility to use [http://jinja.pocoo.org/docs/dev/ Jinja2] template for new pages predefined text. Option {{Property|new_page_template_path}} defines template file name in <code>Packages/User</code> folder or absolute path to template file. Available variables for template rendering:
 ** <code>site_name</code>: wiki site name from settings
@@ -650,3 +650,8 @@ Template example (<code>wiki_new_page.j2</code>):
 == Mediawikier 3.6.2 ==
 * Fix broken flag (<code>!</code>) for inverting option {{Property|mark_as_minor}} value on page post.
 * Fix saved summary message, without prefix and postfix
+
+== Mediawikier 3.6.3 ==
+* Cookie reader engine update with latest [https://github.com/borisbabic/browser_cookie3 browser_cookie3] and [https://github.com/Legrandin/pycryptodome pycryptodome].
+* Experimental support for API <code>clientlogin</code> for authorization with Mediawiki >= 1.27.
+* {{Command|Page open}} <code>inherit_suffix</code> available in new page template. Just open new page in format <code>PageName<-InheritSuffix</code>.

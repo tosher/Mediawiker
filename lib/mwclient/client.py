@@ -472,6 +472,7 @@ class Site(object):
             }
             if self.credentials[2]:
                 kwargs['lgdomain'] = self.credentials[2]
+
             while True:
                 login = self.api('login', **kwargs)
                 if login['login']['result'] == 'Success':
@@ -485,12 +486,47 @@ class Site(object):
 
         self.site_init()
 
+    def clientlogin(self, username=None, password=None, cookies=None, domain=None, **kwargs):
+        self.require(1, 27, raise_error=(None if self.version is None else True))
+
+        if cookies:
+            self.connection.cookies.update(cookies)
+
+        if username and password:
+            kwargs['username'] = username
+            kwargs['password'] = password
+            # kwargs['domain'] = domain
+
+        if kwargs:
+            if 'logintoken' not in kwargs:
+                try:
+                    kwargs['logintoken'] = self.get_token('login')
+                except (errors.APIError, KeyError):
+                    log.debug('Failed to get login token, MediaWiki is older than 1.27.')
+
+            if 'logincontinue' not in kwargs and 'loginreturnurl' not in kwargs:
+                kwargs['loginreturnurl'] = '{}://{}'.format(self.host[0], self.host[1])
+
+            while True:
+                login = self.api('clientlogin', **kwargs)
+                login_status = login['clientlogin'].get('status')
+                if login_status == 'PASS':
+                    break
+                elif login_status == 'FAIL':
+                    raise errors.LoginError(self, login['clientlogin'])
+                elif login_status in ('UI', 'REDIRECT', 'RESTART'):
+                    raise errors.LoginError(self, login['clientlogin'])
+                else:
+                    raise errors.LoginError(self, login['clientlogin'])
+
+        self.site_init()
+
     def get_token(self, type, force=False, title=None):
 
         if self.version[:2] >= (1, 24):
             # The 'csrf' (cross-site request forgery) token introduced in 1.24 replaces
             # the majority of older tokens, like edittoken and movetoken.
-            if type not in set(['watch', 'patrol', 'rollback', 'userrights']):
+            if type not in set(['watch', 'patrol', 'rollback', 'userrights', 'login']):
                 type = 'csrf'
 
         if type not in self.tokens:
@@ -506,8 +542,7 @@ class Site(object):
                 if title is None:
                     # Some dummy title was needed to get a token prior to 1.24
                     title = 'Test'
-                info = self.api('query', titles=title,
-                                prop='info', intoken=type)
+                info = self.api('query', titles=title, prop='info', intoken=type)
                 for i in six.itervalues(info['query']['pages']):
                     if i['title'] == title:
                         self.tokens[type] = i['%stoken' % type]

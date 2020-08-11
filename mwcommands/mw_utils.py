@@ -81,14 +81,16 @@ def set_syntax(page_name=None, page_namespace=None):
 
 
 def comment(text, page_name=None, page_namespace=None):
+    syntax_formats = {
+        'syntax_lua': '-- {}',
+        'syntax_css': '/* {} */',
+        'syntax_js': '// {}',
+        'syntax': '<!-- {} -->'
+    }
     syntax_prop = get_syntax_property(page_name, page_namespace)
-    if syntax_prop == 'syntax_lua':
-        return '-- {}'.format(text)
-    elif syntax_prop == 'syntax_css':
-        return '/* {} */'.format(text)
-    elif syntax_prop == 'syntax_js':
-        return '// {}'.format(text)
-    return '<!-- {} -->'.format(text)
+    if syntax_formats.get(syntax_prop):
+        return syntax_formats[syntax_prop].format(text)
+    return syntax_formats['syntax'].format(text)
 
 
 def cmd(cmd):
@@ -828,7 +830,13 @@ class MediawikerConnectionManager(object):
             if props.get_setting('debug'):
                 self.debug_msgs.append('Connection: {}'.format(connection.connection))
 
-            status_message('Login in with authorization type {}.. '.format(site['authorization_type']), new_line=False)
+            status_message(
+                'Login in with authorization type {}{}.. '.format(
+                    site['authorization_type'],
+                    ' ({})'.format(site['cookies_browser']) if site['authorization_type'] == 'cookies' else ''
+                ),
+                new_line=False
+            )
             success_message = ' done'
             # Cookie auth
             if site['authorization_type'] == self.AUTH_TYPE_COOKIES and site['cookies']:
@@ -836,6 +844,10 @@ class MediawikerConnectionManager(object):
                     connection.login(cookies=site['cookies'])
 
                     if props.get_setting('debug'):
+                        self.debug_msgs.append('OS: {}, arch: {}'.format(
+                            sublime.platform(),
+                            sublime.arch()
+                        ))
                         self.debug_msgs.append('Username: {}'.format(connection.username.strip()))
                         # not connection.logged_in and self.debug_msgs.append('* Anonymous connection: True')
                         self.debug_msgs.append('Anonymous connection: True') if not connection.logged_in else None
@@ -852,12 +864,25 @@ class MediawikerConnectionManager(object):
             # Login/Password auth
             elif site['authorization_type'] == self.AUTH_TYPE_LOGIN and site['username'] and site['password']:
                 try:
+                    # TODO: replace with `clientlogin` or leave for just "bot" connects
                     connection.login(username=site['username'], password=site['password'], domain=site['domain'])
                 except mwclient.LoginError as exc:
                     e = exc.args
-                    error_message(' failed: {}'.format(e[1]['result']))
-                    return
-            # elif self.auth_type == self.AUTH_TYPE_OAUTH:
+                    error_message(' failed: {}, exception: {}'.format(
+                        e[1].get('result'),
+                        e
+                    ))
+
+                    status_message('Old type auth (`login`) failed, trying `clientlogin`..', new_line=False)
+                    try:
+                        connection.clientlogin(username=site['username'], password=site['password'])
+                    except mwclient.LoginError as exc:
+                        e = exc.args
+                        error_message(' failed: {}, exception: {}'.format(
+                            e[1].get('message'),
+                            e
+                        ))
+                        return
             else:
                 success_message = ' done, without authorization.'  # TODO: recheck AUTH messages
 
@@ -868,7 +893,7 @@ class MediawikerConnectionManager(object):
         else:
             error_message(' failed.')
 
-        return None
+        return
 
     def require_password(self, name=None):
 
@@ -892,9 +917,16 @@ class MediawikerConnectionManager(object):
             cookie_files = None
 
         if site['cookies_browser'] == "firefox":
-            return browser_cookie3.firefox(cookie_files=cookie_files, domain_name=site['host'], copy_path=p.from_package(name='User', posix=True, is_abs=True))
+            return browser_cookie3.firefox(
+                cookie_file=cookie_files[0] if cookie_files else None,
+                domain_name=site['host'],
+                copy_path=p.from_package(name='User', posix=True, is_abs=True)
+            )
         elif site['cookies_browser'] == 'chrome':
-            return browser_cookie3.chrome(cookie_files=cookie_files, domain_name=site['host'])
+            return browser_cookie3.chrome(
+                cookie_file=cookie_files[0] if cookie_files else None,
+                domain_name=site['host']
+            )
         else:
             sublime.message_dialog("Incompatible browser for cookie: {}".format(site['cookies_browser'] or "Not defined"))
 

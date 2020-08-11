@@ -163,7 +163,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
             self.page_open(self.title)
 
     def page_open(self, title):
-        self.title = title
+        self.title, _, inherit_suffix = title.partition('<-')
 
         if self.new_tab:
             view = sublime.active_window().new_file()
@@ -201,7 +201,8 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
                 site_name=utils.get_view_site(),
                 page_name=self.title,
                 page_namespace=page_namespace,
-                page_text=text
+                page_text=text,
+                inherit_suffix=inherit_suffix
             )
 
         view.run_command(utils.cmd('insert_text'), {'position': 0, 'text': text, 'with_erase': True})
