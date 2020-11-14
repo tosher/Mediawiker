@@ -46,20 +46,6 @@ from Crypto.Protocol.KDF import PBKDF2
 # import lz4.block
 
 
-
-
-
-
-# TODO:
-# * Проверить yield cookie_tmp вместо удаления в классе (create_local_copy)
-# * Проверить путь до куки файла из issue, почему он не был найден
-# * Проверить, что ручная подстановка пути по-прежнему работает
-
-
-
-
-
-
 class TLDLazy(object):
 
     # https://en.wikipedia.org/wiki/Second-level_domain
