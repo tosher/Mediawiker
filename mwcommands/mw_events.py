@@ -111,65 +111,86 @@ class MediawikerEvents(sublime_plugin.EventListener):
             # TODO: external links..?
 
     def on_query_completions(self, view, prefix, locations):
-        if utils.props.get_view_setting(view, 'is_here') and not utils.props.get_setting('offline_mode'):
-            view = sublime.active_window().active_view()
+        if not utils.props.get_view_setting(view, 'is_here'):
+            return []
 
-            # internal links completions
-            cursor_position = locations[0]  # view.sel()[0].begin()
-            line_region = view.line(view.sel()[0])
-            line_before_position = view.substr(sublime.Region(line_region.a, cursor_position))
-            internal_link = ''
-            if line_before_position.rfind('[[') > line_before_position.rfind(']]'):
-                internal_link = line_before_position[line_before_position.rfind('[[') + 2:]
+        if utils.props.get_setting('offline_mode'):
+            return []
 
-            if utils.api.INTERNAL_LINK_SPLITTER in internal_link:
-                # cursor at custom url text zone..
+        view = sublime.active_window().active_view()
+
+        # internal links completions
+        cursor_position = locations[0]  # view.sel()[0].begin()
+        line_region = view.line(view.sel()[0])
+        line_before_position = view.substr(sublime.Region(line_region.a, cursor_position))
+        internal_link = ''
+        if line_before_position.rfind('[[') > line_before_position.rfind(']]'):
+            internal_link = line_before_position[line_before_position.rfind('[[') + 2:]
+
+        if utils.api.INTERNAL_LINK_SPLITTER in internal_link:
+            # cursor at custom url text zone..
+            return []
+
+        completions = []
+        if internal_link:
+            word_cursor_min_len = utils.props.get_setting('page_prefix_min_length', 3)
+            ns_text = None
+            ns_text_number = None
+
+            if utils.api.NAMESPACE_SPLITTER in internal_link:
+                ns_text, internal_link = internal_link.split(utils.api.NAMESPACE_SPLITTER)
+
+            if len(internal_link) < word_cursor_min_len:
                 return []
 
-            completions = []
-            if internal_link:
-                word_cursor_min_len = utils.props.get_setting('page_prefix_min_length', 3)
-                ns_text = None
-                ns_text_number = None
+            namespaces_search = utils.get_search_ns()
+            if not namespaces_search:
+                return completions
 
-                if utils.api.NAMESPACE_SPLITTER in internal_link:
-                    ns_text, internal_link = internal_link.split(utils.api.NAMESPACE_SPLITTER)
+            if ns_text:
+                ns_text_number = utils.api.call('get_namespace_number', name=ns_text)
 
-                if len(internal_link) >= word_cursor_min_len:
-                    namespaces_search = utils.get_search_ns()
-                    if not namespaces_search:
-                        return completions
+            if internal_link.startswith('/'):
+                internal_link = '{}{}'.format(utils.get_title(), internal_link)
 
-                    if ns_text:
-                        ns_text_number = utils.api.call('get_namespace_number', name=ns_text)
+            pages = []
+            for ns in namespaces_search:
+                # if not ns_text or ns_text_number and int(ns_text_number) == int(ns):
 
-                    if internal_link.startswith('/'):
-                        internal_link = '{}{}'.format(utils.get_title(), internal_link)
+                if ns_text and int(ns_text_number) != int(ns):
+                    continue
 
-                    # TODO: recheck completions
+                pages = utils.api.call('get_pages', prefix=internal_link.replace('_', ' '), namespace=ns)
+                for p in pages:
+                    # name - full page name with namespace
+                    # page_title - title of the page wo namespace
+                    # For (Main) namespace, shows [page_title (Main)], makes [[page_title]]
+                    # For Image, Category namespaces, shows [page_title namespace], makes [[name]]
+                    # For other namespace, shows [page_title namespace], makes [[name|page_title]]
+                    if int(ns):
+                        ns_name = utils.api.page_attr(p, 'namespace_name')
+                        page_name = utils.api.page_attr(p, 'name') if not utils.api.is_equal_ns(ns_text, ns_name) else utils.api.page_attr(p, 'page_title')
+                        if int(ns) in (utils.api.CATEGORY_NAMESPACE, utils.api.IMAGE_NAMESPACE):
+                            page_insert = page_name
+                        else:
+                            page_insert = '{}|{}'.format(page_name, utils.api.page_attr(p, 'page_title'))
+                    else:
+                        ns_name = '(Main)'
+                        page_insert = utils.api.page_attr(p, 'page_title')
 
-                    pages = []
-                    for ns in namespaces_search:
-                        if not ns_text or ns_text_number and int(ns_text_number) == int(ns):
-                            pages = utils.api.call('get_pages', prefix=internal_link, namespace=ns)
-                            for p in pages:
-                                # name - full page name with namespace
-                                # page_title - title of the page wo namespace
-                                # For (Main) namespace, shows [page_title (Main)], makes [[page_title]]
-                                # For Image, Category namespaces, shows [page_title namespace], makes [[name]]
-                                # For other namespace, shows [page_title namespace], makes [[name|page_title]]
-                                if int(ns):
-                                    ns_name = utils.api.page_attr(p, 'namespace_name')
-                                    page_name = utils.api.page_attr(p, 'name') if not utils.api.is_equal_ns(ns_text, ns_name) else utils.api.page_attr(p, 'page_title')
-                                    if int(ns) in (utils.api.CATEGORY_NAMESPACE, utils.api.IMAGE_NAMESPACE):
-                                        page_insert = page_name
-                                    else:
-                                        page_insert = '{}|{}'.format(page_name, utils.api.page_attr(p, 'page_title'))
-                                else:
-                                    ns_name = '(Main)'
-                                    page_insert = utils.api.page_attr(p, 'page_title')
-                                page_show = '{}\t{}'.format(utils.api.page_attr(p, 'page_title'), ns_name)
-                                completions.append((page_show, page_insert))
+                    page_show = '{}\t{}'.format(utils.api.page_attr(p, 'page_title'), ns_name)
 
-            return completions
-        return []
+                    # if name starts with string with `_`, trying to make completions `_`-based
+                    # Big_B -> Big_Buck_Bunny
+                    if '_' in internal_link and ' ' not in internal_link:
+                        page_insert = page_insert.replace(' ', '_')
+                        page_show = page_show.replace(' ', '_')
+
+                    # #167
+                    # if space exists in completion part, adds it only, otherwise full page name (ST completion specials)
+                    _last_part = page_insert[len(internal_link) - 1:]
+                    page_insert = _last_part if ' ' in _last_part else page_insert
+
+                    completions.append((page_show, page_insert))
+
+        return completions
