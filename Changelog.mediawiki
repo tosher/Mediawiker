@@ -658,3 +658,6 @@ Template example (<code>wiki_new_page.j2</code>):
 
 == Mediawikier 3.6.4 ==
 * Completions fix for multispace-titles
+
+== Mediawikier 3.6.5 ==
+* Completions fix for multispace-titles (try 2)

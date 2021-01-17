@@ -187,9 +187,10 @@ class MediawikerEvents(sublime_plugin.EventListener):
                         page_show = page_show.replace(' ', '_')
 
                     # #167
-                    # if space exists in completion part, adds it only, otherwise full page name (ST completion specials)
-                    _last_part = page_insert[len(internal_link) - 1:]
-                    page_insert = _last_part if ' ' in _last_part else page_insert
+                    # if space exists in completion part
+                    _space_cnt = internal_link.count(' ')
+                    if _space_cnt and _space_cnt <= 2:
+                        page_insert = page_insert[len(internal_link.rsplit(' ', 1)[0]) + 1:]
 
                     completions.append((page_show, page_insert))
 
