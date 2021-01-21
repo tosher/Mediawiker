@@ -654,7 +654,7 @@ Template example (<code>wiki_new_page.j2</code>):
 == Mediawikier 3.6.3 ==
 * Cookie reader engine update with latest [https://github.com/borisbabic/browser_cookie3 browser_cookie3] and [https://github.com/Legrandin/pycryptodome pycryptodome].
 * Experimental support for API <code>clientlogin</code> for authorization with Mediawiki >= 1.27.
-* {{Command|Page open}} <code>inherit_suffix</code> available in new page template. Just open new page in format <code>PageName<-InheritSuffix</code>.
+* {{Command|Page open}} <code>inherit_suffix</code> available in new page template. Just open new page in format <code>PageName&lt;-InheritSuffix</code>.
 
 == Mediawikier 3.6.4 ==
 * Completions fix for multispace-titles
