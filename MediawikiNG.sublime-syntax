@@ -665,6 +665,8 @@ contexts:
             - match: (?=\n)  # item definition stops at the end of line
               pop: true
             - include: comments
+        - match: ^\s*[^:]  # item definition stops at the end of line
+          pop: true
 
   block_html:
     # comment: "The available block HTML tags supported are:
