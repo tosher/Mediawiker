@@ -1,80 +1,84 @@
-// SYNTAX TEST "Packages/Mediawiker/MediawikiNG.sublime-syntax"
+<!-- SYNTAX TEST "Packages/Mediawiker/MediawikiNG.sublime-syntax" -->
 
 <nowiki>
-// <- meta.tag.validhtml.mediawiki
- // <- entity.name.tag.nowiki.validhtml.mediawiki
+^^^^^^^^ meta.tag.validhtml
+ ^^^^^^ entity.name.tag.nowiki.validhtml
 ''' bold no wiki '''
-// <- meta.tag.source.validhtml.mediawiki
-</nowiki>
-// <- meta.tag.validhtml.mediawiki
-  // <- entity.name.tag.nowiki.validhtml.mediawiki
+^^^^^^^^^^^^^^^^^^^^ meta.tag.source.validhtml
+</nowiki><!--
+^^^^^^^^^ meta.tag.validhtml
+  ^^^^^^ entity.name.tag.nowiki.validhtml -->
 
-= Header1 Test =
-// <- markup.heading.tag.mediawiki
-  // <- markup.heading.1.mediawiki
-//             ^ markup.heading.tag.mediawiki
+= Header1 Test =<!--
+^ markup.heading.tag
+ ^^^^^^^^^^^^^^ markup.heading.1
+               ^ markup.heading.tag -->
 
-== Header2 Test ==
-// <- markup.heading.tag.mediawiki
-   // <- markup.heading.2.mediawiki
-//              ^ markup.heading.tag.mediawiki
+== Header2 Test ==<!--
+^^ markup.heading.tag
+  ^^^^^^^^^^^^^^ markup.heading.2
+                ^^ markup.heading.tag -->
 
-=== Header3 Test ===
-// <- markup.heading.tag.mediawiki
-    // <- markup.heading.3.mediawiki
-//               ^ markup.heading.tag.mediawiki
+=== Header3 Test ===<!--
+^^^ markup.heading.tag
+   ^^^^^^^^^^^^^^ markup.heading.3
+                 ^^^ markup.heading.tag -->
 
-=== Heading 3<ref name="imdb">[http://domain.com/path/ Url name]</ref> ===
-// <- markup.heading.tag.mediawiki
-//  ^ markup.heading.3.mediawiki
-//            ^ markup.heading.3.mediawiki entity.name.tag.ref.mediawiki
-//                             ^^^^^^^^^^^^^^^^^^^^^^^ markup.heading.3.mediawiki
-//                             ^^^^^^^^^^^^^^^^^^^^^^^ markup.underline.link.external.mediawiki
-//                                                                     ^ markup.heading.tag.mediawiki
+=== Heading 3<ref name="imdb">[http://domain.com/path/ Url name]</ref> ===<!--
+^^^ markup.heading.tag
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ markup.heading.3
+              ^^^ entity.name.tag.ref
+                       ^^^^^^ string.quoted.ref.name
+                               ^^^^^^^^^^^^^^^^^^^^^^^ markup.underline.link.external
+                                                                       ^^^ markup.heading.tag -->
 
-==== Header4 Test ====
-// <- markup.heading.tag.mediawiki
-//   ^ markup.heading.4.mediawiki
-//                ^ markup.heading.tag.mediawiki
+==== Header4 Test ====<!--
+^^^^ markup.heading.tag
+    ^^^^^^^^^^^^^^ markup.heading.4
+                  ^^^^ markup.heading.tag -->
 
-===== Header5 Test =====
-// <- markup.heading.tag.mediawiki
-//    ^ markup.heading.5.mediawiki
-//                 ^ markup.heading.tag.mediawiki
+===== Header5 Test =====<!--
+^^^^^ markup.heading.tag
+     ^^^^^^^^^^^^^^ markup.heading.5
+                   ^^^^^ markup.heading.tag -->
 
 == Lists ==
 # Numberred list item 1<!--
-// <- markup.other.special.mediawiki
-  // <- markup.list.mediawiki
+^ markup.other.special
+ ^^^^^^^^^^^^^^^^^^^^^^ markup.list
 -->
 ## Numberred list item 2.1<!--
- // <- markup.other.special.mediawiki
-// ^ markup.list.mediawiki
+^^ markup.other.special
+  ^^^^^^^^^^^^^^^^^^^^^^^^ markup.list
 -->
 * A newline<!--
-// <- markup.other.special.mediawiki
+^ markup.other.special
+ ^^^^^^^^^^ markup.list
 -->
 * in a list<!--
- // <- markup.list.mediawiki
+^ markup.other.special
+ ^^^^^^^^^^ markup.list
 -->
 marks the end of the list.<!--
-// <- text.html.mediawiki
+^^^^^^^^^^^^^^^^^^^^^^^^^^ text.html
 -->
 Of course
 * you can start again.
 *: you can start again.
 ** and continue..<!--
-// ^ markup.list.mediawiki
+ ^^^^^^^^^^^^^^^^^^^^^
+  ^^^^^^^^^^^^^^^^^^^^^
+  ^^^^^^^^^^^^^^^ markup.list
 -->
 
 ; Definition lists<!--
-// <- markup.other.special.definition-start.mediawiki
-  // <- markup.list.definition.item.mediawiki
+^ markup.other.special.definition-start
+  ^^^^^^^^^^^^^^^^^^^^ markup.list.definition.item
 -->
 ; item : definition<!--
-  // <- markup.list.definition.item.mediawiki
-//     ^ markup.other.special.equal-sign.mediawiki
-//       ^ markup.list.definition.value.mediawiki
+ ^^^^^^^^^^^^^^^^^^^^^^ markup.list.definition.item
+       ^ markup.other.special.equal-sign
+        ^^^^^^^^^^^^^^^ markup.list.definition.value
 -->
 ; semicolon plus term
 : colon plus definition
@@ -83,12 +87,12 @@ Of course
 ; item 1 : definition
 
 :; sub-item 1 plus term<!--
- // <- markup.other.special.definition-start.mediawiki
-// ^ markup.list.definition.item.mediawiki
+    <- markup.other.special.definition-start
+   ^ markup.list.definition.item
 -->
 :: two colons plus definition <!--
- // <- markup.other.special.equal-sign.mediawiki
-// ^ markup.list.definition.value.mediawiki
+    <- markup.other.special.equal-sign
+   ^ markup.list.definition.value
 -->
 
 :; sub-item 2 : colon plus definition
@@ -98,163 +102,170 @@ Of course
 * Or create mixed lists
 *# and nest them
 *#* like this
-*#*; definitions
+*#*; definitions<!-- 
+^^^ markup.other.special
+   ^ markup.other.special.definition-start.mediawiki -->
 *#*: work:<!--
-// <- markup.other.special.mediawiki
- // <- markup.other.special.mediawiki
-  // <- markup.other.special.mediawiki
-// ^ markup.other.special.equal-sign.mediawiki
+^^^ markup.other.special
+   ^ markup.other.special.equal-sign
 -->
 
 *#*; apple<!--
-// ^ markup.other.special.definition-start.mediawiki
+   ^ markup.other.special.definition-start
 -->
 
 *#*; banana <!--
-// ^ markup.other.special.definition-start.mediawiki
-//   ^ markup.list.definition.item.mediawiki
+   ^ markup.other.special.definition-start
+     ^ markup.list.definition.item
 -->
 *#*: fruits <!--
-// ^ markup.other.special.equal-sign.mediawiki
-//  ^ markup.list.definition.value.mediawiki
+   ^ markup.other.special.equal-sign
+    ^ markup.list.definition.value
 -->
 
-## semicolon in text; hmm.. <!--
-//                  ^ markup.list.mediawiki - markup.other.special.definition-start.mediawiki
+*# semicolon in text; hmm.. <!--
+                    ^ markup.list -markup.other.special.definition-start
 -->
 
-## and then: <!--
-//         ^ markup.list.mediawiki - markup.list.definition.item.mediawiki - markup.list.definition.value.mediawiki - markup.other.special.equal-sign.mediawiki
+*# and then: <!--
+           ^ markup.list -markup.list.definition.item -markup.list.definition.value -markup.other.special.equal-sign
 -->
-## is not definition list <!--
-// ^ markup.list.mediawiki - markup.list.definition.item.mediawiki - markup.list.definition.value.mediawiki
+*# is not definition list <!--
+   ^ markup.list -markup.list.definition.item -markup.list.definition.value
 -->
+
+;potential header<!--
+^markup.other.special.definition-start
+ ^^^^^^^^^^^^^^^^ markup.list.definition.item -->
+text ''italics'' '''bold'''<!--
+^^^^ text.html
+       ^^^^^^^ markup.italic.html
+                    ^^^^ markup.bold.html 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^ -markup.list.definition.item -->
+
 
 <gallery mode="packed-hover"><!--
-//                           ^ meta.gallery.mediawiki
+                             ^ meta.gallery
 -->
-Linne num 2.jpg
-// <- meta.item.gallery.mediawiki
-// <- markup.underline.link.internal.mediawiki
+Linne num 2.jpg <!--
+^^^^^^^^^^^^^^^ meta.item.gallery markup.underline.link.internal --><!--
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.block.html.mediawiki -->
+
 Image:Astronotus_ocellatus.jpg | ''[[commons:Astronotus ocellatus|Astronotus ocellatus]]'' (Oscar)<!--
-// <- markup.underline.link.internal.namespace.mediawiki
-//   ^ punctuation.definition.tag.colon.mediawiki
-//    ^ markup.underline.link.internal.mediawiki
--->
+^^^^^ markup.underline.link.internal.namespace
+     ^ punctuation.definition.tag.colon
+      ^^^^^^^^^^^^^^^^^^^^^^^^^ markup.underline.link.internal -->
 Salmonlarvakils.jpg | ''[[commons:Salmo salar|Salmo salar]]''|250px<!--
-//                  ^ meta.tag.gallery.pipe.mediawiki
-//                                                           ^ meta.tag.gallery.pipe.mediawiki
-//                        ^ markup.underline.link.internal.namespace.mediawiki
+                    ^                                        ^ meta.tag.gallery.pipe
+                          ^^^^^^^ markup.underline.link.internal.namespace
 -->
 File:Australian blenny.jpg|''[[commons:Category:Ecsenius|Ecsenius axelrodi]]''<!--
-//                                                      ^ meta.tag.link.wiki.mediawiki
-//                                                       ^ string.other.title.link.internal.mediawiki
+                                                        ^ meta.tag.link.wiki
+                                                         ^ string.other.title.link.internal
 -->
 </gallery>
-  // <- entity.name.tag.ref.mediawiki
+     <- entity.name.tag.ref
 
-[[Image:Test image 1355.jpg|left|thumb|250px | Simple text ''[[Internal link italic|Link title italic]]'' simple text]]
-//                                                             ^ string.other.image.caption.mediawiki markup.italic.mediawiki
-[[Image:Test image 1355.jpg|left|thumb|250px | Simple text [[Internal link italic|Link title ''italic'']] simple text]]
-  // <- constant.other.namespace.image.mediawiki
-//                              ^ punctuation.definition.tag.pipe.mediawiki
-//                                           ^ punctuation.definition.tag.caption-pipe.mediawiki
-//                                             ^ string.other.image.caption.mediawiki
-//                                                           ^ markup.underline.link.internal.mediawiki
-//                                                                                             ^ markup.italic.mediawiki
-//                                                                                ^ string.other.title.link.internal.mediawiki
-//                                                                                                                   ^ meta.tag.inline.any.mediawiki
+[[Image:Test image 1355.jpg|left|thumb|250px | Simple text ''[[Internal link italic|Link title italic]]'' simple text]]<!--
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.other.image.caption markup.italic 
+                                                               ^^^^^^^^^^^^^^^^^^^^ -markup.underline.link.internal.mediawiki(?) -->
+[[Image:Test image 1355.jpg|left|thumb|250px | Simple text [[Internal link italic|Link title ''italic'']] simple text]]<!--
+  ^^^^^ constant.other.namespace.image
+                                ^ punctuation.definition.tag.pipe
+                                             ^ punctuation.definition.tag.caption-pipe
+                                               ^ string.other.image.caption
+                                                             ^ markup.underline.link.internal
+                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.other.title.link.internal
+                                                                                               ^^^^^^ markup.italic
+                                                                                                                     ^^ meta.tag.inline.any -->
 
 
-[[Image:test_image.png]] / [[File:test_file.pdf]]
-  // <- meta.image.wiki.mediawiki
-  // <- constant.other.namespace.image.mediawiki
-//     ^ punctuation.definition.tag.colon.mediawiki
-//      ^ constant.other.wiki-link.image.mediawiki
-//                    ^ meta.image.wiki.mediawiki meta.tag.inline.any.mediawiki
-Inline [[namespace:Internal link/Subpage#anchor|Link '''bold''' te|xt]] in string.
-//       ^ markup.underline.link.internal.namespace.mediawiki
-//                ^ punctuation.definition.tag.colon.mediawiki
-//                 ^ markup.underline.link.internal.mediawiki
-//                                             ^ punctuation.definition.tag.pipe.mediawiki
-//                                              ^ string.other.title.link.internal.mediawiki
-//                                                      ^ markup.bold.mediawiki
-//                                                                ^ string.other.title.link.internal.mediawiki
-//                                                                   ^ meta.tag.inline.link.mediawiki
+[[Image:test_image.png]] / [[File:test_file.pdf]]<!-- 
+^^^^^^^^^^^^^^^^^^^^^^^^   ^^^^^^^^^^^^^^^^^^^^^^ meta.image.wiki
+  ^^^^^ constant.other.namespace.image
+       ^ punctuation.definition.tag.colon
+        ^^^^^^^^^^^^^^ constant.other.wiki-link.image
+^^                    ^^   ^^                  ^^ meta.tag.inline.any -->
+Inline [[namespace:Internal link/Subpage#anchor|Link '''bold''' te|xt]] in string.<!--
+         ^^^^^^^^^ markup.underline.link.internal.namespace
+                  ^ punctuation.definition.tag.colon
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ markup.underline.link.internal
+                                               ^ punctuation.definition.tag.pipe
+                                                ^^^^^^^^^^^^^^^^^^^^^ string.other.title.link.internal
+                                                        ^^^^ markup.bold
+                                                                     ^^ meta.tag.inline.link -->
 
-* [https://meta.wikimedia.org:9723/wiki/Help:Link/ru?a=9&test=abs#anchor Example with inline '''style''']
-// ^ markup.underline.link.external.mediawiki
-//                                                                       ^ string.other.title.link.external.mediawiki
-//                                                                                              ^ markup.bold.mediawiki
-//                                                                                                      ^ meta.tag.inline.link.mediawiki
+* [https://meta.wikimedia.org:9723/wiki/Help:Link/ru?a=9&test=abs#anchor Example with inline '''style''']<!-- 
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ markup.underline.link.external
+                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.other.title.link.external
+                                                                                                ^^^^^ markup.bold
+                                                                                                        ^ meta.tag.inline.link -->
 
-https://meta.wikimedia.org:9723/wiki/Help:Link/ru?a=9&test=abs#anchor
-// <- markup.underline.link.external.mediawiki
+https://meta.wikimedia.org:9723/wiki/Help:Link/ru?a=9&test=abs#anchor<!-- 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ markup.underline.link.external -->
 
-Before template {{Context|add=inline value
-//              ^ meta.tag.inline.start.template.mediawiki
-//               ^ meta.tag.inline.start.template.mediawiki
-//                ^ entity.name.function.template.mediawiki
-//                       ^ meta.tag.param-delimiter.template.mediawiki
-//                        ^ variable.parameter.template.mediawiki
-//                           ^ punctuation.definition.tag.equals-sign.template.mediawiki
-//                            ^ meta.function.parameters.template.mediawiki
- |objname=next value, space in start don't breaks template
- // <- meta.tag.param-delimiter.template.mediawiki
-  // <- variable.parameter.template.mediawiki
-|change=multiline value with '''bold text''' and
-//                              ^ meta.function.parameters.template.mediawiki markup.bold.html.mediawiki
-continued
+{{Context|add=inline value<!-- 
+^^ meta.tag.inline.start.template
+  ^^^^^^^ entity.name.function.template
+         ^ meta.tag.param-delimiter.template
+          ^^^ variable.parameter.template
+             ^ punctuation.definition.tag.equals-sign.template
+              ^^^^^^^^^^^^^^^^ meta.function.parameters.template -->
+ |objname=next value, space in start doesn't break template<!-- 
+ ^ meta.tag.param-delimiter.template
+  ^^^^^^^ variable.parameter.template -->
+|change=multiline value with '''bold text''' and<!-- 
+                                ^^^^^^^^^ meta.function.parameters.template markup.bold.html -->
+continued<!-- 
  with pre text and inline now works
- // <- meta.function.parameters.template.mediawiki markup.raw.block.mediawiki
-|del=next value
-// <- meta.tag.param-delimiter.template.mediawiki
-//  ^ punctuation.definition.tag.equals-sign.template.mediawiki
- |p1=last value
- // <- meta.tag.param-delimiter.template.mediawiki
-}} after template.
-// <- meta.tag.inline.stop.template.mediawiki
- // <- meta.tag.inline.stop.template.mediawiki
-// ^ text.html.mediawiki
+^^^^^^^^^ meta.function.parameters.template markup.raw.block(?) -->
+|del=next value<!-- 
+^ meta.tag.param-delimiter.template
+    ^ punctuation.definition.tag.equals-sign.template -->
+ |p1=last value<!-- 
+ ^ meta.tag.param-delimiter.template -->
+}} after template.<!-- 
+^^ meta.tag.inline.stop.template
+  ^^^^^^^^^^^^^^^^ text.html -->
 
 <source lang="python">
-// <- meta.tag.validhtml.mediawiki
- // <- entity.name.tag.validhtml.source.mediawiki
-//      ^ entity.other.attribute-name.validhtml.mediawiki
-//            ^ string.quoted.mediawiki
-//                   ^meta.tag.validhtml.mediawiki
+# <-^^^^^^^^^^^^^^^^^^ meta.tag.validhtml
+#^^^^^^ entity.name.tag.validhtml.source
+#       ^^^^ entity.other.attribute-name.validhtml
+#           ^ entity.other.attributes.validhtml.mediawiki
+#            ^      ^ entity.other.quote.validhtml.mediawiki
+#             ^^^^^^ string.quoted
 
 # id:1, width_max: 76
-// <- comment.line.number-sign.python
+# <- comment.line.number-sign.python
 
 from __future__ import with_statement
-// <- keyword.control.flow.python
-//              ^^^^^^ keyword.control.import.python
+#  ^<- keyword.control.flow.python
+#               ^^^^^^ keyword.control.import.python
 
-</source>
-// <- meta.tag.validhtml.mediawiki
-  // <- entity.name.tag.validhtml.source.mediawiki
-//      ^ meta.tag.validhtml.mediawiki
+</source><!-- 
+^^^^^^^^^ meta.tag.validhtml
+  ^^^^^^ entity.name.tag.validhtml.source -->
 
 * list element
-:* test
-// <- markup.other.special.mediawiki
+:* test<!-- 
+^^ markup.other.special -->
 *: <source lang="python">
- // <- markup.other.special.mediawiki
-// ^ meta.tag.validhtml.mediawiki
-//  ^ entity.name.tag.validhtml.source.mediawiki
+#^<- markup.other.special
+#  ^ meta.tag.validhtml
+#   ^^^^^^ entity.name.tag.validhtml.source
 </source>
 
-{{FULLPAGENAMEE}}
-//    ^^^ keyword.control.magic.mediawiki
-//             ^^ meta.tag.inline.stop.template.mediawiki
-// <- meta.tag.inline.start.template.mediawiki
+{{FULLPAGENAMEE}}<!--
+^^ meta.tag.inline.start.template
+  ^^^^^^^^^^^^^ keyword.control.magic
+               ^^ meta.tag.inline.stop.template -->
 
-{{!}}
-//^ keyword.control.magic.mediawiki
+{{!}}<!-- 
+  ^ keyword.control.magic -->
 
-{{#special:userlogin}}
-//      ^^^ keyword.control.magic.mediawiki
-{{#speciale:userlogin}} {{#specialno:userlogin}}
-//      ^^^ keyword.control.magic.mediawiki
-//                               ^^^^^ entity.name.function.template.mediawiki
+{{#special:userlogin}}<!-- 
+  ^^^^^^^^^ keyword.control.magic -->
+{{#speciale:userlogin}} {{#specialno:userlogin}}<!-- 
+  ^^^^^^^^^^ keyword.control.magic
+                          ^^^^^^^^^^^^^^^^^^^^ entity.name.function.template -->
