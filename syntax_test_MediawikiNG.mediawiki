@@ -179,6 +179,10 @@ File:Australian blenny.jpg|''[[commons:Category:Ecsenius|Ecsenius axelrodi]]''<!
                                                                                                ^^^^^^ markup.italic
                                                                                                                      ^^ meta.tag.inline.any -->
 
+[[Image:Test image 1355.jpg|left|thumb|250px|link=Example Page]]<!--
+                                                  ^^^^^^^^^^^^ text.html meta.image.wiki keyword.control.image.formatting constant.other.wiki-link
+                                                              ^^^ -keyword.control.image.formatting -constant.other.wiki-link
+-->
 
 [[Image:test_image.png]] / [[File:test_file.pdf]]<!-- 
 ^^^^^^^^^^^^^^^^^^^^^^^^   ^^^^^^^^^^^^^^^^^^^^^^ meta.image.wiki
