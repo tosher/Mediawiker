@@ -399,6 +399,7 @@ class Chrome(object):
         """Load sqlite cookies into a cookiejar
         """
         con = sqlite3.connect(self.tmp_cookie_file)
+        con.text_factory = bytes  # get all columns as bytes
         cur = con.cursor()
 
         _query = self.SQLREQ_DOMAIN if self.domain_name else self.SQLREQ_FULL
@@ -438,8 +439,9 @@ class Chrome(object):
 
             expires = str(int(time.time()) + 3600 * 24 * 7)
 
+            # value = self._decrypt(item[5], item[6].encode('utf-8'))
             value = self._decrypt(item[5], item[6])
-            c = create_cookie(host, path, secure, expires, name, value)
+            c = create_cookie(host.decode('utf-8'), path.decode('utf-8'), secure, expires, name.decode('utf-8'), value)
             cj.set_cookie(c)
         con.close()
         return cj

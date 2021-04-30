@@ -661,3 +661,6 @@ Template example (<code>wiki_new_page.j2</code>):
 
 == Mediawikier 3.6.5 ==
 * Completions fix for multispace-titles (try 2)
+
+== Mediawikier 3.6.6 ==
+* Fix encoding on Chrome's cookies reading
