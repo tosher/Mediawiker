@@ -345,9 +345,10 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 
         self.view.set_scratch(True)
         utils.props.set_view_setting(self.view, 'is_changed', False)  # reset is_changed flag
-        utils.status_message('Page [[{}]] was successfully published to wiki "{}".'.format(
+        utils.status_message('Page [[{}]] was successfully published to wiki "{}"{}'.format(
             self.title,
-            utils.get_view_site()),
+            utils.get_view_site(),
+            ': ' + summary if summary else '.'),
             replace_patterns=['[', ']']
         )
         utils.save_mypages(self.title)
