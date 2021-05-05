@@ -54,6 +54,12 @@ def on_hover_selected(view, point):
         elif link.startswith('comment'):
             sublime.active_window().run_command("insert_snippet", {"contents": "<!-- ${0:$SELECTION} -->"})
 
+    if not utils.props.get_setting('hover_selected'):
+        return False
+
+    if not _should_hover_any(view.name()):
+        return True
+
     popup_flags = get_popup_flags(view)
     if popup_flags is None:
         return
@@ -103,6 +109,12 @@ def on_hover_internal_link(view, point):
             webbrowser.open(url)
         elif link.startswith('get_image'):
             webbrowser.open(page_name)
+
+    if not utils.props.get_setting('hover_internal_links'):
+        return False
+
+    if not _should_hover_any(view.name()):
+        return True
 
     popup_flags = get_popup_flags(view)
     if popup_flags is None:
@@ -193,6 +205,12 @@ def on_hover_template(view, point):
                 'action_params': {'title': link.replace(' ', '_')}
             })
 
+    if not utils.props.get_setting('hover_templates'):
+        return False
+
+    if not _should_hover_any(view.name()):
+        return True
+
     popup_flags = get_popup_flags(view)
     if popup_flags is None:
         return
@@ -273,6 +291,12 @@ def on_hover_table(view, point):
                     r.unfold()
                     return
 
+    if not utils.props.get_setting('hover_tables'):
+        return False
+
+    if not _should_hover_any(view.name()):
+        return True
+
     popup_flags = get_popup_flags(view)
     if popup_flags is None:
         return
@@ -321,6 +345,12 @@ def on_hover_heading(view, point):
                 if h.region.contains(point):
                     h.unfold()
                     return
+
+    if not utils.props.get_setting('hover_headings'):
+        return False
+
+    if not _should_hover_any(view.name()):
+        return True
 
     popup_flags = get_popup_flags(view)
     if popup_flags is None:
@@ -375,6 +405,12 @@ def on_hover_tag(view, point):
                     tag.unfold()
                     return
 
+    if not utils.props.get_setting('hover_comments'):
+        return False
+
+    if not _should_hover_any(view.name()):
+        return True
+
     popup_flags = get_popup_flags(view)
     if popup_flags is None:
         return
@@ -423,7 +459,7 @@ def on_hover_tag(view, point):
     return False
 
 
-def on_hover_comment(view, point):
+def on_hover_comment(view: sublime.View, point):
 
     def on_navigate(link):
         if link.startswith('fold'):
@@ -444,6 +480,12 @@ def on_hover_comment(view, point):
         text = text.replace('WARNING', html.strong('WARNING', css_class='error'))
         text = text.replace('\n', html.br())
         return text
+
+    if not utils.props.get_setting('hover_comments'):
+        return False
+
+    if not _should_hover_any(view.name()):
+        return True
 
     popup_flags = get_popup_flags(view)
     if popup_flags is None:
@@ -481,3 +523,30 @@ def on_hover_comment(view, point):
             )
             return True
     return False
+
+
+def _should_hover_any(title: str) -> bool:
+    # check this in each method so that we can reorder upstream without breaking logic
+    # if we return True from here, then return True & don't bother continuing to re-check
+
+    # because we don't know namespace of the page, duplicate some code from mw_utils method
+    page_type = 'wikitext'
+    if title.startswith('Module:') and not title.endswith('/doc'):
+        page_type = 'lua'
+    elif title.endswith('js'):
+        page_type = 'js'
+    elif title.endswith('css'):
+        page_type = 'css'
+    disallowed_syntaxes = utils.props.get_setting('hover_syntaxes_disable')
+    if page_type in disallowed_syntaxes:
+        return False
+    disallowed_namespaces = utils.props.get_setting('hover_namespaces_disable')
+    for ns in disallowed_namespaces:
+        if ns != '' and title.startswith(ns + ':'):
+            return False
+
+    # This isn't a wholly accurate check but we can't make any api query to get the actual
+    # list of namespaces on the wiki so this will have to do
+    if '' in disallowed_namespaces and ':' not in title:
+        return False
+    return True

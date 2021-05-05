@@ -190,7 +190,18 @@
     ],
     "favorites": {},
     "pagelist": {},
-    "offline_mode": false
+    "offline_mode": false,
+    "hover_comments": true,
+    "hover_selected": true,
+    "hover_internal_links": true,
+    "hover_tags": true,
+    "hover_templates": true,
+    "hover_headings": true,
+    "hover_tables": true,
+    "hover_syntaxes_disable": [],
+    // supported: "wikitext", "lua", "js", "css"
+    "hover_namespaces_disable": [],
+    // enter names of namespaces. "" for main.
 
 }
 
