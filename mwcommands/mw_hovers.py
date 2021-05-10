@@ -36,7 +36,7 @@ def get_popup_flags(view):
 
 def on_hover_selected(view, point):
 
-    def on_navigate_selected(link):
+    def on_navigate(link):
         if link == 'bold':
             sublime.active_window().run_command("insert_snippet", {"contents": "'''${0:$SELECTION}'''"})
         elif link == 'italic':
@@ -78,15 +78,18 @@ def on_hover_selected(view, point):
             ]
 
             content_html = html.build(content)
-            view.show_popup(
-                content=content_html,
-                location=point,
-                flags=popup_flags,
-                on_navigate=on_navigate_selected
-            )
-            return True
+            # view.show_popup(
+            #     content=content_html,
+            #     location=point,
+            #     flags=popup_flags,
+            #     on_navigate=on_navigate
+            # )
+            return {
+                'popup': {'content': content_html, 'location': point, 'flags': popup_flags, 'on_navigate': on_navigate},
+                'related': view.substr(r)
+            }
 
-    return False
+    return
 
 
 def on_hover_internal_link(view, point):
@@ -115,14 +118,14 @@ def on_hover_internal_link(view, point):
 
     links = p.links
 
-    for l in links:
-        if l.region.contains(point):
+    for link in links:
+        if link.region.contains(point):
 
-            if l.name:
-                page_name = l.name
-                if l.name.startswith('/'):
+            if link.name:
+                page_name = link.name
+                if link.name.startswith('/'):
                     # subpage
-                    page_name = '{}{}'.format(utils.get_title(), l.name)
+                    page_name = '{}{}'.format(utils.get_title(), link.name)
 
                 page = utils.api.get_page(page_name)
                 css_class = None if page.exists else 'redlink'
@@ -159,17 +162,27 @@ def on_hover_internal_link(view, point):
                 ]
 
                 content_html = html.build(content)
-                view.show_popup(
-                    content=content_html,
-                    location=point,
-                    max_width=img_size + 150 if img_data else 800,
-                    max_height=img_size + 150 if img_data else 600,
-                    flags=popup_flags,
-                    on_navigate=on_navigate
-                )
-                return True
+                # view.show_popup(
+                #     content=content_html,
+                #     location=point,
+                #     max_width=img_size + 150 if img_data else 800,
+                #     max_height=img_size + 150 if img_data else 600,
+                #     flags=popup_flags,
+                #     on_navigate=on_navigate
+                # )
+                return {
+                    'popup': {
+                        'content': content_html,
+                        'location': point,
+                        'flags': popup_flags,
+                        'on_navigate': on_navigate,
+                        'max_width': img_size + 150 if img_data else 800,
+                        'max_height': img_size + 150 if img_data else 600,
+                    },
+                    'related': page_name
+                }
 
-    return False
+    return
 
 
 def on_hover_template(view, point):
@@ -247,16 +260,25 @@ def on_hover_template(view, point):
                 )
             ]
             content_html = html.build(content)
+            # view.show_popup(
+            #     content=content_html,
+            #     location=point,
+            #     flags=popup_flags,
+            #     on_navigate=on_navigate,
+            #     max_width=800
+            # )
+            return {
+                'popup': {
+                    'content': content_html,
+                    'location': point,
+                    'flags': popup_flags,
+                    'on_navigate': on_navigate,
+                    'max_width': 800
+                },
+                'related': r.page_name
+            }
 
-            view.show_popup(
-                content=content_html,
-                location=point,
-                flags=popup_flags,
-                on_navigate=on_navigate,
-                max_width=800
-            )
-            return True
-    return False
+    return
 
 
 def on_hover_table(view, point):
@@ -296,16 +318,24 @@ def on_hover_table(view, point):
                 )
             ]
             content_html = html.build(content)
-
-            view.show_popup(
-                content=content_html,
-                location=point,
-                flags=popup_flags,
-                on_navigate=on_navigate,
-                max_width=800
-            )
-            return True
-    return False
+            # view.show_popup(
+            #     content=content_html,
+            #     location=point,
+            #     flags=popup_flags,
+            #     on_navigate=on_navigate,
+            #     max_width=800
+            # )
+            return {
+                'popup': {
+                    'content': content_html,
+                    'location': point,
+                    'flags': popup_flags,
+                    'on_navigate': on_navigate,
+                    'max_width': 800
+                },
+                'related': None
+            }
+    return
 
 
 def on_hover_heading(view, point):
@@ -349,15 +379,24 @@ def on_hover_heading(view, point):
                 )
             ]
             content_html = html.build(content)
+            # view.show_popup(
+            #     content=content_html,
+            #     location=point,
+            #     flags=popup_flags,
+            #     on_navigate=on_navigate,
+            #     max_width=800
+            # )
+            return {
+                'popup': {
+                    'content': content_html,
+                    'location': point,
+                    'flags': popup_flags,
+                    'on_navigate': on_navigate,
+                    'max_width': 800
+                },
+                'related': h.title
+            }
 
-            view.show_popup(
-                content=content_html,
-                location=point,
-                flags=popup_flags,
-                on_navigate=on_navigate,
-                max_width=800
-            )
-            return True
     return False
 
 
@@ -412,15 +451,22 @@ def on_hover_tag(view, point):
                 )
             ]
             content_html = html.build(content)
-
-            view.show_popup(
-                content=content_html,
-                location=point,
-                flags=popup_flags,
-                on_navigate=on_navigate
-            )
-            return True
-    return False
+            # view.show_popup(
+            #     content=content_html,
+            #     location=point,
+            #     flags=popup_flags,
+            #     on_navigate=on_navigate
+            # )
+            return {
+                'popup': {
+                    'content': content_html,
+                    'location': point,
+                    'flags': popup_flags,
+                    'on_navigate': on_navigate
+                },
+                'related': tag.title.title()
+            }
+    return
 
 
 def on_hover_comment(view, point):
@@ -470,14 +516,23 @@ def on_hover_comment(view, point):
                 )
             ]
             content_html = html.build(content)
-
-            view.show_popup(
-                content=content_html,
-                location=point,
-                flags=popup_flags,
-                on_navigate=on_navigate,
-                max_width=800,
-                max_height=600
-            )
-            return True
-    return False
+            # view.show_popup(
+            #     content=content_html,
+            #     location=point,
+            #     flags=popup_flags,
+            #     on_navigate=on_navigate,
+            #     max_width=800,
+            #     max_height=600
+            # )
+            return {
+                'popup': {
+                    'content': content_html,
+                    'location': point,
+                    'flags': popup_flags,
+                    'on_navigate': on_navigate,
+                    'max_width': 800,
+                    'max_height': 600
+                },
+                'related': r
+            }
+    return

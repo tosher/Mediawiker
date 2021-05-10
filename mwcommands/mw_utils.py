@@ -80,6 +80,10 @@ def set_syntax(page_name=None, page_namespace=None):
     sublime.active_window().active_view().set_syntax_file(props.get_setting(syntax_prop))
 
 
+def get_view_syntax(view):
+    return view.settings().get('syntax')
+
+
 def comment(text, page_name=None, page_namespace=None):
     syntax_formats = {
         'syntax_lua': '-- {}',

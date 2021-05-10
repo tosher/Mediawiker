@@ -40,20 +40,24 @@ class MediawikerEvents(sublime_plugin.EventListener):
     def on_activated(self, view):
         current_syntax = utils.props.get_view_setting(view, 'syntax', plugin=False)
 
-        # TODO: move method to check mediawiker view to mwutils
-        if (current_syntax is not None and
-                current_syntax.startswith(utils.p.from_package('Mediawiki')) and
-                current_syntax.endswith(('.tmLanguage', '.sublime-syntax'))):
+        if not current_syntax:
+            return
 
-            # Mediawiki mode
-            utils.props.set_view_setting(view, 'is_here', True)
+        if not current_syntax.startswith(utils.p.from_package('Mediawiki')):
+            return
 
-            if not view.file_name():
-                utils.props.set_view_setting(view, 'wiki_instead_editor', utils.props.get_setting('wiki_instead_editor'))
-            else:
-                utils.props.set_view_setting(view, 'wiki_instead_editor', False)
+        if not current_syntax.endswith(('.tmLanguage', '.sublime-syntax')):
+            return
 
-            utils.props.set_view_setting(view, 'site', utils.get_view_site())
+        # Mediawiki mode
+        utils.props.set_view_setting(view, 'is_here', True)
+
+        if not view.file_name():
+            utils.props.set_view_setting(view, 'wiki_instead_editor', utils.props.get_setting('wiki_instead_editor'))
+        else:
+            utils.props.set_view_setting(view, 'wiki_instead_editor', False)
+
+        utils.props.set_view_setting(view, 'site', utils.get_view_site())
 
     def on_activated_async(self, view):
         ''' unsupported on ST2, gutters too - skipping.. '''
@@ -83,32 +87,62 @@ class MediawikerEvents(sublime_plugin.EventListener):
             utils.props.set_view_setting(view, 'wiki_instead_editor', False)
 
     def on_hover(self, view, point, hover_zone):
-        # not fires in ST2
+        if not utils.props.get_view_setting(view, 'is_here'):
+            return
 
-        if utils.props.get_view_setting(view, 'is_here') and hover_zone == sublime.HOVER_TEXT:
+        if hover_zone != sublime.HOVER_TEXT:
+            return
 
-            if hovers.on_hover_comment(view, point):
+        if utils.get_view_syntax(view) != utils.props.get_setting('syntax'):
+            return
+
+        hover_comment = hovers.on_hover_comment(view, point)
+
+        if hover_comment:
+            view.show_popup(**hover_comment)
+            return
+
+        hover_selected = hovers.on_hover_selected(view, point)
+        hover_internal_link = hovers.on_hover_internal_link(view, point)
+        hover_template = hovers.on_hover_template(view, point)
+
+        if hover_selected:
+            selected_text = hover_selected.get('related')
+
+            if hover_internal_link and selected_text == hover_internal_link.get('related'):
+                # crossing with internal link and full link text selected
+                pass
+            elif hover_template and hover_template.get('related').endswith(selected_text):
+                # crossing with template link and full template name selected
+                pass
+            else:
+                view.show_popup(**hover_selected['popup'])
                 return
 
-            if hovers.on_hover_selected(view, point):
-                return
+        if hover_internal_link:
+            view.show_popup(**hover_internal_link['popup'])
+            return
 
-            if hovers.on_hover_internal_link(view, point):
-                return
+        hover_tag = hovers.on_hover_tag(view, point)
+        if hover_tag:
+            view.show_popup(**hover_tag['popup'])
+            return
 
-            if hovers.on_hover_tag(view, point):
-                return
+        if hover_template:
+            view.show_popup(**hover_template['popup'])
+            return
 
-            if hovers.on_hover_template(view, point):
-                return
+        hover_heading = hovers.on_hover_heading(view, point)
+        if hover_heading:
+            view.show_popup(**hover_heading['popup'])
+            return
 
-            if hovers.on_hover_heading(view, point):
-                return
+        hover_table = hovers.on_hover_table(view, point)
+        if hovers.on_hover_table(view, point):
+            view.show_popup(**hover_table['popup'])
+            return
 
-            if hovers.on_hover_table(view, point):
-                return
-
-            # TODO: external links..?
+        # TODO: external links..?
 
     def on_query_completions(self, view, prefix, locations):
         if not utils.props.get_view_setting(view, 'is_here'):

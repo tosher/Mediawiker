@@ -664,3 +664,7 @@ Template example (<code>wiki_new_page.j2</code>):
 
 == Mediawikier 3.6.6 ==
 * Fix encoding on Chrome's cookies reading
+
+== Mediawikier 3.6.7 ==
+* Popups are turned off on non-mediawiki syntax pages
+* Popup priority for link popup instead of selected when selected text is equal to link page name
