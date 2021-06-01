@@ -348,10 +348,10 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
 
         title = self.title
         view_site = utils.get_view_site()
-        msg = 'Page [[{}]] was successfully published to wiki "{}".'.format(title, view_site)
+        msg = 'Page [[{}]] was successfully published to wiki "{}"'.format(title, view_site)
         if summary:
-            msg = 'Page [[{}]] was successfully published to wiki "{}": {}'.format(title, view_site, summary)
-        utils.status_message(msg, replace_patterns=['[', ']'])
+            msg = '{}: "{}"'.format(msg, summary)
+        utils.status_message('{}.'.format(msg), replace_patterns=['[', ']'])
         utils.save_mypages(self.title)
         self.erase_summary_buffer()
 
