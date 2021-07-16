@@ -668,3 +668,6 @@ Template example (<code>wiki_new_page.j2</code>):
 == Mediawikier 3.6.7 ==
 * Popups are turned off on non-mediawiki syntax pages
 * Popup priority for link popup instead of selected when selected text is equal to link page name
+
+== Mediawikier 3.6.8 ==
+* Possibility to connect to wiki site with authorization types "login", "oauth" if Crypto library doesn't available (module browser_cookie3 not works): #173 (ST4, Macos, M1)

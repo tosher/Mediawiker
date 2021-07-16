@@ -5,7 +5,7 @@ import sys
 import os
 import re
 import urllib
-import traceback
+# import traceback
 from collections import OrderedDict
 
 import sublime
@@ -24,7 +24,13 @@ from . import mw_properties as p
 from . import mw_parser as par
 from html.parser import HTMLParser
 from ..lib import mwclient
-from ..lib import browser_cookie3
+
+COOKIE_MODULE_AVAILABLE = False
+try:
+    from ..lib import browser_cookie3
+    COOKIE_MODULE_AVAILABLE = True
+except ImportError:
+    pass
 
 conman = None
 api = None
@@ -498,7 +504,7 @@ class PreAPI(object):
         return self.get_page('Talk:{}'.format(title))
 
     def get_page_extlinks(self, page):
-        return [l for l in page.extlinks()]
+        return [link for link in page.extlinks()]
 
     def get_page_langlinks(self, page):
         return page.langlinks()
@@ -758,39 +764,59 @@ class MediawikerConnectionManager(object):
     def get_connect(self, name=None, force=False):
         ''' setup new connection (call connect()) or returns exists '''
 
+        def _get_new_connection():
+            try:
+
+                connection = self.connect(name=name)
+                self.debug_flush()
+                return connection
+
+            except Exception as e:
+                self.debug_msgs.append('Connection exception: {}'.format(e))
+
+            self.debug_flush()
+
         if props.get_setting('offline_mode'):
-            return None
+            return
 
         self.debug_msgs.append('Get connection from connection manager.')
-        try:
-            site = self.get_site(name)
+        # try:
+        site = self.get_site(name)
 
-            cj = self.get_cookies(name=name) if site['authorization_type'] == self.AUTH_TYPE_COOKIES else None
+        cj = None
+        cookies_changed = False
+        if site['authorization_type'] == self.AUTH_TYPE_COOKIES:
 
-            if site['authorization_type'] == self.AUTH_TYPE_COOKIES and not self.is_eq_cookies(site['cookies'], cj):
+            if not COOKIE_MODULE_AVAILABLE:
+                status_message('Python cookies module is not available, please use "login" or "oauth" authorization type')
+                return
+
+            cj = self.get_cookies(name=name)
+
+            if not self.is_eq_cookies(site['cookies'], cj):
                 self.debug_msgs.append('New cookies: {}'.format(cj))
                 site['cookies'] = cj
-            elif not force and (site['authorization_type'] != self.AUTH_TYPE_LOGIN or not site['username'] or site['password']):
-                connection = site.get('connection', None)
+                cookies_changed = True
 
-                if connection:
-                    self.debug_msgs.append('Cached connection: True')
-                    self.debug_flush()
-                    return connection
+        if cookies_changed:
+            return _get_new_connection()
 
-        except Exception as e:
-            formatted_lines = traceback.format_exc().splitlines()
-            for line in formatted_lines:
-                error_message(line)
+        if force:
+            return _get_new_connection()
 
-        try:
-            connection = self.connect(name=name)
-        except Exception as e:
-            self.debug_msgs.append('Connection exception: {}'.format(e))
+        if site['authorization_type'] == self.AUTH_TYPE_LOGIN and site['username'] and not site['password']:
+            return _get_new_connection()
 
-        self.debug_flush()
+        # try to get cached connection
 
-        return connection
+        connection = site.get('connection', None)
+
+        if connection:
+            self.debug_msgs.append('Cached connection: True')
+            self.debug_flush()
+            return connection
+
+        return _get_new_connection()
 
     def connect(self, name=None):
         ''' new connection '''
