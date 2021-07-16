@@ -41,9 +41,15 @@ elif platform.system() == 'Darwin':
 elif platform.system() == 'Linux':
     sys.path.insert(0, os.path.normpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'Crypto.lin.x64')))
 
-from Crypto.Cipher import AES
-from Crypto.Protocol.KDF import PBKDF2
-# import lz4.block
+# NOTE: Used for Chrome class only
+CRYPTO_AVAILABLE = False
+try:
+    from Crypto.Cipher import AES
+    from Crypto.Protocol.KDF import PBKDF2
+    # import lz4.block
+    CRYPTO_AVAILABLE = True
+except Exception:
+    pass
 
 
 class TLDLazy(object):
@@ -659,6 +665,11 @@ def chrome(cookie_file=None, domain_name=""):
     """Returns a cookiejar of the cookies used by Chrome. Optionally pass in a
     domain name to only load cookies from the specified domain
     """
+
+    if not CRYPTO_AVAILABLE:
+        print('Unable to process Chrome cookies, Crypto library not available')
+        return
+
     return Chrome(cookie_file, domain_name).load()
 
 

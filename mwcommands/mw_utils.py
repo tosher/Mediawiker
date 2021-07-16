@@ -25,12 +25,7 @@ from . import mw_parser as par
 from html.parser import HTMLParser
 from ..lib import mwclient
 
-COOKIE_MODULE_AVAILABLE = False
-try:
-    from ..lib import browser_cookie3
-    COOKIE_MODULE_AVAILABLE = True
-except ImportError:
-    pass
+from ..lib import browser_cookie3
 
 conman = None
 api = None
@@ -786,10 +781,6 @@ class MediawikerConnectionManager(object):
         cj = None
         cookies_changed = False
         if site['authorization_type'] == self.AUTH_TYPE_COOKIES:
-
-            if not COOKIE_MODULE_AVAILABLE:
-                status_message('Python cookies module is not available, please use "login" or "oauth" authorization type')
-                return
 
             cj = self.get_cookies(name=name)
 
