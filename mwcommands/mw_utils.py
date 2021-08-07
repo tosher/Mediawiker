@@ -836,6 +836,7 @@ class MediawikerConnectionManager(object):
                 # additional http auth (basic, digest)
                 if e.response.status_code == 401 and site['use_http_auth']:
                     http_auth_header = e.response.headers.get('www-authenticate', '')
+                    self.debug_msgs.append('www-authenticate header: {}'.format(http_auth_header))
                     connection = self._http_auth(http_auth_header=http_auth_header, name=name)
                 else:
                     # sublime.message_dialog('HTTP connection failed: {}'.format(e[1]))
@@ -962,6 +963,10 @@ class MediawikerConnectionManager(object):
         DIGEST_REALM = 'Digest realm'
         BASIC_REALM = 'Basic realm'
 
+        if not http_auth_header:
+            error_message('Unable to get authorization type: header is empty')
+            return
+
         site = self.get_site(name)
 
         http_auth_login = site['http_auth_login']
@@ -970,30 +975,36 @@ class MediawikerConnectionManager(object):
         if not http_auth_login or not http_auth_password:
             return None
 
-        httpauth = None
+        header_tokens = [v.strip() for v in http_auth_header.split(',')]
+
         realm = None
-        if http_auth_header.startswith(BASIC_REALM):
-            realm = BASIC_REALM
-        elif http_auth_header.startswith(DIGEST_REALM):
-            realm = DIGEST_REALM
 
-        if realm is not None:
-            if realm == BASIC_REALM:
-                httpauth = requests.auth.HTTPBasicAuth(http_auth_login, http_auth_password)
-            elif realm == DIGEST_REALM:
-                httpauth = requests.auth.HTTPDigestAuth(http_auth_login, http_auth_password)
+        for token in header_tokens:
+            if token.startswith(DIGEST_REALM):
+                # digest in higher priority
+                realm = DIGEST_REALM
+                break
+            elif token.startswith(BASIC_REALM):
+                realm = BASIC_REALM
 
-            if httpauth:
-                connection = mwclient.Site(
-                    host=site['hosturl'],
-                    path=site['path'],
-                    httpauth=httpauth,
-                    requests=self.get_requests_config(name))
-                return connection
-        else:
-            error_message('HTTP connection failed: Unknown realm.')
+        if not realm:
+            error_message('Unable to find supported realm for http authorization, header: {}'.format(http_auth_header))
+            return
 
-        return None
+        httpauth = None
+
+        if realm == BASIC_REALM:
+            httpauth = requests.auth.HTTPBasicAuth(http_auth_login, http_auth_password)
+        elif realm == DIGEST_REALM:
+            httpauth = requests.auth.HTTPDigestAuth(http_auth_login, http_auth_password)
+
+        if httpauth:
+            connection = mwclient.Site(
+                host=site['hosturl'],
+                path=site['path'],
+                httpauth=httpauth,
+                requests=self.get_requests_config(name))
+            return connection
 
     def _oauth(self, name=None):
 

@@ -674,3 +674,6 @@ Template example (<code>wiki_new_page.j2</code>):
 
 == Mediawikier 3.6.9 ==
 * Possibility to connect to wiki site with authorization type "cookie" and cookies_browser "firefox" if Crypto library doesn't available (module browser_cookie3 not works): #173 (ST4, Macos, M1)
+
+== Mediawikier 3.6.10 ==
+* Multiple realms support for HTTP Authorization
