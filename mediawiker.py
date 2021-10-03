@@ -205,14 +205,18 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
                 inherit_suffix=inherit_suffix
             )
 
-        view.run_command(utils.cmd('insert_text'), {'position': 0, 'text': text, 'with_erase': True})
+        with utils.p.settings_hack('translate_tabs_to_spaces', False, disabled=not utils.props.get_setting('not_translate_tabs_on_page_open')):
+            view.run_command(utils.cmd('insert_text'), {'position': 0, 'text': text, 'with_erase': True})
 
         if utils.props.get_site_setting(self.site_active, 'show_red_links'):
             utils.show_red_links(view, page)
-        utils.status_message('Page [[{}]] was opened successfully from "{}".'.format(
-            self.title,
-            utils.get_view_site()
-        ), replace_patterns=['[', ']']
+
+        utils.status_message(
+            'Page [[{}]] was opened successfully from "{}".'.format(
+                self.title,
+                utils.get_view_site()
+            ),
+            replace_patterns=['[', ']']
         )
         utils.set_syntax(self.title, page_namespace)
         utils.props.set_view_setting(view, 'is_here', True)

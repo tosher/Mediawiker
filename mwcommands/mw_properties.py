@@ -4,6 +4,7 @@
 import os
 import sublime
 
+
 PM = 'Mediawiker'
 PML = 'mediawiker'
 PROJECT_SETTINGS_PREFIX = 'mediawiker'
@@ -19,6 +20,37 @@ def from_package(*path, **kwargs):
     is_abs = kwargs.get('is_abs', False)
     root = sublime.packages_path() if is_abs else 'Packages'
     return posixer(os.path.join(root, name, *path))
+
+
+class settings_hack:
+    '''
+    Lazy Context: Temporay change some option in user settings
+    disabled: flag to disable modification
+
+    with settings_hack('translate_tabs_to_spaces', False):
+        something_do()
+    '''
+
+    def __init__(self, prop, val, disabled=False):
+        self.property = prop
+        self.value = val
+        self.disabled = disabled
+        self.sets = sublime.load_settings('Preferences.sublime-settings')
+        self.cur_value = self.sets.get(self.property)
+
+    def __enter__(self):
+        if self.disabled:
+            return
+
+        self.sets.set(self.property, self.value)
+        sublime.save_settings('Preferences.sublime-settings')
+
+    def __exit__(self, type, value, traceback):
+        if self.disabled:
+            return
+
+        self.sets.set(self.property, self.cur_value)
+        sublime.save_settings('Preferences.sublime-settings')
 
 
 class MediawikerProperties(object):
@@ -83,7 +115,8 @@ class MediawikerProperties(object):
         'show_favorites_and_history_by_site_host': {'text': 'Show history and favorites pages by host'},
         'offline_mode': {'text': 'Offline mode'},
         'summary_save_on_fail': {'text': 'Save summary on failed post for next try'},
-        'new_page_template_path': {'text': 'Path to Jinja2 template for predefined text for new pages'}
+        'new_page_template_path': {'text': 'Path to Jinja2 template for predefined text for new pages'},
+        'not_translate_tabs_on_page_open': {'text': 'Prevent tabs translating on page open'}
     }
 
     props_dependencies = {

@@ -123,6 +123,7 @@
     "css_html": {},
     "show_gutters": true,
     "show_favorites_and_history_by_site_host": true,
+    "not_translate_tabs_on_page_open": false,
     // New page template
     // Jinja2 template file name in ST's User folder, or absolute path to template
     // Possible template vars:
