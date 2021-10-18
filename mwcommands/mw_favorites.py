@@ -22,4 +22,4 @@ class MediawikerFavoritesOpenCommand(sublime_plugin.WindowCommand):
         self.window.run_command(utils.cmd('page_list'), {'storage_name': 'favorites'})
 
     def is_visible(self, *args):
-        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
+        return True

@@ -12,7 +12,7 @@ class MediawikerPageCopyCommand(sublime_plugin.TextCommand):
             return
 
         panel = utils.InputPanelPageTitle(callback=self.get_src_site)
-        panel.get_title('Bruce Lee')
+        panel.get_title()
 
     def get_src_site(self, title):
         if not title:

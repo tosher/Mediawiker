@@ -36,7 +36,7 @@ class MediawikerOpenPageCommand(sublime_plugin.WindowCommand):
     def is_visible(self, *args):
         if utils.props.get_setting('offline_mode'):
             return False
-        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
+        return True
 
 
 class MediawikerOpenPageSectionCommand(sublime_plugin.WindowCommand):
@@ -51,7 +51,7 @@ class MediawikerOpenPageSectionCommand(sublime_plugin.WindowCommand):
     def is_visible(self, *args):
         if utils.props.get_setting('offline_mode'):
             return False
-        return utils.props.get_view_setting(self.window.active_view(), 'is_here')
+        return True
 
 
 class MediawikerReopenPageCommand(sublime_plugin.WindowCommand):

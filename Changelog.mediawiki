@@ -680,3 +680,6 @@ Template example (<code>wiki_new_page.j2</code>):
 
 == Mediawikier 3.6.11 ==
 * New option {{Property|not_translate_tabs_on_page_open}} to prevent tabs translation when opening the page (default: <code>False</code>).
+
+== Mediawikier 3.6.12 ==
+* Command palette - plugin's commands visibility fixes
