@@ -6,8 +6,8 @@ file_extensions: [mediawiki, wikipedia, wiki]
 scope: text.html.mediawiki
 
 variables:
-  src_tag_before_lang: '((<)(source|syntaxhighlight)[ \t]+(lang)(=)("))'
-  src_tag_after_lang: '((")((\s+[^\"]+(="[^\"]+")?)*)(>))'
+  src_tag_before_lang: '((<)(source|syntaxhighlight)[ \t]+(lang)(=)(\"))'
+  src_tag_after_lang: '((\")((\s+[^\"]+(=\"[^\"]+\")?)*)(>))'
 
 contexts:
   main:
@@ -665,6 +665,8 @@ contexts:
             - match: (?=\n)  # item definition stops at the end of line
               pop: true
             - include: comments
+        - match: ^\s*[^:]  # item definition stops at the end of line
+          pop: true
 
   block_html:
     # comment: "The available block HTML tags supported are:
@@ -900,9 +902,9 @@ contexts:
              |(right|left|center|none)
              |(baseline|sub|super|top|text-top|middle|bottom|text-bottom)
              |([0-9]+)?(x?)([0-9]+)?(px)
-             |(link=)([^|]+)?
-             |(alt=)([^|]+)?
-             |(class=)([^|]+)?
+             |(link=)([^|\n]+)?(?=\]\])
+             |(alt=)([^|\n]+)?(?=\]\])
+             |(class=)([^|\n]+)?(?=\]\])
             )[ ]*
           captures:
             1: punctuation.definition.tag.pipe.mediawiki
