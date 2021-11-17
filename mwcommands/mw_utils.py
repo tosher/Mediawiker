@@ -517,7 +517,21 @@ class PreAPI(object):
             page.save(text, summary=summary.strip(), minor=mark_as_minor, section=section)
             return True
         except Exception as e:
-            error_message('{} exception: {}'.format(type(e).__name__, e))
+            try:
+                status_message("Login failed, reattempting connection once...")
+                new_site = self.get_connect(True)
+
+                # Specifying host as a tuple is deprecated as of mwclient 0.10.1 and this should be
+                # updated to use the new scheme argument instead
+                # https://github.com/mwclient/mwclient/blob/99a1af21e150ab7441d1d07c86db228998ca6ffa/mwclient/client.py#L372
+                site_url = '{}://{}'.format(new_site.host[0], new_site.host[1])
+                status_message("New connection established to {}".format(site_url))
+
+                new_page = new_site.pages[page.name]
+                new_page.save(text, summary=summary.strip(), minor=mark_as_minor, section=section)
+                return True
+            except Exception as e:
+                error_message('{} exception: {}'.format(type(e).__name__, e))
         return False
 
     def page_attr(self, page, attr_name):
