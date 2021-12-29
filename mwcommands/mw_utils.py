@@ -414,7 +414,10 @@ class PreAPI(object):
                     break
 
     def get_page(self, title):
-        return self.get_connect().Pages.get(title, None)
+        try:
+            return self.get_connect().Pages.get(title, None)
+        except Exception as e:
+            error_message('Unable to get page "{}", {} exception raised: {}'.format(title, type(e).__name__, e))
 
     def page_move(self, page, new_title, reason='', no_redirect=False):
         result = page.move(new_title=new_title, reason=reason, move_talk=True, no_redirect=no_redirect)
@@ -516,6 +519,12 @@ class PreAPI(object):
         try:
             page.save(text, summary=summary.strip(), minor=mark_as_minor, section=section)
             return True
+        except mwclient.errors.MaximumRetriesExceeded:
+            error_message('MaximumRetriesExceeded..')
+            # force reconnecting
+            self.get_connect(force=True)
+            page = self.get_page(page.name)
+            self.save_page(page, text, summary, mark_as_minor, section)
         except Exception as e:
             error_message('{} exception: {}'.format(type(e).__name__, e))
         return False
@@ -825,8 +834,10 @@ class MediawikerConnectionManager(object):
                 connection = mwclient.Site(
                     host=site['hosturl'],
                     path=site['path'],
-                    retry_timeout=None,
-                    max_retries=None,
+                    # retry_timeout=None,
+                    # max_retries=None,
+                    retry_timeout=10,
+                    max_retries=3,
                     requests=self.get_requests_config(name)
                 )
             except requests.exceptions.HTTPError as e:
@@ -1002,6 +1013,8 @@ class MediawikerConnectionManager(object):
             connection = mwclient.Site(
                 host=site['hosturl'],
                 path=site['path'],
+                retry_timeout=10,
+                max_retries=3,
                 httpauth=httpauth,
                 requests=self.get_requests_config(name))
             return connection
@@ -1023,8 +1036,10 @@ class MediawikerConnectionManager(object):
                 connection = mwclient.Site(
                     host=site['hosturl'],
                     path=site['path'],
-                    retry_timeout=None,
-                    max_retries=None,
+                    # retry_timeout=None,
+                    # max_retries=None,
+                    retry_timeout=10,
+                    max_retries=3,
                     consumer_token=site['oauth_consumer_token'],
                     consumer_secret=site['oauth_consumer_secret'],
                     access_token=site['oauth_access_token'],
