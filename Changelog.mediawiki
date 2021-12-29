@@ -683,3 +683,6 @@ Template example (<code>wiki_new_page.j2</code>):
 
 == Mediawikier 3.6.12 ==
 * Command palette - plugin's commands visibility fixes
+
+== Mediawikier 3.6.13 ==
+* Tag <code>math</code> attributes support

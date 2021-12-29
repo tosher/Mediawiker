@@ -258,3 +258,17 @@ from __future__ import with_statement
 {{#speciale:userlogin}} {{#specialno:userlogin}}
 //      ^^^ keyword.control.magic.mediawiki
 //                               ^^^^^ entity.name.function.template.mediawiki
+
+<math>
+ // <- entity.name.tag.math.tex.mediawiki
+</math>
+
+<math display="inline" name="test">
+ // <- entity.name.tag.math.tex.mediawiki
+//    ^ entity.other.attributes.validhtml.mediawiki
+//            ^^ entity.other.attributes.validhtml.mediawiki
+//                              ^^ entity.other.attributes.validhtml.mediawiki
+//                                ^ meta.tag.validhtml.math.tex.mediawiki
+</math>
+//^^^^ entity.name.tag.math.tex.mediawiki
+

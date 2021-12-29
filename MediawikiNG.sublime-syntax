@@ -675,12 +675,13 @@ contexts:
     #           * headers: h1, h2, h3, h4, h5, h6
     #           * br"
 
-    - match: "((<)(math)(>))"
+    - match: '(?i:((<)(math)(\b[^>]*)(>)))'
       captures:
-        1: meta.tag.validhtml.math.tex.mediawiki
+        # 1: meta.tag.validhtml.math.tex.mediawiki
         2: meta.tag.validhtml.math.tex.mediawiki
         3: entity.name.tag.math.tex.mediawiki
-        4: meta.tag.validhtml.math.tex.mediawiki
+        4: entity.other.attributes.validhtml.mediawiki
+        5: meta.tag.validhtml.math.tex.mediawiki
       push:
         - meta_include_prototype: false
         - meta_content_scope: meta.environment.embedded.tex.mediawiki source.tex.embedded
