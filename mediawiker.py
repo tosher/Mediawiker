@@ -207,6 +207,7 @@ class MediawikerShowPageCommand(sublime_plugin.TextCommand):
 
         with utils.p.settings_hack('translate_tabs_to_spaces', False, disabled=not utils.props.get_setting('not_translate_tabs_on_page_open')):
             view.run_command(utils.cmd('insert_text'), {'position': 0, 'text': text, 'with_erase': True})
+            view.run_command('detect_indentation')
 
         if utils.props.get_site_setting(self.site_active, 'show_red_links'):
             utils.show_red_links(view, page)
