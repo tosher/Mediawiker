@@ -387,7 +387,7 @@ class HeaderOne(Element):
         self.title = self.get_title()
 
     def fold(self):
-        point_fold_b = self.region_text.b - len(self.open_tag) - 1 if self.region_text.b < self.view.size() else self.region_text.b
+        point_fold_b = self.region_text.b if self.region_text.b < self.view.size() else self.region_text.b
         self.view.fold(sublime.Region(self.region.b, point_fold_b))
 
     def unfold(self):
@@ -402,10 +402,11 @@ class HeaderOne(Element):
 
     def get_next(self):
         v = self.view
-        next_h_region = v.find(r'%s[^\%s]' % (self.open_tag, self.RESERVED_CHAR), self.region.b + 1)
+        find_regex = r'^{head_char}{{1,{head_char_cnt}}}[^\{head_char}]'.format(head_char=self.RESERVED_CHAR, head_char_cnt=self.level)
+        next_h_region = v.find(find_regex, self.region.b + 1)
         # ST2 compat
         if next_h_region:
-            next_h = next_h_region.b
+            next_h = next_h_region.a
         else:
             next_h = v.size()
         return next_h if next_h > 0 else v.size()
