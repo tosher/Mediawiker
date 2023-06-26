@@ -21,7 +21,7 @@ class MediawikerShowInternalLinksCommand(sublime_plugin.TextCommand):
         self.item = None
 
         red_link_icon = utils.props.get_setting('red_link_icon')
-        page = utils.api.get_page(utils.get_title())
+        page = utils.api.call('get_page', title=utils.get_title())
         linksgen = utils.api.get_page_links(page, generator=True)
 
         self.p = par.Parser(self.view)

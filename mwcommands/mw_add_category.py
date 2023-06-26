@@ -72,7 +72,7 @@ class MediawikerAddCategoryCommand(sublime_plugin.TextCommand):
         sublime.active_window().show_input_panel('Category:', self.category_title_default, self.category_menu_show, None, None)
 
     def update_categories(self, category_title):
-        category = utils.api.get_page('{}:{}'.format('Category', category_title))
+        category = utils.api.call('get_page', title='{}:{}'.format('Category', category_title))
         self.cats = SCategories(root=category)
         subcategories = utils.api.call('get_subcategories', category_root=category_title)
         for category in subcategories:

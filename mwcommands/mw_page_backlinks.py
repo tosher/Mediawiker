@@ -35,7 +35,7 @@ class MediawikerPageBacklinksCommand(sublime_plugin.TextCommand):
     def mw_get_page_backlinks(self, title):
         self.links = []
         links_limit = utils.props.get_setting('linkstopage_limit')
-        page = utils.api.get_page(title)
+        page = utils.api.call('get_page', title=title)
 
         # backlinks to page
         linksgen = utils.api.get_page_backlinks(page, links_limit)

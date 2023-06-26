@@ -40,7 +40,7 @@ class MediawikerPageLanglinksCommand(sublime_plugin.TextCommand):
 
     def mw_get_page_langlinks(self, title):
         self.links = {}
-        page = utils.api.get_page(title)
+        page = utils.api.call('get_page', title=title)
 
         linksgen = utils.api.get_page_langlinks(page)
         if linksgen:

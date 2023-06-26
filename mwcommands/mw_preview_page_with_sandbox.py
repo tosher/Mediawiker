@@ -40,7 +40,7 @@ class MediawikerPreviewPageSandboxCommand(sublime_plugin.TextCommand):
             return
 
         page_sandbox_url = utils.get_page_url(page_sandbox_name)
-        page_sandbox = utils.api.get_page(page_sandbox_name)
+        page_sandbox = utils.api.call('get_page', title=page_sandbox_name)
 
         is_success = utils.api.save_page(
             page=page_sandbox,

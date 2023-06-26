@@ -127,7 +127,7 @@ def on_hover_internal_link(view, point):
                     # subpage
                     page_name = '{}{}'.format(utils.get_title(), link.name)
 
-                page = utils.api.get_page(page_name)
+                page = utils.api.call('get_page', title=page_name)
                 css_class = None if page.exists else 'redlink'
                 page_talk = utils.api.get_page_talk_page(page)
                 css_class_talk = None if page_talk.exists else 'redlink'
@@ -245,7 +245,7 @@ def on_hover_template(view, point):
                     help_link = ''
 
             if r.page_name:
-                page = utils.api.get_page(r.page_name)
+                page = utils.api.call('get_page', title=r.page_name)
                 css_class = None if page.exists else 'redlink'
                 page_exists = page.exists
 

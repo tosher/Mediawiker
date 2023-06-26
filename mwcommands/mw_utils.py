@@ -433,7 +433,7 @@ class PreAPI(object):
         url: return image url or base64 data ("http:" is not works: https://github.com/SublimeTextIssues/Core/issues/1378)
         '''
 
-        page = self.get_page(title)  # use image?
+        page = self.call('get_page', title=title)  # use image?
         if self.page_attr(page, 'namespace') == self.IMAGE_NAMESPACE:
             # Link like [[File:Filename]] has not imageinfo, only [[Image:Imagename]]
             if not hasattr(page, 'imageinfo'):

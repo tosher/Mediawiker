@@ -9,7 +9,7 @@ from . import mw_utils as utils
 class MediawikerShowRedLinksCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        page = utils.api.get_page(utils.get_title())
+        page = utils.api.call('get_page', title=utils.get_title())
         utils.process_red_links(self.view, page)
 
     def is_visible(self, *args):

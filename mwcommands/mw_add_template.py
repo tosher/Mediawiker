@@ -68,7 +68,7 @@ class MediawikerAddTemplateCommand(sublime_plugin.TextCommand):
 
     def on_done(self, idx):
         if idx >= 0:
-            template = utils.api.get_page('Template:{}'.format(self.templates_names[idx]))
+            template = utils.api.call('get_page', title='Template:{}'.format(self.templates_names[idx]))
             if utils.api.page_can_read(template):
                 text = utils.api.page_get_text(page=template)
                 params_text = self.get_template_params(text)

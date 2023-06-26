@@ -18,7 +18,7 @@ class MediawikerShowExternalLinksCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         self.item = None
-        page = utils.api.get_page(utils.get_title())
+        page = utils.api.call('get_page', title=utils.get_title())
         linksgen = utils.api.get_page_extlinks(page)
 
         self.p = par.Parser(self.view)

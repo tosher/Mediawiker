@@ -273,7 +273,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
         is_skip_summary = utils.props.get_setting('skip_summary', False)
         self.title = utils.get_title()
         if self.title:
-            self.page = utils.api.get_page(self.title)
+            self.page = utils.api.call('get_page', title=self.title)
 
             if utils.api.page_can_edit(self.page):
 
@@ -342,7 +342,7 @@ class MediawikerPublishPageCommand(sublime_plugin.TextCommand):
             return
 
         # update revision for page in view
-        self.page = utils.api.get_page(self.title)
+        self.page = utils.api.call('get_page', title=self.title)
         utils.props.set_view_setting(self.view, 'page_revision', utils.api.page_attr(self.page, 'revision'))
 
         if utils.props.get_site_setting(utils.get_view_site(), 'show_red_links'):
@@ -395,7 +395,7 @@ class MediawikerMovePageCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         self.title = utils.get_title()
         if self.title:
-            self.page = utils.api.get_page(self.title)
+            self.page = utils.api.call('get_page', title=self.title)
             if utils.api.page_can_edit(self.page):
                 utils.set_timeout_async(self.view.window().show_input_panel('New title', '', self.on_done_name, None, None), 0)
             else:
@@ -447,7 +447,7 @@ class MediawikerOpenTalkPageCommand(sublime_plugin.WindowCommand):
         return utils.props.get_view_setting(self.window.active_view(), 'is_here')
 
     def run(self):
-        page = utils.api.get_page(utils.get_title())
+        page = utils.api.call('get_page', title=utils.get_title())
         page_talk = utils.api.get_page_talk_page(page)
 
         if utils.api.page_attr(page, 'name') == utils.api.page_attr(page_talk, 'name'):
