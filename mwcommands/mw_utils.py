@@ -722,6 +722,11 @@ class MediawikerConnectionManager(object):
             site['oauth_access_secret'] = site_config.get('oauth_access_secret', None)
             site['preview_custom_head'] = site_config.get('preview_custom_head', None)
 
+            if site['https'] and not site['is_ssl_cert_verify']:
+                from requests.packages.urllib3.exceptions import InsecureRequestWarning
+                import warnings
+                warnings.simplefilter("ignore", InsecureRequestWarning)
+
             self.sites[name] = site
 
     def get_site(self, name=None):

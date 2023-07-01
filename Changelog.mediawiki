@@ -689,3 +689,9 @@ Template example (<code>wiki_new_page.j2</code>):
 
 == Mediawikier 3.6.14 ==
 * Headings folding fix
+
+== Mediawikier 3.6.15 ==
+* Reconnection fixes
+
+== Mediawikier 3.6.16 ==
+* Insecure connection warning suppress
