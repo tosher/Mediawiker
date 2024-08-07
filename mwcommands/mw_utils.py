@@ -415,7 +415,7 @@ class PreAPI(object):
 
     def get_page(self, title):
         try:
-            return self.get_connect().Pages.get(title, None)
+            return self.get_connect(force=True).Pages.get(title, None)
         except Exception as e:
             error_message('Unable to get page "{}", {} exception raised: {}'.format(title, type(e).__name__, e))
 
